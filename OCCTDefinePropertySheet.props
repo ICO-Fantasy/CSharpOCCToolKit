@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <OCC_IncludePath>D:\OCC\opencascade-7.7.0-build-vs2022\inc</OCC_IncludePath>
+    <OCC_IncludeTKRelease>D:\OCC\opencascade-7.7.0-build-vs2022\win64\vc14\bin</OCC_IncludeTKRelease>
+    <OCC_LibTKRelease>D:\OCC\opencascade-7.7.0-build-vs2022\win64\vc14\lib</OCC_LibTKRelease>
+    <OCC_IncludeTKDebug>D:\OCC\opencascade-7.7.0-build-vs2022\win64\vc14\bind</OCC_IncludeTKDebug>
+    <OCC_LibTKDebug>D:\OCC\opencascade-7.7.0-build-vs2022\win64\vc14\libd</OCC_LibTKDebug>
+    <OCC_LibTKReleaseWithDebugInfo>D:\OCC\opencascade-7.7.0-build-vs2022\win64\vc14\bini</OCC_LibTKReleaseWithDebugInfo>
+    <OCC_IncludeTKReleaseWithDebugInfo>D:\OCC\opencascade-7.7.0-build-vs2022\win64\vc14\libi</OCC_IncludeTKReleaseWithDebugInfo>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="OCC_IncludePath">
+      <Value>$(OCC_IncludePath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OCC_IncludeTKRelease">
+      <Value>$(OCC_IncludeTKRelease)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OCC_LibTKRelease">
+      <Value>$(OCC_LibTKRelease)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OCC_IncludeTKDebug">
+      <Value>$(OCC_IncludeTKDebug)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OCC_LibTKDebug">
+      <Value>$(OCC_LibTKDebug)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="OCC_LibTKReleaseWithDebugInfo">
+      <Value>$(OCC_LibTKReleaseWithDebugInfo)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OCC_IncludeTKReleaseWithDebugInfo">
+      <Value>$(OCC_IncludeTKReleaseWithDebugInfo)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
