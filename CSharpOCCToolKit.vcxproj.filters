@@ -15,6 +15,15 @@
     <Filter Include="源文件\Visualization">
       <UniqueIdentifier>{08385bf5-1a58-4d58-a570-e53ef69bf8b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OCC">
+      <UniqueIdentifier>{541c1b4c-53db-4e18-a8d1-1e53572ebc7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OCC\AIS">
+      <UniqueIdentifier>{8c2261c1-2e14-4f0c-a32c-a5383848826a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Visualization">
+      <UniqueIdentifier>{0fcf6117-8bb6-4d83-b5e1-9fd5d5f7ad53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -26,5 +35,22 @@
     <ClCompile Include="OCCView.cpp">
       <Filter>源文件\Visualization</Filter>
     </ClCompile>
+    <ClCompile Include="InteractiveObject.cpp">
+      <Filter>OCC\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="TEST.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TEST.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCView.h">
+      <Filter>头文件\Visualization</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractiveObject.h">
+      <Filter>OCC\AIS</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

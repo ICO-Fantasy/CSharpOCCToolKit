@@ -142,6 +142,13 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="OCCView.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="InteractiveObject.cpp" />
+    <ClCompile Include="TEST.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TEST.h" />
+    <ClInclude Include="OCCView.h" />
+    <ClInclude Include="InteractiveObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

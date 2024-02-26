@@ -15,3 +15,7 @@
 
 * `配置属性`->`常规`->`中间目录`: $(ShortProjectName)\obj\$(Platform)\$(Configuration)\
 * `配置属性`->`C/C++`->`预编译头`: 不使用预编译头
+
+# 源码错误
+
+在OCC源码中包含HashCode函数，其与.NET Core中的方法System::HashCode存在符号混淆，因此需要改写OCC源码中。
