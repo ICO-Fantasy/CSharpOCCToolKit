@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using OCCTK.Visualization;
 using Windows.Storage.FileProperties;
-//! some
 
 
 namespace OCCViewForm
@@ -37,37 +36,8 @@ namespace OCCViewForm
     }
     public class OCCViewer : Form
     {
-        //零宽度的最小值
+        //框选零宽度的最小值
         private const int ZEROWIDTHMIN = 1;
-        #region 属性
-        public OCCView view { get; set; } // 视图
-        private System.Windows.Forms.Timer cursorResetTimer { get; set; } // 重设滚轮光标计时器
-        #region 状态flag
-        // 缩放结束
-        public event EventHandler ZoomingFinished;
-        protected void RaiseZoomingFinished()
-        {
-            if (ZoomingFinished != null)
-            {
-                ZoomingFinished(this, EventArgs.Empty);
-            }
-        }
-        //未知
-        public event EventHandler AvaliabiltyOfOperationsChanged;
-        protected void RaiseAvaliabiltyOfOperationsChanged()
-        {
-            if (AvaliabiltyOfOperationsChanged != null)
-            {
-                AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
-            }
-        }
-        //当前选择模式
-        public CurrentAction3d CurrentMode { get; private set; }
-        //是否正在绘制选择框
-        private bool IsDrawRect { get; set; }
-        private bool IsRectVisible { get; set; }
-        #endregion
-        #endregion
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -115,12 +85,50 @@ namespace OCCViewForm
             // 停止计时器
             cursorResetTimer.Stop();
         }
+        #region 属性
+        public OCCView view { get; set; } // 视图
+        private System.Windows.Forms.Timer cursorResetTimer { get; set; } // 重设滚轮光标计时器
+        #region 状态flag
+        // 缩放结束
+        public event EventHandler ZoomingFinished;
+        protected void RaiseZoomingFinished()
+        {
+            if (ZoomingFinished != null)
+            {
+                ZoomingFinished(this, EventArgs.Empty);
+            }
+        }
+        //未知
+        public event EventHandler AvaliabiltyOfOperationsChanged;
+        protected void RaiseAvaliabiltyOfOperationsChanged()
+        {
+            if (AvaliabiltyOfOperationsChanged != null)
+            {
+                AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
+            }
+        }
+        /// <summary>
+        /// 当前选择模式
+        /// </summary>
+        public CurrentAction3d CurrentMode { get; private set; }
+        /// <summary>
+        /// 是否正在绘制选择框
+        /// </summary>
+        private bool IsDrawRect { get; set; }
+        private bool IsRectVisible { get; set; }
+        #endregion
         #region 显示模式
-        //隐藏线显示模式
+        /// <summary>
+        /// 隐藏线显示模式
+        /// </summary>
         public bool DegenerateMode { get; private set; }
-        //框线模式
+        /// <summary>
+        /// 框线模式
+        /// </summary>
         public bool IsWireframeEnabled { get; private set; }
-        //阴影模式
+        /// <summary>
+        /// 阴影模式
+        /// </summary>
         public bool IsShadingEnabled { get; private set; }
 
         //无效定义
@@ -129,13 +137,13 @@ namespace OCCViewForm
         //public bool IsMaterialEnabled { get; private set; }
         //public bool IsDeleteEnabled { get; private set; }
 
-        private int myXmin;
-        private int myYmin;
-        private int myXmax;
-        private int myYmax;
+        private int mouseDownX;
+        private int mouseDownY;
+        private int myCurrentX;
+        private int myCurrentY;
         private int myButtonDownX;
         private int myButtonDownY;
-
+        #endregion
         #endregion
         #region 重写虚方法
         private void OnPaint(object sender, PaintEventArgs e)
@@ -152,10 +160,10 @@ namespace OCCViewForm
             // 获取鼠标按下的按钮和修改键
             MouseButtons mouseButton = e.Button;
             Keys modifiers = ModifierKeys;
-            myXmin = e.X;
-            myXmax = e.X;
-            myYmin = e.Y;
-            myYmax = e.Y;
+            mouseDownX = e.X;
+            //myCurrentX = e.X;
+            mouseDownY = e.Y;
+            //myCurrentY = e.Y;
             // 开始旋转
             view.StartRotation(e.X, e.Y);
             #region 以下代码为了实现按钮切换鼠标交互模式，暂不考虑
@@ -173,11 +181,11 @@ namespace OCCViewForm
             //                case CurrentAction3d.Nothing:
             //                    if (modifiers == Keys.Shift)
             //                    {
-            //                        MultiDragEvent(myXmax, myYmax, -1);
+            //                        MultiDragEvent(myCurrentX, myCurrentY, -1);
             //                    }
             //                    else
             //                    {
-            //                        DragEvent(myXmax, myYmax, -1);
+            //                        DragEvent(myCurrentX, myCurrentY, -1);
             //                    }
             //                    break;
             //                case CurrentAction3d.DynamicRotation:
@@ -205,12 +213,12 @@ namespace OCCViewForm
             // 判断鼠标按钮和修改键的组合
             if (mouseButton == MouseButtons.Left)
             {
-                if (modifiers == Keys.None)
+                if (modifiers == Keys.None || modifiers == Keys.Control)
                 {
-                    // 区域选择
+                    // 框选或多次框选
                     DrawRectangle(false);
-                    myXmax = e.X;
-                    myYmax = e.Y;
+                    myCurrentX = e.X;
+                    myCurrentY = e.Y;
                     DrawRectangle(true);
                     CurrentMode = CurrentAction3d.AreaSelection;
                 }
@@ -221,8 +229,8 @@ namespace OCCViewForm
                 {
                     // 框选区域放大
                     DrawRectangle(false);
-                    myXmax = e.X;
-                    myYmax = e.Y;
+                    myCurrentX = e.X;
+                    myCurrentY = e.Y;
                     DrawRectangle(true);
                     CurrentMode = CurrentAction3d.AreaZooming;
                 }
@@ -240,9 +248,9 @@ namespace OCCViewForm
                 {
                     // Dynamic Panning 表示交互式的平移画面与非交互的平移 Global Panning 相区别
                     // 平移
-                    view.Pan(e.X - myXmax, myYmax - e.Y);
-                    myXmax = e.X;
-                    myYmax = e.Y;
+                    view.Pan(e.X - myCurrentX, myCurrentY - e.Y);
+                    myCurrentX = e.X;
+                    myCurrentY = e.Y;
                     CurrentMode = CurrentAction3d.DynamicPanning;
                 }
             }
@@ -257,9 +265,9 @@ namespace OCCViewForm
                 switch (CurrentMode)
                 {
                     case CurrentAction3d.Nothing:
-                        myXmax = e.X;
-                        myYmax = e.Y;
-                        if (e.X == myXmin && e.Y == myYmin)
+                        myCurrentX = e.X;
+                        myCurrentY = e.Y;
+                        if (myCurrentX == mouseDownX && myCurrentY == mouseDownY)
                         {
                             if (modifiers == Keys.Control)
                             {
@@ -268,23 +276,28 @@ namespace OCCViewForm
                             }
                             else
                             {
-                                //单选
+                                // 单选
                                 view.Select();
                             }
                         }
-                        else
+                        break;
+                    case CurrentAction3d.AreaSelection:
+                        myCurrentX = e.X;
+                        myCurrentY = e.Y;
+                        if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN && Math.Abs(myCurrentY - mouseDownY) > ZEROWIDTHMIN) //移动了
                         {
                             DrawRectangle(false);
                             if (modifiers == Keys.Control)
                             {
                                 // 结束连续框选
-                                MultiDragEvent(myXmax, myYmax, 1);
+                                MultiDragEvent(myCurrentX, myCurrentY, 1);
                             }
                             else
                             {
                                 // 结束单次框选
-                                DragEvent(myXmax, myYmax, 1);
+                                DragEvent(myCurrentX, myCurrentY, 1);
                             }
+
                         }
                         break;
                     //case CurrentAction3d.DynamicZooming:
@@ -293,6 +306,10 @@ namespace OCCViewForm
                     //    RaiseZoomingFinished();
                     //    CurrentMode = CurrentAction3d.Nothing;
                     //    break;
+                    case CurrentAction3d.DynamicRotation:
+                        // 结束旋转
+                        CurrentMode = CurrentAction3d.Nothing;
+                        break;
                     case CurrentAction3d.DynamicPanning:
                         // 结束平移
                         CurrentMode = CurrentAction3d.Nothing;
@@ -315,13 +332,13 @@ namespace OCCViewForm
                 {
                     case CurrentAction3d.AreaZooming:
                         // 结束区域缩放
-                        myXmax = e.X;
-                        myYmax = e.Y;
+                        myCurrentX = e.X;
+                        myCurrentY = e.Y;
                         DrawRectangle(false);
-                        if (Math.Abs(myXmax - myXmin) > ZEROWIDTHMIN &&
-                             Math.Abs(myXmax - myYmax) > ZEROWIDTHMIN)
+                        if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN &&
+                             Math.Abs(myCurrentX - myCurrentY) > ZEROWIDTHMIN)
                         {
-                            view.FitArea(myXmin, myYmin, myXmax, myYmax);
+                            view.FitArea(mouseDownX, mouseDownY, myCurrentX, myCurrentY);
                         }
                         Cursor = Cursors.Arrow;
                         RaiseZoomingFinished();
@@ -480,9 +497,9 @@ namespace OCCViewForm
             {
                 return;
             }
-            int x = Math.Min( myXmin, myXmax );
-            int y = Math.Min( myYmin, myYmax );
-            gr.DrawRectangle(p, x, y, Math.Abs(myXmax - myXmin), Math.Abs(myYmax - myYmin));
+            int x = Math.Min(mouseDownX, myCurrentX);
+            int y = Math.Min(mouseDownY, myCurrentY);
+            gr.DrawRectangle(p, x, y, Math.Abs(myCurrentX - mouseDownX), Math.Abs(myCurrentY - mouseDownY));
         }
         #endregion
     }
