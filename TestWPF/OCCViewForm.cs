@@ -59,6 +59,7 @@ namespace OCCViewForm
             view.Test();
             this.SetDisplayMode(DisplayMode.Shading);
             this.FitAll();
+            view.DisplayViewTrihedron(5);
         }
         private void InitializeComponent()
         {
@@ -476,9 +477,8 @@ namespace OCCViewForm
             view.SetDegenerateMode(theMode);
             degenerateMode = theMode;
         }
-
         /// <summary>
-        /// 依次切换显示模式或切换到指定显示模式
+        /// 依次切换显示模式
         /// </summary>
         public void SetDisplayMode()
         {
@@ -487,6 +487,10 @@ namespace OCCViewForm
 
             RaiseZoomingFinished();
         }
+        /// <summary>
+        /// 切换到指定显示模式
+        /// </summary>
+        /// <param name="theMode"></param>
         public void SetDisplayMode(DisplayMode theMode)
         {
             CurrentDisplayMode = theMode;
@@ -555,6 +559,12 @@ namespace OCCViewForm
             int x = Math.Min(mouseDownX, myCurrentX);
             int y = Math.Min(mouseDownY, myCurrentY);
             gr.DrawRectangle(p, x, y, Math.Abs(myCurrentX - mouseDownX), Math.Abs(myCurrentY - mouseDownY));
+        }
+        #endregion
+        #region 显示
+        public void Display()
+        {
+            //view.Display();
         }
         #endregion
     }

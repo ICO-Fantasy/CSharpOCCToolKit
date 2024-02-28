@@ -18,14 +18,11 @@
     <Filter Include="头文件\Visualization">
       <UniqueIdentifier>{0fcf6117-8bb6-4d83-b5e1-9fd5d5f7ad53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="OCCWrapper">
-      <UniqueIdentifier>{541c1b4c-53db-4e18-a8d1-1e53572ebc7c}</UniqueIdentifier>
+    <Filter Include="头文件\OCCTools">
+      <UniqueIdentifier>{030bbd23-96d1-4853-bb5a-46d79aa5f176}</UniqueIdentifier>
     </Filter>
-    <Filter Include="OCCWrapper\AIS">
-      <UniqueIdentifier>{8c2261c1-2e14-4f0c-a32c-a5383848826a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="OCCWrapper\BRepPrimAPI">
-      <UniqueIdentifier>{e74697dc-ded4-4764-b32e-e0c4116fccf0}</UniqueIdentifier>
+    <Filter Include="源文件\OCCTools">
+      <UniqueIdentifier>{f5ab1354-4ff0-4012-863d-daa30833acb6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -38,14 +35,14 @@
     <ClCompile Include="OCCView.cpp">
       <Filter>源文件\Visualization</Filter>
     </ClCompile>
-    <ClCompile Include="InteractiveObject.cpp">
-      <Filter>OCCWrapper\AIS</Filter>
-    </ClCompile>
     <ClCompile Include="TEST.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="MakeBox.cpp">
-      <Filter>OCCWrapper\BRepPrimAPI</Filter>
+    <ClCompile Include="ViewCube.cpp">
+      <Filter>源文件\Visualization</Filter>
+    </ClCompile>
+    <ClCompile Include="convertChinese.cpp">
+      <Filter>源文件\OCCTools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,11 +52,11 @@
     <ClInclude Include="OCCView.h">
       <Filter>头文件\Visualization</Filter>
     </ClInclude>
-    <ClInclude Include="InteractiveObject.h">
-      <Filter>OCCWrapper\AIS</Filter>
+    <ClInclude Include="ViewCube.h">
+      <Filter>头文件\Visualization</Filter>
     </ClInclude>
-    <ClInclude Include="MakeBox.h">
-      <Filter>OCCWrapper\BRepPrimAPI</Filter>
+    <ClInclude Include="convertChinese.h">
+      <Filter>头文件\OCCTools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

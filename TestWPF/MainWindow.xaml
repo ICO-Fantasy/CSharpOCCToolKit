@@ -20,7 +20,7 @@
             <RowDefinition Height="234*"/>
         </Grid.RowDefinitions>
         <ToolBar DockPanel.Dock="Top">
-            工具
+            视图方向
             <!--使用自定义的按钮模板-->
             <Button Content="Front" Template="{StaticResource RoundedButtonTemplate}" Click="ForntView_Button_Click"/>
             <Button Content="Back" Template="{StaticResource RoundedButtonTemplate}" Click="BackView_Button_Click"/>
@@ -31,8 +31,8 @@
             <Separator/>
             工具
             <!-- 视图控制的两个按钮 -->
-            <Button Content="Zoom In" Template="{StaticResource RoundedButtonTemplate}"/>
-            <Button Content="Zoom Out" Template="{StaticResource RoundedButtonTemplate}"/>
+            <Button Content="Fit All" Template="{StaticResource RoundedButtonTemplate}" Click="FitAll_Button_Click"/>
+            <Button Content="test" Template="{StaticResource RoundedButtonTemplate}"/>
             <Separator/>
             显示模式
             <!-- 显示模式的两个按钮 -->

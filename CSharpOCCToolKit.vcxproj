@@ -140,17 +140,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="MakeBox.cpp" />
+    <ClCompile Include="convertChinese.cpp" />
     <ClCompile Include="OCCView.cpp" />
     <ClCompile Include="String.cpp" />
-    <ClCompile Include="InteractiveObject.cpp" />
     <ClCompile Include="TEST.cpp" />
+    <ClCompile Include="ViewCube.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MakeBox.h" />
+    <ClInclude Include="convertChinese.h" />
     <ClInclude Include="TEST.h" />
     <ClInclude Include="OCCView.h" />
-    <ClInclude Include="InteractiveObject.h" />
+    <ClInclude Include="ViewCube.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

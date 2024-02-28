@@ -63,5 +63,10 @@ namespace TestWPF
         {
             Viewer.SetDisplayMode(DisplayMode.Shading);
         }
+
+        private void FitAll_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.FitAll();
+        }
     }
 }
