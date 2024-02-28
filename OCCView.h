@@ -45,6 +45,8 @@ namespace OCCTK::Visualization
         void ShiftSelect(void);
         void Display(AIS_InteractiveObject *theAISObject, bool theToUpdateViewer);
     #pragma endregion
+        //!测试代码
+        void Test(void);
     private:
         // 将成员变为托管类型
         NCollection_Haft<Handle(V3d_Viewer)> myViewer;

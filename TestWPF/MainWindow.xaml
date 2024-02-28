@@ -5,8 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OCCViewForm"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="768" Width="1024">
+    <Window.Resources>
+        <!-- 定义一个包含圆角边框的按钮模板 -->
+        <ControlTemplate x:Key="RoundedButtonTemplate" TargetType="Button">
+            <Border CornerRadius="1" BorderBrush="Black" BorderThickness="1" Margin="2,2,2,2" Padding="2,2,2,2">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+        </ControlTemplate>
+    </Window.Resources>
     <Grid x:Name="main_grid">
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="17*"/>
+            <RowDefinition Height="234*"/>
+        </Grid.RowDefinitions>
+        <ToolBar DockPanel.Dock="Top">
+            工具
+            <!--使用自定义的按钮模板-->
+            <Button Content="Front" Template="{StaticResource RoundedButtonTemplate}" Click="ForntView_Button_Click"/>
+            <Button Content="Back" Template="{StaticResource RoundedButtonTemplate}" Click="BackView_Button_Click"/>
+            <Button Content="Top" Template="{StaticResource RoundedButtonTemplate}" Click="TopView_Button_Click"/>
+            <Button Content="Bottom" Template="{StaticResource RoundedButtonTemplate}" Click="BottomView_Button_Click"/>
+            <Button Content="Left" Template="{StaticResource RoundedButtonTemplate}" Click="LeftView_Button_Click"/>
+            <Button Content="Right" Template="{StaticResource RoundedButtonTemplate}" Click="RightView_Button_Click"/>
+            <Separator/>
+            工具
+            <!-- 视图控制的两个按钮 -->
+            <Button Content="Zoom In" Template="{StaticResource RoundedButtonTemplate}"/>
+            <Button Content="Zoom Out" Template="{StaticResource RoundedButtonTemplate}"/>
+            <Separator/>
+            显示模式
+            <!-- 显示模式的两个按钮 -->
+            <Button Content="Wireframe" Template="{StaticResource RoundedButtonTemplate}" Click="Wireframe_Button_Click"/>
+            <Button Content="Shading" Template="{StaticResource RoundedButtonTemplate}" Click="Shading_Button_Click"/>
+        </ToolBar>
+        <Grid x:Name="canvas_grid" Grid.Row="1"/>
     </Grid>
 </Window>

@@ -15,14 +15,17 @@
     <Filter Include="源文件\Visualization">
       <UniqueIdentifier>{08385bf5-1a58-4d58-a570-e53ef69bf8b4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="OCC">
-      <UniqueIdentifier>{541c1b4c-53db-4e18-a8d1-1e53572ebc7c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="OCC\AIS">
-      <UniqueIdentifier>{8c2261c1-2e14-4f0c-a32c-a5383848826a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Visualization">
       <UniqueIdentifier>{0fcf6117-8bb6-4d83-b5e1-9fd5d5f7ad53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OCCWrapper">
+      <UniqueIdentifier>{541c1b4c-53db-4e18-a8d1-1e53572ebc7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OCCWrapper\AIS">
+      <UniqueIdentifier>{8c2261c1-2e14-4f0c-a32c-a5383848826a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OCCWrapper\BRepPrimAPI">
+      <UniqueIdentifier>{e74697dc-ded4-4764-b32e-e0c4116fccf0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,10 +39,13 @@
       <Filter>源文件\Visualization</Filter>
     </ClCompile>
     <ClCompile Include="InteractiveObject.cpp">
-      <Filter>OCC\AIS</Filter>
+      <Filter>OCCWrapper\AIS</Filter>
     </ClCompile>
     <ClCompile Include="TEST.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MakeBox.cpp">
+      <Filter>OCCWrapper\BRepPrimAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -50,7 +56,10 @@
       <Filter>头文件\Visualization</Filter>
     </ClInclude>
     <ClInclude Include="InteractiveObject.h">
-      <Filter>OCC\AIS</Filter>
+      <Filter>OCCWrapper\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="MakeBox.h">
+      <Filter>OCCWrapper\BRepPrimAPI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

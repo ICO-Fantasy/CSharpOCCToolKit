@@ -18,16 +18,50 @@ namespace TestWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        private OCCViewer Viewer;
         public MainWindow()
         {
             InitializeComponent();
             // 创建 Windows Forms 控件和 WindowsFormsHost
             WindowsFormsHost aHost = new WindowsFormsHost();
-            OCCViewer aForm = new OCCViewer();
-            aForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            aForm.Show();
-            aHost.Child = aForm;
-            main_grid.Children.Add(aHost);
+            Viewer = new OCCViewer();
+            Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            Viewer.Show();
+            aHost.Child = Viewer;
+            canvas_grid.Children.Add(aHost);
+        }
+
+        private void ForntView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetViewOrientation(ViewOrientation.Front);
+        }
+        private void BackView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetViewOrientation(ViewOrientation.Back);
+        }
+        private void TopView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetViewOrientation(ViewOrientation.Top);
+        }
+        private void BottomView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetViewOrientation(ViewOrientation.Bottom);
+        }
+        private void LeftView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetViewOrientation(ViewOrientation.Left);
+        }
+        private void RightView_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetViewOrientation(ViewOrientation.Right);
+        }
+        private void Wireframe_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetDisplayMode(DisplayMode.Wireframe);
+        }
+        private void Shading_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetDisplayMode(DisplayMode.Shading);
         }
     }
 }
