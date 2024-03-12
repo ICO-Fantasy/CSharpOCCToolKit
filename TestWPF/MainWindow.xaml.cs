@@ -18,13 +18,13 @@ namespace TestWPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private OCCViewer Viewer;
+        private OCCViewForm.OCCCanvas Viewer;
         public MainWindow()
         {
             InitializeComponent();
             // 创建 Windows Forms 控件和 WindowsFormsHost
             WindowsFormsHost aHost = new WindowsFormsHost();
-            Viewer = new OCCViewer();
+            Viewer = new OCCViewForm.OCCCanvas();
             Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             Viewer.Show();
             aHost.Child = Viewer;
@@ -67,6 +67,11 @@ namespace TestWPF
         private void FitAll_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.FitAll();
+        }
+
+        private void Test_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.MakeClampTest();
         }
     }
 }

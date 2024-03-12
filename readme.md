@@ -22,12 +22,14 @@
 
 # OCCView 的交互逻辑
 
-|     交互     | mouseButton | ModifierKeys | CurrentAction3d |
-| :----------: | :---------: | :----------: | :-------------: |
-|     单选     |    Left     |              |     Nothing     |
-|   连续选择   |    Left     |   Control    |     Nothing     |
-|     框选     |    Left     |              |  AreaSelection  |
-|   连续框选   |    Left     |   Control    |  AreaSelection  |
-| 框选区域放大 |    Right    |    Shift     |   AreaZooming   |
-|     旋转     |   Middle    |              | DynamicRotation |
-|     平移     |   Middle    |   Control    | DynamicPanning  |
+|     交互     | mouseButton | ModifierKeys |  CurrentAction3d   |     Cursor      |
+| :----------: | :---------: | :----------: | :----------------: | :-------------: |
+|     单选     |    Left     |              |      Nothing       |  Cursors.Hand   |
+|   连续选择   |    Left     |   Control    |   MultipleSelect   |  Cursors.Hand   |
+|   异或选择   |    Left     |    Shift     |  XORAreaSelection  |                 |
+|     框选     |    Left     |              |   AreaSelection    |  Cursors.Cross  |
+|   连续框选   |    Left     |   Control    | MultipleAreaSelect |  Cursors.Cross  |
+|   异或框选   |    Left     |    Shift     |  XORAreaSelection  |                 |
+| 框选区域放大 |    Right    |    Shift     |    AreaZooming     |   "Zoom.cur"    |
+|     旋转     |   Middle    |              |  DynamicRotation   | "Rotation.cur"  |
+|     平移     |   Middle    |   Control    |   DynamicPanning   | Cursors.SizeAll |

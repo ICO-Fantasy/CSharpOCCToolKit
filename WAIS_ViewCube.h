@@ -1,10 +1,9 @@
 ﻿#pragma once
-#include <Standard_Handle.hxx>
 #include <AIS_ViewCube.hxx>
-#include <vcclr.h>
+#include <Standard_Handle.hxx>
 //包装C++类到托管类
 //#include <NCollection_Haft.h> 
-namespace OCCTK::Visualization {
+namespace OCCTK::OCC::AIS {
 ref class ViewCube
 {
 public:
@@ -12,8 +11,6 @@ public:
 	Handle(AIS_ViewCube)* GetOCC();
 private:
 	Handle(AIS_ViewCube)* myViewCube;
-	//gcroot<AIS_ViewCube*> myViewCube;
-	//NCollection_Haft<Handle(AIS_ViewCube)> myViewCube;
 	Handle(Standard_Transient)* _ptransient;
 };
 }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <V3d_Viewer.hxx>
 #include <V3d_View.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -12,10 +11,9 @@
 //using namespace System;
 namespace OCCTK::Visualization
 {
-public ref class OCCView
-{
+public ref class CSharpViewer {
 public:
-	void InitOCCView(void);
+	void InitOCCViewer(void);
 	bool InitViewer(System::IntPtr theWnd);
 	bool InitSecondViewer(System::IntPtr theSecondWnd);
 	#pragma region 视图设置
@@ -46,17 +44,23 @@ public:
 	#pragma region 交互对象管理
 	void EraseObjects(void);
 	void Select(void);
-	void Select(int theX1, int theY1, int theX2, int theY2);
-	void ShiftSelect(int theX1, int theY1, int theX2, int theY2);
-	void ShiftSelect(void);
-	void Display(AIS_InteractiveObject* theAISObject, bool theToUpdateViewer);
+	void MultipleSelect(void);
+	void XORSelect(void);
+	void AreaSelect(int theX1, int theY1, int theX2, int theY2);
+	void MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2);
+	void XORAreaSelect(int theX1, int theY1, int theX2, int theY2);
+	void Display(Handle(AIS_InteractiveObject)& theAISObject, bool theToUpdateViewer);
+	//void Display(AIS_Shape* theAISObject, bool theToUpdateViewer);
 	void DisplayOriginTrihedron();
 	#pragma endregion
 	#pragma region 持久变换对象
+	void DisplayViewCube(float axisSize);
+	void DisplayGrid(bool theFlag);
 	void DisplayViewTrihedron(float axisSize);
 	#pragma endregion	
 	//!测试代码
 	void Test(void);
+	void MakeClampTest(double theX, double theY, double theZ, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY, double BasePlateThickness, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateCuttingDistance);
 private:
 	// 将成员变为托管类型
 	NCollection_Haft<Handle(V3d_Viewer)> myViewer;

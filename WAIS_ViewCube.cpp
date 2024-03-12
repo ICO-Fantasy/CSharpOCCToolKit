@@ -1,10 +1,10 @@
-﻿#include "ViewCube.h"
-#include <Standard_Handle.hxx>
+﻿#include "WAIS_ViewCube.h"
 #include <AIS_ViewCube.hxx>
 #include <Prs3d_DatumAspect.hxx>
-#include <Resource_Unicode.hxx>
-#include "convertChinese.h"
-namespace OCCTK::Visualization {
+#include <Standard_Handle.hxx>
+//字符编码转换
+#include "ConvertChinese.h"
+namespace OCCTK::OCC::AIS {
 ViewCube::ViewCube(float axisSize)
 {
 	int R, G, B;

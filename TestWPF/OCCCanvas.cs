@@ -1,7 +1,5 @@
 ﻿using OCCTK.Visualization;
 
-
-
 namespace OCCViewForm
 {
     public enum Action3d
@@ -29,19 +27,19 @@ namespace OCCViewForm
         Left,
         Right,
     }
-    public class OCCViewer : Form
+    public class OCCCanvas : Form
     {
         //框选零宽度的最小值
         private const int ZEROWIDTHMIN = 1;
         /// <summary>
         /// 构造函数
         /// </summary>
-        public OCCViewer()
+        public OCCCanvas()
         {
             InitializeComponent();
-            view = new OCCView();
-            view.InitOCCView();
-            if (!view.InitViewer(this.Handle))
+            viewer = new CSharpViewer();
+            viewer.InitOCCViewer();
+            if (!viewer.InitViewer(this.Handle))
             {
                 MessageBox.Show("图形初始化失败", "Error!");
             }
@@ -50,16 +48,45 @@ namespace OCCViewForm
             cursorResetTimer.Interval = 500; // 设置计时器间隔为100毫秒
             cursorResetTimer.Tick += CursorResetTimer_Tick; // 绑定计时器的Tick事件处理方法
             CurrentAction3d = Action3d.Nothing;
+            IsActivateGrid = true;
+            viewer.DisplayGrid(IsActivateGrid);
             IsDrawRect = false;
             degenerateMode = true;
-            this.Test();
+            viewer.DisplayViewCube(5);
+            this.SetDisplayMode(DisplayMode.Shading);
         }
-        private void Test()
+        public void Test()
         {
-            view.Test();
+            viewer.Test();
+            viewer.DisplayViewCube(5);
             this.SetDisplayMode(DisplayMode.Shading);
             this.FitAll();
-            view.DisplayViewTrihedron(5);
+            //viewer.DisplayViewTrihedron(5);
+        }
+        public void MakeClampTest()
+        {
+            double theX = 0.0;
+            double theY = 0.0;
+            double theZ = 0.0;
+            double OffsetZ = 30.0;
+            double BasePlateOffsetX = 10.0;
+            double BasePlateOffsetY = 10.0;
+            double BasePlateThickness = 1.0;
+            double BasePlateLengthX = 0.0;
+            double BasePlateLengthY = 0.0;
+
+            double VerticalPlateThickness = 1.0;
+            double VerticalPlateInitialOffsetX = 5.0;
+            double VerticalPlateOffsetX = 20.0;
+            double VerticalPlateInitialOffsetY = 5.0;
+            double VerticalPlateOffsetY = 10.0;
+            double VerticalPlateConnectionHeight = 15.0;
+            double VerticalPlateClearances = 0.0;
+            double VerticalPlateCuttingDistance = 0.0;
+            viewer.MakeClampTest(theX, theY, theZ, OffsetZ, BasePlateOffsetX, BasePlateOffsetY, BasePlateThickness, BasePlateLengthX, BasePlateLengthY, VerticalPlateThickness, VerticalPlateInitialOffsetX, VerticalPlateOffsetX, VerticalPlateInitialOffsetY, VerticalPlateOffsetY, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateCuttingDistance);
+            this.FitAll();
+            //viewer.DisplayViewTrihedron(5);
+
         }
         private void InitializeComponent()
         {
@@ -108,7 +135,7 @@ namespace OCCViewForm
             }
         }
         #region 属性
-        public OCCView view { get; set; } // 视图对象
+        public CSharpViewer viewer { get; set; } // C++委托的视图对象
         private System.Windows.Forms.Timer cursorResetTimer { get; set; } // 重设滚轮光标计时器
         #region 状态flag
         // 缩放结束
@@ -129,6 +156,10 @@ namespace OCCViewForm
                 AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
             }
         }
+        /// <summary>
+        /// 是否显示网格
+        /// </summary>
+        public bool IsActivateGrid { get; set; }
         /// <summary>
         /// 当前选择模式
         /// </summary>
@@ -178,12 +209,12 @@ namespace OCCViewForm
         #region 重写虚方法
         private void OnPaint(object sender, PaintEventArgs e)
         {
-            view.RedrawView();
-            view.UpdateView();
+            viewer.RedrawView();
+            viewer.UpdateView();
         }
         private void OnSizeChanged(object sender, EventArgs e)
         {
-            view.UpdateView();
+            viewer.UpdateView();
         }
         private void OnMouseDown(object sender, MouseEventArgs e)
         {
@@ -195,7 +226,7 @@ namespace OCCViewForm
             mouseDownY = e.Y;
             //myCurrentY = e.Y;
             // 开始旋转
-            view.StartRotation(e.X, e.Y);
+            viewer.StartRotation(e.X, e.Y);
             #region 以下代码为了实现按钮切换鼠标交互模式，暂不考虑
             //    if (mouseButton == MouseButtons.Left)
             //    {
@@ -251,6 +282,7 @@ namespace OCCViewForm
                     myCurrentY = e.Y;
                     DrawRectangle(true);
                     CurrentAction3d = Action3d.AreaSelection;
+                    Cursor = Cursors.Cross;
                 }
             }
             else if (mouseButton == MouseButtons.Right)
@@ -270,9 +302,10 @@ namespace OCCViewForm
                 if (modifiers == Keys.None)
                 {
                     // 旋转
-                    view.Rotation(e.X, e.Y);
-                    view.RedrawView();
+                    viewer.Rotation(e.X, e.Y);
+                    viewer.RedrawView();
                     CurrentAction3d = Action3d.DynamicRotation;
+                    Cursor = new Cursor("rotation.cur");
                 }
                 else if (modifiers == Keys.Control)
                 {
@@ -280,10 +313,11 @@ namespace OCCViewForm
                     // 平移
                     myCurrentX = e.X;
                     myCurrentY = e.Y;
-                    view.Pan(myCurrentX - mouseDownX, mouseDownY - myCurrentY);
+                    viewer.Pan(myCurrentX - mouseDownX, mouseDownY - myCurrentY);
                     mouseDownX = myCurrentX;
                     mouseDownY = myCurrentY;
                     CurrentAction3d = Action3d.DynamicPanning;
+                    Cursor = Cursors.SizeAll;
                 }
             }
         }
@@ -304,12 +338,13 @@ namespace OCCViewForm
                             if (modifiers == Keys.Control)
                             {
                                 // 连续选择
-                                view.ShiftSelect();
+                                viewer.XORSelect();//连续选择删除已选中的
+                                // view.MultipleSelect(); //连续选择只添加
                             }
                             else
                             {
                                 // 单选
-                                view.Select();
+                                viewer.Select();
                             }
                         }
                         break;
@@ -329,37 +364,15 @@ namespace OCCViewForm
                                 // 结束单次框选
                                 DragEvent(myCurrentX, myCurrentY, 1);
                             }
-
+                            Cursor = Cursors.Default;
                         }
                         break;
-                    //case CurrentAction3d.DynamicZooming:
-                    //    // 结束缩放
-                    //    Cursor = Cursors.Arrow;
-                    //    RaiseZoomingFinished();
-                    //    CurrentMode = CurrentAction3d.Nothing;
-                    //    break;
-                    case Action3d.DynamicRotation:
-                        // 结束旋转
-                        CurrentAction3d = Action3d.Nothing;
-                        break;
-                    case Action3d.DynamicPanning:
-                        // 结束平移
-                        CurrentAction3d = Action3d.Nothing;
-                        break;
-                    //case CurrentAction3d.GlobalPanning:
-                    //    // 暂不支持非交互的平移
-                    //    view.Place(e.X, e.Y, myCurZoom);
-                    //    CurrentMode = CurrentAction3d.Nothing;
-                    //    break;
-
                     default:
                         break;
                 }
             }
             else if (mouseButton == MouseButtons.Right)
             {
-                //view.SetDegenerateMode(DegenerateMode);//不需要设置隐藏线模式
-                // Do Nothing
                 switch (CurrentAction3d)
                 {
                     case Action3d.AreaZooming:
@@ -370,13 +383,15 @@ namespace OCCViewForm
                         if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN &&
                              Math.Abs(myCurrentX - myCurrentY) > ZEROWIDTHMIN)
                         {
-                            view.FitArea(mouseDownX, mouseDownY, myCurrentX, myCurrentY);
+                            viewer.FitArea(mouseDownX, mouseDownY, myCurrentX, myCurrentY);
                         }
-                        Cursor = System.Windows.Forms.Cursors.Arrow;
                         RaiseZoomingFinished();
                         CurrentAction3d = Action3d.Nothing;
+                        Cursor = Cursors.Default;
                         break;
                     default:
+                        CurrentAction3d = Action3d.Nothing;
+                        Cursor = Cursors.Default;
                         break;
                 }
             }
@@ -387,6 +402,12 @@ namespace OCCViewForm
                     case Action3d.DynamicRotation:
                         //结束旋转
                         CurrentAction3d = Action3d.Nothing;
+                        Cursor = Cursors.Default;
+                        break;
+                    case Action3d.DynamicPanning:
+                        // 结束平移
+                        CurrentAction3d = Action3d.Nothing;
+                        Cursor = Cursors.Default;
                         break;
                     default:
                         break;
@@ -407,7 +428,7 @@ namespace OCCViewForm
             if (isScrollingUp)
             {
                 // 向上滚动
-                Cursor = System.Windows.Forms.Cursors.PanNorth;
+                Cursor = Cursors.PanNorth;
                 zoomFactor = 2.0;
                 if (modifiers == Keys.Shift)
                 {
@@ -419,7 +440,7 @@ namespace OCCViewForm
             else if (isScrollingDown)
             {
                 // 向下滚动
-                Cursor = System.Windows.Forms.Cursors.PanSouth;
+                Cursor = Cursors.PanSouth;
                 zoomFactor = 0.5;
                 if (modifiers == Keys.Shift)
                 {
@@ -427,7 +448,7 @@ namespace OCCViewForm
                     zoomFactor = 0.9;
                 }
             }
-            view.Zoom(zoomFactor, true);
+            viewer.Zoom(zoomFactor, true);
             // 启动计时器
             cursorResetTimer.Start();
         }
@@ -451,22 +472,35 @@ namespace OCCViewForm
         //}
         #endregion
         #region 视图控制
+        /// <summary>
+        /// 相机缩放至最佳尺寸
+        /// </summary>
         public void FitAll()
         {
-            view.ZoomAllView();
+            viewer.ZoomAllView();
         }
+        /// <summary>
+        /// 循环设置相机视图方向
+        /// </summary>
         public void SetViewOrientation()
         {
-            view.SetViewOrientation(CycleEnum(CurrentViewOrientation));
+            viewer.SetViewOrientation(CycleEnum(CurrentViewOrientation));
         }
+        /// <summary>
+        /// 设置相机视图方向为theMode
+        /// </summary>
+        /// <param name="theMode"></param>
         public void SetViewOrientation(ViewOrientation theMode)
         {
             CurrentViewOrientation = theMode;
-            view.SetViewOrientation((int)theMode);
+            viewer.SetViewOrientation((int)theMode);
         }
+        /// <summary>
+        /// 重置视图的居中和方向
+        /// </summary>
         public void Reset()
         {
-            view.Reset();
+            viewer.Reset();
         }
         /// <summary>
         /// 设置隐藏线模式
@@ -474,7 +508,7 @@ namespace OCCViewForm
         /// <param name="theMode"></param>
         public void SetHidden(bool theMode)
         {
-            view.SetDegenerateMode(theMode);
+            viewer.SetDegenerateMode(theMode);
             degenerateMode = theMode;
         }
         /// <summary>
@@ -482,8 +516,8 @@ namespace OCCViewForm
         /// </summary>
         public void SetDisplayMode()
         {
-            view.SetDisplayMode(CycleEnum(CurrentDisplayMode));
-            view.UpdateCurrentViewer();
+            viewer.SetDisplayMode(CycleEnum(CurrentDisplayMode));
+            viewer.UpdateCurrentViewer();
 
             RaiseZoomingFinished();
         }
@@ -494,8 +528,8 @@ namespace OCCViewForm
         public void SetDisplayMode(DisplayMode theMode)
         {
             CurrentDisplayMode = theMode;
-            view.SetDisplayMode((int)theMode);
-            view.UpdateCurrentViewer();
+            viewer.SetDisplayMode((int)theMode);
+            viewer.UpdateCurrentViewer();
 
             RaiseZoomingFinished();
         }
@@ -516,10 +550,16 @@ namespace OCCViewForm
             }
             else if (theState == 1) //mouse is up
             {
-                view.ShiftSelect(Math.Min(myButtonDownX, x), Math.Min(myButtonDownY, y),
-                                  Math.Max(myButtonDownX, x), Math.Max(myButtonDownY, y));
+                viewer.MultipleAreaSelect(Math.Min(myButtonDownX, x), Math.Min(myButtonDownY, y),
+                                  Math.Max(myButtonDownX, x), Math.Max(myButtonDownY, y));//连续选择，只添加
             }
         }
+        /// <summary>
+        /// 框选
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="theState"></param>
         protected void DragEvent(int x, int y, int theState)
         {
             if (theState == -1) //mouse is down
@@ -529,7 +569,7 @@ namespace OCCViewForm
             }
             else if (theState == 1) //mouse is up
             {
-                view.Select(Math.Min(myButtonDownX, x), Math.Min(myButtonDownY, y),
+                viewer.AreaSelect(Math.Min(myButtonDownX, x), Math.Min(myButtonDownY, y),
                              Math.Max(myButtonDownX, x), Math.Max(myButtonDownY, y));
             }
         }
@@ -545,7 +585,7 @@ namespace OCCViewForm
             {
                 //p = new System.Drawing.Pen(System.Drawing.Color.Black);
                 IsRectVisible = false;
-                view.UpdateView();
+                viewer.UpdateView();
             }
             else if (draw)
             {
