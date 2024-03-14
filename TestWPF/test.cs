@@ -94,6 +94,10 @@ namespace TestWPF
         /// </summary>
         public double VerticalPlateClearances { get; set; }
         /// <summary>
+        /// 竖板最小支撑长度
+        /// </summary>
+        public double VerticalPlateMinSupportingLen { get; set; }
+        /// <summary>
         /// 竖板切断距离
         /// </summary>
         public double VerticalPlateCuttingDistance { get; set; }

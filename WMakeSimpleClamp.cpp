@@ -14,6 +14,7 @@ void WMakeSimpleClamp::MakeBasePlate(TopoDS_Shape& BasePlate, TopoDS_Shape& Inpu
 	//生成一个step模型类
 	STEPControl_Reader reader;
 	//加载一个文件并且返回一个状态枚举值
+	//IFSelect_ReturnStatus status = reader.ReadFile("test-B柱_5421231-ED01.stp");
 	IFSelect_ReturnStatus status = reader.ReadFile("testWorkPiece.STEP");
 	if (status == IFSelect_RetDone)
 	{
@@ -30,7 +31,7 @@ void WMakeSimpleClamp::MakeBasePlate(TopoDS_Shape& BasePlate, TopoDS_Shape& Inpu
 	BasePlateLengthY = topRightPoint.Y() - lowerLeftPoint.Y();
 	BasePlate = MakeBasePlateShape(lowerLeftPoint, topRightPoint, theZ, BasePlateThickness, BasePlateOffsetX, BasePlateOffsetY);
 }
-void WMakeSimpleClamp::MakeVerticalPlate(std::vector<TopoDS_Shape>& VerticalPlates, TopoDS_Shape InputWorkpiece, double theX, double theY, double theZ, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateCuttingDistance) {
+void WMakeSimpleClamp::MakeVerticalPlate(std::vector<TopoDS_Shape>& VerticalPlates, TopoDS_Shape InputWorkpiece, double theX, double theY, double theZ, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance) {
 	//todo 先做生成竖板、然后加入连接槽和连接处
 	#pragma region 生成竖板
 	std::map<double, TopoDS_Shape> theXSections;
@@ -62,8 +63,15 @@ void WMakeSimpleClamp::MakeVerticalPlate(std::vector<TopoDS_Shape>& VerticalPlat
 	for each (auto aSectionPair in theXSections)
 	{
 		TopoDS_Shape aSection;
-		aSection = MakeVerticalPlateWithSection(aSectionPair, X, theYSections, theX, theY, theZ, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateCuttingDistance);
-		//VerticalPlates.push_back(aSection);
+		aSection = MakeVerticalPlateWithSection(aSectionPair, X, theYSections, BasePlateLengthY, theX, theY, theZ, VerticalPlateThickness, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+		VerticalPlates.push_back(aSection);
+	}
+	return;
+	for each (auto aSectionPair in theYSections)
+	{
+		TopoDS_Shape aSection;
+		aSection = MakeVerticalPlateWithSection(aSectionPair, Y, theXSections, BasePlateLengthX, theX, theY, theZ, VerticalPlateThickness, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+		VerticalPlates.push_back(aSection);
 	}
 	#pragma endregion
 

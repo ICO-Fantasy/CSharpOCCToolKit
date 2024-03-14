@@ -60,7 +60,7 @@ public:
 	#pragma endregion	
 	//!测试代码
 	void Test(void);
-	void MakeClampTest(double theX, double theY, double theZ, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY, double BasePlateThickness, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateCuttingDistance);
+	void MakeClampTest(double theX, double theY, double theZ, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY, double BasePlateThickness, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance);
 private:
 	// 将成员变为托管类型
 	NCollection_Haft<Handle(V3d_Viewer)> myViewer;
