@@ -1,15 +1,19 @@
-﻿using OCCTK.Visualization;
+﻿using OCCTK.OCC.AIS;
+using OCCTK.Visualization;
 
 namespace OCCViewForm;
 public enum Action3d
 {
     Nothing,
-    DynamicZooming,
+    SingleSelect,
+    MultipleSelect,
+    XORSelect,
+    AreaSelect,
+    MultipleAreaSelect,
+    XORAreaSelect,
     AreaZooming,
-    DynamicPanning,
-    GlobalPanning,
     DynamicRotation,
-    AreaSelection
+    DynamicPanning,
 }
 public enum DisplayMode
 {
@@ -42,17 +46,19 @@ public class OCCCanvas : Form
         {
             MessageBox.Show("图形初始化失败", "Error!");
         }
+        viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
         // 初始化计时器
         cursorResetTimer = new System.Windows.Forms.Timer();
         cursorResetTimer.Interval = 500; // 设置计时器间隔为100毫秒
         cursorResetTimer.Tick += CursorResetTimer_Tick; // 绑定计时器的Tick事件处理方法
         CurrentAction3d = Action3d.Nothing;
-        IsActivateGrid = true;
-        viewer.DisplayGrid(IsActivateGrid);
+        IsActivateGrid = false;
+
         IsDrawRect = false;
         degenerateMode = true;
         viewer.DisplayViewCube(5);
         this.SetDisplayMode(DisplayMode.Shading);
+        this.SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
     }
     public void Test()
     {
@@ -80,6 +86,14 @@ public class OCCCanvas : Form
         double VerticalPlateInitialOffsetY = 5.0;
         double VerticalPlateOffsetY = 10.0;
         double VerticalPlateConnectionHeight = 15.0;
+
+        //double VerticalPlateThickness = 1.0;
+        //double VerticalPlateInitialOffsetX = 5.0;
+        //double VerticalPlateOffsetX = 20.0;
+        //double VerticalPlateInitialOffsetY = 5.0;
+        //double VerticalPlateOffsetY = 10.0;
+        //double VerticalPlateConnectionHeight = 15.0;
+
         double VerticalPlateClearances = 3.0;
         double VerticalPlateMinSupportingLen = 500.0;
         double VerticalPlateCuttingDistance = 20.0;
@@ -160,10 +174,19 @@ public class OCCCanvas : Form
             AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
         }
     }
+    private bool _isActivateGrid;
     /// <summary>
     /// 是否显示网格
     /// </summary>
-    public bool IsActivateGrid { get; set; }
+    public bool IsActivateGrid
+    {
+        get { return _isActivateGrid; }
+        set
+        {
+            _isActivateGrid = value;
+            viewer.DisplayGrid(_isActivateGrid);
+        }
+    }
     /// <summary>
     /// 当前选择模式
     /// </summary>
@@ -231,6 +254,8 @@ public class OCCCanvas : Form
         //myCurrentY = e.Y;
         // 开始旋转
         viewer.StartRotation(e.X, e.Y);
+        //默认设置为点击，如果鼠标移动了会替换掉默认模式
+        CurrentAction3d = Action3d.SingleSelect;
         #region 以下代码为了实现按钮切换鼠标交互模式，暂不考虑
         //    if (mouseButton == MouseButtons.Left)
         //    {
@@ -278,14 +303,24 @@ public class OCCCanvas : Form
         // 判断鼠标按钮和修改键的组合
         if (mouseButton == MouseButtons.Left)
         {
-            if (modifiers == Keys.None || modifiers == Keys.Control)
+            if (modifiers == Keys.None)
             {
-                // 框选或多次框选
+                // 框选
                 DrawRectangle(false);
                 myCurrentX = e.X;
                 myCurrentY = e.Y;
                 DrawRectangle(true);
-                CurrentAction3d = Action3d.AreaSelection;
+                CurrentAction3d = Action3d.AreaSelect;
+                Cursor = Cursors.Cross;
+            }
+            else if (modifiers == Keys.Control)
+            {
+                // 多次框选
+                DrawRectangle(false);
+                myCurrentX = e.X;
+                myCurrentY = e.Y;
+                DrawRectangle(true);
+                CurrentAction3d = Action3d.MultipleAreaSelect;
                 Cursor = Cursors.Cross;
             }
         }
@@ -324,100 +359,80 @@ public class OCCCanvas : Form
                 Cursor = Cursors.SizeAll;
             }
         }
+        else
+        {
+            //将鼠标位置发送给OCC交互上下文管理器，用于获取该位置的所选对象
+            //!单选等操作均需要基于该位置进行
+            viewer.MoveTo(e.X, e.Y);
+        }
     }
     private void OnMouseUp(object sender, MouseEventArgs e)
     {
         // 获取鼠标按下的按钮和修改键
         MouseButtons mouseButton = e.Button;
         Keys modifiers = ModifierKeys;
-        if (mouseButton == MouseButtons.Left)
+        switch (CurrentAction3d)
         {
-            switch (CurrentAction3d)
-            {
-                case Action3d.Nothing:
-                    myCurrentX = e.X;
-                    myCurrentY = e.Y;
-                    if (myCurrentX == mouseDownX && myCurrentY == mouseDownY)
-                    {
-                        if (modifiers == Keys.Control)
-                        {
-                            // 连续选择
-                            viewer.XORSelect();//连续选择删除已选中的
-                                               // view.MultipleSelect(); //连续选择只添加
-                        }
-                        else
-                        {
-                            // 单选
-                            viewer.Select();
-                        }
-                    }
-                    break;
-                case Action3d.AreaSelection:
-                    myCurrentX = e.X;
-                    myCurrentY = e.Y;
-                    if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN && Math.Abs(myCurrentY - mouseDownY) > ZEROWIDTHMIN) //移动了
-                    {
-                        DrawRectangle(false);
-                        if (modifiers == Keys.Control)
-                        {
-                            // 结束连续框选
-                            MultiDragEvent(myCurrentX, myCurrentY, 1);
-                        }
-                        else
-                        {
-                            // 结束单次框选
-                            DragEvent(myCurrentX, myCurrentY, 1);
-                        }
-                        Cursor = Cursors.Default;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        else if (mouseButton == MouseButtons.Right)
-        {
-            switch (CurrentAction3d)
-            {
-                case Action3d.AreaZooming:
-                    // 结束区域缩放
-                    myCurrentX = e.X;
-                    myCurrentY = e.Y;
+            case Action3d.SingleSelect:
+                //myCurrentX = e.X;
+                //myCurrentY = e.Y;
+                //if (myCurrentX == mouseDownX && myCurrentY == mouseDownY)
+                // 单选
+                viewer.Select();
+                break;
+            case Action3d.MultipleSelect:
+                viewer.XORSelect();
+                break;
+            case Action3d.AreaSelect:
+                myCurrentX = e.X;
+                myCurrentY = e.Y;
+                if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN && Math.Abs(myCurrentY - mouseDownY) > ZEROWIDTHMIN) //移动了
+                {
                     DrawRectangle(false);
-                    if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN &&
-                         Math.Abs(myCurrentX - myCurrentY) > ZEROWIDTHMIN)
-                    {
-                        viewer.FitArea(mouseDownX, mouseDownY, myCurrentX, myCurrentY);
-                    }
-                    RaiseZoomingFinished();
-                    CurrentAction3d = Action3d.Nothing;
-                    Cursor = Cursors.Default;
-                    break;
-                default:
-                    CurrentAction3d = Action3d.Nothing;
-                    Cursor = Cursors.Default;
-                    break;
-            }
+                    // 结束单次框选
+                    DragEvent(myCurrentX, myCurrentY, 1);
+                }
+                else
+                {
+                    // 单选
+                    viewer.Select();
+                }
+                break;
+            case Action3d.MultipleAreaSelect:
+                if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN && Math.Abs(myCurrentY - mouseDownY) > ZEROWIDTHMIN) //移动了
+                {
+                    DrawRectangle(false);
+                    // 结束连续框选
+                    MultiDragEvent(myCurrentX, myCurrentY, 1);
+                }
+                else
+                {
+                    viewer.XORSelect();
+                }
+                break;
+            case Action3d.AreaZooming:
+                // 结束区域缩放
+                myCurrentX = e.X;
+                myCurrentY = e.Y;
+                DrawRectangle(false);
+                if (Math.Abs(myCurrentX - mouseDownX) > ZEROWIDTHMIN &&
+                    Math.Abs(myCurrentX - myCurrentY) > ZEROWIDTHMIN)
+                {
+                    viewer.FitArea(mouseDownX, mouseDownY, myCurrentX, myCurrentY);
+                }
+                RaiseZoomingFinished();
+                break;
+            case Action3d.DynamicRotation:
+                //结束旋转
+                break;
+            case Action3d.DynamicPanning:
+                // 结束平移
+                break;
+            default:
+                break;
         }
-        else if (mouseButton == MouseButtons.Middle)
-        {
-            switch (CurrentAction3d)
-            {
-                case Action3d.DynamicRotation:
-                    //结束旋转
-                    CurrentAction3d = Action3d.Nothing;
-                    Cursor = Cursors.Default;
-                    break;
-                case Action3d.DynamicPanning:
-                    // 结束平移
-                    CurrentAction3d = Action3d.Nothing;
-                    Cursor = Cursors.Default;
-                    break;
-                default:
-                    break;
-            }
-        }
-
+        CurrentAction3d = Action3d.Nothing;
+        Cursor = Cursors.Default;
     }
     protected override void OnMouseWheel(MouseEventArgs e)
     {
@@ -538,6 +553,13 @@ public class OCCCanvas : Form
         RaiseZoomingFinished();
     }
     #endregion
+    #region 显示
+    public void Display(WAIS_Shape theAIS, bool Toupdate)
+    {
+        viewer.Display(theAIS, Toupdate);
+    }
+    #endregion
+    #region 交互对象
     #region 选择框
     /// <summary>
     /// 连续框选
@@ -605,10 +627,14 @@ public class OCCCanvas : Form
         gr.DrawRectangle(p, x, y, Math.Abs(myCurrentX - mouseDownX), Math.Abs(myCurrentY - mouseDownY));
     }
     #endregion
-    #region 显示
-    public void Display()
+    public void SetSelectionMode(OCCTK.Visualization.SelectionMode theMode)
     {
-        //view.Display();
+        viewer.SetSelectionMode(theMode);
+    }
+    public WAIS_Shape GetSelectedShape()
+    {
+        WAIS_Shape result = viewer.GetSelectedAIS();
+        return result;
     }
     #endregion
 }

@@ -74,6 +74,9 @@
     <ClCompile Include="WMakeSimpleClamp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="WAIS_Shape.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -94,11 +97,15 @@
     <ClInclude Include="Wgp_Trsf.h">
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
-    <ClInclude Include="MakeSimpleClamp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="WMakeSimpleClamp.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WAIS_Shape.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="readme.md" />
   </ItemGroup>
 </Project>

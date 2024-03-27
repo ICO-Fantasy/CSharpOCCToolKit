@@ -10,7 +10,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms.Integration;
 using OCCViewForm;
-
+using OCCTK;
+using OCCTK.OCC.AIS;
 namespace TestWPF
 {
     /// <summary>
@@ -19,6 +20,11 @@ namespace TestWPF
     public partial class MainWindow : Window
     {
         private OCCViewForm.OCCCanvas Viewer;
+        private OCCTK.OCC.AIS.WAIS_Shape InputWorkpiece;
+        private OCCTK.OCC.AIS.WAIS_Shape BasePlate;
+        private List<OCCTK.OCC.AIS.WAIS_Shape> VerticalPlates;
+        private OCCTK.OCC.AIS.WAIS_Shape VerticalPlate;
+        private OCCTK.Laser.BasePlate testBase;
         public MainWindow()
         {
             InitializeComponent();
@@ -68,10 +74,112 @@ namespace TestWPF
         {
             Viewer.FitAll();
         }
-
         private void Test_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.MakeClampTest();
+            //Viewer.Test();
         }
+        private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("testWorkPiece.STEP");
+            //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("test_b柱_5421231-ed01.STEP");
+            InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("testSmall.STEP");
+            Viewer.Display(InputWorkpiece, true);
+        }
+
+        private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
+        {
+            InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("test2.STEP");
+            Viewer.Display(InputWorkpiece, true);
+        }
+        private void Test_BasePlate_Button_Click(object sender, RoutedEventArgs e)
+        {
+            double OffsetZ = 300.0;
+            double BasePlateOffsetX = 10.0;
+            double BasePlateOffsetY = 10.0;
+            double BasePlateThickness = 1.0;
+            //double OffsetZ = 30.0;
+            //double BasePlateOffsetX = 10.0;
+            //double BasePlateOffsetY = 10.0;
+            //double BasePlateThickness = 1.0;
+            //OCCTK.OCC.AIS.WAIS_Shape InputAISFace = Viewer.GetSelectedShape();
+            //testBase = OCCTK.Laser.WMakeSimpleClamp.TestMakeBase(InputWorkpiece, InputAISFace, OffsetZ, BasePlateThickness, BasePlateOffsetX, BasePlateOffsetY);
+            try
+            {
+                testBase = OCCTK.Laser.WMakeSimpleClamp.TestMakeBase_NoSelect(InputWorkpiece, OffsetZ, BasePlateThickness, BasePlateOffsetX, BasePlateOffsetY);
+                Viewer.Display(testBase.shape, true);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        private void Test_MakeV_Button_Click(object sender, RoutedEventArgs e)
+        {
+            double testXValue = -10.0;
+            double VerticalPlateClearances = 5.0;
+            double VerticalPlateMinSupportingLen = 500.0;
+            double VerticalPlateCuttingDistance = 20.0;
+            //double testXValue = 50.0;
+            //double VerticalPlateClearances = 3.0;
+            //double VerticalPlateMinSupportingLen = 500.0;
+            //double VerticalPlateCuttingDistance = 20.0;
+            List<WAIS_Shape> result = OCCTK.Laser.WMakeSimpleClamp.TestMakeVertical(InputWorkpiece,
+                                                                                    testBase,
+                                                                                    OCCTK.Laser.VerticalPlateDirection.X,
+                                                                                    testXValue,
+                                                                                    VerticalPlateClearances,
+                                                                                    VerticalPlateMinSupportingLen,
+                                                                                    VerticalPlateCuttingDistance);
+            foreach (var item in result)
+            {
+                Viewer.Display(item, true);
+            }
+        }
+        private void Test_MakeV_2_Button_Click(object sender, RoutedEventArgs e)
+        {
+            double testXValue = 20.0;
+            double VerticalPlateClearances = 5.0;
+            double VerticalPlateMinSupportingLen = 500.0;
+            double VerticalPlateCuttingDistance = 20.0;
+            List<WAIS_Shape> result = OCCTK.Laser.WMakeSimpleClamp.TestMakeVertical(InputWorkpiece,
+                                                                        testBase,
+                                                                        OCCTK.Laser.VerticalPlateDirection.X,
+                                                                        testXValue,
+                                                                        VerticalPlateClearances,
+                                                                        VerticalPlateMinSupportingLen,
+                                                                        VerticalPlateCuttingDistance);
+            foreach (var item in result)
+            {
+                Viewer.Display(item, true);
+            }
+        }
+        private void Test_ConnectV_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
+        }
+
+        private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
+        }
+
+        private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Edge);
+        }
+
+        private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Vertex);
+        }
+
+
     }
 }

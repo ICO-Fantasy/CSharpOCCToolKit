@@ -3,10 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <OCC_IncludePath>D:\OCC\7.7.0\opencascade-7.7.0-install\inc</OCC_IncludePath>
-    <OCC_IncludeTKRelease>
-    </OCC_IncludeTKRelease>
-    <OCC_LibTKRelease>
-    </OCC_LibTKRelease>
+    <OCC_IncludeTKRelease>D:\OCC\7.7.0\opencascade-7.7.0-install\win64\vc143\bin</OCC_IncludeTKRelease>
+    <OCC_LibTKRelease>D:\OCC\7.7.0\opencascade-7.7.0-install\win64\vc143\lib</OCC_LibTKRelease>
     <OCC_IncludeTKDebug>D:\OCC\7.7.0\opencascade-7.7.0-install\win64\vc143\bind</OCC_IncludeTKDebug>
     <OCC_LibTKDebug>D:\OCC\7.7.0\opencascade-7.7.0-install\win64\vc143\libd</OCC_LibTKDebug>
     <OCC_LibTKReleaseWithDebugInfo>

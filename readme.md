@@ -1,4 +1,4 @@
-# 配置需求
+﻿# 配置需求
 
 项目为 CLR 类库 (.NET) 项目，需要对以下配置进行更改
 
@@ -24,7 +24,7 @@
 
 |     交互     | mouseButton | ModifierKeys |  CurrentAction3d   |     Cursor      |
 | :----------: | :---------: | :----------: | :----------------: | :-------------: |
-|     单选     |    Left     |              |      Nothing       |  Cursors.Hand   |
+|     单选     |    Left     |              |    SingleSelect    |  Cursors.Hand   |
 |   连续选择   |    Left     |   Control    |   MultipleSelect   |  Cursors.Hand   |
 |   异或选择   |    Left     |    Shift     |  XORAreaSelection  |                 |
 |     框选     |    Left     |              |   AreaSelection    |  Cursors.Cross  |

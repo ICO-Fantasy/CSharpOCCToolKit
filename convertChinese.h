@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 #include <TCollection_ExtendedString.hxx>
 #include <Resource_Unicode.hxx>
 
 /// <summary>
-/// ×ª»»ÖĞÎÄ×Ö·ûÎªUnicode
+/// è½¬æ¢ä¸­æ–‡å­—ç¬¦ä¸ºUnicode
 /// </summary>
 /// <param name="chineseString"></param>
 /// <returns>TCollection_ExtendedString</returns>

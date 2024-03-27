@@ -1,7 +1,7 @@
 #include "WAIS_InteractiveObject.h"
-namespace OCCTK::OCC::AIS {
-InteractiveObject::InteractiveObject(Handle(Standard_Transient)* nativeHandle)
+namespace OCCTK::OCC::AIS
 {
+InteractiveObject::InteractiveObject(Handle(Standard_Transient)* nativeHandle) {
 	this->nativeHandle = nativeHandle;
 }
 bool InteractiveObject::IsNull() {

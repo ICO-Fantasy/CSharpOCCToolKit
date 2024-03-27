@@ -4,13 +4,13 @@
 #include <Standard_Handle.hxx>
 //字符编码转换
 #include "ConvertChinese.h"
-namespace OCCTK::OCC::AIS {
-ViewCube::ViewCube(float axisSize)
+namespace OCCTK::OCC::AIS
 {
+ViewCube::ViewCube(float axisSize) {
 	int R, G, B;
-	_ptransient = new Handle_Standard_Transient(new AIS_ViewCube());//创建基类对象智能指针
-	myViewCube = (Handle(AIS_ViewCube)*)_ptransient;//强制转换基类对象，并创建指向Handle(AIS_ViewCube)的指针
-	Handle(AIS_ViewCube) aViewCube = (*myViewCube);//指针解引用
+	_ptransient = new Handle_Standard_Transient(new AIS_ViewCube());// 创建基类对象智能指针
+	myViewCube = (Handle(AIS_ViewCube)*)_ptransient;// 强制转换基类对象，并创建指向Handle(AIS_ViewCube)的指针
+	Handle(AIS_ViewCube) aViewCube = (*myViewCube);// 指针解引用
 	// 设置坐标轴半径
 	aViewCube->SetAxesRadius(axisSize);
 	aViewCube->SetAxesConeRadius(axisSize * 1.5);
@@ -65,8 +65,7 @@ ViewCube::ViewCube(float axisSize)
 	// 设置立方体面到边间空隙的可选择范围
 	// aViewCube->SetBoxEdgeGap(0)
 }
-Handle(AIS_ViewCube)* ViewCube::GetOCC()
-{
+Handle(AIS_ViewCube)* ViewCube::GetOCC() {
 	return myViewCube;
 }
 }

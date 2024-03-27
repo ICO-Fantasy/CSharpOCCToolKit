@@ -1,17 +1,18 @@
-#pragma once
+ï»¿#pragma once
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <Resource_Unicode.hxx>
 #include <vcclr.h> 
 
-namespace OCCTK::DataExchange {
+using namespace System;
+namespace OCCTK::DataExchange
+{
 /// <summary>
-/// ½«C#×Ö·û´®×ª»»ÎªTCollection_AsciiString×Ö·û´®
+/// å°†C#å­—ç¬¦ä¸²è½¬æ¢ä¸ºTCollection_AsciiStringå­—ç¬¦ä¸²
 /// </summary>
 /// <param name="theString"></param>
 /// <returns></returns>
-TCollection_AsciiString toAsciiString(System::String^ theString)
-{
+TCollection_AsciiString toAsciiString(System::String^ theString) {
 	if (theString == nullptr)
 	{
 		return TCollection_AsciiString();
@@ -25,4 +26,5 @@ TCollection_AsciiString toAsciiString(System::String^ theString)
 	}
 	return TCollection_AsciiString(aWCharPtr);
 }
+
 }

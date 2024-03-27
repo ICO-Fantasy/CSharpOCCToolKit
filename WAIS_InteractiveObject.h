@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <AIS_InteractiveObject.hxx>
 #include <Standard_Handle.hxx>
 //using namespace OCCTK::OCC;
