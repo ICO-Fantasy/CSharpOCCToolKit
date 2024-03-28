@@ -165,8 +165,14 @@ namespace OCCTK::Laser
 		break;
 		case OCCTK::Laser::VerticalPlateDirection::Y:
 		{
-			TopoDS_Face aXPlane = MakeVerticalPlane(theValue, Y);
-			TopoDS_Shape aXSection = MakeSection(aXPlane, InputWorkpiece);
+			TopoDS_Face aYPlane = MakeVerticalPlane(theValue, Y);
+			TopoDS_Shape aYSection = MakeSection(aYPlane, InputWorkpiece);
+			std::vector<TopoDS_Shape> thePieces = MakeVerticalPieceWithSection(aYSection, Y, theBasePlate->Z, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+			for (AIS_Shape aV : thePieces)
+			{
+				WAIS_Shape^ theAISV = gcnew WAIS_Shape(aV);
+				result->Add(theAISV);
+			}
 		}
 		break;
 		default:

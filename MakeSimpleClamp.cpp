@@ -22,6 +22,7 @@
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <GCPnts_TangentialDeflection.hxx>
 #include <GProp_PEquation.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
 ///==============================
 ///生成底板 
 ///==============================
@@ -662,7 +663,161 @@ namespace LocalSpace
 #pragma endregion
 			break;
 		case Y:
-			//todo 还没做
+			//首先对每个线段中的首末点排序
+			for (auto& anEdge : TempEdges)
+			{
+				if (anEdge.startPoint.X() > anEdge.endPoint.X())
+				{
+					std::swap(anEdge.startPoint, anEdge.endPoint);
+				}
+			}
+			//按照 X 值从小到大排序，使用 lambda 表达式
+			std::sort(TempEdges.begin(), TempEdges.end(), [](const auto& a, const auto& b) {
+				return a.middlePoint.X() < b.middlePoint.X();
+				});
+#pragma region 找出所有段
+			while (begin < TempEdges.size())
+			{
+				//已添加
+				if (std::find(addedEdges.begin(), addedEdges.end(), TempEdges[begin]) != addedEdges.end()) {
+					begin++;
+					continue;
+				}
+				addedEdges.push_back(TempEdges[begin]);
+
+				PolyLine aLine;
+				aLine.Edges.push_back(TempEdges[begin]);
+				aLine.startPoint = TempEdges[begin].startPoint;
+				aLine.endPoint = TempEdges[begin].endPoint;
+				//从起始段开始，往后查找
+				IsDone = true;
+				while (IsDone)
+				{
+					bool continueF = false;
+					for (localEdge anEdge : TempEdges)
+					{
+						if (std::find(addedEdges.begin(), addedEdges.end(), anEdge) != addedEdges.end()) {
+							continue;
+						}
+						//拼接两点，并确保Y递增
+						if (anEdge.startPoint.IsEqual(aLine.endPoint, 1e-2) && anEdge.endPoint.X() > aLine.endPoint.X())
+						{
+							addedEdges.push_back(anEdge);
+							//Edge加入line中，并更新末端点
+							aLine.Edges.push_back(anEdge);
+							aLine.endPoint = anEdge.endPoint;
+							continueF = true;
+							break;
+						}
+					}
+					if (continueF)
+					{
+						continue;
+					}
+					IsDone = false;
+					Lines.push_back(aLine);
+				}
+			}
+#pragma endregion
+			//todo比较逻辑需要重写
+			//首先创建线段（上一步）
+			//然后比较两线段是否重叠
+			//如果重叠，取出两个线段的公共部分
+			//比较公共部分的中心点Z值大小
+			//抛弃Z大的那个（加入added）
+			//继续比较，直到栈为空
+#pragma region 比较逻辑
+			N1 = 0;
+			while (N1 < Lines.size())
+			{
+				PolyLine L1 = Lines[N1];
+				if (std::find(addedLines.begin(), addedLines.end(), L1) != addedLines.end())
+				{
+					N1++;
+					continue;
+				}
+				addedLines.push_back(L1);//待比较的项，先加入added
+				int N2 = 0;
+				while (N2 < Lines.size())
+				{
+					PolyLine L2 = Lines[N2];
+					if (std::find(addedLines.begin(), addedLines.end(), L2) != addedLines.end())
+					{
+						N2++;
+						continue;
+					}
+					// 比较L1和L2
+					//如果区间重叠
+					Standard_Real p1 = L1.startPoint.X(), p2 = L1.endPoint.X(), p3 = L2.startPoint.X(), p4 = L2.endPoint.X();
+					Standard_Real middle = -999999.0;
+					if (p1 < p3 && p3 < p2) {
+						middle = (p3 + p2) / 2;
+					}
+					else if (p3 < p1 && p1 < p4) {
+						auto middle = (p1 + p4) / 2;
+					}
+					else if (p3 < p1 && p2 < p4) {
+						auto middle = (p1 + p2) / 2;
+					}
+					else if (p1 < p3 && p4 < p2) {
+						auto middle = (p3 + p4) / 2;
+					}
+					if (middle != -999999.0) {//找到中点对应的边上对应的点
+						Standard_Real z1 = 0, z2 = 0;
+						for (auto anEdge : L1.Edges)
+						{
+							if (anEdge.startPoint.X() <= middle && middle <= anEdge.endPoint.X())
+							{
+								BRepAdaptor_Curve aBAC(anEdge.Edge);
+								Standard_Real ap1 = aBAC.FirstParameter();
+								Standard_Real ap2 = aBAC.LastParameter();
+								if (ap1 > ap2)
+								{
+									std::swap(ap1, ap2);
+								}
+								z1 = aBAC.Value(ap1 + (ap2 - ap1) * (middle - anEdge.startPoint.X()) / (anEdge.endPoint.X() - anEdge.startPoint.X())).Z();
+								break;
+							}
+						}
+						for (auto anEdge : L2.Edges)
+						{
+							if (anEdge.startPoint.X() <= middle && middle <= anEdge.endPoint.X())
+							{
+								BRepAdaptor_Curve aBAC(anEdge.Edge);
+								Standard_Real ap1 = aBAC.FirstParameter();
+								Standard_Real ap2 = aBAC.LastParameter();
+								if (ap1 > ap2)
+								{
+									std::swap(ap1, ap2);
+								}
+								z2 = aBAC.Value(ap1 + (ap2 - ap1) * (middle - anEdge.startPoint.X()) / (anEdge.endPoint.X() - anEdge.startPoint.X())).Z();
+								break;
+							}
+						}
+						//比较边上对应的点的Z值大小，取小的线段
+						if (z1 < z2)
+						{
+							removedLines.push_back(L2);
+						}
+						else {
+							removedLines.push_back(L1);
+						}
+						addedLines.push_back(L2);
+					}
+					N2++;
+				}
+				N1++;
+
+			}
+			//最后把没被移除的加入结果
+			for (auto theLine : Lines)
+			{
+				if (std::find(removedLines.begin(), removedLines.end(), theLine) == removedLines.end())
+				{
+					resultLines.push_back(theLine);
+				}
+			}
+#pragma endregion
 			break;
 		default:
 			//todo错误处理
@@ -687,16 +842,52 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 	Rings = GetRings(TempEdges);
 	//!每个环中取最下边的线段作为原始构造线
 	std::vector<LocalSpace::localEdge> originConstructionLines;
+	std::vector<TopoDS_Shape>TranslatedEdges;
 	for (auto aRing : Rings)
 	{
-		auto tempPLs = SplitRing(aRing, theDirection);
-		for (auto pl : tempPLs) {
-			for (auto l : pl.Edges)
+		std::vector <LocalSpace::PolyLine> SplitedPolyLine = SplitRing(aRing, theDirection);
+		//!将筛选出来的底边线都转化为直线，去掉圆弧
+		for (auto anPL : SplitedPolyLine) {
+			for (auto anLEdge : anPL.Edges)
 			{
-				result.push_back(l.Edge);
+				BRepAdaptor_Curve aBAC(anLEdge.Edge);
+				// 曲线类型
+				if (aBAC.GetType() == GeomAbs_Line) {
+					TranslatedEdges.push_back(anLEdge.Edge);
+					//result.push_back(anLEdge.Edge);//test
+				}
+				else if (aBAC.GetType() == GeomAbs_BSplineCurve)
+				{
+					//!转换样条线为直线
+					Standard_Real f, s;
+					Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(anLEdge.Edge), f, s);
+					GeomAdaptor_Curve aCurveAdaptor(aCurve);
+					Standard_Real anADeflect = 0.1 * 3.1415; //todo考虑开放出参数 角度偏差 Angular deflection
+					Standard_Real aCDeflect = 2; //todo考虑开放出参数 曲率偏差 Curvature deflection
+					GCPnts_TangentialDeflection aPointsOnCurve;
+					aPointsOnCurve.Initialize(aCurveAdaptor, anADeflect, aCDeflect);
+					if (aPointsOnCurve.NbPoints() <= 2)//!简单的认为没离散出来点的样条线就是直线
+					{
+						TopoDS_Shape newEdge = BRepBuilderAPI_MakeEdge(anLEdge.startPoint, anLEdge.endPoint).Shape();
+						TranslatedEdges.push_back(newEdge);
+						//result.push_back(newEdge);//test
+					}
+					//result.push_back(anLEdge.Edge);//test
+					//for (int i = 1; i <= aPointsOnCurve.NbPoints(); ++i)
+					//{
+					//	double aU = aPointsOnCurve.Parameter(i);
+					//	gp_Pnt aPnt = aPointsOnCurve.Value(i);
+					//	result.push_back(BRepBuilderAPI_MakeVertex(aPnt).Shape());
+					//}
+				}
+				else
+				{
+					//todo没处理圆弧和其它类型曲线
+					//auto othertype=aBAC.GetType();
+					//result.push_back(anLEdge.Edge);
+				}
 			}
 		}
-		////todo将LocalSpace::Ring中的线都转化为直线，去掉圆弧
 		//Ring newRing = ConvertRing(aRing);
 		////todo采用直接删去垂直线段（沿Z方向）的逻辑，如果有超过两段线是垂直的，将会出错。
 		//std::vector<localEdge>theEdges = GetConstructionLinesFromRing(newRing);
@@ -704,6 +895,27 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 		//{
 		//	originConstructionLines.insert(originConstructionLines.end(), theEdges.begin(), theEdges.end());
 		//}
+	}
+	//!利用所有TranslatedEdges构造平板(Face)
+	//todo需要首先缩短和切割板
+	for (auto anEdge : TranslatedEdges) {
+		BRepAdaptor_Curve aBAC(TopoDS::Edge(anEdge));
+		gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
+		gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
+		gp_Pnt p3(p2.X(), p2.Y(), theZ);
+		gp_Pnt p4(p1.X(), p1.Y(), theZ);
+		//todo没有检查GC_MakeSegment是否构造成功
+		Handle(Geom_TrimmedCurve) L1 = GC_MakeSegment(p1, p2);
+		Handle(Geom_TrimmedCurve) L2 = GC_MakeSegment(p2, p3);
+		Handle(Geom_TrimmedCurve) L3 = GC_MakeSegment(p3, p4);
+		Handle(Geom_TrimmedCurve) L4 = GC_MakeSegment(p4, p1);
+		BRepBuilderAPI_MakeWire aWireMk = BRepBuilderAPI_MakeWire();
+		aWireMk.Add(BRepBuilderAPI_MakeEdge(L1));
+		aWireMk.Add(BRepBuilderAPI_MakeEdge(L2));
+		aWireMk.Add(BRepBuilderAPI_MakeEdge(L3));
+		aWireMk.Add(BRepBuilderAPI_MakeEdge(L4));
+		TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(aWireMk.Wire());
+		result.push_back(myFaceProfile);//test
 	}
 #pragma endregion
 	return result;

@@ -82,8 +82,8 @@ namespace TestWPF
         private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
         {
             //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("testWorkPiece.STEP");
-            //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("test_b柱_5421231-ed01.STEP");
-            InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("testSmall.STEP");
+            InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("test_b柱_5421231-ed01.STEP");
+            //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("testSmall.STEP");
             Viewer.Display(InputWorkpiece, true);
         }
 
@@ -118,6 +118,7 @@ namespace TestWPF
         private void Test_MakeV_Button_Click(object sender, RoutedEventArgs e)
         {
             double testXValue = -10.0;
+            double testYValue = -300.0;
             double VerticalPlateClearances = 5.0;
             double VerticalPlateMinSupportingLen = 500.0;
             double VerticalPlateCuttingDistance = 20.0;
@@ -132,6 +133,14 @@ namespace TestWPF
                                                                                     VerticalPlateClearances,
                                                                                     VerticalPlateMinSupportingLen,
                                                                                     VerticalPlateCuttingDistance);
+            List<WAIS_Shape> result2 = OCCTK.Laser.WMakeSimpleClamp.TestMakeVertical(InputWorkpiece,
+                                                                                    testBase,
+                                                                                    OCCTK.Laser.VerticalPlateDirection.Y,
+                                                                                    testYValue,
+                                                                                    VerticalPlateClearances,
+                                                                                    VerticalPlateMinSupportingLen,
+                                                                                    VerticalPlateCuttingDistance);
+            result.AddRange(result2);
             foreach (var item in result)
             {
                 Viewer.Display(item, true);
