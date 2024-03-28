@@ -145,7 +145,7 @@ namespace OCCTK::Laser
 		theBasePlate->shape = gcnew WAIS_Shape(theAIS);
 		return theBasePlate;
 	}
-	List<WAIS_Shape^>^ WMakeSimpleClamp::TestMakeVertical(WAIS_Shape^ InputAISWorkpiece, BasePlate^ theBasePlate, VerticalPlateDirection theVDir, double theValue, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance) {
+	List<WAIS_Shape^>^ WMakeSimpleClamp::TestMakeVertical(WAIS_Shape^ InputAISWorkpiece, BasePlate^ theBasePlate, VerticalPlateDirection theVDir, double theValue, double maxVerticalLength, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance) {
 		TopoDS_Shape InputWorkpiece = (*InputAISWorkpiece->GetOCC())->Shape();
 		List<WAIS_Shape^>^ result = gcnew List<WAIS_Shape^>();
 		switch (theVDir)
@@ -155,10 +155,13 @@ namespace OCCTK::Laser
 			TopoDS_Face aXPlane = MakeVerticalPlane(theValue, X);
 			TopoDS_Shape aXSection = MakeSection(aXPlane, InputWorkpiece);
 			//result->Add(gcnew WAIS_Shape(aXSection));//test
-			std::vector<TopoDS_Shape> thePieces = MakeVerticalPieceWithSection(aXSection, X, theBasePlate->Z, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
-			for (AIS_Shape aV : thePieces)
+			std::vector<TopoDS_Shape> thePieces = MakeVerticalPieceWithSection(aXSection, X, theBasePlate->Z, maxVerticalLength, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+			for (auto aV : thePieces)
 			{
-				WAIS_Shape^ theAISV = gcnew WAIS_Shape(aV);
+				AIS_Shape aAIS(aV);
+				aAIS.SetColor(Quantity_NOC_GREEN);
+				aAIS.SetTransparency(0.2);
+				WAIS_Shape^ theAISV = gcnew WAIS_Shape(aAIS);
 				result->Add(theAISV);
 			}
 		}
@@ -167,10 +170,13 @@ namespace OCCTK::Laser
 		{
 			TopoDS_Face aYPlane = MakeVerticalPlane(theValue, Y);
 			TopoDS_Shape aYSection = MakeSection(aYPlane, InputWorkpiece);
-			std::vector<TopoDS_Shape> thePieces = MakeVerticalPieceWithSection(aYSection, Y, theBasePlate->Z, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
-			for (AIS_Shape aV : thePieces)
+			std::vector<TopoDS_Shape> thePieces = MakeVerticalPieceWithSection(aYSection, Y, theBasePlate->Z, maxVerticalLength, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+			for (auto aV : thePieces)
 			{
-				WAIS_Shape^ theAISV = gcnew WAIS_Shape(aV);
+				AIS_Shape aAIS(aV);
+				aAIS.SetColor(Quantity_NOC_RED);
+				aAIS.SetTransparency(0.2);
+				WAIS_Shape^ theAISV = gcnew WAIS_Shape(aAIS);
 				result->Add(theAISV);
 			}
 		}

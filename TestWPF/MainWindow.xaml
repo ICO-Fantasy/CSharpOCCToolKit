@@ -18,12 +18,11 @@
     </Window.Resources>
     <Grid x:Name="main_grid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="67*"/>
-            <RowDefinition Height="0*"/>
-            <RowDefinition Height="918*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="19*"/>
         </Grid.RowDefinitions>
-        <Grid x:Name="canvas_grid" Grid.Row="2"/>
-        <ToolBar Margin="0,0,0,918" Grid.RowSpan="3">
+        <!--Toolbar-->
+        <ToolBar Margin="0,0,0,34">
             <System:String xml:space="preserve">视图方向 </System:String>
             <!--使用自定义的按钮模板-->
             <Button Content="Front" Template="{StaticResource RoundedButtonTemplate}" Click="ForntView_Button_Click"/>
@@ -53,8 +52,13 @@
             <Button Content="BasePlate" Template="{StaticResource RoundedButtonTemplate}" Click="Test_BasePlate_Button_Click"/>
             <Button Content="MakeV" Template="{StaticResource RoundedButtonTemplate}" Click="Test_MakeV_Button_Click"/>
             <Button Content="ConnectV" Template="{StaticResource RoundedButtonTemplate}" Click="Test_ConnectV_Button_Click"/>
-            <Button Content="测试2" Template="{StaticResource RoundedButtonTemplate}" Click="Test_input_test_2_Click"/>
-            <Button Content="MakeV_2" Template="{StaticResource RoundedButtonTemplate}" Click="Test_MakeV_2_Button_Click"/>
+            <Button Content="导入2" Template="{StaticResource RoundedButtonTemplate}" Click="Test_input_test_2_Click"/>
+            <Button Content="导入3" Template="{StaticResource RoundedButtonTemplate}" Click="Test_input_test_2_Click"/>
         </ToolBar>
+
+        <!--canvas-->
+        <Grid Grid.Row="1" x:Name="canvas_grid" >
+        </Grid>
+
     </Grid>
 </Window>

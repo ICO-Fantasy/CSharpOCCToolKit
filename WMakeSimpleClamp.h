@@ -29,7 +29,7 @@ namespace OCCTK::Laser
 		static WAIS_Shape^ TestInputWorkpiece(String^ path);
 		static BasePlate^ TestMakeBase(WAIS_Shape^ InputAISWorkpiece, WAIS_Shape^ InputAISFace, double OffsetZ, double BasePlateThickness, double BasePlateOffsetX, double BasePlateOffsetY);
 		static BasePlate^ TestMakeBase_NoSelect(WAIS_Shape^ InputAISWorkpiece, double OffsetZ, double BasePlateThickness, double BasePlateOffsetX, double BasePlateOffsetY);
-		static List<WAIS_Shape^>^ TestMakeVertical(WAIS_Shape^ InputAISWorkpiece, BasePlate^ theBasePlate, VerticalPlateDirection theVDir, double theValue, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance);
+		static List<WAIS_Shape^>^ TestMakeVertical(WAIS_Shape^ InputAISWorkpiece, BasePlate^ theBasePlate, VerticalPlateDirection theVDir, double theValue, double maxVerticalLength, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance);
 	};
 }
 

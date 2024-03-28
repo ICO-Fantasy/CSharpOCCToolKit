@@ -826,7 +826,7 @@ namespace LocalSpace
 		return resultLines;
 	}
 }
-static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSection, Direction theDirection, Standard_Real theZ, Standard_Real VerticalPlateClearances, Standard_Real VerticalPlateMinSupportingLen, Standard_Real VerticalPlateCuttingDistance) {
+static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSection, Direction theDirection, Standard_Real theZ, Standard_Real maxVerticalLength, Standard_Real VerticalPlateClearances, Standard_Real VerticalPlateMinSupportingLen, Standard_Real VerticalPlateCuttingDistance) {
 	std::vector<TopoDS_Shape>result;
 #pragma region 得到原始构造线
 	//!首先判断有几个环，对环进行处理
@@ -842,52 +842,76 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 	Rings = GetRings(TempEdges);
 	//!每个环中取最下边的线段作为原始构造线
 	std::vector<LocalSpace::localEdge> originConstructionLines;
-	std::vector<TopoDS_Shape>TranslatedEdges;
+	std::vector<LocalSpace::localEdge>TranslatedEdges;
+	//std::vector<TopoDS_Shape>TranslatedEdges;//03-28修改
 	for (auto aRing : Rings)
 	{
 		std::vector <LocalSpace::PolyLine> SplitedPolyLine = SplitRing(aRing, theDirection);
-		//!将筛选出来的底边线都转化为直线，去掉圆弧
-		for (auto anPL : SplitedPolyLine) {
-			for (auto anLEdge : anPL.Edges)
-			{
-				BRepAdaptor_Curve aBAC(anLEdge.Edge);
-				// 曲线类型
-				if (aBAC.GetType() == GeomAbs_Line) {
-					TranslatedEdges.push_back(anLEdge.Edge);
-					//result.push_back(anLEdge.Edge);//test
-				}
-				else if (aBAC.GetType() == GeomAbs_BSplineCurve)
+		for (auto PL : SplitedPolyLine) {
+			for (auto LE : PL.Edges) {
+				switch (theDirection)
 				{
-					//!转换样条线为直线
-					Standard_Real f, s;
-					Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(anLEdge.Edge), f, s);
-					GeomAdaptor_Curve aCurveAdaptor(aCurve);
-					Standard_Real anADeflect = 0.1 * 3.1415; //todo考虑开放出参数 角度偏差 Angular deflection
-					Standard_Real aCDeflect = 2; //todo考虑开放出参数 曲率偏差 Curvature deflection
-					GCPnts_TangentialDeflection aPointsOnCurve;
-					aPointsOnCurve.Initialize(aCurveAdaptor, anADeflect, aCDeflect);
-					if (aPointsOnCurve.NbPoints() <= 2)//!简单的认为没离散出来点的样条线就是直线
+				case X:
+					if (LE.endPoint.Y() - LE.startPoint.Y() > maxVerticalLength)
 					{
-						TopoDS_Shape newEdge = BRepBuilderAPI_MakeEdge(anLEdge.startPoint, anLEdge.endPoint).Shape();
-						TranslatedEdges.push_back(newEdge);
-						//result.push_back(newEdge);//test
+						TranslatedEdges.push_back(LE);
 					}
-					//result.push_back(anLEdge.Edge);//test
-					//for (int i = 1; i <= aPointsOnCurve.NbPoints(); ++i)
-					//{
-					//	double aU = aPointsOnCurve.Parameter(i);
-					//	gp_Pnt aPnt = aPointsOnCurve.Value(i);
-					//	result.push_back(BRepBuilderAPI_MakeVertex(aPnt).Shape());
-					//}
-				}
-				else
-				{
-					//todo没处理圆弧和其它类型曲线
-					//auto othertype=aBAC.GetType();
-					//result.push_back(anLEdge.Edge);
+					break;
+				case Y:
+					if (LE.endPoint.X() - LE.startPoint.X() > maxVerticalLength)
+					{
+						TranslatedEdges.push_back(LE);
+					}
+					TranslatedEdges.push_back(LE);
+					break;
+				default:
+					break;
 				}
 			}
 		}
+#pragma region 将筛选出来的底边线都转化为直线，去掉圆弧（2024-03-28去掉该功能）
+		//for (auto anPL : SplitedPolyLine) {
+		//	for (auto anLEdge : anPL.Edges)
+		//	{
+		//		BRepAdaptor_Curve aBAC(anLEdge.Edge);
+		//		// 曲线类型
+		//		if (aBAC.GetType() == GeomAbs_Line) {
+		//			TranslatedEdges.push_back(anLEdge.Edge);
+		//			//result.push_back(anLEdge.Edge);//test
+		//		}
+		//		else if (aBAC.GetType() == GeomAbs_BSplineCurve)
+		//		{
+		//			//!转换样条线为直线
+		//			Standard_Real f, s;
+		//			Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(anLEdge.Edge), f, s);
+		//			GeomAdaptor_Curve aCurveAdaptor(aCurve);
+		//			Standard_Real anADeflect = 0.1 * 3.1415; //todo考虑开放出参数 角度偏差 Angular deflection
+		//			Standard_Real aCDeflect = 2; //todo考虑开放出参数 曲率偏差 Curvature deflection
+		//			GCPnts_TangentialDeflection aPointsOnCurve;
+		//			aPointsOnCurve.Initialize(aCurveAdaptor, anADeflect, aCDeflect);
+		//			if (aPointsOnCurve.NbPoints() <= 2)//!简单的认为没离散出来点的样条线就是直线
+		//			{
+		//				TopoDS_Shape newEdge = BRepBuilderAPI_MakeEdge(anLEdge.startPoint, anLEdge.endPoint).Shape();
+		//				TranslatedEdges.push_back(newEdge);
+		//				//result.push_back(newEdge);//test
+		//			}
+		//			//result.push_back(anLEdge.Edge);//test
+		//			//for (int i = 1; i <= aPointsOnCurve.NbPoints(); ++i)
+		//			//{
+		//			//	double aU = aPointsOnCurve.Parameter(i);
+		//			//	gp_Pnt aPnt = aPointsOnCurve.Value(i);
+		//			//	result.push_back(BRepBuilderAPI_MakeVertex(aPnt).Shape());
+		//			//}
+		//		}
+		//		else
+		//		{
+		//			//todo没处理圆弧和其它类型曲线
+		//			//auto othertype=aBAC.GetType();
+		//			//result.push_back(anLEdge.Edge);
+		//		}
+		//	}
+		//}
+
 		//Ring newRing = ConvertRing(aRing);
 		////todo采用直接删去垂直线段（沿Z方向）的逻辑，如果有超过两段线是垂直的，将会出错。
 		//std::vector<localEdge>theEdges = GetConstructionLinesFromRing(newRing);
@@ -895,28 +919,52 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 		//{
 		//	originConstructionLines.insert(originConstructionLines.end(), theEdges.begin(), theEdges.end());
 		//}
+#pragma endregion
 	}
-	//!利用所有TranslatedEdges构造平板(Face)
+#pragma region 利用所有TranslatedEdges构造平板(Face)（2024-03-28修改该功能）
+	////todo需要首先缩短和切割板
+	//for (auto anEdge : TranslatedEdges) {
+	//	BRepAdaptor_Curve aBAC(TopoDS::Edge(anEdge));
+	//	gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
+	//	gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
+	//	gp_Pnt p3(p2.X(), p2.Y(), theZ);
+	//	gp_Pnt p4(p1.X(), p1.Y(), theZ);
+	//	//todo没有检查GC_MakeSegment是否构造成功
+	//	Handle(Geom_TrimmedCurve) L1 = GC_MakeSegment(p1, p2);
+	//	Handle(Geom_TrimmedCurve) L2 = GC_MakeSegment(p2, p3);
+	//	Handle(Geom_TrimmedCurve) L3 = GC_MakeSegment(p3, p4);
+	//	Handle(Geom_TrimmedCurve) L4 = GC_MakeSegment(p4, p1);
+	//	BRepBuilderAPI_MakeWire aWireMk = BRepBuilderAPI_MakeWire();
+	//	aWireMk.Add(BRepBuilderAPI_MakeEdge(L1));
+	//	aWireMk.Add(BRepBuilderAPI_MakeEdge(L2));
+	//	aWireMk.Add(BRepBuilderAPI_MakeEdge(L3));
+	//	aWireMk.Add(BRepBuilderAPI_MakeEdge(L4));
+	//	TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(aWireMk.Wire());
+	//	result.push_back(myFaceProfile);//test
+	//}
+#pragma endregion
+#pragma region 利用样条线构造平板
 	//todo需要首先缩短和切割板
 	for (auto anEdge : TranslatedEdges) {
-		BRepAdaptor_Curve aBAC(TopoDS::Edge(anEdge));
-		gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
-		gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
+		//BRepAdaptor_Curve aBAC(TopoDS::Edge(anEdge.Edge));
+		gp_Pnt p1 = anEdge.startPoint;
+		gp_Pnt p2 = anEdge.endPoint;
 		gp_Pnt p3(p2.X(), p2.Y(), theZ);
 		gp_Pnt p4(p1.X(), p1.Y(), theZ);
 		//todo没有检查GC_MakeSegment是否构造成功
-		Handle(Geom_TrimmedCurve) L1 = GC_MakeSegment(p1, p2);
+		//Handle(Geom_TrimmedCurve) L1 = GC_MakeSegment(p1, p2);
 		Handle(Geom_TrimmedCurve) L2 = GC_MakeSegment(p2, p3);
 		Handle(Geom_TrimmedCurve) L3 = GC_MakeSegment(p3, p4);
 		Handle(Geom_TrimmedCurve) L4 = GC_MakeSegment(p4, p1);
 		BRepBuilderAPI_MakeWire aWireMk = BRepBuilderAPI_MakeWire();
-		aWireMk.Add(BRepBuilderAPI_MakeEdge(L1));
+		aWireMk.Add(anEdge.Edge);
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(L2));
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(L3));
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(L4));
 		TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(aWireMk.Wire());
 		result.push_back(myFaceProfile);//test
 	}
+#pragma endregion
 #pragma endregion
 	return result;
 }
