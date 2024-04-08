@@ -158,6 +158,7 @@
     <ClCompile Include="convertChinese.cpp" />
     <ClCompile Include="CSharpViewer.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
+    <ClCompile Include="PlatePiece.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="WAIS_InteractiveObject.cpp" />
     <ClCompile Include="WAIS_Shape.cpp" />

@@ -131,6 +131,30 @@ static TopoDS_Shape MakeBasePlateShape(gp_Pnt theLowerLeftPoint, gp_Pnt theTopRi
 	BRepPrimAPI_MakeBox aBoxMaker(lowerLeftPointWithZ, topRightPointWithZ);
 	return aBoxMaker.Shape();
 }
+static TopoDS_Shape MakeBasePlate(gp_Pnt theLowerLeftPoint, gp_Pnt theTopRightPoint, Standard_Real theZ, Standard_Real dmx, Standard_Real dmy) {
+
+	// 根据边界框尺寸创建立方体
+	Standard_Real xmin = theLowerLeftPoint.X();
+	Standard_Real ymin = theLowerLeftPoint.Y();
+	Standard_Real xmax = theTopRightPoint.X();
+	Standard_Real ymax = theTopRightPoint.Y();
+	gp_Pnt lowerLeftPointWithZ(xmin - dmx, ymin - dmy, theZ);
+	gp_Pnt p2(xmin, ymax, theZ);
+	gp_Pnt topRightPointWithZ(xmax + dmx, ymax + dmy, theZ);
+	gp_Pnt p4(xmax, ymin, theZ);
+	//todo没有检查GC_MakeSegment是否构造成功
+	Handle(Geom_TrimmedCurve) L1 = GC_MakeSegment(lowerLeftPointWithZ, p2);
+	Handle(Geom_TrimmedCurve) L2 = GC_MakeSegment(p2, topRightPointWithZ);
+	Handle(Geom_TrimmedCurve) L3 = GC_MakeSegment(topRightPointWithZ, p4);
+	Handle(Geom_TrimmedCurve) L4 = GC_MakeSegment(p4, lowerLeftPointWithZ);
+	BRepBuilderAPI_MakeWire aWireMk = BRepBuilderAPI_MakeWire();
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(L1));
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(L2));
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(L3));
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(L4));
+	BRepBuilderAPI_MakeFace aFaceMaker = BRepBuilderAPI_MakeFace(aWireMk.Wire());
+	return aFaceMaker.Shape();
+}
 ///==============================
 ///生成竖板 
 ///==============================
@@ -216,6 +240,13 @@ namespace LocalSpace
 			return startPoint.IsEqual(other.startPoint, 1e-4) && endPoint.IsEqual(other.endPoint, 1e-4);
 		}
 	};
+	struct Piece {
+		TopoDS_Shape Shape;
+		TopoDS_Edge Edge;
+		double Start;
+		double End;
+	};
+
 	static void AddEdgeToRing(Ring& theRing, std::vector<localEdge>& Edges) {
 		// 使用迭代器遍历 Edges
 		for (auto it = Edges.begin(); it != Edges.end(); ++it)
@@ -593,16 +624,16 @@ namespace LocalSpace
 					//如果区间重叠
 					Standard_Real p1 = L1.startPoint.Y(), p2 = L1.endPoint.Y(), p3 = L2.startPoint.Y(), p4 = L2.endPoint.Y();
 					Standard_Real middle = -999999.0;
-					if (p1 < p3 && p3 < p2) {
+					if (p1 <= p3 && p3 < p2) {
 						middle = (p3 + p2) / 2;
 					}
-					else if (p3 < p1 && p1 < p4) {
+					else if (p3 <= p1 && p1 < p4) {
 						auto middle = (p1 + p4) / 2;
 					}
-					else if (p3 < p1 && p2 < p4) {
+					else if (p3 <= p1 && p2 <= p4) {
 						auto middle = (p1 + p2) / 2;
 					}
-					else if (p1 < p3 && p4 < p2) {
+					else if (p1 <= p3 && p4 <= p2) {
 						auto middle = (p3 + p4) / 2;
 					}
 					if (middle != -999999.0) {//找到中点对应的边上对应的点
@@ -676,8 +707,22 @@ namespace LocalSpace
 				return a.middlePoint.X() < b.middlePoint.X();
 				});
 #pragma region 找出所有段
+
 			while (begin < TempEdges.size())
 			{
+				//只有两条线的情况下不用找，直接比较
+				if (TempEdges.size() <= 2)
+				{
+					// 逐个将TempEdges中的元素插入到Lines的末尾
+					for (const auto& edge : TempEdges) {
+						PolyLine tLine;
+						tLine.Edges.push_back(edge);
+						tLine.startPoint = edge.startPoint;
+						tLine.endPoint = edge.endPoint;
+						Lines.push_back(tLine);
+					}
+					break;
+				}
 				//已添加
 				if (std::find(addedEdges.begin(), addedEdges.end(), TempEdges[begin]) != addedEdges.end()) {
 					begin++;
@@ -750,16 +795,16 @@ namespace LocalSpace
 					//如果区间重叠
 					Standard_Real p1 = L1.startPoint.X(), p2 = L1.endPoint.X(), p3 = L2.startPoint.X(), p4 = L2.endPoint.X();
 					Standard_Real middle = -999999.0;
-					if (p1 < p3 && p3 < p2) {
+					if (p1 <= p3 && p3 < p2) {
 						middle = (p3 + p2) / 2;
 					}
-					else if (p3 < p1 && p1 < p4) {
+					else if (p3 <= p1 && p1 < p4) {
 						auto middle = (p1 + p4) / 2;
 					}
-					else if (p3 < p1 && p2 < p4) {
+					else if (p3 <= p1 && p2 <= p4) {
 						auto middle = (p1 + p2) / 2;
 					}
-					else if (p1 < p3 && p4 < p2) {
+					else if (p1 <= p3 && p4 <= p2) {
 						auto middle = (p3 + p4) / 2;
 					}
 					if (middle != -999999.0) {//找到中点对应的边上对应的点
@@ -826,8 +871,8 @@ namespace LocalSpace
 		return resultLines;
 	}
 }
-static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSection, Direction theDirection, Standard_Real theZ, Standard_Real maxVerticalLength, Standard_Real VerticalPlateClearances, Standard_Real VerticalPlateMinSupportingLen, Standard_Real VerticalPlateCuttingDistance) {
-	std::vector<TopoDS_Shape>result;
+static std::vector<LocalSpace::Piece> MakeVerticalPieceWithSection(TopoDS_Shape theSection, Direction theDirection, Standard_Real theZ, Standard_Real VerticalPlateClearances, Standard_Real VerticalPlateMinSupportingLen, Standard_Real VerticalPlateCuttingDistance) {
+	std::vector<LocalSpace::Piece>result;
 #pragma region 得到原始构造线
 	//!首先判断有几个环，对环进行处理
 	std::vector<LocalSpace::localEdge>TempEdges;
@@ -852,17 +897,17 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 				switch (theDirection)
 				{
 				case X:
-					if (LE.endPoint.Y() - LE.startPoint.Y() > maxVerticalLength)
+					//!不保存小于最小支撑长度的线
+					if (LE.endPoint.Y() - LE.startPoint.Y() > VerticalPlateMinSupportingLen)
 					{
 						TranslatedEdges.push_back(LE);
 					}
 					break;
 				case Y:
-					if (LE.endPoint.X() - LE.startPoint.X() > maxVerticalLength)
+					if (LE.endPoint.X() - LE.startPoint.X() > VerticalPlateMinSupportingLen)
 					{
 						TranslatedEdges.push_back(LE);
 					}
-					TranslatedEdges.push_back(LE);
 					break;
 				default:
 					break;
@@ -946,6 +991,21 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 #pragma region 利用样条线构造平板
 	//todo需要首先缩短和切割板
 	for (auto anEdge : TranslatedEdges) {
+		LocalSpace::Piece anPiece;
+		anPiece.Edge = anEdge.Edge;
+		switch (theDirection)
+		{
+		case X:
+			anPiece.Start = anEdge.startPoint.Y();
+			anPiece.End = anEdge.endPoint.Y();
+			break;
+		case Y:
+			anPiece.Start = anEdge.startPoint.X();
+			anPiece.End = anEdge.endPoint.X();
+			break;
+		default:
+			break;
+		}
 		//BRepAdaptor_Curve aBAC(TopoDS::Edge(anEdge.Edge));
 		gp_Pnt p1 = anEdge.startPoint;
 		gp_Pnt p2 = anEdge.endPoint;
@@ -962,12 +1022,28 @@ static std::vector<TopoDS_Shape> MakeVerticalPieceWithSection(TopoDS_Shape theSe
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(L3));
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(L4));
 		TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(aWireMk.Wire());
-		result.push_back(myFaceProfile);//test
+		anPiece.Shape = myFaceProfile;
+		result.push_back(anPiece);//test
 	}
 #pragma endregion
 #pragma endregion
 	return result;
 }
+
+
+///==============================
+///生成竖板 (需求变更，以下代码废弃)
+///==============================
+/// <summary>
+/// 生成竖板
+/// </summary>
+/// <param name="theSection"></param>
+/// <param name="theDirection"></param>
+/// <param name="otherSections"></param>
+/// <param name="theX"></param>
+/// <param name="theY"></param>
+/// <param name="theZ"></param>
+/// <returns></returns>
 // 定义一个结构体
 struct myEdge {
 	TopoDS_Edge topo;
@@ -1005,20 +1081,6 @@ static bool IsEdgePiar(myEdge edge1, myEdge edge2) {
 		return false;
 	}
 }
-
-///==============================
-///生成竖板 (需求变更，以下代码废弃)
-///==============================
-/// <summary>
-/// 生成竖板
-/// </summary>
-/// <param name="theSection"></param>
-/// <param name="theDirection"></param>
-/// <param name="otherSections"></param>
-/// <param name="theX"></param>
-/// <param name="theY"></param>
-/// <param name="theZ"></param>
-/// <returns></returns>
 static TopoDS_Shape MakeVerticalPlateWithSection(std::pair<double, TopoDS_Shape> theSectionPair, Direction theDirection, std::map<double, TopoDS_Shape> otherSections, Standard_Real BasePlateLength, Standard_Real theX, Standard_Real theY, Standard_Real theZ, Standard_Real VerticalPlateThickness, Standard_Real VerticalPlateConnectionHeight, Standard_Real VerticalPlateClearances, Standard_Real VerticalPlateMinSupportingLen, Standard_Real VerticalPlateCuttingDistance) {
 	//todo首先生成板，再考虑连接
 

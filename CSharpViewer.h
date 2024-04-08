@@ -57,6 +57,7 @@ namespace OCCTK::Visualization
 		void MoveTo(int theX, int theY);
 		void SetSelectionMode(SelectionMode theMode);
 		void Select(void);
+		void SelectAIS(AIS::WAIS_Shape^ theAIS);
 		void MultipleSelect(void);
 		void XORSelect(void);
 		void AreaSelect(int theX1, int theY1, int theX2, int theY2);
@@ -64,6 +65,9 @@ namespace OCCTK::Visualization
 		void XORAreaSelect(int theX1, int theY1, int theX2, int theY2);
 		void Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 		void Display(AIS::WAIS_Shape^ theAIS, bool theToUpdateViewer);
+		void EraseAll();
+		void Erase(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
+		void Erase(AIS::WAIS_Shape^ theAIS, bool theToUpdateViewer);
 		AIS::WAIS_Shape^ GetSelectedAIS(void);
 		void DisplayOriginTrihedron();
 #pragma endregion
@@ -75,7 +79,6 @@ namespace OCCTK::Visualization
 		//!测试代码
 		void Test(void);
 		AIS::WAIS_Shape^ TestMakeBox(void);
-		void MakeClampTest(double theX, double theY, double theZ, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY, double BasePlateThickness, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance);
 	private:
 		// 将成员变为托管类型
 		NCollection_Haft<Handle(V3d_Viewer)> myViewer;

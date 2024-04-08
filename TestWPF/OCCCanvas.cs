@@ -1,4 +1,7 @@
-﻿using OCCTK.OCC.AIS;
+﻿using System;
+using System.Windows.Forms;
+
+using OCCTK.OCC.AIS;
 using OCCTK.Visualization;
 
 namespace OCCViewForm;
@@ -67,44 +70,6 @@ public class OCCCanvas : Form
         this.SetDisplayMode(DisplayMode.Shading);
         this.FitAll();
         //viewer.DisplayViewTrihedron(5);
-    }
-    public void MakeClampTest()
-    {
-        double theX = 0.0;
-        double theY = 0.0;
-        double theZ = 0.0;
-        double OffsetZ = 30.0;
-        double BasePlateOffsetX = 10.0;
-        double BasePlateOffsetY = 10.0;
-        double BasePlateThickness = 1.0;
-        double BasePlateLengthX = 0.0;
-        double BasePlateLengthY = 0.0;
-
-        double VerticalPlateThickness = 1.0;
-        double VerticalPlateInitialOffsetX = 5.0;
-        double VerticalPlateOffsetX = 20.0;
-        double VerticalPlateInitialOffsetY = 5.0;
-        double VerticalPlateOffsetY = 10.0;
-        double VerticalPlateConnectionHeight = 15.0;
-
-        //double VerticalPlateThickness = 1.0;
-        //double VerticalPlateInitialOffsetX = 5.0;
-        //double VerticalPlateOffsetX = 20.0;
-        //double VerticalPlateInitialOffsetY = 5.0;
-        //double VerticalPlateOffsetY = 10.0;
-        //double VerticalPlateConnectionHeight = 15.0;
-
-        double VerticalPlateClearances = 3.0;
-        double VerticalPlateMinSupportingLen = 500.0;
-        double VerticalPlateCuttingDistance = 20.0;
-        viewer.MakeClampTest(
-            theX, theY, theZ, OffsetZ, BasePlateOffsetX, BasePlateOffsetY, BasePlateThickness, BasePlateLengthX,
-            BasePlateLengthY, VerticalPlateThickness, VerticalPlateInitialOffsetX, VerticalPlateOffsetX,
-            VerticalPlateInitialOffsetY, VerticalPlateOffsetY, VerticalPlateConnectionHeight, VerticalPlateClearances,
-            VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
-        this.FitAll();
-        //viewer.DisplayViewTrihedron(5);
-
     }
     private void InitializeComponent()
     {
@@ -558,6 +523,15 @@ public class OCCCanvas : Form
     {
         viewer.Display(theAIS, Toupdate);
     }
+    public void EraseSelect()
+    {
+        viewer.EraseObjects();
+    }
+    public void Erase(WAIS_Shape theAIS, bool Toupdate)
+    {
+        viewer.Erase(theAIS, Toupdate);
+    }
+
     #endregion
     #region 交互对象
     #region 选择框
