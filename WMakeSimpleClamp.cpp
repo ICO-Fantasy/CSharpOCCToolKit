@@ -8,52 +8,47 @@
 #include "String.h"
 using namespace OCCTK::Visualization;
 
-namespace OCCTK::Laser
-{
-	void WMakeSimpleClamp::MakeVerticalPlate(std::pair<std::vector<TopoDS_Shape>, std::vector<TopoDS_Shape>>& VerticalPlates, TopoDS_Shape InputWorkpiece, double theX, double theY, double theZ, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance) {
-		//todo 先做生成竖板、然后加入连接槽和连接处
-#pragma region 生成竖板
-		std::map<double, TopoDS_Shape> theXSections;
-		std::map<double, TopoDS_Shape> theYSections;
-#pragma region 沿着X方向生成截平面
-		double TempX = theX + VerticalPlateInitialOffsetX;
-		double DefaultXmin = 0.0;//todo 默认不生成长度
-		while (TempX < BasePlateLengthX - DefaultXmin)
-		{
-			TopoDS_Face aXPlane = MakeVerticalPlane(TempX, X);
-			TopoDS_Shape aXSection = MakeSection(aXPlane, InputWorkpiece);
-			theXSections.insert(std::make_pair(TempX, aXSection));
-			//VerticalPlates.push_back(aXSection); //test
-			TempX = TempX + VerticalPlateOffsetX;
-		}
-#pragma endregion
-#pragma region 沿着Y方向生成截平面
-		double TempY = theY + VerticalPlateInitialOffsetY;
-		double DefaultYmin = 0.0;//todo 默认不生成长度
-		while (TempY < BasePlateLengthY - DefaultYmin)
-		{
-			TopoDS_Face aYPlane = MakeVerticalPlane(TempY, Y);
-			TopoDS_Shape aYSection = MakeSection(aYPlane, InputWorkpiece);
-			theYSections.insert(std::make_pair(TempY, aYSection));
-			//VerticalPlates.push_back(aYSection); //test
-			TempY = TempY + VerticalPlateOffsetY;
-		}
-#pragma endregion
-		for each (auto aSectionPair in theXSections)
-		{
-			TopoDS_Shape aSection;
-			aSection = MakeVerticalPlateWithSection(aSectionPair, X, theYSections, BasePlateLengthY, theX, theY, theZ, VerticalPlateThickness, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
-			VerticalPlates.first.push_back(aSection);
-		}
-		for each (auto aSectionPair in theYSections)
-		{
-			TopoDS_Shape aSection;
-			aSection = MakeVerticalPlateWithSection(aSectionPair, Y, theXSections, BasePlateLengthX, theX, theY, theZ, VerticalPlateThickness, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
-			VerticalPlates.second.push_back(aSection);
-		}
-#pragma endregion
-
-	}
+namespace OCCTK::Laser {
+	//	void WMakeSimpleClamp::MakeVerticalPlate(std::pair<std::vector<TopoDS_Shape>, std::vector<TopoDS_Shape>>& VerticalPlates, TopoDS_Shape InputWorkpiece, double theX, double theY, double theZ, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance) {
+	//		//todo 先做生成竖板、然后加入连接槽和连接处
+	//#pragma region 生成竖板
+	//		std::map<double, TopoDS_Shape> theXSections;
+	//		std::map<double, TopoDS_Shape> theYSections;
+	//#pragma region 沿着X方向生成截平面
+	//		double TempX = theX + VerticalPlateInitialOffsetX;
+	//		double DefaultXmin = 0.0;//todo 默认不生成长度
+	//		while (TempX < BasePlateLengthX - DefaultXmin) {
+	//			TopoDS_Face aXPlane = MakeVerticalPlane(TempX, X);
+	//			TopoDS_Shape aXSection = MakeSection(aXPlane, InputWorkpiece);
+	//			theXSections.insert(std::make_pair(TempX, aXSection));
+	//			//VerticalPlates.push_back(aXSection); //test
+	//			TempX = TempX + VerticalPlateOffsetX;
+	//		}
+	//#pragma endregion
+	//#pragma region 沿着Y方向生成截平面
+	//		double TempY = theY + VerticalPlateInitialOffsetY;
+	//		double DefaultYmin = 0.0;//todo 默认不生成长度
+	//		while (TempY < BasePlateLengthY - DefaultYmin) {
+	//			TopoDS_Face aYPlane = MakeVerticalPlane(TempY, Y);
+	//			TopoDS_Shape aYSection = MakeSection(aYPlane, InputWorkpiece);
+	//			theYSections.insert(std::make_pair(TempY, aYSection));
+	//			//VerticalPlates.push_back(aYSection); //test
+	//			TempY = TempY + VerticalPlateOffsetY;
+	//		}
+	//#pragma endregion
+	//		for each (auto aSectionPair in theXSections) {
+	//			TopoDS_Shape aSection;
+	//			aSection = MakeVerticalPlateWithSection(aSectionPair, X, theYSections, BasePlateLengthY, theX, theY, theZ, VerticalPlateThickness, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+	//			VerticalPlates.first.push_back(aSection);
+	//		}
+	//		for each (auto aSectionPair in theYSections) {
+	//			TopoDS_Shape aSection;
+	//			aSection = MakeVerticalPlateWithSection(aSectionPair, Y, theXSections, BasePlateLengthX, theX, theY, theZ, VerticalPlateThickness, VerticalPlateConnectionHeight, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+	//			VerticalPlates.second.push_back(aSection);
+	//		}
+	//#pragma endregion
+	//
+	//	}
 	WAIS_Shape^ WMakeSimpleClamp::TestInputWorkpiece(String^ filePath) {
 		auto cPath = OCCTK::DataExchange::toAsciiString(filePath);
 		TopoDS_Shape InputWorkpiece;
@@ -63,8 +58,7 @@ namespace OCCTK::Laser
 		//加载一个文件并且返回一个状态枚举值
 		IFSelect_ReturnStatus status = reader.ReadFile(cPath.ToCString());
 		//IFSelect_ReturnStatus status = reader.ReadFile("testWorkPiece.STEP");
-		if (status == IFSelect_RetDone)
-		{
+		if (status == IFSelect_RetDone) {
 			reader.TransferRoot(1);
 			InputWorkpiece = reader.Shape(1);
 		}
@@ -126,37 +120,53 @@ namespace OCCTK::Laser
 	List<Piece^>^ WMakeSimpleClamp::TestMakeVertical(WAIS_Shape^ InputAISWorkpiece, BasePlate^ theBasePlate, VerticalPlateDirection theVDir, double theValue, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance) {
 		TopoDS_Shape InputWorkpiece = (*InputAISWorkpiece->GetOCC())->Shape();
 		List<Piece^>^ result = gcnew List<Piece^>();
-		std::vector<LocalSpace::Piece> thePieces;
-		switch (theVDir)
-		{
+		std::vector<LocalSpace::Piece> theOriginPieces;
+		std::vector<LocalSpace::Piece> theRemovedPieces;
+		std::vector<LocalSpace::Piece> theTrimPieces;
+		std::vector<LocalSpace::Piece> theCuttedPieces;
+		switch (theVDir) {
 		case OCCTK::Laser::VerticalPlateDirection::X:
 		{
 			TopoDS_Face aXPlane = MakeVerticalPlane(theValue, X);
 			TopoDS_Shape aXSection = MakeSection(aXPlane, InputWorkpiece);
-			//result->Add(gcnew WAIS_Shape(aXSection));//test
-			thePieces = MakeVerticalPieceWithSection(aXSection, X, theBasePlate->Z, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+			theOriginPieces = MakeVerticalPieceWithSection(aXSection, X);
+			theTrimPieces = TrimEdgeEnds(theOriginPieces, VerticalPlateClearances);
+			theRemovedPieces = RemoveShortEdge(theTrimPieces, VerticalPlateMinSupportingLen);
+			theCuttedPieces = CutLongEdge(theRemovedPieces, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
 		}
 		break;
 		case OCCTK::Laser::VerticalPlateDirection::Y:
 		{
 			TopoDS_Face aYPlane = MakeVerticalPlane(theValue, Y);
 			TopoDS_Shape aYSection = MakeSection(aYPlane, InputWorkpiece);
-			thePieces = MakeVerticalPieceWithSection(aYSection, Y, theBasePlate->Z, VerticalPlateClearances, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
+			theOriginPieces = MakeVerticalPieceWithSection(aYSection, Y);
+			theTrimPieces = TrimEdgeEnds(theOriginPieces, VerticalPlateClearances);
+			theRemovedPieces = RemoveShortEdge(theTrimPieces, VerticalPlateMinSupportingLen);
+			theCuttedPieces = CutLongEdge(theRemovedPieces, VerticalPlateMinSupportingLen, VerticalPlateCuttingDistance);
 		}
 		break;
 		default:
 			break;
 		}
-		for (auto aV : thePieces)
-		{
+		//前面都是在操作Edge，这一步需要把Edge生成为Piece片体
+		for (auto& aP : theCuttedPieces) {
+			MakePieceFromEdge(aP, theBasePlate->Z);
+		}
+
+		for (auto aP : theCuttedPieces) {
+
 			Piece^ anPiece = gcnew Piece();
-			AIS_Shape aAIS(aV.Shape);
+			AIS_Shape aAIS(aP.Shape);
 			switch (theVDir) {
 			case OCCTK::Laser::VerticalPlateDirection::X:
 				aAIS.SetColor(Quantity_NOC_RED);
+				anPiece->start = aP.StartPoint().Y();
+				anPiece->end = aP.EndPoint().Y();
 				break;
 			case OCCTK::Laser::VerticalPlateDirection::Y:
 				aAIS.SetColor(Quantity_NOC_GREEN);
+				anPiece->start = aP.StartPoint().X();
+				anPiece->end = aP.EndPoint().X();
 				break;
 			default:
 				break;
@@ -164,9 +174,7 @@ namespace OCCTK::Laser
 			aAIS.SetTransparency(0.2);
 			WAIS_Shape^ theAISV = gcnew WAIS_Shape(aAIS);
 			anPiece->shape = theAISV;
-			anPiece->start = aV.Start;
-			anPiece->end = aV.End;
-			//todoEdge没用上
+
 			result->Add(anPiece);
 		}
 		return result;

@@ -62,6 +62,7 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="30*" />
         </Grid.RowDefinitions>
+
         <!--  Toolbar  -->
         <ToolBar Grid.Row="0">
             <System:String xml:space="preserve">视图方向 </System:String>
@@ -215,233 +216,537 @@
         <Grid
             x:Name="info_grid"
             Grid.RowSpan="3"
-            Grid.Column="1">
+            Grid.Column="1"
+            Background="#FF62ED91">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="8*" />
-                <RowDefinition Height="8*" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
-            <custom:myLabel
-                x:Name="InitialOffsetXLabel"
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="0"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="OffsetXLabel"
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="1"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="InitialOffsetYLabel"
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="2"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="OffsetYLabel"
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="3"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="ConnectionHeightLabel"
-                Grid.Row="1"
-                Grid.RowSpan="2"
-                Grid.Column="0"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="MinSupportingLenLabel"
-                Grid.Row="1"
-                Grid.RowSpan="2"
-                Grid.Column="1"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="ClearancesLabel"
-                Grid.Row="1"
-                Grid.RowSpan="2"
-                Grid.Column="2"
-                Margin="0,0,0,47" />
-            <custom:myLabel
-                x:Name="CuttingDistanceLabel"
-                Grid.Row="1"
-                Grid.RowSpan="2"
-                Grid.Column="3"
-                Margin="0,0,0,47" />
-            <Grid Grid.Row="2" Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
-                <Label
-                    Grid.Row="0"
-                    VerticalAlignment="Stretch"
-                    Content="方向" />
-                <ComboBox
-                    x:Name="DirectionComboBox"
-                    Grid.Row="1"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Top"
-                    SelectionChanged="DirectionComboBox_SelectionChanged" />
-            </Grid>
-            <Grid Grid.Row="2" Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
-                <Label
-                    Grid.Row="0"
-                    VerticalAlignment="Stretch"
-                    Content="该方向位置" />
-                <ComboBox
-                    x:Name="PlateX_ComboBox"
-                    Grid.Row="1"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Top"
-                    SelectionChanged="PlateX_ComboBox_SelectionChanged">
-                    <ComboBoxItem Content="X1" />
-                    <ComboBoxItem Content="X2" />
-                </ComboBox>
-                <ComboBox
-                    x:Name="PlateY_ComboBox"
-                    Grid.Row="1"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Top"
-                    SelectionChanged="PlateY_ComboBox_SelectionChanged">
-                    <ComboBoxItem Content="Y3" />
-                    <ComboBoxItem Content="Y4" />
-                </ComboBox>
-            </Grid>
-            <Grid
-                x:Name="CurrentPlateValueGrid"
-                Grid.Row="3"
-                Grid.ColumnSpan="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
+            <!--  底板  -->
+            <Label
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#FF62ED91"
+                Content="底板设置" />
+            <Grid x:Name="BasePlate_Grid" Grid.Row="1">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="#FF7371FE" />
+                        <GradientStop Offset="1" Color="#FF5EF9E8" />
+                    </LinearGradientBrush>
+                </Grid.Background>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Content="选中的坐标" />
-                <TextBox x:Name="CurrentPlateLocationTextBox" Grid.Row="1" />
-                <Button
-                    x:Name="UpdateCurrentPlateLocationButton"
-                    Grid.RowSpan="2"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel
+                    x:Name="BasePlateOffsetX_StackPanel"
+                    Grid.Row="1"
+                    Orientation="Vertical">
+                    <Label
+                        x:Name="BasePlateOffsetX_Label"
+                        VerticalAlignment="Stretch"
+                        Content="X向偏移" />
+                    <TextBox
+                        x:Name="BasePlateOffsetX_TextBox"
+                        Margin="0,4,0,4"
+                        VerticalAlignment="Stretch"
+                        Background="White" />
+                </StackPanel>
+                <StackPanel
+                    x:Name="BasePlateOffsetY_StackPanel"
+                    Grid.Row="1"
                     Grid.Column="1"
-                    Click="UpdateCurrentPlateLocation_Button_Click"
-                    Content="更新坐标"
+                    Orientation="Vertical">
+                    <Label
+                        x:Name="BasePlateOffsetY_Label"
+                        VerticalAlignment="Stretch"
+                        Content="Y向偏移" />
+                    <TextBox
+                        x:Name="BasePlateOffsetY_TextBox"
+                        Margin="0,4,0,4"
+                        VerticalAlignment="Stretch" />
+                </StackPanel>
+                <StackPanel
+                    x:Name="BasePlateHight_StackPanel"
+                    Grid.Row="2"
+                    Orientation="Vertical">
+                    <Label
+                        x:Name="BasePlateHight_Label"
+                        VerticalAlignment="Stretch"
+                        Content="-Z向偏移" />
+                    <TextBox
+                        x:Name="BasePlateHight_TextBox"
+                        Margin="0,4,0,4"
+                        VerticalAlignment="Stretch" />
+                </StackPanel>
+                <Button
+                    x:Name="MakeBasePlate_Button"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="2,2,2,2"
+                    Click="MakeBasePlate_Button_Clcik"
+                    Content="创建底板"
                     Style="{StaticResource dgButton}"
                     Template="{StaticResource buttonTemplate}" />
             </Grid>
-            <ScrollViewer
-                x:Name="CurrentPieces"
-                Grid.Row="4"
-                Grid.ColumnSpan="4">
-                <StackPanel x:Name="Plate_StackPanel">
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                    <Label Content="test" />
-                </StackPanel>
-            </ScrollViewer>
+            <!--  竖板  -->
             <Grid
-                x:Name="buttons"
-                Grid.Row="5"
-                Grid.ColumnSpan="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
+                x:Name="VerticalPlate_Grid"
+                Grid.Row="2"
+                Background="#FF62ED91">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <Label
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="竖板" />
+                <!--  创建竖板  -->
                 <Grid
-                    x:Name="MakeV"
-                    Grid.Row="0"
+                    x:Name="MakeV_Grid"
+                    Grid.Row="1"
                     Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="5*" />
-                    </Grid.RowDefinitions>
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#FF717AFC" />
+                            <GradientStop Offset="1" Color="#FF60F1EA" />
+                        </LinearGradientBrush>
+                    </Grid.Background>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Row="0" Grid.Column="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Label VerticalAlignment="Center" Content="X" />
-                        <TextBox
-                            x:Name="XNum_TextBox"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center" />
-                    </Grid>
-                    <Grid Grid.Row="0" Grid.Column="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel x:Name="InitialOffsetX_StackPanel" Orientation="Vertical">
                         <Label
-                            Grid.ColumnSpan="2"
-                            VerticalAlignment="Center"
-                            Content="Y" />
+                            x:Name="InitialOffsetX_Label"
+                            VerticalAlignment="Stretch"
+                            Content="初始X向偏移" />
                         <TextBox
-                            x:Name="YNum_TextBox"
+                            x:Name="InitialOffsetX_TextBox"
+                            Margin="0,4,0,4"
+                            VerticalAlignment="Stretch" />
+                    </StackPanel>
+                    <StackPanel
+                        x:Name="InitialOffsetY_StackPanel"
+                        Grid.Column="1"
+                        Orientation="Vertical">
+                        <Label
+                            x:Name="InitialOffsetY_Label"
+                            VerticalAlignment="Stretch"
+                            Content="初始Y向偏移" />
+                        <TextBox
+                            x:Name="InitialOffsetY_TextBox"
+                            Margin="0,4,0,4"
+                            VerticalAlignment="Stretch" />
+                    </StackPanel>
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <Button
+                            x:Name="SetXYNum_Button"
+                            Height="50"
+                            HorizontalAlignment="Center"
+                            Click="SetXYNum_Button_Click"
+                            Content="XY方向数量"
+                            Style="{StaticResource dgButton}"
+                            Template="{StaticResource buttonTemplate}" />
+                        <Button
+                            x:Name="SetXYOffset_Button"
                             Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center" />
+                            Height="50"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Click="SetXYOffset_Button_Click"
+                            Content="固定偏移量"
+                            Style="{StaticResource dgButton}"
+                            Template="{StaticResource buttonTemplate}" />
+
+                        <StackPanel
+                            x:Name="XNum_StackPanel"
+                            Grid.Row="1"
+                            Orientation="Vertical"
+                            Visibility="Visible">
+                            <Label
+                                x:Name="XNum_Label"
+                                VerticalAlignment="Stretch"
+                                Content="X方向数目" />
+                            <TextBox
+                                x:Name="XNum_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel
+                            x:Name="YNum_StackPanel"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Orientation="Vertical"
+                            Visibility="Visible">
+                            <Label
+                                x:Name="YNum_Label"
+                                VerticalAlignment="Stretch"
+                                Content="Y方向数目" />
+                            <TextBox
+                                x:Name="YNum_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+
+                        <StackPanel
+                            x:Name="OffsetX_StackPanel"
+                            Grid.Row="1"
+                            Orientation="Vertical"
+                            Visibility="Collapsed">
+                            <Label
+                                x:Name="OffsetX_Label"
+                                VerticalAlignment="Stretch"
+                                Content="偏移X值" />
+                            <TextBox
+                                x:Name="OffsetX_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel
+                            x:Name="OffsetY_StackPanel"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Orientation="Vertical"
+                            Visibility="Collapsed">
+                            <Label
+                                x:Name="OffsetY_Label"
+                                VerticalAlignment="Stretch"
+                                Content="偏移Y值" />
+                            <TextBox
+                                x:Name="OffsetY_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="3" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel
+                            x:Name="ConnectionHeight_StackPanel"
+                            Grid.Row="4"
+                            Orientation="Vertical">
+                            <Label
+                                x:Name="ConnectionHeight_Label"
+                                VerticalAlignment="Stretch"
+                                Content="连接高度" />
+                            <TextBox
+                                x:Name="ConnectionHeight_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel
+                            x:Name="MinSupportingLen_StackPanel"
+                            Grid.Row="2"
+                            Orientation="Vertical">
+                            <Label
+                                x:Name="MinSupportingLen_Label"
+                                VerticalAlignment="Stretch"
+                                Content="最小支撑长度" />
+                            <TextBox
+                                x:Name="MinSupportingLen_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel
+                            x:Name="Clearances_StackPanel"
+                            Grid.Row="3"
+                            Orientation="Vertical">
+                            <Label
+                                x:Name="Clearances_Label"
+                                VerticalAlignment="Stretch"
+                                Content="板两侧偏置量" />
+                            <TextBox
+                                x:Name="Clearances_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
+                        <StackPanel
+                            x:Name="CuttingDistance_StackPanel"
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Orientation="Vertical">
+                            <Label
+                                x:Name="CuttingDistance_Label"
+                                VerticalAlignment="Stretch"
+                                Content="切断距离" />
+                            <TextBox
+                                x:Name="CuttingDistance_TextBox"
+                                Margin="0,4,0,4"
+                                VerticalAlignment="Stretch" />
+                        </StackPanel>
                     </Grid>
                     <Button
                         x:Name="MakePlate_Click_Button"
-                        Grid.Row="1"
+                        Grid.Row="4"
                         Grid.Column="0"
                         Grid.ColumnSpan="3"
-                        Margin="4,4,4,4"
+                        Height="50"
+                        Margin="100,4,100,4"
                         Click="MakeVerticalPlate_Button_Click"
                         Content="创建竖板"
                         Style="{StaticResource dgButton}"
                         Template="{StaticResource buttonTemplate}" />
                 </Grid>
+                <!--  选择单块竖板  -->
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="选择竖板" />
+                <Grid x:Name="SelectPlate_Grid" Grid.Row="3">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#FF7272FD" />
+                            <GradientStop Offset="1" Color="#FF5EF9E8" />
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid x:Name="CurrentPlateDirection_Grid" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            x:Name="CurrentPlateDirection_Label"
+                            HorizontalAlignment="Stretch"
+                            Content="方向" />
+                        <ComboBox
+                            x:Name="CurrentPlateDirection_ComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="CurrentPlateDirection_ComboBox_SelectionChanged">
+                            <ComboBoxItem Content="X" />
+                            <ComboBoxItem Content="Y" />
+                        </ComboBox>
+                    </Grid>
+                    <Grid
+                        x:Name="CurrentPlateLocation_Grid"
+                        Grid.Row="1"
+                        Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            x:Name="CurrentPlateLocation_Label"
+                            HorizontalAlignment="Stretch"
+                            Content="位置" />
+                        <ComboBox
+                            x:Name="CurrentPlateLocationX_ComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="CurrentPlateLocationX_ComboBox_SelectionChanged"
+                            Visibility="Collapsed" />
+                        <ComboBox
+                            x:Name="CurrentPlateLocationY_ComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="CurrentPlateLocationY_ComboBox_SelectionChanged"
+                            Visibility="Collapsed" />
+                    </Grid>
+                    <StackPanel
+                        x:Name="CurrentPlateAddLocation_StackPanel"
+                        Grid.Row="2"
+                        Orientation="Vertical">
+                        <Label
+                            x:Name="CurrentPlateAddLocation_Label"
+                            VerticalAlignment="Stretch"
+                            Content="添加竖板位置" />
+                        <TextBox x:Name="CurrentPlateAddLocation_TextBox" VerticalAlignment="Stretch" />
+                    </StackPanel>
+                    <Button
+                        x:Name="addPlate_Button"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="5,5,5,5"
+                        Click="addPlate_Button_Click"
+                        Content="添加一块板"
+                        Style="{StaticResource dgButton}"
+                        Template="{StaticResource buttonTemplate}" />
+                </Grid>
+                <Label
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="当前选择" />
+                <Grid x:Name="CurrentPlate_Grid" Grid.Row="5">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                            <GradientStop Color="#FF7272FD" />
+                            <GradientStop Offset="1" Color="#FF5EFAE8" />
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel
+                        x:Name="CurrentPlateSelectedLocation_StackPanel"
+                        Grid.Row="3"
+                        Orientation="Vertical">
+                        <Label
+                            x:Name="CurrentPlateSelectedLocation_Label"
+                            VerticalAlignment="Stretch"
+                            Content="当前位置" />
+                        <TextBox x:Name="CurrentPlateSelectedLocation_TextBox" VerticalAlignment="Stretch" />
+                    </StackPanel>
+                    <Button
+                        x:Name="UpdateCurrentPlateLocation_Button"
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Click="UpdateCurrentPlateLocation_Button_Click"
+                        Content="更新当前位置"
+                        Style="{StaticResource dgButton}"
+                        Template="{StaticResource buttonTemplate}" />
+
+                    <ScrollViewer
+                        x:Name="CurrentPlate_ScrollViewer"
+                        Grid.Row="4"
+                        Grid.ColumnSpan="4">
+                        <StackPanel x:Name="CurrentPlate_StackPanel">
+                            <Label Content="test" />
+                            <Label Content="test" />
+                            <Label Content="test" />
+                            <Label Content="test" />
+                            <Label Content="test" />
+                            <Label Content="test" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
 
             </Grid>
-            <Grid
-                x:Name="test_buttons"
-                Grid.Row="6"
-                Grid.ColumnSpan="4">
+            <Label
+                Grid.Row="3"
+                HorizontalAlignment="Center"
+                Content="结果" />
+            <Grid x:Name="Connet_Grid" Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <Button
+                    x:Name="ConnectPlate_Button"
+                    Content="连接并生成竖板"
+                    Style="{StaticResource dgButton}"
+                    Template="{StaticResource buttonTemplate}" Height="35" />
+                <Grid x:Name="NumberMark_grid" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Label Content="数字" />
+                    <ComboBox Grid.Column="1">
+                        <ComboBoxItem Content="1" />
+                        <ComboBoxItem Content="2" />
+                        <ComboBoxItem Content="3" />
+                        <ComboBoxItem Content="4" />
+                        <ComboBoxItem Content="5" />
+                        <ComboBoxItem Content="6" />
+                        <ComboBoxItem Content="7" />
+                    </ComboBox>
+                    <Button
+                        x:Name="NumberMark_Button"
+                        Grid.Column="2"
+                        Content="设置编号"
+                        Style="{StaticResource dgButton}"
+                        Template="{StaticResource buttonTemplate}" />
+                </Grid>
+                <Button
+                    Grid.Row="2"
+                    Content="导出DWG"
+                    Style="{StaticResource dgButton}"
+                    Template="{StaticResource buttonTemplate}" Height="40" />
+            </Grid>
+            <!--  TEST  -->
+            <Grid x:Name="test_buttons" Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="auto" />

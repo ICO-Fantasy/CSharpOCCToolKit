@@ -14,17 +14,14 @@ namespace TestWPF.Models
             { return _location; }
             set
             {
-                if (value != _location)
-                {
-                    _slices = WMakeSimpleClamp.TestMakeVertical(Workpiece,
-                                                                        BasePlate,
-                                                                        Direction,
-                                                                        value,
-                                                                        Clearances,
-                                                                        MinSupportingLen,
-                                                                        CuttingDistance);
-                    _location = value;
-                }
+                _slices = WMakeSimpleClamp.TestMakeVertical(Workpiece,
+                                                                    BasePlate,
+                                                                    Direction,
+                                                                    value,
+                                                                    Clearances,
+                                                                    MinSupportingLen,
+                                                                    CuttingDistance);
+                _location = value;
             }
         }
         private WAIS_Shape Workpiece { get; }

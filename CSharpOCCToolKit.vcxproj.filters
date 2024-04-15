@@ -77,9 +77,6 @@
     <ClCompile Include="WAIS_Shape.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="PlatePiece.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
