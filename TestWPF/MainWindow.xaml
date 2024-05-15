@@ -483,7 +483,7 @@
                             <TextBox
                                 x:Name="ConnectionHeight_TextBox"
                                 Margin="0,4,0,4"
-                                VerticalAlignment="Stretch" />
+                                VerticalAlignment="Stretch" TextChanged="ConnectionHeight_TextBox_TextChanged" />
                         </StackPanel>
                         <StackPanel
                             x:Name="MinSupportingLen_StackPanel"

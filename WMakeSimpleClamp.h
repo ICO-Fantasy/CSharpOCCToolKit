@@ -1,40 +1,67 @@
 ﻿#pragma once
-#include "CSharpViewer.h"
-#include <Standard_Handle.hxx>
-#include <AIS_Shape.hxx>
+#include "MakeSimpleClamp.h"
 #include "WAIS_Shape.h"
-#include <STEPControl_Reader.hxx>
+#include <vcclr.h>
+
 using namespace  OCCTK::OCC::AIS;
 using namespace System::Collections::Generic;
+using namespace System;
+
 namespace OCCTK::Laser
 {
-	public ref struct BasePlate {
-		WAIS_Shape^ shape;
-		double X;
-		double Y;
-		double Z;
-		double dX;
-		double dY;
-		double OffsetX;
-		double OffsetY;
-	};
-	public ref struct Piece {
-		int SerialNumber;
-		WAIS_Shape^ shape;
-		double start;
-		double end;
-	};
-	public enum class  VerticalPlateDirection {
-		X,
-		Y
-	};
-	public ref class WMakeSimpleClamp {
-	public:
-		//void MakeVerticalPlate(std::pair<std::vector<TopoDS_Shape>, std::vector<TopoDS_Shape>>& VerticalPlates, TopoDS_Shape InputWorkpiece, double theX, double theY, double theZ, double BasePlateLengthX, double BasePlateLengthY, double VerticalPlateThickness, double VerticalPlateInitialOffsetX, double VerticalPlateOffsetX, double VerticalPlateInitialOffsetY, double VerticalPlateOffsetY, double VerticalPlateConnectionHeight, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance);
-		static WAIS_Shape^ TestInputWorkpiece(String^ path);
-		static BasePlate^ TestMakeBase(WAIS_Shape^ InputAISWorkpiece, WAIS_Shape^ InputAISFace, double OffsetZ, double BasePlateThickness, double BasePlateOffsetX, double BasePlateOffsetY);
-		static BasePlate^ MakeBase_NoSelect(WAIS_Shape^ InputAISWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY);
-		static List<Piece^>^ TestMakeVertical(WAIS_Shape^ InputAISWorkpiece, BasePlate^ theBasePlate, VerticalPlateDirection theVDir, double theValue, double VerticalPlateClearances, double VerticalPlateMinSupportingLen, double VerticalPlateCuttingDistance);
-	};
+public enum class Direction {
+	X,
+	Y
+};
+public ref struct BasePlate {
+	WAIS_Shape^ workpiece; //todo 修改成TopoDS_Shape
+	WAIS_Shape^ shape;
+	double X;
+	double Y;
+	double Z;
+	double dX;
+	double dY;
+	double OffsetX;
+	double OffsetY;
+public:
+	OCCTK::SimpleClamp::BasePlate GetOCC();
+};
+public ref struct VerticalPiece {
+	WAIS_Shape^ shape;//todo 应该换成TopoDS_Shape
+	double start; //todo 应该换成Pnt
+	double end; //todo 应该换成Pnt
+	Direction dir;
+};
+public ref struct VerticalPlate {
+	WAIS_Shape^ workpiece; //todo 修改成TopoDS_Shape
+	BasePlate^ baseplate; //todo 修改成TopoDS_Shape
+	// 方向的定义参考飞书文档
+	Direction direction;
+	double location;
+	List<VerticalPiece^>^ pieces;
+	// 竖板避让间隙
+	double clearances;
+	// 竖板最小支撑长度
+	double minSupportLen;
+	// 竖板切断距离
+	double cuttingDistance;
+	// 竖板连接高
+	double connectionHeight;
+	// 最终的竖板形状
+	WAIS_Shape^ shape;
+public:
+	OCCTK::SimpleClamp::VerticalPlate GetOCC();
+};
+public ref class WMakeSimpleClamp {
+public:
+#pragma region demo测试用方法
+	static WAIS_Shape^ TestInputWorkpiece(String^ path);
+#pragma endregion
+	static BasePlate^ MakeBasePlate_NoInteract(WAIS_Shape^ InputAISWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY);
+	static VerticalPlate^ MakeVerticalPlate(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, Direction theDirection, double theLocation, double theClearances, double theMinSupportLen, double theCuttingDistance);
+	static List<VerticalPlate^>^ MakeVerticalPlates(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, List<double>^ XLocation, List<double>^ YLocation, double theClearances, double theMinSupportLen, double theCuttingDistance);
+	List<VerticalPlate^>^ MakeVerticalPlates(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, int XNum, int YNum, double initialOffsetX, double initialOffsetY, double theClearances, double theMinSupportLen, double theCuttingDistance);
+	static void SuturePLate(VerticalPlate^& theVerticalPlate, double theConnectHight);
+};
 }
 

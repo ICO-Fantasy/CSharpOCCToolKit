@@ -2,6 +2,7 @@
 #include <TopoDS_Shape.hxx>
 #include <AIS_Shape.hxx>
 #include "WAIS_InteractiveObject.h"
+
 namespace OCCTK::OCC::AIS
 {
 public ref class WAIS_Shape {

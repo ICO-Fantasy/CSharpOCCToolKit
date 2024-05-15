@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
+    <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="WAIS_InteractiveObject.h" />
     <ClInclude Include="WAIS_Shape.h" />
     <ClInclude Include="WAIS_ViewCube.h" />

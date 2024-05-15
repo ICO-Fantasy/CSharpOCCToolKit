@@ -103,6 +103,9 @@
     <ClInclude Include="WAIS_Shape.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
+    <ClInclude Include="MakeSimpleClamp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

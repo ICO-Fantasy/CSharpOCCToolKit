@@ -14,6 +14,7 @@ using OCCViewForm;
 using TestWPF.Models;
 
 using static OCCTK.Laser.VerticalPlateDirection;
+
 namespace TestWPF
 {
     /// <summary>
@@ -24,6 +25,7 @@ namespace TestWPF
         private OCCCanvas Viewer;
         private WAIS_Shape InputWorkpiece;
         public List<VerticalPlate> VerticalPlates = new List<VerticalPlate>();
+
         /// <summary>
         /// 横板
         /// </summary>
@@ -41,33 +43,40 @@ namespace TestWPF
         /// 竖板横向初始偏移
         /// </summary>
         public double InitialOffsetXParameter { get; set; } = 5;
+
         /// <summary>
         /// 竖板横向偏移
         /// </summary>
         public double OffsetXParameter { get; set; } = 20;
+
         //Y方向
         /// <summary>
         /// 竖板纵向初始偏移
         /// </summary>
         public double InitialOffsetYParameter { get; set; } = 5;
+
         /// <summary>
         /// 竖板纵向偏移
         /// </summary>
         public double OffsetYParameter { get; set; } = 20;
+
         //Z方向
         /// <summary>
         /// 竖板连接高
         /// </summary>
         public double ConnectionHeightParameter { get; set; } = 20;
+
         /// <summary>
         /// 竖板最小支撑长度
         /// </summary>
         public double MinSupportingLenParameter { get; set; } = 5;
+
         //XY方向
         /// <summary>
         /// 竖板避让间隙
         /// </summary>
         public double ClearancesParameter { get; set; } = 40;
+
         /// <summary>
         /// 竖板切断距离
         /// </summary>
@@ -139,35 +148,43 @@ namespace TestWPF
             #region 单块板的属性
             #endregion
         }
+
         #region 视角
         private void ForntView_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetViewOrientation(ViewOrientation.Front);
         }
+
         private void BackView_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetViewOrientation(ViewOrientation.Back);
         }
+
         private void TopView_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetViewOrientation(ViewOrientation.Top);
         }
+
         private void BottomView_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetViewOrientation(ViewOrientation.Bottom);
         }
+
         private void LeftView_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetViewOrientation(ViewOrientation.Left);
         }
+
         private void RightView_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetViewOrientation(ViewOrientation.Right);
         }
+
         private void Wireframe_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetDisplayMode(DisplayMode.Wireframe);
         }
+
         private void Shading_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.SetDisplayMode(DisplayMode.Shading);
@@ -178,6 +195,7 @@ namespace TestWPF
         {
             Viewer.FitAll();
         }
+
         private void Test_Button_Click(object sender, RoutedEventArgs e)
         {
             //Viewer.MakeClampTest();
@@ -203,6 +221,7 @@ namespace TestWPF
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
         }
+
         private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
@@ -211,6 +230,7 @@ namespace TestWPF
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
         }
+
         private void Test_input_test_3_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
@@ -219,6 +239,7 @@ namespace TestWPF
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
         }
+
         private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
@@ -227,6 +248,7 @@ namespace TestWPF
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
         }
+
         private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
@@ -237,10 +259,8 @@ namespace TestWPF
         }
 
         #endregion
-        private void Test_ConnectV_Button_Click(object sender, RoutedEventArgs e)
-        {
+        private void Test_ConnectV_Button_Click(object sender, RoutedEventArgs e) { }
 
-        }
         #region 选择模式
         private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -280,6 +300,7 @@ namespace TestWPF
                 BasePlateOffsetX = newValue;
             }
         }
+
         private void BasePlateOffsetY_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -291,6 +312,7 @@ namespace TestWPF
                 BasePlateOffsetY = newValue;
             }
         }
+
         private void BasePlateOffsetZ_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -302,6 +324,7 @@ namespace TestWPF
                 BasePlateOffsetZ = newValue;
             }
         }
+
         private void InitialOffsetX_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -313,6 +336,7 @@ namespace TestWPF
                 InitialOffsetXParameter = newValue;
             }
         }
+
         private void OffsetX_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -324,6 +348,7 @@ namespace TestWPF
                 OffsetXParameter = newValue;
             }
         }
+
         private void InitialOffsetY_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -335,6 +360,7 @@ namespace TestWPF
                 InitialOffsetYParameter = newValue;
             }
         }
+
         private void OffsetY_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -346,6 +372,7 @@ namespace TestWPF
                 OffsetYParameter = newValue;
             }
         }
+
         private void ConnectionHeight_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -357,6 +384,7 @@ namespace TestWPF
                 ConnectionHeightParameter = newValue;
             }
         }
+
         private void MinSupportingLen_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -368,6 +396,7 @@ namespace TestWPF
                 MinSupportingLenParameter = newValue;
             }
         }
+
         private void Clearances_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -379,6 +408,7 @@ namespace TestWPF
                 ClearancesParameter = newValue;
             }
         }
+
         private void CuttingDistance_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -390,6 +420,7 @@ namespace TestWPF
                 CuttingDistanceParameter = newValue;
             }
         }
+
         private void XNum_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -401,6 +432,7 @@ namespace TestWPF
                 XNum = newValue;
             }
         }
+
         private void YNum_TextChanged(object sender, EventArgs e)
         {
             // 获取TextBox的新值
@@ -412,7 +444,11 @@ namespace TestWPF
                 YNum = newValue;
             }
         }
-        private void CurrentPlateDirection_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        private void CurrentPlateDirection_ComboBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e
+        )
         {
             ComboBoxItem seletedItem = (ComboBoxItem)CurrentPlateDirection_ComboBox.SelectedItem;
             string selectedDirection = "";
@@ -432,7 +468,11 @@ namespace TestWPF
                 CurrentPlateLocationY_ComboBox.Visibility = Visibility.Visible;
             }
         }
-        private void CurrentPlateLocationX_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        private void CurrentPlateLocationX_ComboBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e
+        )
         {
             //清空列表
             CurrentPlate_StackPanel.Children.Clear();
@@ -452,7 +492,11 @@ namespace TestWPF
                 Viewer.viewer.UpdateCurrentViewer();
             }
         }
-        private void CurrentPlateLocationY_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        private void CurrentPlateLocationY_ComboBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e
+        )
         {
             //清空列表
             CurrentPlate_StackPanel.Children.Clear();
@@ -504,10 +548,12 @@ namespace TestWPF
             PieceLabel.Content = "位置: " + thePiece.start.ToString("F1");
             PieceLabel.HorizontalContentAlignment = HorizontalAlignment.Left; // 设置 Label 的水平内容对齐方式为 Left
 
-
             Button selectButton = new Button();
             selectButton.Content = "选中";
-            selectButton.Click += (sender, e) => { Viewer.viewer.SelectAIS(thePiece.shape); };
+            selectButton.Click += (sender, e) =>
+            {
+                Viewer.viewer.SelectAIS(thePiece.shape);
+            };
 
             Button deletButton = new Button();
             deletButton.Content = "删除";
@@ -583,6 +629,7 @@ namespace TestWPF
                 Viewer.viewer.UpdateCurrentViewer();
             }
         }
+
         //添加板
         private void addPlate_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -595,19 +642,31 @@ namespace TestWPF
             }
             if (CurrentPlateLocationX_ComboBox.IsVisible)
             {
-                newPLate = new VerticalPlate(InputWorkpiece, BasePlate, X, addedLocation, ClearancesParameter, MinSupportingLenParameter, CuttingDistanceParameter);
+                newPLate = new VerticalPlate(
+                    InputWorkpiece,
+                    BasePlate,
+                    X,
+                    addedLocation,
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
                 CurrentPlateLocationX_ComboBox.Items.Add(newPLate);
                 // 设置 ComboBox 的 SelectedItem 为新添加的项
                 CurrentPlateLocationX_ComboBox.SelectedItem = newPLate;
                 VerticalPlates.Add(newPLate);
 
                 // 获取 ComboBox 的 ItemsSource
-                var items = CurrentPlateLocationX_ComboBox.ItemsSource as ObservableCollection<VerticalPlate>;
+                var items =
+                    CurrentPlateLocationX_ComboBox.ItemsSource
+                    as ObservableCollection<VerticalPlate>;
 
                 // 对集合进行排序（示例中按照字符串排序，你可以根据需要修改比较器）
                 if (items != null)
                 {
-                    var sortedItems = new ObservableCollection<VerticalPlate>(items.OrderBy(item => double.Parse(item.ToString())));
+                    var sortedItems = new ObservableCollection<VerticalPlate>(
+                        items.OrderBy(item => double.Parse(item.ToString()))
+                    );
 
                     // 更新 ComboBox 的 ItemsSource
                     CurrentPlateLocationX_ComboBox.ItemsSource = sortedItems;
@@ -618,19 +677,31 @@ namespace TestWPF
             }
             if (CurrentPlateLocationY_ComboBox.IsVisible)
             {
-                newPLate = new VerticalPlate(InputWorkpiece, BasePlate, Y, addedLocation, ClearancesParameter, MinSupportingLenParameter, CuttingDistanceParameter);
+                newPLate = new VerticalPlate(
+                    InputWorkpiece,
+                    BasePlate,
+                    Y,
+                    addedLocation,
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
                 CurrentPlateLocationY_ComboBox.Items.Add(newPLate);
                 // 设置 ComboBox 的 SelectedItem 为新添加的项
                 CurrentPlateLocationY_ComboBox.SelectedItem = newPLate;
                 VerticalPlates.Add(newPLate);
 
                 // 获取 ComboBox 的 ItemsSource
-                var items = CurrentPlateLocationY_ComboBox.ItemsSource as ObservableCollection<VerticalPlate>;
+                var items =
+                    CurrentPlateLocationY_ComboBox.ItemsSource
+                    as ObservableCollection<VerticalPlate>;
 
                 // 对集合进行排序（示例中按照字符串排序，你可以根据需要修改比较器）
                 if (items != null)
                 {
-                    var sortedItems = new ObservableCollection<VerticalPlate>(items.OrderBy(item => double.Parse(item.ToString())));
+                    var sortedItems = new ObservableCollection<VerticalPlate>(
+                        items.OrderBy(item => double.Parse(item.ToString()))
+                    );
 
                     // 更新 ComboBox 的 ItemsSource
                     CurrentPlateLocationY_ComboBox.ItemsSource = sortedItems;
@@ -638,9 +709,8 @@ namespace TestWPF
                     CurrentPlateLocationY_ComboBox.SelectedIndex = 0;
                 }
             }
-
-
         }
+
         private void SetXYNum_Button_Click(object sender, RoutedEventArgs e)
         {
             XNum_StackPanel.Visibility = Visibility.Visible;
@@ -648,6 +718,7 @@ namespace TestWPF
             OffsetX_StackPanel.Visibility = Visibility.Collapsed;
             OffsetY_StackPanel.Visibility = Visibility.Collapsed;
         }
+
         private void SetXYOffset_Button_Click(object sender, RoutedEventArgs e)
         {
             XNum_StackPanel.Visibility = Visibility.Collapsed;
@@ -672,7 +743,9 @@ namespace TestWPF
             #region 测试用代码，之后删除
             if (InputWorkpiece == null)
             {
-                InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("mods\\mytest.STEP");
+                InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece(
+                    "mods\\mytest.STEP"
+                );
                 Viewer.Display(InputWorkpiece, true);
             }
             if (BasePlate == null)
@@ -693,6 +766,7 @@ namespace TestWPF
             }
             Viewer.FitAll();
         }
+
         private void MakeBasePlate_Button_Clcik(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
@@ -703,9 +777,15 @@ namespace TestWPF
             Viewer.Display(InputWorkpiece, true);
             MakeBasePlate();
         }
+
         private void MakeBasePlate()
         {
-            BasePlate = WMakeSimpleClamp.MakeBase_NoSelect(InputWorkpiece, BasePlateOffsetZ, BasePlateOffsetX, BasePlateOffsetY);
+            BasePlate = WMakeSimpleClamp.MakeBase_NoSelect(
+                InputWorkpiece,
+                BasePlateOffsetZ,
+                BasePlateOffsetX,
+                BasePlateOffsetY
+            );
             Viewer.Display(BasePlate.shape, true);
             //根据计算结果，设置推荐值
             InitialOffsetXParameter = Math.Round(BasePlate.dX * 0.1);
@@ -713,19 +793,30 @@ namespace TestWPF
             InitialOffsetYParameter = Math.Round(BasePlate.dY * 0.1);
             InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString();
         }
+
         private void MakeVerticalPlate()
         {
             #region 创建竖板的逻辑
             if (XNum != 0 && YNum != 0)
             {
                 if (XNum != 1)
-                { OffsetXParameter = (int)Math.Floor((BasePlate.dX - InitialOffsetXParameter * 2) / (XNum - 1)); }
+                {
+                    OffsetXParameter = (int)
+                        Math.Floor((BasePlate.dX - InitialOffsetXParameter * 2) / (XNum - 1));
+                }
                 else
-                { OffsetXParameter = 999999; }
+                {
+                    OffsetXParameter = 999999;
+                }
                 if (YNum != 1)
-                { OffsetYParameter = (int)Math.Floor((BasePlate.dY - InitialOffsetYParameter * 2) / (YNum - 1)); }
+                {
+                    OffsetYParameter = (int)
+                        Math.Floor((BasePlate.dY - InitialOffsetYParameter * 2) / (YNum - 1));
+                }
                 else
-                { OffsetYParameter = 999999; }
+                {
+                    OffsetYParameter = 999999;
+                }
             }
             double theXValue = Math.Round(BasePlate.X + InitialOffsetXParameter);
             double theYValue = Math.Round(BasePlate.Y + InitialOffsetYParameter);
@@ -733,7 +824,15 @@ namespace TestWPF
             //沿着X方向创建竖板
             while (theXValue < BasePlate.X + BasePlate.dX)
             {
-                VerticalPlate theVerticalPlateX = new VerticalPlate(InputWorkpiece, BasePlate, X, theXValue, ClearancesParameter, MinSupportingLenParameter, CuttingDistanceParameter);
+                VerticalPlate theVerticalPlateX = new VerticalPlate(
+                    InputWorkpiece,
+                    BasePlate,
+                    X,
+                    theXValue,
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
                 VerticalPlates.Add(theVerticalPlateX);
                 CurrentPlateLocationX_ComboBox.Items.Add(theVerticalPlateX);
                 result.AddRange(theVerticalPlateX.Slices);
@@ -742,7 +841,15 @@ namespace TestWPF
             //沿着Y方向创建竖板
             while (theYValue <= BasePlate.Y + BasePlate.dY)
             {
-                VerticalPlate theVerticalPlateY = new VerticalPlate(InputWorkpiece, BasePlate, Y, theYValue, ClearancesParameter, MinSupportingLenParameter, CuttingDistanceParameter);
+                VerticalPlate theVerticalPlateY = new VerticalPlate(
+                    InputWorkpiece,
+                    BasePlate,
+                    Y,
+                    theYValue,
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
                 VerticalPlates.Add(theVerticalPlateY);
                 CurrentPlateLocationY_ComboBox.Items.Add(theVerticalPlateY);
                 result.AddRange(theVerticalPlateY.Slices);
@@ -755,6 +862,7 @@ namespace TestWPF
             }
             #endregion
         }
+
         private void clearPlates()
         {
             CurrentPlate_StackPanel.Children.Clear();
@@ -768,12 +876,12 @@ namespace TestWPF
             CurrentPlateLocationY_ComboBox.Items.Clear();
             CurrentPlateSelectedLocation_TextBox.Text = null;
         }
+
         private void changeCurrentLocation(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
             VerticalPlate thePlate = (VerticalPlate)button.Tag;
             CurrentPlateSelectedLocation_TextBox.Text = thePlate.Location.ToString();
         }
-
     }
 }
