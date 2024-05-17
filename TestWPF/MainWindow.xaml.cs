@@ -11,10 +11,6 @@ using OCCTK.OCC.AIS;
 
 using OCCViewForm;
 
-using TestWPF.Models;
-
-using static OCCTK.Laser.VerticalPlateDirection;
-
 namespace TestWPF
 {
     /// <summary>
@@ -26,18 +22,25 @@ namespace TestWPF
         private WAIS_Shape InputWorkpiece;
         public List<VerticalPlate> VerticalPlates = new List<VerticalPlate>();
 
+        #region 创建横板参数
         /// <summary>
         /// 横板
         /// </summary>
         private BasePlate? BasePlate;
+
         public double BasePlateOffsetX { get; set; } = 5;
+
         public double BasePlateOffsetY { get; set; } = 5;
+
         public double BasePlateOffsetZ { get; set; } = 100.0;
+
+        #endregion
+
         #region 创建竖板参数
         public int XNum { get; set; } = 3;
+
         public int YNum { get; set; } = 3;
-        #endregion
-        #region 竖板全局参数
+
         //X方向
         /// <summary>
         /// 竖板横向初始偏移
@@ -60,6 +63,9 @@ namespace TestWPF
         /// </summary>
         public double OffsetYParameter { get; set; } = 20;
 
+        #endregion
+
+        #region 竖板全局参数
         //Z方向
         /// <summary>
         /// 竖板连接高
@@ -75,18 +81,26 @@ namespace TestWPF
         /// <summary>
         /// 竖板避让间隙
         /// </summary>
-        public double ClearancesParameter { get; set; } = 40;
+        public double ClearancesParameter { get; set; } = 4;
 
         /// <summary>
         /// 竖板切断距离
         /// </summary>
-        public double CuttingDistanceParameter { get; set; } = 50;
+        public double CuttingDistanceParameter { get; set; } = 500;
+
+        /// <summary>
+        /// 连接卡槽宽度
+        /// </summary>
+        public double ConnectionThicknessParameter { get; set; } = 3;
+
         #endregion
+
         #region 单块板属性
+
         public VerticalPlate? CurrentPlate { get; set; }
+
         #endregion
-        #region 显示用list
-        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
@@ -138,6 +152,9 @@ namespace TestWPF
             // 设置CuttingDistanceLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
             CuttingDistance_TextBox.Text = CuttingDistanceParameter.ToString();
             CuttingDistance_TextBox.TextChanged += CuttingDistance_TextChanged;
+
+            ConnectionThickness_TextBox.Text = ConnectionThicknessParameter.ToString();
+            ConnectionThickness_TextBox.TextChanged += ConnectionThickness_TextChanged;
             #endregion
             #region 创建竖板
             XNum_TextBox.Text = XNum.ToString();
@@ -208,7 +225,7 @@ namespace TestWPF
         private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\mytest.STEP");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
             //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("mods\\test1Small.STEP");
             Viewer.Display(InputWorkpiece, true);
         }
@@ -216,7 +233,7 @@ namespace TestWPF
         private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\test1.stp");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1.stp");
             BasePlate = null;
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
@@ -225,7 +242,7 @@ namespace TestWPF
         private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\test2.stp");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test2.stp");
             BasePlate = null;
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
@@ -234,7 +251,7 @@ namespace TestWPF
         private void Test_input_test_3_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\test3.STEP");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test3.STEP");
             BasePlate = null;
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
@@ -243,7 +260,7 @@ namespace TestWPF
         private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\test4.stp");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test4.stp");
             BasePlate = null;
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
@@ -252,7 +269,7 @@ namespace TestWPF
         private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\test5.stp");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test5.stp");
             BasePlate = null;
             Viewer.Display(InputWorkpiece, true);
             Viewer.FitAll();
@@ -445,6 +462,18 @@ namespace TestWPF
             }
         }
 
+        private void ConnectionThickness_TextChanged(object sender, EventArgs e)
+        {
+            // 获取TextBox的新值
+            TextBox textBox = (TextBox)sender;
+            int newValue;
+            if (int.TryParse(textBox.Text, out newValue))
+            {
+                // 更新XNum的值
+                ConnectionThicknessParameter = newValue;
+            }
+        }
+
         private void CurrentPlateDirection_ComboBox_SelectionChanged(
             object sender,
             SelectionChangedEventArgs e
@@ -480,12 +509,17 @@ namespace TestWPF
             if (CurrentPlate != null)
             {
                 //显示选中板的坐标
-                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.Location.ToString();
+                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString();
                 //清空画布并重新显示
                 Viewer.viewer.EraseAll();
                 Viewer.viewer.Display(InputWorkpiece, false);
                 Viewer.viewer.Display(BasePlate.shape, false);
-                foreach (var item in CurrentPlate.Slices)
+                if (CurrentPlate.shape != null)
+                {
+                    Viewer.viewer.Display(CurrentPlate.shape, true);
+                    return;
+                }
+                foreach (var item in CurrentPlate.pieces)
                 {
                     CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
                 }
@@ -505,12 +539,17 @@ namespace TestWPF
             if (CurrentPlate != null)
             {
                 //显示选中板的坐标
-                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.Location.ToString();
+                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString();
                 //清空画布并重新显示
                 Viewer.viewer.EraseAll();
                 Viewer.viewer.Display(InputWorkpiece, false);
                 Viewer.viewer.Display(BasePlate.shape, false);
-                foreach (var item in CurrentPlate.Slices)
+                if (CurrentPlate.shape != null)
+                {
+                    Viewer.viewer.Display(CurrentPlate.shape, true);
+                    return;
+                }
+                foreach (var item in CurrentPlate.pieces)
                 {
                     CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
                 }
@@ -520,7 +559,7 @@ namespace TestWPF
 
         //单板
 
-        private Grid MakeStackItem(Piece thePiece)
+        private Grid MakeStackItem(VerticalPiece thePiece)
         {
             if (CurrentPlate == null)
             {
@@ -579,7 +618,7 @@ namespace TestWPF
                 #endregion
                 #region 删除AIS对象和piece对象
                 Viewer.viewer.Erase(thePiece.shape, true);
-                CurrentPlate.Slices.Remove(thePiece);
+                CurrentPlate.pieces.Remove(thePiece);
                 #endregion
             };
 
@@ -605,7 +644,7 @@ namespace TestWPF
             if (CurrentPlate != null)
             {
                 //更新视图显示
-                foreach (var item in CurrentPlate.Slices)
+                foreach (var item in CurrentPlate.pieces)
                 {
                     Viewer.viewer.Erase(item.shape, false);
                 }
@@ -613,16 +652,16 @@ namespace TestWPF
                 // 更新CurrentPlateValueLable的值
                 if (double.TryParse(CurrentPlateAddLocation_TextBox.Text, out newValue))
                 {
-                    CurrentPlate.Location = newValue;
+                    CurrentPlate.location = newValue;
                 }
                 //更新stack中的元素
                 CurrentPlate_StackPanel.Children.Clear();
-                foreach (var item in CurrentPlate.Slices)
+                foreach (var item in CurrentPlate.pieces)
                 {
                     CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
                 }
                 //显示新创建的板
-                foreach (var item in CurrentPlate.Slices)
+                foreach (var item in CurrentPlate.pieces)
                 {
                     Viewer.viewer.Display(item.shape, theToUpdateViewer: false);
                 }
@@ -642,10 +681,10 @@ namespace TestWPF
             }
             if (CurrentPlateLocationX_ComboBox.IsVisible)
             {
-                newPLate = new VerticalPlate(
+                newPLate = SimpleClampMaker.MakeVerticalPlate(
                     InputWorkpiece,
                     BasePlate,
-                    X,
+                    Direction.X,
                     addedLocation,
                     ClearancesParameter,
                     MinSupportingLenParameter,
@@ -677,10 +716,10 @@ namespace TestWPF
             }
             if (CurrentPlateLocationY_ComboBox.IsVisible)
             {
-                newPLate = new VerticalPlate(
+                newPLate = SimpleClampMaker.MakeVerticalPlate(
                     InputWorkpiece,
                     BasePlate,
-                    Y,
+                    Direction.Y,
                     addedLocation,
                     ClearancesParameter,
                     MinSupportingLenParameter,
@@ -733,19 +772,13 @@ namespace TestWPF
             OffsetY_TextBox.Text = OffsetYParameter.ToString();
         }
 
-        /// <summary>
-        /// 创建竖板的逻辑
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        //创建竖板
         private void MakeVerticalPlate_Button_Click(object sender, RoutedEventArgs e)
         {
             #region 测试用代码，之后删除
             if (InputWorkpiece == null)
             {
-                InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece(
-                    "mods\\mytest.STEP"
-                );
+                InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
                 Viewer.Display(InputWorkpiece, true);
             }
             if (BasePlate == null)
@@ -762,25 +795,57 @@ namespace TestWPF
                 Viewer.Display(InputWorkpiece, true);
                 Viewer.Display(BasePlate.shape, true);
 
-                MakeVerticalPlate();
+                MakeVerticalPlateLogic();
             }
             Viewer.FitAll();
         }
 
+        //创建底板
         private void MakeBasePlate_Button_Clcik(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
             if (InputWorkpiece == null)
             {
-                InputWorkpiece = WMakeSimpleClamp.TestInputWorkpiece("mods\\mytest.STEP");
+                InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
             }
             Viewer.Display(InputWorkpiece, true);
             MakeBasePlate();
         }
 
+        //连接竖板
+        private void ConnectPlate_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //for (int i = 0; i < VerticalPlates.Count; i++)
+            //{
+            //    var onePlate = VerticalPlates[i];
+            //    SimpleClampMaker.SuturePLate(ref onePlate, BasePlate, ConnectionHeightParameter);
+            //    VerticalPlates[i] = onePlate;
+            //}
+            var newVerticalPlates = SimpleClampMaker.SuturePLates(
+                VerticalPlates,
+                BasePlate,
+                ConnectionHeightParameter,
+                ConnectionThicknessParameter
+            );
+            VerticalPlates = newVerticalPlates;
+            //重新显示更新后的shape
+            if (InputWorkpiece != null && BasePlate != null)
+            {
+                Viewer.viewer.EraseAll();
+                Viewer.Display(InputWorkpiece, true);
+                Viewer.Display(BasePlate.shape, true);
+
+                foreach (var onePlate in VerticalPlates)
+                {
+                    Viewer.Display(onePlate.shape, true);
+                }
+            }
+            Viewer.FitAll();
+        }
+
         private void MakeBasePlate()
         {
-            BasePlate = WMakeSimpleClamp.MakeBase_NoSelect(
+            BasePlate = SimpleClampMaker.MakeBasePlate_NoInteract(
                 InputWorkpiece,
                 BasePlateOffsetZ,
                 BasePlateOffsetX,
@@ -794,7 +859,7 @@ namespace TestWPF
             InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString();
         }
 
-        private void MakeVerticalPlate()
+        private void MakeVerticalPlateLogic()
         {
             #region 创建竖板的逻辑
             if (XNum != 0 && YNum != 0)
@@ -820,14 +885,14 @@ namespace TestWPF
             }
             double theXValue = Math.Round(BasePlate.X + InitialOffsetXParameter);
             double theYValue = Math.Round(BasePlate.Y + InitialOffsetYParameter);
-            List<Piece> result = new List<Piece>();
+            List<VerticalPiece> result = new List<VerticalPiece>();
             //沿着X方向创建竖板
             while (theXValue < BasePlate.X + BasePlate.dX)
             {
-                VerticalPlate theVerticalPlateX = new VerticalPlate(
+                VerticalPlate theVerticalPlateX = SimpleClampMaker.MakeVerticalPlate(
                     InputWorkpiece,
                     BasePlate,
-                    X,
+                    Direction.X,
                     theXValue,
                     ClearancesParameter,
                     MinSupportingLenParameter,
@@ -835,16 +900,16 @@ namespace TestWPF
                 );
                 VerticalPlates.Add(theVerticalPlateX);
                 CurrentPlateLocationX_ComboBox.Items.Add(theVerticalPlateX);
-                result.AddRange(theVerticalPlateX.Slices);
+                result.AddRange(theVerticalPlateX.pieces);
                 theXValue = Math.Round(theXValue + OffsetXParameter);
             }
             //沿着Y方向创建竖板
             while (theYValue <= BasePlate.Y + BasePlate.dY)
             {
-                VerticalPlate theVerticalPlateY = new VerticalPlate(
+                VerticalPlate theVerticalPlateY = SimpleClampMaker.MakeVerticalPlate(
                     InputWorkpiece,
                     BasePlate,
-                    Y,
+                    Direction.Y,
                     theYValue,
                     ClearancesParameter,
                     MinSupportingLenParameter,
@@ -852,7 +917,7 @@ namespace TestWPF
                 );
                 VerticalPlates.Add(theVerticalPlateY);
                 CurrentPlateLocationY_ComboBox.Items.Add(theVerticalPlateY);
-                result.AddRange(theVerticalPlateY.Slices);
+                result.AddRange(theVerticalPlateY.pieces);
                 theYValue = Math.Round(theYValue + OffsetYParameter);
             }
 
@@ -881,7 +946,7 @@ namespace TestWPF
         {
             Button button = (Button)sender;
             VerticalPlate thePlate = (VerticalPlate)button.Tag;
-            CurrentPlateSelectedLocation_TextBox.Text = thePlate.Location.ToString();
+            CurrentPlateSelectedLocation_TextBox.Text = thePlate.location.ToString();
         }
     }
 }

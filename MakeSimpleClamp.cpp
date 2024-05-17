@@ -1,31 +1,35 @@
 ﻿#pragma once
 #include "MakeSimpleClamp.h"
-#include <BRepAdaptor_Surface.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
-#include <Bnd_Box.hxx>
-#include <BRepBndLib.hxx>
-#include <BRepLib.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepAlgoAPI_Section.hxx>
-#include <vector>
-#include <TopExp_Explorer.hxx>
-#include <BRepAdaptor_Curve.hxx>
-#include <TopoDS.hxx>
 #include <algorithm>
-#include <BRepAlgoAPI_Fuse.hxx>
-#include <GProp_GProps.hxx>
-#include <BRepGProp.hxx>
+#include <Bnd_Box.hxx>
 #include <BRep_Builder.hxx>//test
-#include <map>
-#include <GC_MakeSegment.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <BRepAdaptor_Surface.hxx>
+#include <BRepAlgoAPI_Fuse.hxx>
+#include <BRepAlgoAPI_Section.hxx>
+#include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
-#include <BRepBuilderAPI_MakeWire.hxx>
-#include <BRepPrimAPI_MakePrism.hxx>
-#include <GCPnts_TangentialDeflection.hxx>
-#include <GProp_PEquation.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
-#include <ShapeUpgrade_UnifySameDomain.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepGProp.hxx>
+#include <BRepGProp_Face.hxx>
+#include <BRepLib.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
+#include <BRepPrimAPI_MakePrism.hxx>
+#include <GC_MakeSegment.hxx>
+#include <GCPnts_TangentialDeflection.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <GProp_GProps.hxx>
+#include <GProp_PEquation.hxx>
+#include <map>
+#include <ShapeUpgrade_UnifySameDomain.hxx>
+#include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Shell.hxx>
+#include <vector>
+#include <BRepBuilderAPI_Transform.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
 
 namespace OCCTK {
 namespace SimpleClamp {
@@ -654,10 +658,10 @@ static void GetCorners(TopoDS_Shape theShape, BasePlate& theBasePlate) {
 /// <returns></returns>
 static void MakeBasePlateShape(BasePlate& theBaseplate, double theZ) {
 	// 根据边界框尺寸创建立方体
-	// 左上角点
 	gp_Pnt theLowLeft(theBaseplate.X - theBaseplate.OffsetX, theBaseplate.Y - theBaseplate.OffsetY, theZ);
+	gp_Pnt p2(theBaseplate.X - theBaseplate.OffsetX, theBaseplate.Y + theBaseplate.dY + theBaseplate.OffsetY, theZ);
 	gp_Pnt theTopRight(theBaseplate.X + theBaseplate.dX + theBaseplate.OffsetX, theBaseplate.Y + theBaseplate.dY + theBaseplate.OffsetY, theZ);
-	theBaseplate.shape = MakePiece(theLowLeft, theTopRight);
+	theBaseplate.shape = MakePiece(theLowLeft, p2, theTopRight);
 }
 /// <summary>
 /// 非交互的生成底板
@@ -672,7 +676,8 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 	theBaseplate.OffsetX = theOffsetX;
 	theBaseplate.OffsetY = theOffsetY;
 	GetCorners(theWorkpiece, theBaseplate);
-	MakeBasePlateShape(theBaseplate, theOffsetZ);
+	theBaseplate.Z -= theOffsetZ;
+	MakeBasePlateShape(theBaseplate, theBaseplate.Z);
 	return theBaseplate;
 }
 
@@ -843,10 +848,8 @@ static TopoDS_Edge TrimEdge(TopoDS_Edge theOriginEdge, gp_Pnt p1, gp_Pnt p2) {
 	return theOriginEdge;
 }
 
-static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePieces, double theClearances) {
-	std::vector<VerticalPiece> result;
-	for (VerticalPiece aPiece : thePieces) {
-		VerticalPiece newPiece = aPiece;
+static void TrimEdgeEnds(std::vector<VerticalPiece>& thePieces, double theClearances) {
+	for (VerticalPiece& aPiece : thePieces) {
 		BRepAdaptor_Curve aBAC(aPiece.Edge);
 		gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
 		gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
@@ -860,7 +863,7 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 			p2.SetY(p2.Y() - theClearances);
 			TopoDS_Edge outEdge = TrimEdge(aPiece.Edge, p1, p2);
 			if (!outEdge.IsNull()) {
-				newPiece.Edge = outEdge;
+				aPiece.Edge = outEdge;
 			}
 			break;
 		}
@@ -873,16 +876,14 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 			p2.SetX(p2.X() - theClearances);
 			TopoDS_Edge outEdge = TrimEdge(aPiece.Edge, p1, p2);
 			if (!outEdge.IsNull()) {
-				newPiece.Edge = outEdge;
+				aPiece.Edge = outEdge;
 			}
 			break;
 		}
 		default:
 			break;
 		}
-		result.push_back(newPiece);
 	}
-	return result;
 }
 
 /// <summary>
@@ -1134,7 +1135,19 @@ static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePie
 	}
 	return result;
 }
-
+//inline gp_Vec getNormal(TopoDS_Shape result) {
+//	TopoDS_Face testfacemain = TopoDS::Face(result);
+//	// 创建 BRepGProp_Face 对象
+//	BRepGProp_Face prop(testfacemain);
+//	// 创建 BRepAdaptor_Surface 对象
+//	BRepAdaptor_Surface adaptor(testfacemain);
+//
+//	// 计算面的法线向量
+//	gp_Pnt normalPnt;
+//	gp_Vec nomarl;
+//	prop.Normal(adaptor.FirstUParameter(), adaptor.FirstVParameter(), normalPnt, nomarl);
+//	return nomarl;
+//};
 /// <summary>
 /// 合并片体为一块板
 /// </summary>
@@ -1143,57 +1156,112 @@ static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePie
 /// <param name="theCuttingDistance"></param>
 /// <param name="theZ"></param>
 /// <returns></returns>
-void SuturePiece(VerticalPlate& thePlate, double theConnectionHight) {
+void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight) {
 	//创造一块连接板
-	//板宽度不包含Offset的部分
-	TopoDS_Shape connectionPiece;
-	gp_Pnt leftLow, rightTop;
+	//! 板宽度不包含Offset的部分
+	TopoDS_Face connectionPiece;
+	gp_Pnt leftLow, p2, rightTop;
 	switch (thePlate.dir)
 	{
 	case X:
-		leftLow = gp_Pnt(thePlate.location, thePlate.baseplate->Y, thePlate.baseplate->Z);
-		rightTop = gp_Pnt(thePlate.location, thePlate.baseplate->Y + thePlate.baseplate->dY, thePlate.baseplate->Z + theConnectionHight);
-		connectionPiece = MakePiece(leftLow, rightTop);
+		leftLow = gp_Pnt(thePlate.location, theBasePlate.Y, theBasePlate.Z);
+		p2 = gp_Pnt(thePlate.location, theBasePlate.Y, theBasePlate.Z + theConnectionHight);
+		rightTop = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, theBasePlate.Z + theConnectionHight);
+		connectionPiece = MakePiece(leftLow, p2, rightTop);
 		break;
 	case Y:
-		leftLow = gp_Pnt(thePlate.baseplate->X, thePlate.location, thePlate.baseplate->Z);
-		rightTop = gp_Pnt(thePlate.baseplate->X + thePlate.baseplate->dX, thePlate.location, thePlate.baseplate->Z + theConnectionHight);
-		connectionPiece = MakePiece(leftLow, rightTop);
+		leftLow = gp_Pnt(theBasePlate.X, thePlate.location, theBasePlate.Z);
+		p2 = gp_Pnt(theBasePlate.X, thePlate.location, theBasePlate.Z + theConnectionHight);
+		rightTop = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, theBasePlate.Z + theConnectionHight);
+		connectionPiece = MakePiece(leftLow, p2, rightTop);
 		break;
 	default:
 		throw std::runtime_error("Unexpected Direction in switch");
 	}
 	//把Piece和连接板融合
 	TopoDS_Shape result = connectionPiece;
+	auto theOrientation = connectionPiece.Orientation();
 	for (VerticalPiece onePiece : thePlate.pieces) {
+		TopoDS::Face(onePiece.Shape);
+		onePiece.Shape.Orientation(theOrientation);
 		result = BRepAlgoAPI_Fuse(result, onePiece.Shape).Shape();
-		//去掉融合后的内边界
-		ShapeUpgrade_UnifySameDomain unifyer(result);
-		unifyer.Build();
-		result = unifyer.Shape();
 	}
+
+	//todo 内边界的融合会失败，不清楚原因
+	//去掉融合后的内边界
+	ShapeUpgrade_UnifySameDomain unifyer(result, true, true, true);
+	unifyer.Build();
+	TopoDS_Shape result_unified = unifyer.Shape();
 	//最终结果保存在Plate中
-	thePlate.shape = result;
+	thePlate.shape = result_unified;
+}
+
+void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth) {
+	switch (thePlate.dir)
+	{
+	case Direction::X:
+	{
+		// 先在Y平面创建一个槽(从下往上）
+		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z);
+		gp_Pnt p2(thePlate.location, -theConnectWidth / 2, theBasePlate.Z + theConnectionHight / 2);
+		gp_Pnt p3(thePlate.location, theConnectWidth / 2, theBasePlate.Z + theConnectionHight / 2);
+		TopoDS_Face theSlot = MakePiece(p1, p2, p3);
+		// 在每个位置切槽
+		for (double aloc : theLocations) {
+			gp_Trsf move;
+			move.SetTranslation(gp_Vec(0, aloc, 0)); // 沿着Y
+			BRepBuilderAPI_Transform transform(theSlot, move);
+			transform.Build();
+			TopoDS_Shape localSlot = transform.Shape();
+			//更新shape
+			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
+		}
+		break;
+	}
+	case Direction::Y:
+	{
+		// 先在X平面创建一个槽(从上往下）
+		gp_Pnt p1(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + theConnectionHight / 2);
+		gp_Pnt p2(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);// 上沿应该是无限高的
+		gp_Pnt p3(theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);
+		TopoDS_Face theSlot = MakePiece(p1, p2, p3);
+		// 在每个位置切槽
+		for (double aloc : theLocations) {
+			gp_Trsf move;
+			move.SetTranslation(gp_Vec(aloc, 0, 0)); // 沿着X
+			BRepBuilderAPI_Transform transform(theSlot, move);
+			transform.Build();
+			TopoDS_Shape localSlot = transform.Shape();
+			//更新shape
+			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
+		}
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlate, Direction theDir, double theLoc, double theClearances, double theMinSupportLen, double theCutDistance)
 {
 	VerticalPlate onePlate; // result
-	onePlate.workpiece = &theWorkpiece;
-	onePlate.baseplate = &theBasePlate;
+	onePlate.dir = theDir;
+	onePlate.location = theLoc;
+	onePlate.clearances = theClearances;
+	onePlate.minSupportLen = theMinSupportLen;
+	onePlate.cuttiDistance = theCutDistance;
 
 	TopoDS_Face aPlane = MakeCrossPlane(theLoc, theDir);
 	TopoDS_Shape aSection = MakeSection(aPlane, theWorkpiece);
 	std::vector<VerticalPiece> theOriginPieces = MakeVerticalPieceWithSection(aSection, theDir);
-	std::vector<VerticalPiece> theTrimPieces = TrimEdgeEnds(theOriginPieces, theClearances);
-	std::vector<VerticalPiece> theRemovedPieces = RemoveShortEdge(theTrimPieces, theMinSupportLen);
+	TrimEdgeEnds(theOriginPieces, theClearances);
+	std::vector<VerticalPiece> theRemovedPieces = RemoveShortEdge(theOriginPieces, theMinSupportLen);
 	std::vector<VerticalPiece> theCuttedPieces = CutLongEdge(theRemovedPieces, theMinSupportLen, theCutDistance);
 
 	//前面都是在操作Edge，这一步需要把Edge生成为Piece片体形状
 	for (auto& aP : theCuttedPieces) {
 		MakePieceFromEdge(aP, theBasePlate.Z);
-		aP.workpiece = &theWorkpiece;
-		aP.baseplate = &theBasePlate;
+		onePlate.pieces.push_back(aP);
 	}
 	return onePlate;
 }

@@ -6,6 +6,7 @@
 #include "GC_MakeSegment.hxx"
 #include "TopoDS_Edge.hxx"
 #include "TopoDS_Shape.hxx"
+#include <TopoDS_Face.hxx>
 #include <vector>
 
 //! 所有板均无厚度
@@ -19,7 +20,6 @@ enum Direction {
 	Y
 };
 struct BasePlate {
-	TopoDS_Shape* workpiece;
 	TopoDS_Shape shape;
 	double X;
 	double Y;
@@ -61,9 +61,6 @@ struct PolyLine {
 	}
 };
 struct VerticalPiece {
-	TopoDS_Shape* workpiece;
-	BasePlate* baseplate;
-
 	Direction dir;
 	TopoDS_Shape Shape;
 	TopoDS_Edge Edge;
@@ -135,9 +132,6 @@ struct VerticalPiece {
 };
 struct VerticalPlate
 {
-	TopoDS_Shape* workpiece;
-	BasePlate* baseplate;
-
 	TopoDS_Shape shape;
 	std::vector<VerticalPiece> pieces;
 	Direction dir;
@@ -145,40 +139,46 @@ struct VerticalPlate
 	double clearances;
 	double minSupportLen;
 	double cuttiDistance;
+	double connectionHeight;
 };
 ///==============================Function==============================
-
-/// <summary>
-/// 以逆时针方向，根据两个角点构建片体
-/// </summary>
-/// <param name="theLowerLeftPoint">左下角点</param>
-/// <param name="theTopRightPoint">右上角点</param>
-/// <returns></returns>
-static TopoDS_Shape MakePiece(gp_Pnt theLowerLeftPoint, gp_Pnt theTopRightPoint) {
-	// 左上角点
-	gp_Pnt p1 = theLowerLeftPoint;
-	// 左下角点
-	gp_Pnt p2(theLowerLeftPoint.X(), theTopRightPoint.Y(), theLowerLeftPoint.Z());
-	// 右下角点
-	gp_Pnt p3 = theTopRightPoint;
-	// 右上角点
-	gp_Pnt p4(theTopRightPoint.X(), theLowerLeftPoint.Y(), theLowerLeftPoint.Z());
-	// 创建边
-	BRepBuilderAPI_MakeEdge l1(GC_MakeSegment(p1, p2).Value());
-	BRepBuilderAPI_MakeEdge l2(GC_MakeSegment(p2, p3).Value());
-	BRepBuilderAPI_MakeEdge l3(GC_MakeSegment(p3, p4).Value());
-	BRepBuilderAPI_MakeEdge l4(GC_MakeSegment(p4, p1).Value());
-	// 创建线段
-	BRepBuilderAPI_MakeWire wire;
-	wire.Add(l1.Edge());
-	wire.Add(l2.Edge());
-	wire.Add(l3.Edge());
-	wire.Add(l4.Edge());
-	// 创建面
-	BRepBuilderAPI_MakeFace face(wire.Wire());
-	return face.Shape();
-}
-
+//todo 函数不正常工作，拆分成其它函数(2024-05-17)
+///// <summary>
+///// 以逆时针方向，根据三个角点构建片体
+///// </summary>
+///// <param name="p1">左下角点</param>
+///// <param name="p2"></param>
+///// <param name="p3">右上角点</param>
+///// /// <returns></returns>
+//static TopoDS_Face MakePiece(gp_Pnt p1, gp_Pnt p2, gp_Pnt p3) {
+//	/*p2 p3
+//	p1  p4*/
+//	//先取两个相邻点，得到其中心点
+//	gp_Pnt middlePnt((p1.X() + p2.X()) / 2, (p1.Y() + p2.Y()) / 2, (p1.Z() + p2.Z()) / 2);
+//	//得到矩形中心
+//	gp_Pnt centerPnt((p1.X() + p3.X()) / 2, (p1.Y() + p3.Y()) / 2, (p1.Z() + p3.Z()) / 2);
+//	//得到对称平面
+//	gp_Ax2 mirrorFace = gp_Ax2(middlePnt, gp_Dir(gp_Vec(p1, p2)));
+//	gp_Pnt p4 = p3.Mirrored(mirrorFace);
+//	//! p4一定是右下角点，如果不是，交换p3、p4
+//	if (gp_Vec(centerPnt, p3).Dot(gp_Vec(centerPnt, p4)) < 0) {
+//		std::swap(p3, p4);
+//	}
+//	// 创建边
+//	BRepBuilderAPI_MakeEdge l1(GC_MakeSegment(p1, p2).Value());
+//	BRepBuilderAPI_MakeEdge l2(GC_MakeSegment(p2, p3).Value());
+//	BRepBuilderAPI_MakeEdge l3(GC_MakeSegment(p3, p4).Value());
+//	BRepBuilderAPI_MakeEdge l4(GC_MakeSegment(p4, p1).Value());
+//	// 创建线段
+//	BRepBuilderAPI_MakeWire wire;
+//	wire.Add(l1.Edge());
+//	wire.Add(l2.Edge());
+//	wire.Add(l3.Edge());
+//	wire.Add(l4.Edge());
+//	// 创建面
+//	BRepBuilderAPI_MakeFace face(wire.Wire());
+//	return face.Face();
+//}
 #pragma endregion
 
 ///==============================
@@ -192,8 +192,7 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 ///==============================
 
 VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlate, Direction theDir, double theLoc, double theClearances, double theMinSupportLen, double theCuttiDistance);
-void SuturePiece(VerticalPlate& thePlate, double theConnectionHight);
+void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight);
+void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth);
 }
 }
-
-

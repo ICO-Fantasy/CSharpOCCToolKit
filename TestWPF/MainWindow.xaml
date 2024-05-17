@@ -483,7 +483,7 @@
                             <TextBox
                                 x:Name="ConnectionHeight_TextBox"
                                 Margin="0,4,0,4"
-                                VerticalAlignment="Stretch" TextChanged="ConnectionHeight_TextBox_TextChanged" />
+                                VerticalAlignment="Stretch" />
                         </StackPanel>
                         <StackPanel
                             x:Name="MinSupportingLen_StackPanel"
@@ -704,12 +704,33 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-
-                <Button
-                    x:Name="ConnectPlate_Button"
-                    Content="连接并生成竖板"
-                    Style="{StaticResource dgButton}"
-                    Template="{StaticResource buttonTemplate}" Height="35" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Label
+                        x:Name="ConnectionThickness_Label"
+                        Grid.Column="0"
+                        VerticalAlignment="Stretch"
+                        Content="开槽宽度" />
+                    <TextBox
+                        x:Name="ConnectionThickness_TextBox"
+                        Grid.Column="1"
+                        VerticalAlignment="Stretch" />
+                    <Button
+                        x:Name="ConnectPlate_Button"
+                        Grid.Column="2"
+                        Height="35"
+                        Click="ConnectPlate_Button_Click"
+                        Content="连接并生成竖板"
+                        Style="{StaticResource dgButton}"
+                        Template="{StaticResource buttonTemplate}" />
+                </Grid>
                 <Grid x:Name="NumberMark_grid" Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
@@ -741,9 +762,10 @@
                 </Grid>
                 <Button
                     Grid.Row="2"
+                    Height="40"
                     Content="导出DWG"
                     Style="{StaticResource dgButton}"
-                    Template="{StaticResource buttonTemplate}" Height="40" />
+                    Template="{StaticResource buttonTemplate}" />
             </Grid>
             <!--  TEST  -->
             <Grid x:Name="test_buttons" Grid.Row="3">
