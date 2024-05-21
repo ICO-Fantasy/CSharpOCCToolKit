@@ -5,6 +5,7 @@
 #include <BRep_Builder.hxx>//test
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRepBndLib.hxx>
@@ -12,24 +13,27 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
 #include <BRepGProp.hxx>
 #include <BRepGProp_Face.hxx>
 #include <BRepLib.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
+#include <cmath>
 #include <GC_MakeSegment.hxx>
 #include <GCPnts_TangentialDeflection.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <gp_EulerSequence.hxx>
+#include <gp_Quaternion.hxx>
 #include <GProp_GProps.hxx>
 #include <GProp_PEquation.hxx>
 #include <map>
 #include <ShapeUpgrade_UnifySameDomain.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
-#include <TopoDS_Shell.hxx>
+#include <TopoDS_Compound.hxx>
 #include <vector>
-#include <BRepBuilderAPI_Transform.hxx>
-#include <BRepAlgoAPI_Cut.hxx>
+
 
 namespace OCCTK {
 namespace SimpleClamp {
@@ -659,9 +663,8 @@ static void GetCorners(TopoDS_Shape theShape, BasePlate& theBasePlate) {
 static void MakeBasePlateShape(BasePlate& theBaseplate, double theZ) {
 	// 根据边界框尺寸创建立方体
 	gp_Pnt theLowLeft(theBaseplate.X - theBaseplate.OffsetX, theBaseplate.Y - theBaseplate.OffsetY, theZ);
-	gp_Pnt p2(theBaseplate.X - theBaseplate.OffsetX, theBaseplate.Y + theBaseplate.dY + theBaseplate.OffsetY, theZ);
 	gp_Pnt theTopRight(theBaseplate.X + theBaseplate.dX + theBaseplate.OffsetX, theBaseplate.Y + theBaseplate.dY + theBaseplate.OffsetY, theZ);
-	theBaseplate.shape = MakePiece(theLowLeft, p2, theTopRight);
+	theBaseplate.shape = MakePiece(theLowLeft, theTopRight, Direction::Z);
 }
 /// <summary>
 /// 非交互的生成底板
@@ -1135,19 +1138,7 @@ static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePie
 	}
 	return result;
 }
-//inline gp_Vec getNormal(TopoDS_Shape result) {
-//	TopoDS_Face testfacemain = TopoDS::Face(result);
-//	// 创建 BRepGProp_Face 对象
-//	BRepGProp_Face prop(testfacemain);
-//	// 创建 BRepAdaptor_Surface 对象
-//	BRepAdaptor_Surface adaptor(testfacemain);
-//
-//	// 计算面的法线向量
-//	gp_Pnt normalPnt;
-//	gp_Vec nomarl;
-//	prop.Normal(adaptor.FirstUParameter(), adaptor.FirstVParameter(), normalPnt, nomarl);
-//	return nomarl;
-//};
+
 /// <summary>
 /// 合并片体为一块板
 /// </summary>
@@ -1165,15 +1156,13 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 	{
 	case X:
 		leftLow = gp_Pnt(thePlate.location, theBasePlate.Y, theBasePlate.Z);
-		p2 = gp_Pnt(thePlate.location, theBasePlate.Y, theBasePlate.Z + theConnectionHight);
 		rightTop = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, theBasePlate.Z + theConnectionHight);
-		connectionPiece = MakePiece(leftLow, p2, rightTop);
+		connectionPiece = MakePiece(leftLow, rightTop, Direction::X);
 		break;
 	case Y:
 		leftLow = gp_Pnt(theBasePlate.X, thePlate.location, theBasePlate.Z);
-		p2 = gp_Pnt(theBasePlate.X, thePlate.location, theBasePlate.Z + theConnectionHight);
 		rightTop = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, theBasePlate.Z + theConnectionHight);
-		connectionPiece = MakePiece(leftLow, p2, rightTop);
+		connectionPiece = MakePiece(leftLow, rightTop, Direction::Y);
 		break;
 	default:
 		throw std::runtime_error("Unexpected Direction in switch");
@@ -1183,29 +1172,42 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 	auto theOrientation = connectionPiece.Orientation();
 	for (VerticalPiece onePiece : thePlate.pieces) {
 		TopoDS::Face(onePiece.Shape);
-		onePiece.Shape.Orientation(theOrientation);
-		result = BRepAlgoAPI_Fuse(result, onePiece.Shape).Shape();
+		auto oriShape = onePiece.Shape.Oriented(theOrientation);//todo 这一步并不管用
+		BRepAlgoAPI_Fuse aFuse(result, oriShape);
+		aFuse.SimplifyResult();// 简化结果
+		result = aFuse.Shape();
 	}
 
-	//todo 内边界的融合会失败，不清楚原因
-	//去掉融合后的内边界
-	ShapeUpgrade_UnifySameDomain unifyer(result, true, true, true);
-	unifyer.Build();
-	TopoDS_Shape result_unified = unifyer.Shape();
-	//最终结果保存在Plate中
-	thePlate.shape = result_unified;
+
+	////todo 内边界的融合会失败，不清楚原因
+	////去掉融合后的内边界
+	//ShapeUpgrade_UnifySameDomain unifyer(result, true, true, true);
+	//unifyer.Build();
+	//TopoDS_Shape result_unified = unifyer.Shape();
+	////最终结果保存在Plate中
+	//thePlate.shape = result_unified;
+	thePlate.shape = result;
 }
 
-void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth) {
+/// <summary>
+/// 在竖板上切连接槽
+/// </summary>
+/// <param name="thePlate"></param>
+/// <param name="theBasePlate"></param>
+/// <param name="theLocations"></param>
+/// <param name="theConnectionHight"></param>
+/// <param name="theConnectWidth"></param>
+/// <param name="theFilletRadius"></param>
+void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius) {
 	switch (thePlate.dir)
 	{
 	case Direction::X:
 	{
 		// 先在Y平面创建一个槽(从下往上）
-		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z);
-		gp_Pnt p2(thePlate.location, -theConnectWidth / 2, theBasePlate.Z + theConnectionHight / 2);
+		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z - 999);
 		gp_Pnt p3(thePlate.location, theConnectWidth / 2, theBasePlate.Z + theConnectionHight / 2);
-		TopoDS_Face theSlot = MakePiece(p1, p2, p3);
+		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::X, theFilletRadius);
+
 		// 在每个位置切槽
 		for (double aloc : theLocations) {
 			gp_Trsf move;
@@ -1222,9 +1224,8 @@ void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<doubl
 	{
 		// 先在X平面创建一个槽(从上往下）
 		gp_Pnt p1(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + theConnectionHight / 2);
-		gp_Pnt p2(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);// 上沿应该是无限高的
 		gp_Pnt p3(theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);
-		TopoDS_Face theSlot = MakePiece(p1, p2, p3);
+		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::Y, theFilletRadius);
 		// 在每个位置切槽
 		for (double aloc : theLocations) {
 			gp_Trsf move;
@@ -1266,6 +1267,68 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	return onePlate;
 }
 
+/// <summary>
+/// 把所有板平铺
+/// </summary>
+/// <param name="theBasePlate"></param>
+/// <param name="theVerticalPlates"></param>
+/// <returns></returns>
+TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> theVerticalPlates)
+{
+	double X = theBasePlate.X;
+	double Y = theBasePlate.Y;
+	double Z = theBasePlate.Z;
+	double gap = 10.0;
+	gp_Trsf base_trsf = gp_Trsf();
+	base_trsf.SetTranslationPart(gp_Vec(-X - theBasePlate.dX - gap, -Y - theBasePlate.dY - gap, -Z));
+	TopoDS_Shape newBP = theBasePlate.shape.Moved(TopLoc_Location(base_trsf), true);
+	double theX = 0.0;
+	double theY = 0.0;
+	std::vector<TopoDS_Shape> newVPs;
+	for (auto theVP : theVerticalPlates)
+	{
+		switch (theVP.dir)
+		{
+		case Direction::X:
+		{
+			// X朝左
+			theX -= gap;
+			gp_Trsf vp_trsf = gp_Trsf();
+			vp_trsf.SetTranslationPart(gp_Vec(-theVP.location - theX - theBasePlate.dY, -Y + gap, -Z));
+			gp_Quaternion vp_quat = gp_Quaternion();
+			vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, -M_PI / 2, -M_PI / 2);
+			vp_trsf.SetRotationPart(vp_quat);
+			TopoDS_Shape newVP = theVP.shape.Moved(TopLoc_Location(vp_trsf), true);
+			newVPs.push_back(newVP);
+			break;
+		}
+		case Direction::Y:
+		{
+			// Y朝右
+			//theX -= gap;
+			//gp_Trsf vp_trsf = gp_Trsf();
+			//vp_trsf.SetTranslationPart(gp_Vec(-theVP.location - theX - theBasePlate.dY, -Y + gap, -Z));
+			//theX -= theBasePlate.dY;
+			//gp_Quaternion vp_quat = gp_Quaternion();
+			//vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, -M_PI / 2, -M_PI / 2);
+			//vp_trsf.SetRotationPart(vp_quat);
+			//TopoDS_Shape newVP = theVP.shape.Moved(TopLoc_Location(vp_trsf), true);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	TopoDS_Compound result = TopoDS_Compound();
+	BRep_Builder builder = BRep_Builder();
+	builder.MakeCompound(result);
+	builder.Add(result, newBP);
+	for (auto anewVP : newVPs)
+	{
+		builder.Add(result, anewVP);
+	}
+	return result;
+}
 #pragma endregion
 }
 }

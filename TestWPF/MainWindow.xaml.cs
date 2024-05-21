@@ -91,7 +91,8 @@ namespace TestWPF
         /// <summary>
         /// 连接卡槽宽度
         /// </summary>
-        public double ConnectionThicknessParameter { get; set; } = 3;
+        public double ConnectionThicknessParameter { get; set; } = 5.0;
+        public double FilletRadiusParameter { get; set; } = 2.0;
 
         #endregion
 
@@ -103,6 +104,7 @@ namespace TestWPF
 
         public MainWindow()
         {
+            Decimal a = 0.0M;
             InitializeComponent();
             // 创建 Windows Forms 控件和 WindowsFormsHost
             WindowsFormsHost aHost = new WindowsFormsHost();
@@ -155,6 +157,9 @@ namespace TestWPF
 
             ConnectionThickness_TextBox.Text = ConnectionThicknessParameter.ToString();
             ConnectionThickness_TextBox.TextChanged += ConnectionThickness_TextChanged;
+
+            FilletRadius_TextBox.Text = FilletRadiusParameter.ToString();
+            FilletRadius_TextBox.TextChanged += FilletRadius_TextChanged;
             #endregion
             #region 创建竖板
             XNum_TextBox.Text = XNum.ToString();
@@ -471,6 +476,18 @@ namespace TestWPF
             {
                 // 更新XNum的值
                 ConnectionThicknessParameter = newValue;
+            }
+        }
+
+        private void FilletRadius_TextChanged(object sender, EventArgs e)
+        {
+            // 获取TextBox的新值
+            TextBox textBox = (TextBox)sender;
+            int newValue;
+            if (int.TryParse(textBox.Text, out newValue))
+            {
+                // 更新XNum的值
+                FilletRadiusParameter = newValue;
             }
         }
 
@@ -795,8 +812,27 @@ namespace TestWPF
                 Viewer.Display(InputWorkpiece, true);
                 Viewer.Display(BasePlate.shape, true);
 
-                MakeVerticalPlateLogic();
+                VerticalPlates = SimpleClampMaker.MakeVerticalPlates(
+                    InputWorkpiece,
+                    BasePlate,
+                    XNum,
+                    YNum,
+                    InitialOffsetXParameter,
+                    InitialOffsetYParameter,
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
+                UpdateComboBox();
+                foreach (var onePlate in VerticalPlates)
+                {
+                    foreach (var onePiece in onePlate.pieces)
+                    {
+                        Viewer.Display(onePiece.shape, false);
+                    }
+                }
             }
+            Viewer.Update();
             Viewer.FitAll();
         }
 
@@ -815,19 +851,14 @@ namespace TestWPF
         //连接竖板
         private void ConnectPlate_Button_Click(object sender, RoutedEventArgs e)
         {
-            //for (int i = 0; i < VerticalPlates.Count; i++)
-            //{
-            //    var onePlate = VerticalPlates[i];
-            //    SimpleClampMaker.SuturePLate(ref onePlate, BasePlate, ConnectionHeightParameter);
-            //    VerticalPlates[i] = onePlate;
-            //}
-            var newVerticalPlates = SimpleClampMaker.SuturePLates(
+            VerticalPlates = SimpleClampMaker.SuturePLates(
                 VerticalPlates,
                 BasePlate,
                 ConnectionHeightParameter,
-                ConnectionThicknessParameter
+                ConnectionThicknessParameter,
+                FilletRadiusParameter
             );
-            VerticalPlates = newVerticalPlates;
+            UpdateComboBox();
             //重新显示更新后的shape
             if (InputWorkpiece != null && BasePlate != null)
             {
@@ -859,73 +890,20 @@ namespace TestWPF
             InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString();
         }
 
-        private void MakeVerticalPlateLogic()
+        private void UpdateComboBox()
         {
-            #region 创建竖板的逻辑
-            if (XNum != 0 && YNum != 0)
+            clearPlates();
+            foreach (var onePlate in VerticalPlates)
             {
-                if (XNum != 1)
+                if (onePlate.direction == Direction.X)
                 {
-                    OffsetXParameter = (int)
-                        Math.Floor((BasePlate.dX - InitialOffsetXParameter * 2) / (XNum - 1));
+                    CurrentPlateLocationX_ComboBox.Items.Add(onePlate);
                 }
-                else
+                if (onePlate.direction == Direction.Y)
                 {
-                    OffsetXParameter = 999999;
-                }
-                if (YNum != 1)
-                {
-                    OffsetYParameter = (int)
-                        Math.Floor((BasePlate.dY - InitialOffsetYParameter * 2) / (YNum - 1));
-                }
-                else
-                {
-                    OffsetYParameter = 999999;
+                    CurrentPlateLocationY_ComboBox.Items.Add(onePlate);
                 }
             }
-            double theXValue = Math.Round(BasePlate.X + InitialOffsetXParameter);
-            double theYValue = Math.Round(BasePlate.Y + InitialOffsetYParameter);
-            List<VerticalPiece> result = new List<VerticalPiece>();
-            //沿着X方向创建竖板
-            while (theXValue < BasePlate.X + BasePlate.dX)
-            {
-                VerticalPlate theVerticalPlateX = SimpleClampMaker.MakeVerticalPlate(
-                    InputWorkpiece,
-                    BasePlate,
-                    Direction.X,
-                    theXValue,
-                    ClearancesParameter,
-                    MinSupportingLenParameter,
-                    CuttingDistanceParameter
-                );
-                VerticalPlates.Add(theVerticalPlateX);
-                CurrentPlateLocationX_ComboBox.Items.Add(theVerticalPlateX);
-                result.AddRange(theVerticalPlateX.pieces);
-                theXValue = Math.Round(theXValue + OffsetXParameter);
-            }
-            //沿着Y方向创建竖板
-            while (theYValue <= BasePlate.Y + BasePlate.dY)
-            {
-                VerticalPlate theVerticalPlateY = SimpleClampMaker.MakeVerticalPlate(
-                    InputWorkpiece,
-                    BasePlate,
-                    Direction.Y,
-                    theYValue,
-                    ClearancesParameter,
-                    MinSupportingLenParameter,
-                    CuttingDistanceParameter
-                );
-                VerticalPlates.Add(theVerticalPlateY);
-                CurrentPlateLocationY_ComboBox.Items.Add(theVerticalPlateY);
-                result.AddRange(theVerticalPlateY.pieces);
-                theYValue = Math.Round(theYValue + OffsetYParameter);
-            }
-
-            foreach (var item in result)
-            {
-                Viewer.Display(item.shape, true);
-            }
-            #endregion
         }
 
         private void clearPlates()
@@ -947,6 +925,23 @@ namespace TestWPF
             Button button = (Button)sender;
             VerticalPlate thePlate = (VerticalPlate)button.Tag;
             CurrentPlateSelectedLocation_TextBox.Text = thePlate.location.ToString();
+        }
+
+        private void PermutationPlate_Button_Click(object sender, RoutedEventArgs e)
+        {
+            //重新显示更新后的shape
+            if (InputWorkpiece != null && BasePlate != null)
+            {
+                Viewer.viewer.EraseAll();
+                Viewer.Display(InputWorkpiece, true);
+                Viewer.Display(BasePlate.shape, true);
+
+                //foreach (var onePlate in VerticalPlates)
+                //{
+                //    Viewer.Display(onePlate.shape, true);
+                //}
+            }
+            Viewer.FitAll();
         }
     }
 }

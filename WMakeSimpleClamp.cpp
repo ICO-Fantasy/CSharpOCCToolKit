@@ -274,8 +274,6 @@ VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WAIS_Shape^ InputAISWorkpiece
 	return onePlate;
 }
 
-
-
 /// <summary>
 /// 创建所有竖板
 /// </summary>
@@ -326,7 +324,7 @@ List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WAIS_Shape^ InputAISW
 	XLocation->Add(XLoc);
 	//两端始终要有两块，由initialOffset控制，中间会有Num-2块，位置均分
 	for (int i = 0; i < XNum - 2; ++i) {
-		XLoc += BasePlate->dX / (XNum - 2);
+		XLoc += (BasePlate->dX - initialOffsetX * 2) / (XNum - 2 + 1);
 		XLocation->Add(XLoc);
 	}
 	XLocation->Add(BasePlate->X + BasePlate->dX - initialOffsetX);
@@ -337,7 +335,7 @@ List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WAIS_Shape^ InputAISW
 	YLocation->Add(YLoc);
 	//两端始终要有两块，由initialOffset控制，中间会有Num-2块，位置均分
 	for (int i = 0; i < YNum - 2; ++i) {
-		YLoc += BasePlate->dY / (YNum - 2);
+		YLoc += (BasePlate->dY - initialOffsetY * 2) / (YNum - 2 + 1);
 		YLocation->Add(YLoc);
 	}
 	YLocation->Add(BasePlate->Y + BasePlate->dY - initialOffsetY);
@@ -360,7 +358,7 @@ void SimpleClampMaker::SuturePLate(VerticalPlate^% theVerticalPlate, BasePlate^ 
 	theVerticalPlate->shape = gcnew WAIS_Shape(theoccVP.shape);//todo 此处应该替换为TopoDS_Shape
 }
 
-List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness)
+List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness, double theFilletRadius)
 {
 	List<VerticalPlate^>^ plates = gcnew List<VerticalPlate^>();
 	//把X和Y方向的竖板分为两组，得到其位置
@@ -388,10 +386,10 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 		switch (oneVP->direction)
 		{
 		case Direction::X:
-			OCCTK::SimpleClamp::Slotting(theoccVP, theoccBP, YLocs, theConnectHight, theConnectThickness);
+			OCCTK::SimpleClamp::Slotting(theoccVP, theoccBP, YLocs, theConnectHight, theConnectThickness, theFilletRadius);
 			break;
 		case Direction::Y:
-			OCCTK::SimpleClamp::Slotting(theoccVP, theoccBP, XLocs, theConnectHight, theConnectThickness);
+			OCCTK::SimpleClamp::Slotting(theoccVP, theoccBP, XLocs, theConnectHight, theConnectThickness, theFilletRadius);
 			break;
 		default:
 			break;

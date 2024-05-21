@@ -8,6 +8,8 @@
 #include "TopoDS_Shape.hxx"
 #include <TopoDS_Face.hxx>
 #include <vector>
+#include <BRepFilletAPI_MakeFillet2d.hxx>
+#include <BRepTools_WireExplorer.hxx>
 
 //! 所有板均无厚度
 
@@ -17,7 +19,8 @@ namespace SimpleClamp {
 
 enum Direction {
 	X,
-	Y
+	Y,
+	Z,
 };
 struct BasePlate {
 	TopoDS_Shape shape;
@@ -142,6 +145,7 @@ struct VerticalPlate
 	double connectionHeight;
 };
 ///==============================Function==============================
+
 //todo 函数不正常工作，拆分成其它函数(2024-05-17)
 ///// <summary>
 ///// 以逆时针方向，根据三个角点构建片体
@@ -179,6 +183,99 @@ struct VerticalPlate
 //	BRepBuilderAPI_MakeFace face(wire.Wire());
 //	return face.Face();
 //}
+
+/// <summary>
+/// 根据两个角点和平面创建矩形
+/// </summary>
+/// <param name="p1"></param>
+/// <param name="p3"></param>
+/// <param name="faceDir">面法线</param>
+/// <returns></returns>
+static TopoDS_Face MakePiece(gp_Pnt leftBottom, gp_Pnt rightTop, Direction faceDir) {
+	gp_Pnt p1, p2, p3, p4;
+	p1 = leftBottom;
+	p3 = rightTop;
+	switch (faceDir)
+	{
+	case X: // X不变
+		p2 = gp_Pnt(p1.X(), p1.Y(), p3.Z());
+		p4 = gp_Pnt(p1.X(), p3.Y(), p1.Z());
+		break;
+	case Y: // Y不变
+		p2 = gp_Pnt(p1.X(), p1.Y(), p3.Z());
+		p4 = gp_Pnt(p3.X(), p1.Y(), p1.Z());
+		break;
+	case Z: // Z不变
+		p2 = gp_Pnt(p1.X(), p3.Y(), p1.Z());
+		p4 = gp_Pnt(p3.X(), p1.Y(), p1.Z());
+		break;
+	default:
+		break;
+	}
+	// 创建边
+	BRepBuilderAPI_MakeEdge l1(GC_MakeSegment(p1, p2).Value());
+	BRepBuilderAPI_MakeEdge l2(GC_MakeSegment(p2, p3).Value());
+	BRepBuilderAPI_MakeEdge l3(GC_MakeSegment(p3, p4).Value());
+	BRepBuilderAPI_MakeEdge l4(GC_MakeSegment(p4, p1).Value());
+	// 创建线段
+	BRepBuilderAPI_MakeWire wire;
+	wire.Add(l1.Edge());
+	wire.Add(l2.Edge());
+	wire.Add(l3.Edge());
+	wire.Add(l4.Edge());
+	// 创建面
+	BRepBuilderAPI_MakeFace face(wire.Wire());
+	return face.Face();
+}
+static TopoDS_Face MakePiece(gp_Pnt leftBottom, gp_Pnt rightTop, Direction faceDir, double theRadius) {
+	gp_Pnt p1, p2, p3, p4;
+	p1 = leftBottom;
+	p3 = rightTop;
+	switch (faceDir)
+	{
+	case X: // X不变
+		p2 = gp_Pnt(p1.X(), p1.Y(), p3.Z());
+		p4 = gp_Pnt(p1.X(), p3.Y(), p1.Z());
+		break;
+	case Y: // Y不变
+		p2 = gp_Pnt(p1.X(), p1.Y(), p3.Z());
+		p4 = gp_Pnt(p3.X(), p1.Y(), p1.Z());
+		break;
+	case Z: // Z不变
+		p2 = gp_Pnt(p1.X(), p3.Y(), p1.Z());
+		p4 = gp_Pnt(p3.X(), p1.Y(), p1.Z());
+		break;
+	default:
+		break;
+	}
+
+	// 创建边
+	TopoDS_Edge l1 = BRepBuilderAPI_MakeEdge(GC_MakeSegment(p1, p2).Value());
+	TopoDS_Edge l2 = BRepBuilderAPI_MakeEdge(GC_MakeSegment(p2, p3).Value());
+	TopoDS_Edge l3 = BRepBuilderAPI_MakeEdge(GC_MakeSegment(p3, p4).Value());
+	TopoDS_Edge l4 = BRepBuilderAPI_MakeEdge(GC_MakeSegment(p4, p1).Value());
+
+	// 创建线段
+	BRepBuilderAPI_MakeWire wire;
+	wire.Add(l1);
+	wire.Add(l2);
+	wire.Add(l3);
+	wire.Add(l4);
+	// 创建面
+	BRepBuilderAPI_MakeFace face(wire.Wire());
+
+	BRepFilletAPI_MakeFillet2d filleter(face);
+	BRepTools_WireExplorer explorer(wire.Wire());
+	while (explorer.More())
+	{
+		TopoDS_Vertex vertex = explorer.CurrentVertex();
+		filleter.AddFillet(vertex, theRadius);
+		explorer.Next();
+	}
+
+	return TopoDS::Face(filleter.Shape());
+}
+
 #pragma endregion
 
 ///==============================
@@ -193,6 +290,13 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 
 VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlate, Direction theDir, double theLoc, double theClearances, double theMinSupportLen, double theCuttiDistance);
 void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight);
-void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth);
+void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius);
+
+///==============================
+///得到结果
+///==============================
+
+TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> theVerticalPlates);
+
 }
 }
