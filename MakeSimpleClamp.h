@@ -297,6 +297,6 @@ void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<doubl
 ///==============================
 
 TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> theVerticalPlates);
-
+bool saveSTEP(TopoDS_Shape theShape, TCollection_AsciiString filePath);
 }
 }

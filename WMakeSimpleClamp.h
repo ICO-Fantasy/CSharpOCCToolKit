@@ -75,6 +75,8 @@ public:
 	static List<VerticalPlate^>^ MakeVerticalPlates(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, int XNum, int YNum, double initialOffsetX, double initialOffsetY, double theClearances, double theMinSupportLen, double theCuttingDistance);
 	static void SuturePLate(VerticalPlate^% theVerticalPlate, BasePlate^ BasePlate, double theConnectHight);
 	static List<VerticalPlate^>^ SuturePLates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness, double theFilletRadius);
+	static WAIS_Shape^ DeployPlates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate);
+	static bool SaveSTEP(WAIS_Shape^ theShape, String^ filePath);
 };
 }
 

@@ -4,35 +4,30 @@
 #include <Bnd_Box.hxx>
 #include <BRep_Builder.hxx>//test
 #include <BRepAdaptor_Curve.hxx>
-#include <BRepAdaptor_Surface.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
-#include <BRepGProp.hxx>
-#include <BRepGProp_Face.hxx>
-#include <BRepLib.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
-#include <BRepPrimAPI_MakePrism.hxx>
 #include <cmath>
 #include <GC_MakeSegment.hxx>
 #include <GCPnts_TangentialDeflection.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <gp_EulerSequence.hxx>
 #include <gp_Quaternion.hxx>
-#include <GProp_GProps.hxx>
 #include <GProp_PEquation.hxx>
-#include <map>
-#include <ShapeUpgrade_UnifySameDomain.hxx>
+#include <IFSelect_ReturnStatus.hxx>
+#include <STEPCAFControl_Writer.hxx>
+#include <STEPControl_StepModelType.hxx>
+#include <TCollection_AsciiString.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Compound.hxx>
 #include <vector>
+#include <Interface_Static.hxx>
 
 
 namespace OCCTK {
@@ -1267,6 +1262,7 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	return onePlate;
 }
 
+#pragma endregion
 /// <summary>
 /// 把所有板平铺
 /// </summary>
@@ -1279,9 +1275,11 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> the
 	double Y = theBasePlate.Y;
 	double Z = theBasePlate.Z;
 	double gap = 10.0;
+#pragma region 横板
 	gp_Trsf base_trsf = gp_Trsf();
-	base_trsf.SetTranslationPart(gp_Vec(-X - theBasePlate.dX - gap, -Y - theBasePlate.dY - gap, -Z));
+	base_trsf.SetTranslationPart(gp_Vec(-X + theBasePlate.OffsetX + gap / 2, -Y + theBasePlate.OffsetY + gap / 2, -Z));
 	TopoDS_Shape newBP = theBasePlate.shape.Moved(TopLoc_Location(base_trsf), true);
+#pragma endregion
 	double theX = 0.0;
 	double theY = 0.0;
 	std::vector<TopoDS_Shape> newVPs;
@@ -1291,28 +1289,36 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> the
 		{
 		case Direction::X:
 		{
-			// X朝左
-			theX -= gap;
+			theY += gap / 2;
+			gp_Trsf vp_toOrigin = gp_Trsf();
 			gp_Trsf vp_trsf = gp_Trsf();
-			vp_trsf.SetTranslationPart(gp_Vec(-theVP.location - theX - theBasePlate.dY, -Y + gap, -Z));
+			vp_toOrigin.SetTranslationPart(gp_Vec(-theVP.location, -Y, -Z));
+			theVP.shape = theVP.shape.Located(TopLoc_Location(vp_toOrigin));
+			//! 注意,齐次变换是先旋转后平移的
 			gp_Quaternion vp_quat = gp_Quaternion();
-			vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, -M_PI / 2, -M_PI / 2);
+			vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, -M_PI / 2, 0);
 			vp_trsf.SetRotationPart(vp_quat);
+			vp_trsf.SetTranslationPart(gp_Vec(-gap / 2, theY, 0));
 			TopoDS_Shape newVP = theVP.shape.Moved(TopLoc_Location(vp_trsf), true);
 			newVPs.push_back(newVP);
+			theY += theBasePlate.dY + gap / 2;
 			break;
 		}
 		case Direction::Y:
 		{
-			// Y朝右
-			//theX -= gap;
-			//gp_Trsf vp_trsf = gp_Trsf();
-			//vp_trsf.SetTranslationPart(gp_Vec(-theVP.location - theX - theBasePlate.dY, -Y + gap, -Z));
-			//theX -= theBasePlate.dY;
-			//gp_Quaternion vp_quat = gp_Quaternion();
-			//vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, -M_PI / 2, -M_PI / 2);
-			//vp_trsf.SetRotationPart(vp_quat);
-			//TopoDS_Shape newVP = theVP.shape.Moved(TopLoc_Location(vp_trsf), true);
+			theX += gap / 2;
+			gp_Trsf vp_toOrigin = gp_Trsf();
+			gp_Trsf vp_trsf = gp_Trsf();
+			vp_toOrigin.SetTranslationPart(gp_Vec(-X, -theVP.location, -Z));
+			theVP.shape = theVP.shape.Located(TopLoc_Location(vp_toOrigin));
+			//! 注意,齐次变换是先旋转后平移的
+			gp_Quaternion vp_quat = gp_Quaternion();
+			vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, 0, M_PI / 2);
+			vp_trsf.SetRotationPart(vp_quat);
+			vp_trsf.SetTranslationPart(gp_Vec(theX, -gap / 2, 0));
+			TopoDS_Shape newVP = theVP.shape.Moved(TopLoc_Location(vp_trsf), true);
+			newVPs.push_back(newVP);
+			theX += theBasePlate.dX + gap / 2;
 			break;
 		}
 		default:
@@ -1329,6 +1335,20 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> the
 	}
 	return result;
 }
-#pragma endregion
+
+bool saveSTEP(TopoDS_Shape theShape, TCollection_AsciiString filePath) {
+	//初始化写入对象
+	STEPControl_Writer aWriter;
+
+	aWriter.Transfer(theShape, STEPControl_AsIs);
+	IFSelect_ReturnStatus status = aWriter.Write(filePath.ToCString());
+
+	if (status == IFSelect_RetDone)
+	{
+		return true;
+	}
+	return false;
+
+}
 }
 }

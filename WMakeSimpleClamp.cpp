@@ -5,7 +5,6 @@
 #include <STEPControl_Reader.hxx>
 #include <vector>
 #include <TopoDS.hxx>
-#include <map>
 #include "String.h"
 using namespace System::Collections::Generic;
 
@@ -401,7 +400,27 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 	return plates;
 }
 
+WAIS_Shape^ SimpleClampMaker::DeployPlates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate) {
+	OCCTK::SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
+	std::vector<OCCTK::SimpleClamp::VerticalPlate> cppPlates;
+	for each (auto onePlate in verticalPlates)
+	{
+		cppPlates.push_back(onePlate->GetOCC());
+	}
+	TopoDS_Shape result = OCCTK::SimpleClamp::DeployPlates(theoccBP, cppPlates);
+	return gcnew WAIS_Shape(result);
+}
 
+bool SimpleClampMaker::SaveSTEP(WAIS_Shape^ theShape, String^ filePath)
+{
+	TopoDS_Shape theoccShape = (*(theShape->GetOCC()))->Shape();
+	auto theStr = OCCTK::DataExchange::toAsciiString(filePath);
+	if (OCCTK::SimpleClamp::saveSTEP(theoccShape, theStr))
+	{
+		return true;
+	}
+	return false;
+}
 
 
 }

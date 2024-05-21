@@ -21,6 +21,7 @@ namespace TestWPF
         private OCCCanvas Viewer;
         private WAIS_Shape InputWorkpiece;
         public List<VerticalPlate> VerticalPlates = new List<VerticalPlate>();
+        public WAIS_Shape CombinedFixtureBoard;
 
         #region 创建横板参数
         /// <summary>
@@ -104,7 +105,6 @@ namespace TestWPF
 
         public MainWindow()
         {
-            Decimal a = 0.0M;
             InitializeComponent();
             // 创建 Windows Forms 控件和 WindowsFormsHost
             WindowsFormsHost aHost = new WindowsFormsHost();
@@ -230,8 +230,8 @@ namespace TestWPF
         private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
-            //InputWorkpiece = OCCTK.Laser.WMakeSimpleClamp.TestInputWorkpiece("mods\\test1Small.STEP");
+            //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
             Viewer.Display(InputWorkpiece, true);
         }
 
@@ -281,7 +281,6 @@ namespace TestWPF
         }
 
         #endregion
-        private void Test_ConnectV_Button_Click(object sender, RoutedEventArgs e) { }
 
         #region 选择模式
         private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
@@ -933,15 +932,22 @@ namespace TestWPF
             if (InputWorkpiece != null && BasePlate != null)
             {
                 Viewer.viewer.EraseAll();
-                Viewer.Display(InputWorkpiece, true);
-                Viewer.Display(BasePlate.shape, true);
+                //Viewer.Display(InputWorkpiece, true);
+                //Viewer.Display(BasePlate.shape, true);
 
                 //foreach (var onePlate in VerticalPlates)
                 //{
                 //    Viewer.Display(onePlate.shape, true);
                 //}
             }
+            CombinedFixtureBoard = SimpleClampMaker.DeployPlates(VerticalPlates, BasePlate);
+            Viewer.Display(CombinedFixtureBoard, true);
             Viewer.FitAll();
+        }
+
+        private void OutputSTEP_Button_Click(object sender, RoutedEventArgs e)
+        {
+            SimpleClampMaker.SaveSTEP(CombinedFixtureBoard, "mods\\test_output.STEP");
         }
     }
 }
