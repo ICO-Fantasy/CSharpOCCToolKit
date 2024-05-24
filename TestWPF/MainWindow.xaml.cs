@@ -5,10 +5,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
-
 using OCCTK.Laser;
 using OCCTK.OCC.AIS;
-
 using OCCViewForm;
 
 namespace TestWPF
@@ -220,8 +218,6 @@ namespace TestWPF
 
         private void Test_Button_Click(object sender, RoutedEventArgs e)
         {
-            //Viewer.MakeClampTest();
-            //Viewer.Test();
             InputWorkpiece = Viewer.viewer.TestMakeBox();
             Viewer.Display(InputWorkpiece, true);
         }
@@ -232,7 +228,9 @@ namespace TestWPF
             Viewer.viewer.EraseAll();
             //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
             InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
+            BasePlate = null;
             Viewer.Display(InputWorkpiece, true);
+            Viewer.FitAll();
         }
 
         private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
@@ -475,6 +473,10 @@ namespace TestWPF
             {
                 // 更新XNum的值
                 ConnectionThicknessParameter = newValue;
+                if (FilletRadiusParameter > newValue / 2)
+                {
+                    FilletRadiusParameter = Math.Round(ConnectionThicknessParameter / 2);
+                }
             }
         }
 
@@ -850,13 +852,7 @@ namespace TestWPF
         //连接竖板
         private void ConnectPlate_Button_Click(object sender, RoutedEventArgs e)
         {
-            VerticalPlates = SimpleClampMaker.SuturePLates(
-                VerticalPlates,
-                BasePlate,
-                ConnectionHeightParameter,
-                ConnectionThicknessParameter,
-                FilletRadiusParameter
-            );
+            testconnect();
             UpdateComboBox();
             //重新显示更新后的shape
             if (InputWorkpiece != null && BasePlate != null)
@@ -871,6 +867,17 @@ namespace TestWPF
                 }
             }
             Viewer.FitAll();
+        }
+
+        private void testconnect()
+        {
+            VerticalPlates = SimpleClampMaker.SuturePLates(
+                VerticalPlates,
+                BasePlate,
+                ConnectionHeightParameter,
+                ConnectionThicknessParameter,
+                FilletRadiusParameter
+            );
         }
 
         private void MakeBasePlate()
@@ -932,13 +939,6 @@ namespace TestWPF
             if (InputWorkpiece != null && BasePlate != null)
             {
                 Viewer.viewer.EraseAll();
-                //Viewer.Display(InputWorkpiece, true);
-                //Viewer.Display(BasePlate.shape, true);
-
-                //foreach (var onePlate in VerticalPlates)
-                //{
-                //    Viewer.Display(onePlate.shape, true);
-                //}
             }
             CombinedFixtureBoard = SimpleClampMaker.DeployPlates(VerticalPlates, BasePlate);
             Viewer.Display(CombinedFixtureBoard, true);

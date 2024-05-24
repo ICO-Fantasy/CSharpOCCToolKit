@@ -376,6 +376,7 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 		}
 	}
 #pragma region 在每块板的每个对应位置开槽
+	int testNum = 0;
 	for each (auto theP in verticalPlates) {
 		auto oneVP = theP;
 		//先完成板的连接
@@ -394,6 +395,7 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 			break;
 		}
 		plates->Add(getDelegate(theoccVP));
+
 	}
 #pragma endregion
 

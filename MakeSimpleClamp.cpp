@@ -817,7 +817,7 @@ static TopoDS_Edge TrimEdge(TopoDS_Edge theOriginEdge, gp_Pnt p1, gp_Pnt p2) {
 	//获取底层曲线
 	double first, last;
 	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
-	//有时底层曲线没有创建，要手动创建
+	// 有时底层曲线没有创建，要手动创建
 	//if (aCurve.IsNull())
 	//{
 	//	BRepLib::BuildCurves3d(theOriginEdge, 1.0e-5, GeomAbs_C1);//创建曲线(一阶导数的连续性)
@@ -846,8 +846,18 @@ static TopoDS_Edge TrimEdge(TopoDS_Edge theOriginEdge, gp_Pnt p1, gp_Pnt p2) {
 	return theOriginEdge;
 }
 
-static void TrimEdgeEnds(std::vector<VerticalPiece>& thePieces, double theClearances) {
+/// <summary>
+/// 根据长度修剪线
+/// </summary>
+/// <param name="thePieces"></param>
+/// <param name="theClearances"></param>
+static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePieces, double theClearances) {
+	std::vector<VerticalPiece> result;
 	for (VerticalPiece& aPiece : thePieces) {
+		if (aPiece.Length() < theClearances * 2)
+		{
+			continue;
+		}
 		BRepAdaptor_Curve aBAC(aPiece.Edge);
 		gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
 		gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
@@ -863,6 +873,7 @@ static void TrimEdgeEnds(std::vector<VerticalPiece>& thePieces, double theCleara
 			if (!outEdge.IsNull()) {
 				aPiece.Edge = outEdge;
 			}
+			result.push_back(aPiece);
 			break;
 		}
 		case Y:
@@ -876,12 +887,14 @@ static void TrimEdgeEnds(std::vector<VerticalPiece>& thePieces, double theCleara
 			if (!outEdge.IsNull()) {
 				aPiece.Edge = outEdge;
 			}
+			result.push_back(aPiece);
 			break;
 		}
 		default:
 			break;
 		}
 	}
+	return result;
 }
 
 /// <summary>
@@ -1164,15 +1177,27 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 	}
 	//把Piece和连接板融合
 	TopoDS_Shape result = connectionPiece;
-	auto theOrientation = connectionPiece.Orientation();
+	//int theNum = 0;
+	//saveSTEP(connectionPiece, "outs\\CPlate.STEP");
+	//for (VerticalPiece onePiece : thePlate.pieces)
+	//{
+	//	std::stringstream filePath;
+	//	filePath << "outs\\";
+	//	filePath << theNum;
+	//	filePath << ".STEP";
+	//	saveSTEP(onePiece.Shape, filePath.str().c_str());
+	//	theNum += 1;
+	//}
+	//auto theOrientation = connectionPiece.Orientation();
 	for (VerticalPiece onePiece : thePlate.pieces) {
-		TopoDS::Face(onePiece.Shape);
-		auto oriShape = onePiece.Shape.Oriented(theOrientation);//todo 这一步并不管用
-		BRepAlgoAPI_Fuse aFuse(result, oriShape);
+		//TopoDS::Face(onePiece.Shape);
+		//auto oriShape = onePiece.Shape.Oriented(theOrientation);//todo 这一步并不管用
+		TopoDS_Shape pieceShape = onePiece.Shape;
+		BRepAlgoAPI_Fuse aFuse(result, pieceShape);
 		aFuse.SimplifyResult();// 简化结果
 		result = aFuse.Shape();
-	}
 
+	}
 
 	////todo 内边界的融合会失败，不清楚原因
 	////去掉融合后的内边界
@@ -1250,8 +1275,8 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	TopoDS_Face aPlane = MakeCrossPlane(theLoc, theDir);
 	TopoDS_Shape aSection = MakeSection(aPlane, theWorkpiece);
 	std::vector<VerticalPiece> theOriginPieces = MakeVerticalPieceWithSection(aSection, theDir);
-	TrimEdgeEnds(theOriginPieces, theClearances);
-	std::vector<VerticalPiece> theRemovedPieces = RemoveShortEdge(theOriginPieces, theMinSupportLen);
+	std::vector<VerticalPiece> theTrimedPieces = TrimEdgeEnds(theOriginPieces, theClearances);
+	std::vector<VerticalPiece> theRemovedPieces = RemoveShortEdge(theTrimedPieces, theMinSupportLen);
 	std::vector<VerticalPiece> theCuttedPieces = CutLongEdge(theRemovedPieces, theMinSupportLen, theCutDistance);
 
 	//前面都是在操作Edge，这一步需要把Edge生成为Piece片体形状
