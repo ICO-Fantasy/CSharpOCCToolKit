@@ -7,6 +7,8 @@ using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using OCCTK.Laser;
 using OCCTK.OCC.AIS;
+using OCCTK.OCC.gp;
+using OCCTK.OCC.TopoDS;
 using OCCViewForm;
 
 namespace TestWPF
@@ -17,9 +19,62 @@ namespace TestWPF
     public partial class MainWindow : Window
     {
         private OCCCanvas Viewer;
-        private WAIS_Shape InputWorkpiece;
+
+        private WTopoDS_Shape _InputWorkpiece;
+        private WAIS_Shape _AISInputWorkpiece;
+        private WTopoDS_Shape InputWorkpiece
+        {
+            get { return _InputWorkpiece; }
+            set
+            {
+                _InputWorkpiece = value;
+                _AISInputWorkpiece = new WAIS_Shape(value);
+            }
+        }
+        public WAIS_Shape AISInputWorkpiece
+        {
+            get
+            {
+                var a = _AISInputWorkpiece;
+                a.SetColor(125, 125, 125);
+                return a;
+            }
+            set
+            {
+                _AISInputWorkpiece = value;
+                _InputWorkpiece = value.Shape();
+            }
+        }
+
+        public WAIS_Shape AISBasePlate
+        {
+            get
+            {
+                WAIS_Shape a = new WAIS_Shape(BasePlate.shape);
+                a.SetColor(0, 0, 255);
+                return a;
+            }
+        }
+
+        public WAIS_Shape AISCurrentPlate
+        {
+            get
+            {
+                WAIS_Shape a = new WAIS_Shape(CurrentPlate.shape);
+                if (CurrentPlate.direction == Direction.X)
+                {
+                    a.SetColor(255, 0, 0);
+                }
+                if (CurrentPlate.direction == Direction.Y)
+                {
+                    a.SetColor(0, 255, 0);
+                }
+                return a;
+            }
+        }
+
         public List<VerticalPlate> VerticalPlates = new List<VerticalPlate>();
-        public WAIS_Shape CombinedFixtureBoard;
+        public WTopoDS_Shape CombinedFixtureBoard;
 
         #region 创建横板参数
         /// <summary>
@@ -210,6 +265,7 @@ namespace TestWPF
             Viewer.SetDisplayMode(DisplayMode.Shading);
         }
         #endregion
+
         #region 测试
         private void FitAll_Button_Click(object sender, RoutedEventArgs e)
         {
@@ -218,18 +274,20 @@ namespace TestWPF
 
         private void Test_Button_Click(object sender, RoutedEventArgs e)
         {
-            InputWorkpiece = Viewer.viewer.TestMakeBox();
-            Viewer.Display(InputWorkpiece, true);
+            InputWorkpiece = Viewer.viewer.TestMakeBox().Shape();
+            Viewer.Display(AISInputWorkpiece, true);
         }
         #endregion
+
         #region 导入
         private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
             //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
-            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
+            //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
+            InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test4Small.STEP");
             BasePlate = null;
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             Viewer.FitAll();
         }
 
@@ -238,7 +296,7 @@ namespace TestWPF
             Viewer.viewer.EraseAll();
             InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1.stp");
             BasePlate = null;
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             Viewer.FitAll();
         }
 
@@ -247,7 +305,7 @@ namespace TestWPF
             Viewer.viewer.EraseAll();
             InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test2.stp");
             BasePlate = null;
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             Viewer.FitAll();
         }
 
@@ -256,7 +314,7 @@ namespace TestWPF
             Viewer.viewer.EraseAll();
             InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test3.STEP");
             BasePlate = null;
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             Viewer.FitAll();
         }
 
@@ -265,7 +323,7 @@ namespace TestWPF
             Viewer.viewer.EraseAll();
             InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test4.stp");
             BasePlate = null;
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             Viewer.FitAll();
         }
 
@@ -274,7 +332,7 @@ namespace TestWPF
             Viewer.viewer.EraseAll();
             InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test5.stp");
             BasePlate = null;
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             Viewer.FitAll();
         }
 
@@ -527,14 +585,14 @@ namespace TestWPF
             if (CurrentPlate != null)
             {
                 //显示选中板的坐标
-                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString();
+                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString("F1");
                 //清空画布并重新显示
                 Viewer.viewer.EraseAll();
-                Viewer.viewer.Display(InputWorkpiece, false);
-                Viewer.viewer.Display(BasePlate.shape, false);
+                Viewer.viewer.Display(AISInputWorkpiece, false);
+                Viewer.viewer.Display(AISBasePlate, false);
                 if (CurrentPlate.shape != null)
                 {
-                    Viewer.viewer.Display(CurrentPlate.shape, true);
+                    Viewer.viewer.Display(AISCurrentPlate, true);
                     return;
                 }
                 foreach (var item in CurrentPlate.pieces)
@@ -557,14 +615,15 @@ namespace TestWPF
             if (CurrentPlate != null)
             {
                 //显示选中板的坐标
-                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString();
+                CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString("F1");
                 //清空画布并重新显示
                 Viewer.viewer.EraseAll();
-                Viewer.viewer.Display(InputWorkpiece, false);
-                Viewer.viewer.Display(BasePlate.shape, false);
+                Viewer.viewer.Display(AISInputWorkpiece, false);
+                WAIS_Shape theshape = new(BasePlate.shape);
+                Viewer.viewer.Display(theshape, false);
                 if (CurrentPlate.shape != null)
                 {
-                    Viewer.viewer.Display(CurrentPlate.shape, true);
+                    Viewer.viewer.Display(AISCurrentPlate, true);
                     return;
                 }
                 foreach (var item in CurrentPlate.pieces)
@@ -602,14 +661,14 @@ namespace TestWPF
 
             // 创建要添加到 StackPanel 中的子元素
             Label PieceLabel = new Label();
-            PieceLabel.Content = "位置: " + thePiece.start.ToString("F1");
+            PieceLabel.Content = "位置: " + thePiece.ToString("F2");
             PieceLabel.HorizontalContentAlignment = HorizontalAlignment.Left; // 设置 Label 的水平内容对齐方式为 Left
 
             Button selectButton = new Button();
             selectButton.Content = "选中";
             selectButton.Click += (sender, e) =>
             {
-                Viewer.viewer.SelectAIS(thePiece.shape);
+                Viewer.viewer.SelectAIS(thePiece.aisShape);
             };
 
             Button deletButton = new Button();
@@ -635,7 +694,7 @@ namespace TestWPF
                 }
                 #endregion
                 #region 删除AIS对象和piece对象
-                Viewer.viewer.Erase(thePiece.shape, true);
+                Viewer.viewer.Erase(thePiece.aisShape, true);
                 CurrentPlate.pieces.Remove(thePiece);
                 #endregion
             };
@@ -650,7 +709,7 @@ namespace TestWPF
             outerStackPanel.Children.Add(selectButton);
             outerStackPanel.Children.Add(deletButton);
             //显示
-            Viewer.viewer.Display(thePiece.shape, false);
+            Viewer.viewer.Display(thePiece.aisShape, false);
             return outerStackPanel;
         }
         #endregion
@@ -664,7 +723,7 @@ namespace TestWPF
                 //更新视图显示
                 foreach (var item in CurrentPlate.pieces)
                 {
-                    Viewer.viewer.Erase(item.shape, false);
+                    Viewer.viewer.Erase(item.aisShape, false);
                 }
                 Viewer.viewer.UpdateCurrentViewer();
                 // 更新CurrentPlateValueLable的值
@@ -681,7 +740,7 @@ namespace TestWPF
                 //显示新创建的板
                 foreach (var item in CurrentPlate.pieces)
                 {
-                    Viewer.viewer.Display(item.shape, theToUpdateViewer: false);
+                    Viewer.viewer.Display(item.aisShape, theToUpdateViewer: false);
                 }
                 Viewer.viewer.UpdateCurrentViewer();
             }
@@ -797,7 +856,7 @@ namespace TestWPF
             if (InputWorkpiece == null)
             {
                 InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
-                Viewer.Display(InputWorkpiece, true);
+                Viewer.Display(AISInputWorkpiece, true);
             }
             if (BasePlate == null)
             {
@@ -810,8 +869,8 @@ namespace TestWPF
             if (InputWorkpiece != null && BasePlate != null)
             {
                 Viewer.viewer.EraseAll();
-                Viewer.Display(InputWorkpiece, true);
-                Viewer.Display(BasePlate.shape, true);
+                Viewer.Display(AISInputWorkpiece, true);
+                Viewer.Display(AISBasePlate, true);
 
                 VerticalPlates = SimpleClampMaker.MakeVerticalPlates(
                     InputWorkpiece,
@@ -829,7 +888,7 @@ namespace TestWPF
                 {
                     foreach (var onePiece in onePlate.pieces)
                     {
-                        Viewer.Display(onePiece.shape, false);
+                        Viewer.Display(onePiece.aisShape, false);
                     }
                 }
             }
@@ -841,11 +900,11 @@ namespace TestWPF
         private void MakeBasePlate_Button_Clcik(object sender, RoutedEventArgs e)
         {
             Viewer.viewer.EraseAll();
-            if (InputWorkpiece == null)
+            if (AISInputWorkpiece == null)
             {
                 InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
             }
-            Viewer.Display(InputWorkpiece, true);
+            Viewer.Display(AISInputWorkpiece, true);
             MakeBasePlate();
         }
 
@@ -855,15 +914,15 @@ namespace TestWPF
             testconnect();
             UpdateComboBox();
             //重新显示更新后的shape
-            if (InputWorkpiece != null && BasePlate != null)
+            if (AISInputWorkpiece != null && AISBasePlate != null)
             {
                 Viewer.viewer.EraseAll();
-                Viewer.Display(InputWorkpiece, true);
-                Viewer.Display(BasePlate.shape, true);
+                Viewer.Display(AISInputWorkpiece, true);
+                Viewer.Display(AISBasePlate, true);
 
                 foreach (var onePlate in VerticalPlates)
                 {
-                    Viewer.Display(onePlate.shape, true);
+                    Viewer.Display(onePlate.aisShape, true);
                 }
             }
             Viewer.FitAll();
@@ -888,12 +947,12 @@ namespace TestWPF
                 BasePlateOffsetX,
                 BasePlateOffsetY
             );
-            Viewer.Display(BasePlate.shape, true);
+            Viewer.Display(AISBasePlate, true);
             //根据计算结果，设置推荐值
             InitialOffsetXParameter = Math.Round(BasePlate.dX * 0.1);
-            InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString();
+            InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString("F1");
             InitialOffsetYParameter = Math.Round(BasePlate.dY * 0.1);
-            InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString();
+            InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString("F1");
         }
 
         private void UpdateComboBox()
@@ -930,7 +989,7 @@ namespace TestWPF
         {
             Button button = (Button)sender;
             VerticalPlate thePlate = (VerticalPlate)button.Tag;
-            CurrentPlateSelectedLocation_TextBox.Text = thePlate.location.ToString();
+            CurrentPlateSelectedLocation_TextBox.Text = thePlate.location.ToString("F1");
         }
 
         private void PermutationPlate_Button_Click(object sender, RoutedEventArgs e)
@@ -941,7 +1000,7 @@ namespace TestWPF
                 Viewer.viewer.EraseAll();
             }
             CombinedFixtureBoard = SimpleClampMaker.DeployPlates(VerticalPlates, BasePlate);
-            Viewer.Display(CombinedFixtureBoard, true);
+            Viewer.Display(new WAIS_Shape(CombinedFixtureBoard), true);
             Viewer.FitAll();
         }
 

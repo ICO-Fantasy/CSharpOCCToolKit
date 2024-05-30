@@ -17,7 +17,7 @@ namespace OCCTK::Laser {
 OCCTK::SimpleClamp::BasePlate BasePlate::GetOCC()
 {
 	OCCTK::SimpleClamp::BasePlate occBasePlate{
-		(*(this->shape)->GetOCC())->Shape() ,
+		*(this->shape)->GetOCC(),
 		this->X,
 		this->Y,
 		this->Z,
@@ -40,7 +40,7 @@ OCCTK::SimpleClamp::VerticalPlate VerticalPlate::GetOCC()
 	TopoDS_Shape VerticalPlateShape = TopoDS_Shape();
 	if (this->shape != nullptr)
 	{
-		VerticalPlateShape = (*(this->shape)->GetOCC())->Shape();
+		VerticalPlateShape = *(this->shape)->GetOCC();
 	}
 
 	//std::vector<VerticalPiece> pieces;
@@ -93,14 +93,17 @@ OCCTK::SimpleClamp::VerticalPiece VerticalPiece::GetOCC()
 		throw std::runtime_error("Unexpected Direction in switch");
 	}
 	//TopoDS_Shape Shape;
-	TopoDS_Shape theshape = (*(shape->GetOCC()))->Shape();
+	TopoDS_Shape theshape = *(shape->GetOCC());
 	//TopoDS_Edge Edge;
-	TopoDS_Shape theedgeshape = (*(edge->GetOCC()))->Shape();//todo 这个转换可以不用
-	TopoDS_Edge theedge = TopoDS::Edge(theedgeshape);//todo 这个转换可以不用
+	TopoDS_Edge theedge = TopoDS::Edge(*(edge->GetOCC()));
+	gp_Pnt thestart = *start->GetOCC();
+	gp_Pnt theend = *end->GetOCC();
 	OCCTK::SimpleClamp::VerticalPiece occVerticalPiece{
 		thedir,
 		theshape,
 		theedge,
+		thestart,
+		theend,
 	};
 	return occVerticalPiece;
 }
@@ -108,7 +111,7 @@ OCCTK::SimpleClamp::VerticalPiece VerticalPiece::GetOCC()
 //把CPP结构体封装为委托结构体
 static auto getDelegate(OCCTK::SimpleClamp::BasePlate cppBase) {
 	BasePlate^ theBase = gcnew BasePlate();
-	theBase->shape = gcnew WAIS_Shape(cppBase.shape);//todo 需要替换为TopoDS_Shape
+	theBase->shape = gcnew WTopoDS_Shape(cppBase.shape);
 	theBase->X = cppBase.X;
 	theBase->Y = cppBase.Y;
 	theBase->Z = cppBase.Z;
@@ -133,10 +136,11 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPiece cppPiece) {
 	default:
 		break;
 	}
-	thePiece->shape = gcnew WAIS_Shape(cppPiece.Shape);
-	thePiece->edge = gcnew WAIS_Shape(cppPiece.Edge);
-	thePiece->start = cppPiece.StartPoint().X(); //todo 需要换成Wgp_Pnt
-	thePiece->end = cppPiece.StartPoint().Y(); //todo 需要换成Wgp_Pnt
+	thePiece->shape = gcnew WTopoDS_Shape(cppPiece.Shape);
+	thePiece->aisShape = gcnew WAIS_Shape(cppPiece.Shape);
+	thePiece->edge = gcnew WTopoDS_Shape(cppPiece.edge);
+	thePiece->start = gcnew Wgp_Pnt(cppPiece.startPoint);
+	thePiece->end = gcnew Wgp_Pnt(cppPiece.endPoint);
 	return thePiece;
 }
 //把CPP结构体封装为委托结构体
@@ -164,13 +168,14 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) {
 	thePlate->minSupportLen = cppPlate.minSupportLen;
 	thePlate->cuttingDistance = cppPlate.cuttiDistance;
 	thePlate->connectionHeight = cppPlate.connectionHeight;
-	thePlate->shape = gcnew WAIS_Shape(cppPlate.shape);
+	thePlate->shape = gcnew WTopoDS_Shape(cppPlate.shape);
+	thePlate->aisShape = gcnew WAIS_Shape(cppPlate.shape);
 
 	return thePlate;
 }
 
 #pragma region demo测试用方法
-WAIS_Shape^ SimpleClampMaker::TestInputWorkpiece(String^ filePath) {
+WTopoDS_Shape^ SimpleClampMaker::TestInputWorkpiece(String^ filePath) {
 	auto cPath = OCCTK::DataExchange::toAsciiString(filePath);
 	TopoDS_Shape InputWorkpiece;
 #pragma region readStep
@@ -186,12 +191,7 @@ WAIS_Shape^ SimpleClampMaker::TestInputWorkpiece(String^ filePath) {
 	}
 
 #pragma endregion
-
-	Handle(AIS_Shape) theAIS = new AIS_Shape(InputWorkpiece);
-	theAIS->SetColor(Quantity_NOC_GRAY);
-	theAIS->SetTransparency();
-	WAIS_Shape^ InputAIS = gcnew WAIS_Shape(theAIS);
-	return InputAIS;
+	return gcnew WTopoDS_Shape(InputWorkpiece);
 }
 #pragma endregion
 
@@ -204,13 +204,13 @@ WAIS_Shape^ SimpleClampMaker::TestInputWorkpiece(String^ filePath) {
 /// <param name="BasePlateOffsetX"></param>
 /// <param name="BasePlateOffsetY"></param>
 /// <returns></returns>
-BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(WAIS_Shape^ InputAISWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
-	TopoDS_Shape InputWorkpiece = (*InputAISWorkpiece->GetOCC())->Shape();
+BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(WTopoDS_Shape^ InputAISWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
+	TopoDS_Shape InputWorkpiece = *InputAISWorkpiece->GetOCC();
 
 	OCCTK::SimpleClamp::BasePlate theCPPBasePlate = OCCTK::SimpleClamp::MakeBasePlate(InputWorkpiece, OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
 
 	BasePlate^ theBasePlate = gcnew BasePlate();
-	theBasePlate->shape = gcnew WAIS_Shape(theCPPBasePlate.shape);
+	theBasePlate->shape = gcnew WTopoDS_Shape(theCPPBasePlate.shape);
 	theBasePlate->X = theCPPBasePlate.X;
 	theBasePlate->Y = theCPPBasePlate.Y;
 	theBasePlate->Z = theCPPBasePlate.Z;
@@ -232,12 +232,12 @@ BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(WAIS_Shape^ InputAISWorkpi
 /// <param name="theClearances"></param>
 /// <param name="theCuttingDistance"></param>
 /// <returns></returns>
-VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, Direction theDirection, double theLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
+VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WTopoDS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, Direction theDirection, double theLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
 {
 	VerticalPlate^ onePlate = gcnew VerticalPlate();
 	OCCTK::SimpleClamp::VerticalPlate cppPlate;
 
-	TopoDS_Shape InputWorkpiece = (*InputAISWorkpiece->GetOCC())->Shape();
+	TopoDS_Shape InputWorkpiece = *InputAISWorkpiece->GetOCC();
 	switch (theDirection)
 	{
 	case OCCTK::Laser::Direction::X:
@@ -258,11 +258,12 @@ VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WAIS_Shape^ InputAISWorkpiece
 		VerticalPiece^ onePiece = gcnew VerticalPiece();
 
 		onePiece->dir = theDirection; // 没必要每一个都取，同一块板内的piece方向是统一的
-		onePiece->shape = gcnew WAIS_Shape(oneCPPPiece.Shape);//todo 需要替换为TopoDS_Shape
-		onePiece->edge = gcnew WAIS_Shape(oneCPPPiece.Edge);//todo 需要替换为TopoDS_Edge
+		onePiece->shape = gcnew WTopoDS_Shape(oneCPPPiece.Shape);
+		onePiece->aisShape = gcnew WAIS_Shape(oneCPPPiece.Shape);
+		onePiece->edge = gcnew WTopoDS_Shape(oneCPPPiece.edge);
 		//这里应该区分是X还是Y，换成Pnt就不需要了
-		onePiece->start = oneCPPPiece.StartPoint().X(); //todo 应该换成Pnt
-		onePiece->end = oneCPPPiece.StartPoint().Y(); //todo 应该换成Pnt
+		onePiece->start = gcnew Wgp_Pnt(oneCPPPiece.startPoint);
+		onePiece->end = gcnew Wgp_Pnt(oneCPPPiece.endPoint);
 
 		onePlate->pieces->Add(onePiece);
 	}
@@ -284,10 +285,10 @@ VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WAIS_Shape^ InputAISWorkpiece
 /// <param name="theMinSupportLen"></param>
 /// <param name="theCuttingDistance"></param>
 /// <returns></returns>
-List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, List<double>^ XLocation, List<double>^ YLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
+List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, List<double>^ XLocation, List<double>^ YLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
 {
 	List<VerticalPlate^>^ Plates = gcnew List<VerticalPlate^>(); // result
-	TopoDS_Shape InputWorkpiece = (*InputAISWorkpiece->GetOCC())->Shape();
+	TopoDS_Shape InputWorkpiece = *InputAISWorkpiece->GetOCC();
 
 	for each (double aXLoc in XLocation)
 	{
@@ -315,7 +316,7 @@ List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WAIS_Shape^ InputAISW
 /// <param name="theMinSupportLen"></param>
 /// <param name="theCuttingDistance"></param>
 /// <returns></returns>
-List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WAIS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, int XNum, int YNum, double initialOffsetX, double initialOffsetY, double theClearances, double theMinSupportLen, double theCuttingDistance)
+List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, int XNum, int YNum, double initialOffsetX, double initialOffsetY, double theClearances, double theMinSupportLen, double theCuttingDistance)
 {
 	// 计算 XLocation
 	double XLoc = BasePlate->X + initialOffsetX;
@@ -354,7 +355,8 @@ void SimpleClampMaker::SuturePLate(VerticalPlate^% theVerticalPlate, BasePlate^ 
 	OCCTK::SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
 	OCCTK::SimpleClamp::SuturePiece(theoccVP, theoccBP, theConnectHight);
 	//shape写回对象中
-	theVerticalPlate->shape = gcnew WAIS_Shape(theoccVP.shape);//todo 此处应该替换为TopoDS_Shape
+	theVerticalPlate->shape = gcnew WTopoDS_Shape(theoccVP.shape);
+	theVerticalPlate->aisShape = gcnew WAIS_Shape(theoccVP.shape);
 }
 
 List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness, double theFilletRadius)
@@ -402,7 +404,7 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 	return plates;
 }
 
-WAIS_Shape^ SimpleClampMaker::DeployPlates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate) {
+WTopoDS_Shape^ SimpleClampMaker::DeployPlates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate) {
 	OCCTK::SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
 	std::vector<OCCTK::SimpleClamp::VerticalPlate> cppPlates;
 	for each (auto onePlate in verticalPlates)
@@ -410,12 +412,12 @@ WAIS_Shape^ SimpleClampMaker::DeployPlates(List<VerticalPlate^>^ verticalPlates,
 		cppPlates.push_back(onePlate->GetOCC());
 	}
 	TopoDS_Shape result = OCCTK::SimpleClamp::DeployPlates(theoccBP, cppPlates);
-	return gcnew WAIS_Shape(result);
+	return gcnew WTopoDS_Shape(result);
 }
 
-bool SimpleClampMaker::SaveSTEP(WAIS_Shape^ theShape, String^ filePath)
+bool SimpleClampMaker::SaveSTEP(WTopoDS_Shape^ theShape, String^ filePath)
 {
-	TopoDS_Shape theoccShape = (*(theShape->GetOCC()))->Shape();
+	TopoDS_Shape theoccShape = *(theShape->GetOCC());
 	auto theStr = OCCTK::DataExchange::toAsciiString(filePath);
 	if (OCCTK::SimpleClamp::saveSTEP(theoccShape, theStr))
 	{

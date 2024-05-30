@@ -26,10 +26,10 @@
 | :----------: | :---------: | :----------: | :----------------: | :-------------: |
 |     单选     |    Left     |              |    SingleSelect    |  Cursors.Hand   |
 |   连续选择   |    Left     |   Control    |   MultipleSelect   |  Cursors.Hand   |
-|   异或选择   |    Left     |    Shift     |  XORAreaSelection  |                 |
-|     框选     |    Left     |              |   AreaSelection    |  Cursors.Cross  |
+|   异或选择   |    Left     |    Shift     |  XORSelect  |                 |
+|     框选     |    Left     |              |   AreaSelect   |  Cursors.Cross  |
 |   连续框选   |    Left     |   Control    | MultipleAreaSelect |  Cursors.Cross  |
-|   异或框选   |    Left     |    Shift     |  XORAreaSelection  |                 |
+|   异或框选   |    Left     |    Shift     |  XORAreaSelect  |                 |
 | 框选区域放大 |    Right    |    Shift     |    AreaZooming     |   "Zoom.cur"    |
 |     旋转     |   Middle    |              |  DynamicRotation   | "Rotation.cur"  |
 |     平移     |   Middle    |   Control    |   DynamicPanning   | Cursors.SizeAll |

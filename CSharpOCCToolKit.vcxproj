@@ -162,8 +162,10 @@
     <ClCompile Include="WAIS_InteractiveObject.cpp" />
     <ClCompile Include="WAIS_Shape.cpp" />
     <ClCompile Include="WAIS_ViewCube.cpp" />
+    <ClCompile Include="Wgp_Pnt.cpp" />
     <ClCompile Include="Wgp_Trsf.cpp" />
     <ClCompile Include="WMakeSimpleClamp.cpp" />
+    <ClCompile Include="WTopoDS_Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
@@ -173,8 +175,10 @@
     <ClInclude Include="WAIS_Shape.h" />
     <ClInclude Include="WAIS_ViewCube.h" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="Wgp_Pnt.h" />
     <ClInclude Include="Wgp_Trsf.h" />
     <ClInclude Include="WMakeSimpleClamp.h" />
+    <ClInclude Include="WTopoDS_Shape.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

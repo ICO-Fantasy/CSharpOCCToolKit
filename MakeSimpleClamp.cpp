@@ -20,14 +20,15 @@
 #include <gp_Quaternion.hxx>
 #include <GProp_PEquation.hxx>
 #include <IFSelect_ReturnStatus.hxx>
+#include <Interface_Static.hxx>
 #include <STEPCAFControl_Writer.hxx>
 #include <STEPControl_StepModelType.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Compound.hxx>
+#include <utility>
 #include <vector>
-#include <Interface_Static.hxx>
 
 
 namespace OCCTK {
@@ -74,13 +75,12 @@ static void AddEdgeToRing(Ring& theRing, std::vector<localEdge>& Edges) {
 	return;
 }
 static std::vector<Ring> GetRings(std::vector<localEdge> Edges) {
-	Ring aRing;
 	std::vector<Ring>Rings;
-
+	Ring aRing;
 	while (not Edges.empty()) {
-		aRing.startPoint = Edges[0].startPoint;
-		aRing.endPoint = Edges[0].endPoint;
-		aRing.Edges.push_back(Edges[0]);
+		aRing.startPoint = Edges.front().startPoint;
+		aRing.endPoint = Edges.front().endPoint;
+		aRing.Edges.push_back(Edges.front());
 		Edges.erase(Edges.begin());
 		AddEdgeToRing(aRing, Edges);
 		Rings.push_back(aRing);
@@ -141,24 +141,24 @@ static std::vector<TopoDS_Edge> ConvertBSplineToLine(TopoDS_Edge theBSpline) {
 	}
 	return results;
 }
-static Ring ConvertRing(Ring theRing) {
-	Ring newRing;
-	for (auto aEdge : theRing.Edges) {
-		BRepAdaptor_Curve aBAC(aEdge.Edge);
-		// 曲线类型
-		if (aBAC.GetType() == GeomAbs_BSplineCurve) {
-			std::vector<TopoDS_Edge>newEdges = ConvertBSplineToLine(aEdge.Edge);
-			for (auto newEdge : newEdges) {
-				newRing.Edges.push_back(localEdge(newEdge));
-			}
-		}
-		else {
-			auto theType = aBAC.GetType();
-			newRing.Edges.push_back(aEdge);
-		}
-	}
-	return newRing;
-}
+//static Ring ConvertRing(Ring theRing) {
+//	Ring newRing;
+//	for (auto aEdge : theRing.Edges) {
+//		BRepAdaptor_Curve aBAC(aEdge.Edge);
+//		// 曲线类型
+//		if (aBAC.GetType() == GeomAbs_BSplineCurve) {
+//			std::vector<TopoDS_Edge>newEdges = ConvertBSplineToLine(aEdge.Edge);
+//			for (auto newEdge : newEdges) {
+//				newRing.Edges.push_back(localEdge(newEdge));
+//			}
+//		}
+//		else {
+//			auto theType = aBAC.GetType();
+//			newRing.Edges.push_back(aEdge);
+//		}
+//	}
+//	return newRing;
+//}
 //todo 采用直接删去垂直线段（沿Z方向）的逻辑，如果有超过两段线是垂直的，将会出错。
 static std::vector<localEdge>GetConstructionLinesFromRing(Ring theRing) {
 	std::vector<localEdge> results;
@@ -168,7 +168,7 @@ static std::vector<localEdge>GetConstructionLinesFromRing(Ring theRing) {
 	std::vector<localEdge> addedEdge;
 	//排除所有非直线线段
 	for (size_t i = 0; i < theEdges.size(); i++) {
-		BRepAdaptor_Curve aBAC(theEdges[i].Edge);
+		BRepAdaptor_Curve aBAC(theEdges[i].edge);
 		// 曲线类型
 		auto theType = aBAC.GetType();
 		if (aBAC.GetType() != GeomAbs_Line) {
@@ -268,329 +268,111 @@ static TopoDS_Shape MakeFaceFromLocalEdge(localEdge theEdge, double theZ) {
 	auto result = BRepBuilderAPI_MakeFace(w).Shape();
 	return result;
 }
-//todo 这个算法鲁棒性不高，需要修正
-static std::vector<PolyLine> SplitRing(Ring theRing, Direction theDirection) {
-	std::vector<localEdge>addedEdges;
-	std::vector<localEdge> TempEdges;
-	//!排除垂直的线
-	gp_Dir theZDir = gp_Dir(0, 0, 1);
-	gp_Dir theMinusZDir = gp_Dir(0, 0, -1);
-	for (auto anEdge : theRing.Edges) {
-		gp_Dir edgeDir = gp_Dir(gp_Vec(anEdge.startPoint, anEdge.endPoint));
-		if (edgeDir.IsParallel(theZDir, 1e-1) || edgeDir.IsParallel(theMinusZDir, 1e-1)) {
-			addedEdges.push_back(anEdge);
-		}
-		else {
-			TempEdges.push_back(anEdge);
+
+static bool MoreEdge(localEdge& now, std::vector<localEdge> theEdges) {
+	for (localEdge theEdge : theEdges) {
+		if (now.endPoint.IsEqual(theEdge.startPoint, 1e-2))
+		{
+			now = theEdge;
+			return true;
 		}
 	}
-	//!找出下端线
-	bool IsDone;
-	int begin = 0;
-	std::vector<PolyLine> Lines, addedLines, resultLines, removedLines;
-	int N1;
-	switch (theDirection) {
-	case X:
-		//首先对每个线段中的首末点排序
-		for (auto& anEdge : TempEdges) {
-			if (anEdge.startPoint.Y() > anEdge.endPoint.Y()) {
-				std::swap(anEdge.startPoint, anEdge.endPoint);
-			}
+	return false;
+}
+
+static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
+	std::vector<localEdge> firstEdges, secondEdges;
+	std::vector<localEdge> restEdges;
+	std::vector<localEdge> removedEdges;
+	gp_Vec Z(0.0, 0.0, 1.0);
+	localEdge currentEdge;
+	// 去除垂直的边
+	//! 有的边可能不是垂直的，可能是斜着的,设置阈值为20°
+	for (localEdge theEdge : theRing.Edges) {
+		if (!gp_Vec(theEdge.startPoint, theEdge.endPoint).IsParallel(Z, M_PI * (2.0 / 18.0)))
+		{
+			removedEdges.push_back(theEdge);
 		}
-		//按照 Y 值从小到大排序，使用 lambda 表达式
-		std::sort(TempEdges.begin(), TempEdges.end(), [](const auto& a, const auto& b) {
-			return a.middlePoint.Y() < b.middlePoint.Y();
+	}
+	// 把Edge按坐标排序
+	if (theDirection == X)
+	{
+		std::sort(removedEdges.begin(), removedEdges.end(), [](const localEdge& a, const localEdge& b) {
+			return a.startPoint.Y() < b.startPoint.Y();
 			});
-		//{//test
-		//	PolyLine test;
-		//	for (auto& anEdge : TempEdges) {
-		//		test.Edges.push_back(anEdge);
-		//	}
-		//	resultLines.push_back(test);
-		//	return resultLines;
-		//}
-#pragma region 找出所有段
-		while (begin < TempEdges.size()) {
-			//已添加
-			if (std::find(addedEdges.begin(), addedEdges.end(), TempEdges[begin]) != addedEdges.end()) {
-				begin++;
-				continue;
-			}
-			addedEdges.push_back(TempEdges[begin]);
-
-			PolyLine aLine;
-			aLine.Edges.push_back(TempEdges[begin]);
-			aLine.startPoint = TempEdges[begin].startPoint;
-			aLine.endPoint = TempEdges[begin].endPoint;
-			//从起始段开始，往后查找
-			IsDone = true;
-			while (IsDone) {
-				bool continueF = false;
-				for (localEdge anEdge : TempEdges) {
-					if (std::find(addedEdges.begin(), addedEdges.end(), anEdge) != addedEdges.end()) {
-						continue;
-					}
-					//拼接两点，并确保Y递增
-					if (anEdge.startPoint.IsEqual(aLine.endPoint, 1e-2) && anEdge.endPoint.Y() > aLine.endPoint.Y()) {
-						addedEdges.push_back(anEdge);
-						//Edge加入line中，并更新末端点
-						aLine.Edges.push_back(anEdge);
-						aLine.endPoint = anEdge.endPoint;
-						continueF = true;
-						break;
-					}
-				}
-				if (continueF) {
-					continue;
-				}
-				IsDone = false;
-				Lines.push_back(aLine);
-			}
-		}
-#pragma endregion
-		//todo比较逻辑需要重写
-		//首先创建线段（上一步）
-		//然后比较两线段是否重叠
-		//如果重叠，取出两个线段的公共部分
-		//比较公共部分的中心点Z值大小
-		//抛弃Z大的那个（加入added）
-		//继续比较，直到栈为空
-#pragma region 比较逻辑
-		N1 = 0;
-		while (N1 < Lines.size()) {
-			PolyLine L1 = Lines[N1];
-			if (std::find(addedLines.begin(), addedLines.end(), L1) != addedLines.end()) {
-				N1++;
-				continue;
-			}
-			addedLines.push_back(L1);//待比较的项，先加入added
-			int N2 = 0;
-			while (N2 < Lines.size()) {
-				PolyLine L2 = Lines[N2];
-				if (std::find(addedLines.begin(), addedLines.end(), L2) != addedLines.end()) {
-					N2++;
-					continue;
-				}
-				// 比较L1和L2
-				//如果区间重叠
-				double p1 = L1.startPoint.Y(), p2 = L1.endPoint.Y(), p3 = L2.startPoint.Y(), p4 = L2.endPoint.Y();
-				double middle = -999999.0;
-				if (p1 <= p3 && p3 < p2) {
-					middle = (p3 + p2) / 2;
-				}
-				else if (p3 <= p1 && p1 < p4) {
-					auto middle = (p1 + p4) / 2;
-				}
-				else if (p3 <= p1 && p2 <= p4) {
-					auto middle = (p1 + p2) / 2;
-				}
-				else if (p1 <= p3 && p4 <= p2) {
-					auto middle = (p3 + p4) / 2;
-				}
-				if (middle != -999999.0) {//找到中点对应的边上对应的点
-					double z1 = 0, z2 = 0;
-					for (auto anEdge : L1.Edges) {
-						if (anEdge.startPoint.Y() <= middle && middle <= anEdge.endPoint.Y()) {
-							BRepAdaptor_Curve aBAC(anEdge.Edge);
-							double ap1 = aBAC.FirstParameter();
-							double ap2 = aBAC.LastParameter();
-							if (ap1 > ap2) {
-								std::swap(ap1, ap2);
-							}
-							z1 = aBAC.Value(ap1 + (ap2 - ap1) * (middle - anEdge.startPoint.Y()) / (anEdge.endPoint.Y() - anEdge.startPoint.Y())).Z();
-							break;
-						}
-					}
-					for (auto anEdge : L2.Edges) {
-						if (anEdge.startPoint.Y() <= middle && middle <= anEdge.endPoint.Y()) {
-							BRepAdaptor_Curve aBAC(anEdge.Edge);
-							double ap1 = aBAC.FirstParameter();
-							double ap2 = aBAC.LastParameter();
-							if (ap1 > ap2) {
-								std::swap(ap1, ap2);
-							}
-							z2 = aBAC.Value(ap1 + (ap2 - ap1) * (middle - anEdge.startPoint.Y()) / (anEdge.endPoint.Y() - anEdge.startPoint.Y())).Z();
-							break;
-						}
-					}
-					//比较边上对应的点的Z值大小，取小的线段
-					if (z1 < z2) {
-						removedLines.push_back(L2);
-					}
-					else {
-						removedLines.push_back(L1);
-					}
-					addedLines.push_back(L2);
-				}
-				N2++;
-			}
-			N1++;
-
-		}
-		//最后把没被移除的加入结果
-		for (auto theLine : Lines) {
-			if (std::find(removedLines.begin(), removedLines.end(), theLine) == removedLines.end()) {
-				resultLines.push_back(theLine);
-			}
-		}
-#pragma endregion
-		break;
-	case Y:
-		//首先对每个线段中的首末点排序
-		for (auto& anEdge : TempEdges) {
-			if (anEdge.startPoint.X() > anEdge.endPoint.X()) {
-				std::swap(anEdge.startPoint, anEdge.endPoint);
-			}
-		}
-		//按照 X 值从小到大排序，使用 lambda 表达式
-		std::sort(TempEdges.begin(), TempEdges.end(), [](const auto& a, const auto& b) {
-			return a.middlePoint.X() < b.middlePoint.X();
+	}
+	if (theDirection == Y)
+	{
+		std::sort(removedEdges.begin(), removedEdges.end(), [](const localEdge& a, const localEdge& b) {
+			return a.startPoint.X() < b.startPoint.X();
 			});
-#pragma region 找出所有段
-
-		while (begin < TempEdges.size()) {
-			//只有两条线的情况下不用找，直接比较
-			if (TempEdges.size() <= 2) {
-				// 逐个将TempEdges中的元素插入到Lines的末尾
-				for (const auto& edge : TempEdges) {
-					PolyLine tLine;
-					tLine.Edges.push_back(edge);
-					tLine.startPoint = edge.startPoint;
-					tLine.endPoint = edge.endPoint;
-					Lines.push_back(tLine);
-				}
+	}
+	// 找到数值最小的起始边
+	currentEdge = removedEdges.front();
+	// 构建第一条线
+	firstEdges.push_back(currentEdge);
+	while (MoreEdge(currentEdge, removedEdges))
+	{
+		firstEdges.push_back(currentEdge);
+	}
+	// 构建第二条线
+	for (const localEdge& theEdge : removedEdges) {
+		bool found = false;
+		for (const localEdge& addedEdge : firstEdges) {
+			if (theEdge == addedEdge)
+			{
+				found = true;
 				break;
 			}
-			//已添加
-			if (std::find(addedEdges.begin(), addedEdges.end(), TempEdges[begin]) != addedEdges.end()) {
-				begin++;
-				continue;
-			}
-			addedEdges.push_back(TempEdges[begin]);
-
-			PolyLine aLine;
-			aLine.Edges.push_back(TempEdges[begin]);
-			aLine.startPoint = TempEdges[begin].startPoint;
-			aLine.endPoint = TempEdges[begin].endPoint;
-			//从起始段开始，往后查找
-			IsDone = true;
-			while (IsDone) {
-				bool continueF = false;
-				for (localEdge anEdge : TempEdges) {
-					if (std::find(addedEdges.begin(), addedEdges.end(), anEdge) != addedEdges.end()) {
-						continue;
-					}
-					//拼接两点，并确保Y递增
-					if (anEdge.startPoint.IsEqual(aLine.endPoint, 1e-2) && anEdge.endPoint.X() > aLine.endPoint.X()) {
-						addedEdges.push_back(anEdge);
-						//Edge加入line中，并更新末端点
-						aLine.Edges.push_back(anEdge);
-						aLine.endPoint = anEdge.endPoint;
-						continueF = true;
-						break;
-					}
-				}
-				if (continueF) {
-					continue;
-				}
-				IsDone = false;
-				Lines.push_back(aLine);
-			}
 		}
-#pragma endregion
-		//todo比较逻辑需要重写
-		//首先创建线段（上一步）
-		//然后比较两线段是否重叠
-		//如果重叠，取出两个线段的公共部分
-		//比较公共部分的中心点Z值大小
-		//抛弃Z大的那个（加入added）
-		//继续比较，直到栈为空
-#pragma region 比较逻辑
-		N1 = 0;
-		while (N1 < Lines.size()) {
-			PolyLine L1 = Lines[N1];
-			if (std::find(addedLines.begin(), addedLines.end(), L1) != addedLines.end()) {
-				N1++;
-				continue;
-			}
-			addedLines.push_back(L1);//待比较的项，先加入added
-			int N2 = 0;
-			while (N2 < Lines.size()) {
-				PolyLine L2 = Lines[N2];
-				if (std::find(addedLines.begin(), addedLines.end(), L2) != addedLines.end()) {
-					N2++;
-					continue;
-				}
-				// 比较L1和L2
-				//如果区间重叠
-				double p1 = L1.startPoint.X(), p2 = L1.endPoint.X(), p3 = L2.startPoint.X(), p4 = L2.endPoint.X();
-				double middle = -999999.0;
-				if (p1 <= p3 && p3 < p2) {
-					middle = (p3 + p2) / 2;
-				}
-				else if (p3 <= p1 && p1 < p4) {
-					auto middle = (p1 + p4) / 2;
-				}
-				else if (p3 <= p1 && p2 <= p4) {
-					auto middle = (p1 + p2) / 2;
-				}
-				else if (p1 <= p3 && p4 <= p2) {
-					auto middle = (p3 + p4) / 2;
-				}
-				if (middle != -999999.0) {//找到中点对应的边上对应的点
-					double z1 = 0, z2 = 0;
-					for (auto anEdge : L1.Edges) {
-						if (anEdge.startPoint.X() <= middle && middle <= anEdge.endPoint.X()) {
-							BRepAdaptor_Curve aBAC(anEdge.Edge);
-							double ap1 = aBAC.FirstParameter();
-							double ap2 = aBAC.LastParameter();
-							if (ap1 > ap2) {
-								std::swap(ap1, ap2);
-							}
-							z1 = aBAC.Value(ap1 + (ap2 - ap1) * (middle - anEdge.startPoint.X()) / (anEdge.endPoint.X() - anEdge.startPoint.X())).Z();
-							break;
-						}
-					}
-					for (auto anEdge : L2.Edges) {
-						if (anEdge.startPoint.X() <= middle && middle <= anEdge.endPoint.X()) {
-							BRepAdaptor_Curve aBAC(anEdge.Edge);
-							double ap1 = aBAC.FirstParameter();
-							double ap2 = aBAC.LastParameter();
-							if (ap1 > ap2) {
-								std::swap(ap1, ap2);
-							}
-							z2 = aBAC.Value(ap1 + (ap2 - ap1) * (middle - anEdge.startPoint.X()) / (anEdge.endPoint.X() - anEdge.startPoint.X())).Z();
-							break;
-						}
-					}
-					//比较边上对应的点的Z值大小，取小的线段
-					if (z1 < z2) {
-						removedLines.push_back(L2);
-					}
-					else {
-						removedLines.push_back(L1);
-					}
-					addedLines.push_back(L2);
-				}
-				N2++;
-			}
-			N1++;
-
+		if (!found) {
+			secondEdges.push_back(theEdge);
 		}
-		//最后把没被移除的加入结果
-		for (auto theLine : Lines) {
-			if (std::find(removedLines.begin(), removedLines.end(), theLine) == removedLines.end()) {
-				resultLines.push_back(theLine);
-			}
-		}
-#pragma endregion
-		break;
-	default:
-		//todo错误处理
-		break;
 	}
-	return resultLines;
+	// 比较高度
+	//! 使用两端的Z值比较可能不准确（由于斜着的边缘）
+	for (size_t i = 1; i < firstEdges.size() - 1; ++i) {
+		const localEdge& firstEdge = firstEdges[i];
+		bool isSame = false;
+		for (size_t i = 1; i < secondEdges.size() - 1; ++i) {
+			const localEdge& secondEdge = secondEdges[i];
+			if (theDirection == X)
+			{
+				if (std::abs(firstEdge.startPoint.Y() - secondEdge.startPoint.Y()) < 2.0)
+				{
+					isSame = true;
+				}
+			}
+			if (theDirection == Y) {
+				if (std::abs(firstEdge.startPoint.X() - secondEdge.startPoint.X()) < 2.0)
+				{
+					isSame = true;
+				}
+			}
+			if (isSame)
+			{
+				if (firstEdge.startPoint.Z() < secondEdge.startPoint.Z())
+				{
+					return firstEdges;
+				}
+				else
+				{
+					return secondEdges;
+				}
+			}
+		}
+	}
+	//todo 最后如果前面逻辑失效，比较第一个
+	if (firstEdges.front().startPoint.Z() < secondEdges.front().startPoint.Z())
+	{
+		return firstEdges;
+	}
+	else
+	{
+		return secondEdges;
+	}
 }
+
 static TopoDS_Shape MakeConnectionPiece(double theX, double theY, double theZ, double theLength, double theHight, Direction theDirection) {
 	// 左上角点
 	gp_Pnt p1(theX, theY, theZ + theHight);
@@ -620,10 +402,10 @@ static TopoDS_Shape MakeConnectionPiece(double theX, double theY, double theZ, d
 	BRepBuilderAPI_MakeEdge l4(GC_MakeSegment(p4, p1).Value());
 	// 创建线段
 	BRepBuilderAPI_MakeWire wire;
-	wire.Add(l1.Edge());
-	wire.Add(l2.Edge());
-	wire.Add(l3.Edge());
-	wire.Add(l4.Edge());
+	wire.Add(l1);
+	wire.Add(l2);
+	wire.Add(l3);
+	wire.Add(l4);
 	// 创建面
 	BRepBuilderAPI_MakeFace face(wire.Wire());
 	return face.Shape();
@@ -739,27 +521,27 @@ static std::vector<VerticalPiece> MakeVerticalPieceWithSection(TopoDS_Shape theS
 	std::vector<Ring>Rings;
 	TopExp_Explorer aEdgeExp = TopExp_Explorer(theSection, TopAbs_EDGE);
 	while (aEdgeExp.More()) {
-		localEdge anEdge(TopoDS::Edge(aEdgeExp.Current()));// 遍历得到每一个边
+		localEdge anEdge(TopoDS::Edge(aEdgeExp.Current()), theDirection);// 遍历得到每一个边
 		aEdgeExp.Next();
 		TempEdges.push_back(anEdge);
 	}
 	Rings = GetRings(TempEdges);
 	//! 每个环中取最下边的线段作为原始构造线
 	std::vector<localEdge>OriginEdges;
-	for (auto aRing : Rings) {
-		std::vector <PolyLine> SplitedPolyLine = SplitRing(aRing, theDirection);
-		for (auto PL : SplitedPolyLine) {
-			for (auto LE : PL.Edges) {
-				OriginEdges.push_back(LE);
-			}
+	for (Ring aRing : Rings) {
+		std::vector <localEdge> SplitedPolyLine = SplitRing(aRing, theDirection);
+		for (localEdge LE : SplitedPolyLine) {
+			OriginEdges.push_back(LE);
 		}
 	}
 #pragma endregion
 #pragma region 输出Pieces
-	for (auto anEdge : OriginEdges) {
+	for (const auto& anEdge : OriginEdges) {
 		VerticalPiece anPiece;
 		anPiece.dir = theDirection;
-		anPiece.Edge = anEdge.Edge;
+		anPiece.edge = anEdge.edge;
+		anPiece.startPoint = anEdge.startPoint;
+		anPiece.endPoint = anEdge.endPoint;
 		result.push_back(anPiece);
 	}
 	return result;
@@ -772,20 +554,15 @@ static std::vector<VerticalPiece> MakeVerticalPieceWithSection(TopoDS_Shape theS
 /// <param name="thePiece"></param>
 /// <param name="theZ"></param>
 static void MakePieceFromEdge(VerticalPiece& thePiece, double theZ) {
-	gp_Pnt p1 = thePiece.StartPoint();
-	gp_Pnt p2 = thePiece.EndPoint();
-	gp_Pnt p3(p2.X(), p2.Y(), theZ);
-	gp_Pnt p4(p1.X(), p1.Y(), theZ);
-	//todo没有检查GC_MakeSegment是否构造成功
-	//Handle(Geom_TrimmedCurve) L1 = GC_MakeSegment(p1, p2);
-	Handle(Geom_TrimmedCurve) L2 = GC_MakeSegment(p2, p3);
-	Handle(Geom_TrimmedCurve) L3 = GC_MakeSegment(p3, p4);
-	Handle(Geom_TrimmedCurve) L4 = GC_MakeSegment(p4, p1);
+	gp_Pnt p2 = thePiece.startPoint;
+	gp_Pnt p3 = thePiece.endPoint;
+	gp_Pnt p1(p2.X(), p2.Y(), theZ);
+	gp_Pnt p4(p3.X(), p3.Y(), theZ);
 	BRepBuilderAPI_MakeWire aWireMk = BRepBuilderAPI_MakeWire();
-	aWireMk.Add(thePiece.Edge);
-	aWireMk.Add(BRepBuilderAPI_MakeEdge(L2));
-	aWireMk.Add(BRepBuilderAPI_MakeEdge(L3));
-	aWireMk.Add(BRepBuilderAPI_MakeEdge(L4));
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(p1, p2));
+	aWireMk.Add(thePiece.edge);
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(p3, p4));
+	aWireMk.Add(BRepBuilderAPI_MakeEdge(p4, p1));
 	TopoDS_Face myFaceProfile = BRepBuilderAPI_MakeFace(aWireMk.Wire());
 	thePiece.Shape = myFaceProfile;
 }
@@ -858,7 +635,7 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 		{
 			continue;
 		}
-		BRepAdaptor_Curve aBAC(aPiece.Edge);
+		BRepAdaptor_Curve aBAC(aPiece.edge);
 		gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
 		gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
 		switch (aPiece.dir) {
@@ -869,9 +646,9 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 			}
 			p1.SetY(p1.Y() + theClearances);
 			p2.SetY(p2.Y() - theClearances);
-			TopoDS_Edge outEdge = TrimEdge(aPiece.Edge, p1, p2);
+			TopoDS_Edge outEdge = TrimEdge(aPiece.edge, p1, p2);
 			if (!outEdge.IsNull()) {
-				aPiece.Edge = outEdge;
+				aPiece.edge = outEdge;
 			}
 			result.push_back(aPiece);
 			break;
@@ -883,9 +660,9 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 			}
 			p1.SetX(p1.X() + theClearances);
 			p2.SetX(p2.X() - theClearances);
-			TopoDS_Edge outEdge = TrimEdge(aPiece.Edge, p1, p2);
+			TopoDS_Edge outEdge = TrimEdge(aPiece.edge, p1, p2);
 			if (!outEdge.IsNull()) {
-				aPiece.Edge = outEdge;
+				aPiece.edge = outEdge;
 			}
 			result.push_back(aPiece);
 			break;
@@ -913,17 +690,17 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 	}
 	//获取底层曲线
 	double first, last, left, right;
-	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.Edge, first, last);
+	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.edge, first, last);
 	double increment = thePiece.Length() / theNum;
 	double start = 0, end = 0;
-	gp_Pnt startP = thePiece.StartPoint(), endP = thePiece.StartPoint();
+	gp_Pnt startP = thePiece.startPoint, endP = thePiece.startPoint;
 	double param1, param2;
 	switch (thePiece.dir) {
 	case X:
 	{
 		// 首段直接生成
-		start = thePiece.StartPoint().Y();
-		end = thePiece.StartPoint().Y() + theSupportLen;
+		start = thePiece.startPoint.Y();
+		end = thePiece.startPoint.Y() + theSupportLen;
 		//startP
 		endP.SetY(end);
 		//投影点到曲线上，并获取投影点处的参数
@@ -934,8 +711,8 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 		VerticalPiece newPieceStart;
 		newPieceStart.dir = thePiece.dir;
 		TopoDS_Edge newEdgeStart = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-		newEdgeStart.Orientation(thePiece.Edge.Orientation());//同向
-		newPieceStart.Edge = newEdgeStart;
+		newEdgeStart.Orientation(thePiece.edge.Orientation());//同向
+		newPieceStart.edge = newEdgeStart;
 		result.push_back(newPieceStart);
 
 		// 中间段从中间往两边生成
@@ -954,15 +731,15 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 			VerticalPiece newPiece;
 			newPiece.dir = thePiece.dir;
 			TopoDS_Edge newEdge = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-			newEdge.Orientation(thePiece.Edge.Orientation());//同向
-			newPiece.Edge = newEdge;
+			newEdge.Orientation(thePiece.edge.Orientation());//同向
+			newPiece.edge = newEdge;
 			result.push_back(newPiece);
 		}
 		// 尾端直接生成
-		start = thePiece.EndPoint().Y() - theSupportLen;
+		start = thePiece.endPoint.Y() - theSupportLen;
 		//end
 		startP.SetY(start);
-		endP = thePiece.EndPoint();
+		endP = thePiece.endPoint;
 		//投影点到曲线上，并获取投影点处的参数
 		GeomAPI_ProjectPointOnCurve ppc1E(startP, aCurve);
 		param1 = ppc1E.LowerDistanceParameter();
@@ -971,16 +748,16 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 		VerticalPiece newPieceEnd;
 		newPieceEnd.dir = thePiece.dir;
 		TopoDS_Edge newEdgeEnd = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-		newEdgeEnd.Orientation(thePiece.Edge.Orientation());//同向
-		newPieceEnd.Edge = newEdgeEnd;
+		newEdgeEnd.Orientation(thePiece.edge.Orientation());//同向
+		newPieceEnd.edge = newEdgeEnd;
 		result.push_back(newPieceEnd);
 		break;
 	}
 	case Y:
 	{
 		// 首段直接生成
-		start = thePiece.StartPoint().X();
-		end = thePiece.StartPoint().X() + theSupportLen;
+		start = thePiece.startPoint.X();
+		end = thePiece.startPoint.X() + theSupportLen;
 		//startP
 		endP.SetX(end);
 		//投影点到曲线上，并获取投影点处的参数
@@ -991,8 +768,8 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 		VerticalPiece newPieceStart;
 		newPieceStart.dir = thePiece.dir;
 		TopoDS_Edge newEdgeStart = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-		newEdgeStart.Orientation(thePiece.Edge.Orientation());//同向
-		newPieceStart.Edge = newEdgeStart;
+		newEdgeStart.Orientation(thePiece.edge.Orientation());//同向
+		newPieceStart.edge = newEdgeStart;
 		result.push_back(newPieceStart);
 
 		// 中间段从中间往两边生成
@@ -1011,15 +788,15 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 			VerticalPiece newPiece;
 			newPiece.dir = thePiece.dir;
 			TopoDS_Edge newEdge = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-			newEdge.Orientation(thePiece.Edge.Orientation());//同向
-			newPiece.Edge = newEdge;
+			newEdge.Orientation(thePiece.edge.Orientation());//同向
+			newPiece.edge = newEdge;
 			result.push_back(newPiece);
 		}
 		// 尾端直接生成
-		start = thePiece.EndPoint().X() - theSupportLen;
+		start = thePiece.endPoint.X() - theSupportLen;
 		//end
 		startP.SetX(start);
-		endP = thePiece.EndPoint();
+		endP = thePiece.endPoint;
 		//投影点到曲线上，并获取投影点处的参数
 		GeomAPI_ProjectPointOnCurve ppc1E(startP, aCurve);
 		param1 = ppc1E.LowerDistanceParameter();
@@ -1028,8 +805,8 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 		VerticalPiece newPieceEnd;
 		newPieceEnd.dir = thePiece.dir;
 		TopoDS_Edge newEdgeEnd = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-		newEdgeEnd.Orientation(thePiece.Edge.Orientation());//同向
-		newPieceEnd.Edge = newEdgeEnd;
+		newEdgeEnd.Orientation(thePiece.edge.Orientation());//同向
+		newPieceEnd.edge = newEdgeEnd;
 		result.push_back(newPieceEnd);
 		break;
 	}
@@ -1048,21 +825,21 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 	}
 	//获取底层曲线
 	double first, last;
-	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.Edge, first, last);
+	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.edge, first, last);
 	double start = 0, end = 0;
-	gp_Pnt startP = thePiece.StartPoint(), endP = thePiece.StartPoint();
+	gp_Pnt startP = thePiece.startPoint, endP = thePiece.startPoint;
 	//第一条
 	switch (thePiece.dir) {
 	case X:
-		start = thePiece.StartPoint().Y();
-		end = thePiece.StartPoint().Y() + theSupportLen;
+		start = thePiece.startPoint.Y();
+		end = thePiece.startPoint.Y() + theSupportLen;
 
 		startP.SetY(start);
 		endP.SetY(end);
 		break;
 	case Y:
-		start = thePiece.StartPoint().X();
-		end = thePiece.StartPoint().X() + theSupportLen;
+		start = thePiece.startPoint.X();
+		end = thePiece.startPoint.X() + theSupportLen;
 
 		startP.SetX(start);
 		endP.SetX(end);
@@ -1078,8 +855,8 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 	VerticalPiece newPieceS;
 	newPieceS.dir = thePiece.dir;
 	TopoDS_Edge newEdgeS = BRepBuilderAPI_MakeEdge(aCurve, param1S, param2S);
-	newEdgeS.Orientation(thePiece.Edge.Orientation());//同向
-	newPieceS.Edge = newEdgeS;
+	newEdgeS.Orientation(thePiece.edge.Orientation());//同向
+	newPieceS.edge = newEdgeS;
 	result.push_back(newPieceS);
 	//第一条之后的
 	for (size_t i = 0; i < theNum; i++) {
@@ -1109,8 +886,8 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 		VerticalPiece newPiece;
 		newPiece.dir = thePiece.dir;
 		TopoDS_Edge newEdge = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-		newEdge.Orientation(thePiece.Edge.Orientation());//同向
-		newPiece.Edge = newEdge;
+		newEdge.Orientation(thePiece.edge.Orientation());//同向
+		newPiece.edge = newEdge;
 		result.push_back(newPiece);
 	}
 	return result;
@@ -1148,121 +925,16 @@ static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePie
 }
 
 /// <summary>
-/// 合并片体为一块板
+/// 生成Pieces
 /// </summary>
-/// <param name="thePieces"></param>
-/// <param name="theSupportLen"></param>
-/// <param name="theCuttingDistance"></param>
-/// <param name="theZ"></param>
-/// <returns></returns>
-void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight) {
-	//创造一块连接板
-	//! 板宽度不包含Offset的部分
-	TopoDS_Face connectionPiece;
-	gp_Pnt leftLow, p2, rightTop;
-	switch (thePlate.dir)
-	{
-	case X:
-		leftLow = gp_Pnt(thePlate.location, theBasePlate.Y, theBasePlate.Z);
-		rightTop = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, theBasePlate.Z + theConnectionHight);
-		connectionPiece = MakePiece(leftLow, rightTop, Direction::X);
-		break;
-	case Y:
-		leftLow = gp_Pnt(theBasePlate.X, thePlate.location, theBasePlate.Z);
-		rightTop = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, theBasePlate.Z + theConnectionHight);
-		connectionPiece = MakePiece(leftLow, rightTop, Direction::Y);
-		break;
-	default:
-		throw std::runtime_error("Unexpected Direction in switch");
-	}
-	//把Piece和连接板融合
-	TopoDS_Shape result = connectionPiece;
-	//int theNum = 0;
-	//saveSTEP(connectionPiece, "outs\\CPlate.STEP");
-	//for (VerticalPiece onePiece : thePlate.pieces)
-	//{
-	//	std::stringstream filePath;
-	//	filePath << "outs\\";
-	//	filePath << theNum;
-	//	filePath << ".STEP";
-	//	saveSTEP(onePiece.Shape, filePath.str().c_str());
-	//	theNum += 1;
-	//}
-	//auto theOrientation = connectionPiece.Orientation();
-	for (VerticalPiece onePiece : thePlate.pieces) {
-		//TopoDS::Face(onePiece.Shape);
-		//auto oriShape = onePiece.Shape.Oriented(theOrientation);//todo 这一步并不管用
-		TopoDS_Shape pieceShape = onePiece.Shape;
-		BRepAlgoAPI_Fuse aFuse(result, pieceShape);
-		aFuse.SimplifyResult();// 简化结果
-		result = aFuse.Shape();
-
-	}
-
-	////todo 内边界的融合会失败，不清楚原因
-	////去掉融合后的内边界
-	//ShapeUpgrade_UnifySameDomain unifyer(result, true, true, true);
-	//unifyer.Build();
-	//TopoDS_Shape result_unified = unifyer.Shape();
-	////最终结果保存在Plate中
-	//thePlate.shape = result_unified;
-	thePlate.shape = result;
-}
-
-/// <summary>
-/// 在竖板上切连接槽
-/// </summary>
-/// <param name="thePlate"></param>
+/// <param name="theWorkpiece"></param>
 /// <param name="theBasePlate"></param>
-/// <param name="theLocations"></param>
-/// <param name="theConnectionHight"></param>
-/// <param name="theConnectWidth"></param>
-/// <param name="theFilletRadius"></param>
-void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius) {
-	switch (thePlate.dir)
-	{
-	case Direction::X:
-	{
-		// 先在Y平面创建一个槽(从下往上）
-		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z - 999);
-		gp_Pnt p3(thePlate.location, theConnectWidth / 2, theBasePlate.Z + theConnectionHight / 2);
-		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::X, theFilletRadius);
-
-		// 在每个位置切槽
-		for (double aloc : theLocations) {
-			gp_Trsf move;
-			move.SetTranslation(gp_Vec(0, aloc, 0)); // 沿着Y
-			BRepBuilderAPI_Transform transform(theSlot, move);
-			transform.Build();
-			TopoDS_Shape localSlot = transform.Shape();
-			//更新shape
-			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
-		}
-		break;
-	}
-	case Direction::Y:
-	{
-		// 先在X平面创建一个槽(从上往下）
-		gp_Pnt p1(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + theConnectionHight / 2);
-		gp_Pnt p3(theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);
-		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::Y, theFilletRadius);
-		// 在每个位置切槽
-		for (double aloc : theLocations) {
-			gp_Trsf move;
-			move.SetTranslation(gp_Vec(aloc, 0, 0)); // 沿着X
-			BRepBuilderAPI_Transform transform(theSlot, move);
-			transform.Build();
-			TopoDS_Shape localSlot = transform.Shape();
-			//更新shape
-			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
-		}
-		break;
-	}
-	default:
-		break;
-	}
-}
-
+/// <param name="theDir"></param>
+/// <param name="theLoc"></param>
+/// <param name="theClearances"></param>
+/// <param name="theMinSupportLen"></param>
+/// <param name="theCutDistance"></param>
+/// <returns></returns>
 VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlate, Direction theDir, double theLoc, double theClearances, double theMinSupportLen, double theCutDistance)
 {
 	VerticalPlate onePlate; // result
@@ -1285,6 +957,216 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 		onePlate.pieces.push_back(aP);
 	}
 	return onePlate;
+}
+
+/// <summary>
+/// 合并片体为一块板
+/// </summary>
+/// <param name="thePieces"></param>
+/// <param name="theSupportLen"></param>
+/// <param name="theCuttingDistance"></param>
+/// <param name="theZ"></param>
+/// <returns></returns>
+void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight) {
+	//! 板宽度不包含Offset的部分
+	double Z = theBasePlate.Z;
+	double ZC = theBasePlate.Z + theConnectionHight;
+	gp_Pnt start_p0, start_p1, start_p2, end_p0, end_p1;
+	gp_Pnt start_pnt, end_pnt;
+	BRepBuilderAPI_MakeEdge start_l0, start_l1, end_l0, end_l1;
+	std::vector<VerticalPiece> thePieces;
+	BRepBuilderAPI_MakeWire wire;
+	double theX = theBasePlate.X, theY = theBasePlate.Y;
+	// 线段生成逻辑见飞书
+	switch (thePlate.dir)
+	{
+	case X:
+		/// 首先对输入的Pieces排序
+		for (VerticalPiece onePiece : thePlate.pieces) {
+			thePieces.push_back(onePiece);
+		}
+		// 使用 lambda 函数进行排序
+		std::sort(thePieces.begin(), thePieces.end(), [](const VerticalPiece& a, const VerticalPiece& b) {
+			return a.startPoint.Y() < b.startPoint.Y();
+			});
+		// 首段点
+		start_p0 = gp_Pnt(thePlate.location, theBasePlate.Y, Z);
+		start_p1 = gp_Pnt(thePlate.location, theBasePlate.Y, ZC);
+		// start_p2为首个Edge的start.X&Y
+		start_pnt = thePieces.front().startPoint;
+		start_p2 = gp_Pnt(thePlate.location, start_pnt.Y(), ZC);
+		// 末段点
+		// end_p0为最后一个Edge的End.X&Y
+		end_pnt = thePieces.back().endPoint;
+		end_p0 = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, ZC);
+		end_p1 = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, Z);
+
+		/// 首段
+		start_l0 = BRepBuilderAPI_MakeEdge(start_p0, start_p1);
+		start_l1 = BRepBuilderAPI_MakeEdge(start_p1, start_p2);
+		wire.Add(start_l0);
+		wire.Add(start_l1);
+
+		/// 中间段
+		for (size_t i = 0; i < thePieces.size(); i++)
+		{
+			VerticalPiece onePiece = thePieces[i];
+			gp_Pnt nextPnt;
+			if (i + 1 < thePieces.size()) {
+				nextPnt = thePieces[i + 1].startPoint;
+			}
+			else {
+				nextPnt = end_p0;
+			}
+			gp_Pnt p1, p2, p3, p4, p5;
+			p1 = gp_Pnt(thePlate.location, onePiece.startPoint.Y(), ZC);
+			p2 = onePiece.startPoint;
+			p3 = onePiece.endPoint;
+			//更新theY
+			p4 = gp_Pnt(thePlate.location, p3.Y(), ZC);
+			p5 = gp_Pnt(thePlate.location, nextPnt.Y(), ZC);
+			// 创建边
+			BRepBuilderAPI_MakeEdge l1(p1, p2);
+			// l2为Edge
+			BRepBuilderAPI_MakeEdge l3(p3, p4);
+			BRepBuilderAPI_MakeEdge l4(p4, p5);
+			wire.Add(l1);
+			wire.Add(onePiece.edge);
+			wire.Add(l3);
+			wire.Add(l4);
+		}
+
+		/// 末段
+		end_l0 = BRepBuilderAPI_MakeEdge(end_p0, end_p1);
+		end_l1 = BRepBuilderAPI_MakeEdge(end_p1, start_p0);
+		wire.Add(end_l0);
+		wire.Add(end_l1);
+		break;
+	case Y:
+		/// 首先对输入的Pieces排序
+		for (VerticalPiece onePiece : thePlate.pieces) {
+			thePieces.push_back(onePiece);
+		}
+		// 使用 lambda 函数进行排序
+		std::sort(thePieces.begin(), thePieces.end(), [](const VerticalPiece& a, const VerticalPiece& b) {
+			return a.startPoint.X() < b.startPoint.X();
+			});
+		// 首段点
+		start_p0 = gp_Pnt(theBasePlate.X, thePlate.location, Z);
+		start_p1 = gp_Pnt(theBasePlate.X, thePlate.location, ZC);
+		// start_p2为首个Edge的start.X&Y
+		start_pnt = thePieces.front().startPoint;
+		start_p2 = gp_Pnt(start_pnt.X(), thePlate.location, ZC);
+		// 末段点
+		// end_p0为最后一个Edge的End.X&Y
+		end_pnt = thePieces.back().endPoint;
+		end_p0 = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, ZC);
+		end_p1 = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, Z);
+
+		/// 首段
+		start_l0 = BRepBuilderAPI_MakeEdge(start_p0, start_p1);
+		start_l1 = BRepBuilderAPI_MakeEdge(start_p1, start_p2);
+		wire.Add(start_l0);
+		wire.Add(start_l1);
+
+		/// 中间段
+		for (size_t i = 0; i < thePieces.size(); i++)
+		{
+			VerticalPiece onePiece = thePieces[i];
+			gp_Pnt nextPnt;
+			if (i + 1 < thePieces.size()) {
+				nextPnt = thePieces[i + 1].startPoint;
+			}
+			else {
+				nextPnt = end_p0;
+			}
+			gp_Pnt p1, p2, p3, p4, p5;
+			p1 = gp_Pnt(onePiece.startPoint.X(), thePlate.location, ZC);
+			p2 = onePiece.startPoint;
+			p3 = onePiece.endPoint;
+			//更新theY
+			p4 = gp_Pnt(p3.X(), thePlate.location, ZC);
+			p5 = gp_Pnt(nextPnt.X(), thePlate.location, ZC);
+			// 创建边
+			BRepBuilderAPI_MakeEdge l1(p1, p2);
+			// l2为Edge
+			BRepBuilderAPI_MakeEdge l3(p3, p4);
+			BRepBuilderAPI_MakeEdge l4(p4, p5);
+			wire.Add(l1);
+			wire.Add(onePiece.edge);
+			wire.Add(l3);
+			wire.Add(l4);
+		}
+
+		/// 末段
+		end_l0 = BRepBuilderAPI_MakeEdge(end_p0, end_p1);
+		end_l1 = BRepBuilderAPI_MakeEdge(end_p1, start_p0);
+		wire.Add(end_l0);
+		wire.Add(end_l1);
+		break;
+	default:
+		throw std::runtime_error("Unexpected Direction in switch");
+	}
+
+	// 创建面
+	BRepBuilderAPI_MakeFace face(wire.Wire());
+
+	thePlate.shape = face.Face();
+}
+
+/// <summary>
+/// 在竖板上切连接槽
+/// </summary>
+/// <param name="thePlate"></param>
+/// <param name="theBasePlate"></param>
+/// <param name="theLocations"></param>
+/// <param name="theConnectionHight"></param>
+/// <param name="theConnectWidth"></param>
+/// <param name="theFilletRadius"></param>
+void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius) {
+	double offset = 0.9;
+	switch (thePlate.dir)
+	{
+	case Direction::X:
+	{
+		// 先在Y平面创建一个槽(从下往上）
+		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z - 999);
+		gp_Pnt p3(thePlate.location, theConnectWidth / 2, theBasePlate.Z + (theConnectionHight / 2) * (2 - offset));
+		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::X, theFilletRadius);
+
+		// 在每个位置切槽
+		for (double aloc : theLocations) {
+			gp_Trsf move;
+			move.SetTranslation(gp_Vec(0, aloc, 0)); // 沿着Y
+			BRepBuilderAPI_Transform transform(theSlot, move);
+			transform.Build();
+			TopoDS_Shape localSlot = transform.Shape();
+			//更新shape
+			//thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
+		}
+		break;
+	}
+	case Direction::Y:
+	{
+		// 先在X平面创建一个槽(从上往下）
+		gp_Pnt p1(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + (theConnectionHight / 2) * offset);
+		gp_Pnt p3(theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);
+		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::Y, theFilletRadius);
+		// 在每个位置切槽
+		for (double aloc : theLocations) {
+			gp_Trsf move;
+			move.SetTranslation(gp_Vec(aloc, 0, 0)); // 沿着X
+			BRepBuilderAPI_Transform transform(theSlot, move);
+			transform.Build();
+			TopoDS_Shape localSlot = transform.Shape();
+			//更新shape
+			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
+		}
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 #pragma endregion

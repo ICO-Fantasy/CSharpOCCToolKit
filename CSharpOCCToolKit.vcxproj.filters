@@ -45,6 +45,12 @@
     <Filter Include="源文件\OCCProxy\gp">
       <UniqueIdentifier>{5eb9a2c4-e204-4292-ab9d-a39032d4fc22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\OCCProxy\TopoDS">
+      <UniqueIdentifier>{f24ae2a2-3bef-4209-b664-4706a9161fb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\TopoDS">
+      <UniqueIdentifier>{47be04fe-9e35-4d2e-b1dd-fb077ca6de0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -77,6 +83,12 @@
     <ClCompile Include="WAIS_Shape.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
+    <ClCompile Include="Wgp_Pnt.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="WTopoDS_Shape.cpp">
+      <Filter>源文件\OCCProxy\TopoDS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -105,6 +117,12 @@
     </ClInclude>
     <ClInclude Include="MakeSimpleClamp.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Wgp_Pnt.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="WTopoDS_Shape.h">
+      <Filter>头文件\OCCProxy\TopoDS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
