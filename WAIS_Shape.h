@@ -15,6 +15,7 @@ public:
 	WAIS_Shape(AIS_Shape aAISShape);
 	WTopoDS_Shape^ Shape();
 	void SetColor(int R, int G, int B);
+	void SetTransparency(double theFactor);
 	Handle(AIS_Shape)* GetOCC();
 	Handle(Standard_Transient)* GetStd();
 private:

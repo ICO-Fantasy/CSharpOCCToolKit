@@ -34,6 +34,10 @@ void WAIS_Shape::SetColor(int R, int G, int B)
 	Quantity_Color theColor((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
 	(*_pAis_Shape)->SetColor(theColor);
 }
+void WAIS_Shape::SetTransparency(double theFactor)
+{
+	(*_pAis_Shape)->SetTransparency(theFactor);
+}
 Handle(AIS_Shape)* WAIS_Shape::GetOCC() {
 	return _pAis_Shape;
 }

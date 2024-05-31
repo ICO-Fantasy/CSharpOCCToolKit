@@ -101,7 +101,7 @@ struct VerticalPiece {
 	TopoDS_Edge edge;
 	gp_Pnt startPoint;
 	gp_Pnt endPoint;
-	Standard_Real Length() {
+	double Length() const {
 		double len;
 		switch (dir) {
 		case X:
@@ -113,7 +113,7 @@ struct VerticalPiece {
 			return len;
 			break;
 		default:
-			throw std::runtime_error("Unexpected Direction in switch");
+			throw std::runtime_error("Unexpected Direction");
 		}
 	}
 };

@@ -2,6 +2,7 @@
 #include "MakeSimpleClamp.h"
 #include <algorithm>
 #include <Bnd_Box.hxx>
+#include <BRepLib.hxx>
 #include <BRep_Builder.hxx>//test
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
@@ -334,17 +335,17 @@ static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
 	for (size_t i = 1; i < firstEdges.size() - 1; ++i) {
 		const localEdge& firstEdge = firstEdges[i];
 		bool isSame = false;
-		for (size_t i = 1; i < secondEdges.size() - 1; ++i) {
+		for (size_t i = 0; i < secondEdges.size(); ++i) {
 			const localEdge& secondEdge = secondEdges[i];
 			if (theDirection == X)
 			{
-				if (std::abs(firstEdge.startPoint.Y() - secondEdge.startPoint.Y()) < 2.0)
+				if (std::abs(firstEdge.startPoint.Y() - secondEdge.startPoint.Y()) < 3.0)
 				{
 					isSame = true;
 				}
 			}
 			if (theDirection == Y) {
-				if (std::abs(firstEdge.startPoint.X() - secondEdge.startPoint.X()) < 2.0)
+				if (std::abs(firstEdge.startPoint.X() - secondEdge.startPoint.X()) < 3.0)
 				{
 					isSame = true;
 				}
@@ -595,11 +596,11 @@ static TopoDS_Edge TrimEdge(TopoDS_Edge theOriginEdge, gp_Pnt p1, gp_Pnt p2) {
 	double first, last;
 	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
 	// 有时底层曲线没有创建，要手动创建
-	//if (aCurve.IsNull())
-	//{
-	//	BRepLib::BuildCurves3d(theOriginEdge, 1.0e-5, GeomAbs_C1);//创建曲线(一阶导数的连续性)
-	//	aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
-	//}
+	if (aCurve.IsNull())
+	{
+		BRepLib::BuildCurves3d(theOriginEdge, 1.0e-5, GeomAbs_C1);//创建曲线(一阶导数的连续性)
+		aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
+	}
 	if (!aCurve.IsNull()) {
 		//投影点到曲线上，并获取投影点处的参数
 		GeomAPI_ProjectPointOnCurve ppc1(p1, aCurve);
@@ -633,13 +634,13 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 	for (VerticalPiece& aPiece : thePieces) {
 		if (aPiece.Length() < theClearances * 2)
 		{
+			// 去掉修剪后长度小于0的边
 			continue;
 		}
-		BRepAdaptor_Curve aBAC(aPiece.edge);
-		gp_Pnt p1 = aBAC.Value(aBAC.FirstParameter());
-		gp_Pnt p2 = aBAC.Value(aBAC.LastParameter());
-		switch (aPiece.dir) {
-		case X:
+		gp_Pnt p1 = aPiece.startPoint;
+		gp_Pnt p2 = aPiece.endPoint;
+
+		if (aPiece.dir == X)
 		{
 			if (p1.Y() > p2.Y()) {
 				std::swap(p1, p2);
@@ -649,11 +650,18 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 			TopoDS_Edge outEdge = TrimEdge(aPiece.edge, p1, p2);
 			if (!outEdge.IsNull()) {
 				aPiece.edge = outEdge;
+				BRepAdaptor_Curve aBAC(outEdge);
+				gp_Pnt np1 = aBAC.Value(aBAC.FirstParameter());
+				gp_Pnt np2 = aBAC.Value(aBAC.LastParameter());
+				if (np1.Y() > np2.Y()) {
+					std::swap(np1, np2);
+				}
+				aPiece.startPoint = np1;
+				aPiece.endPoint = np2;
 			}
 			result.push_back(aPiece);
-			break;
 		}
-		case Y:
+		if (aPiece.dir == Y)
 		{
 			if (p1.X() > p2.X()) {
 				std::swap(p1, p2);
@@ -663,32 +671,31 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 			TopoDS_Edge outEdge = TrimEdge(aPiece.edge, p1, p2);
 			if (!outEdge.IsNull()) {
 				aPiece.edge = outEdge;
+				BRepAdaptor_Curve aBAC(outEdge);
+				gp_Pnt np1 = aBAC.Value(aBAC.FirstParameter());
+				gp_Pnt np2 = aBAC.Value(aBAC.LastParameter());
+				if (np1.X() > np2.X()) {
+					std::swap(np1, np2);
+				}
+				aPiece.startPoint = np1;
+				aPiece.endPoint = np2;
 			}
 			result.push_back(aPiece);
-			break;
-		}
-		default:
-			break;
 		}
 	}
 	return result;
 }
 
-/// <summary>
-/// 切开过长的边，与修剪两端类似的做法
-/// </summary>
-/// <param name="thePieces"></param>
-/// <param name="theDirection"></param>
-/// <param name="VerticalPlateClearances"></param>
+
 static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double theSupportLen, int theNum) {
 	std::vector<VerticalPiece> result;
-	//如果最小支撑长度不足，则不做切割
+	// 如果最小支撑长度不足，则不做切割
 	if (theSupportLen <= 1)
 	{
 		result.push_back(thePiece);
 		return result;
 	}
-	//获取底层曲线
+	// 获取底层曲线
 	double first, last, left, right;
 	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.edge, first, last);
 	double increment = thePiece.Length() / theNum;
@@ -817,18 +824,18 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 }
 static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double theSupportLen, double theCutLen, int theNum) {
 	std::vector<VerticalPiece> result;
-	//如果最小支撑长度不足，则不做切割
+	// 如果最小支撑长度不足，则不做切割
 	if (theSupportLen <= 1)
 	{
 		result.push_back(thePiece);
 		return result;
 	}
-	//获取底层曲线
+	// 获取底层曲线
 	double first, last;
 	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.edge, first, last);
 	double start = 0, end = 0;
 	gp_Pnt startP = thePiece.startPoint, endP = thePiece.startPoint;
-	//第一条
+	// 第一条
 	switch (thePiece.dir) {
 	case X:
 		start = thePiece.startPoint.Y();
@@ -847,7 +854,7 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 	default:
 		break;
 	}
-	//投影点到曲线上，并获取投影点处的参数
+	// 投影点到曲线上，并获取投影点处的参数
 	GeomAPI_ProjectPointOnCurve ppc1S(startP, aCurve);
 	double param1S = ppc1S.LowerDistanceParameter();
 	GeomAPI_ProjectPointOnCurve ppc2S(endP, aCurve);
@@ -858,7 +865,7 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 	newEdgeS.Orientation(thePiece.edge.Orientation());//同向
 	newPieceS.edge = newEdgeS;
 	result.push_back(newPieceS);
-	//第一条之后的
+	// 第一条之后的
 	for (size_t i = 0; i < theNum; i++) {
 		switch (thePiece.dir) {
 		case X:
@@ -892,6 +899,13 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 	}
 	return result;
 }
+
+/// <summary>
+/// 切开过长的边，与修剪两端类似的做法
+/// </summary>
+/// <param name="thePieces"></param>
+/// <param name="theDirection"></param>
+/// <param name="VerticalPlateClearances"></param>
 static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePieces, double theSupportLen, double theCuttingDistance) {
 	//如果两个参数值均为0，则不处理
 	if (theSupportLen + theCuttingDistance == 0) {
