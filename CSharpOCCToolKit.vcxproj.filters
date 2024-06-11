@@ -56,7 +56,7 @@
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="String.cpp">
+    <ClCompile Include="StringExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="CSharpViewer.cpp">
@@ -89,6 +89,9 @@
     <ClCompile Include="WTopoDS_Shape.cpp">
       <Filter>源文件\OCCProxy\TopoDS</Filter>
     </ClCompile>
+    <ClCompile Include="STEPExchange.cpp">
+      <Filter>源文件\DataExchange</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -97,7 +100,7 @@
     <ClInclude Include="ConvertChinese.h">
       <Filter>头文件\OCCTools</Filter>
     </ClInclude>
-    <ClInclude Include="String.h">
+    <ClInclude Include="StringExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="WAIS_ViewCube.h">
@@ -123,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="WTopoDS_Shape.h">
       <Filter>头文件\OCCProxy\TopoDS</Filter>
+    </ClInclude>
+    <ClInclude Include="STEPExchange.h">
+      <Filter>头文件\DataExchange</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

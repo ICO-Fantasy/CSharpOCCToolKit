@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "MakeSimpleClamp.h"
 #include <algorithm>
+#include <array>
 #include <Bnd_Box.hxx>
-#include <BRepLib.hxx>
 #include <BRep_Builder.hxx>//test
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
@@ -13,6 +13,7 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
+#include <BRepLib.hxx>
 #include <cmath>
 #include <GC_MakeSegment.hxx>
 #include <GCPnts_TangentialDeflection.hxx>
@@ -22,14 +23,17 @@
 #include <GProp_PEquation.hxx>
 #include <IFSelect_ReturnStatus.hxx>
 #include <Interface_Static.hxx>
+#include <map>
 #include <STEPCAFControl_Writer.hxx>
 #include <STEPControl_StepModelType.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopLoc_Location.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Compound.hxx>
 #include <utility>
 #include <vector>
+#include <BRepPrimAPI_MakePrism.hxx>
 
 
 namespace OCCTK {
@@ -270,11 +274,19 @@ static TopoDS_Shape MakeFaceFromLocalEdge(localEdge theEdge, double theZ) {
 	return result;
 }
 
-static bool MoreEdge(localEdge& now, std::vector<localEdge> theEdges) {
+static bool MoreEdge(gp_Pnt& startPoint, gp_Pnt& endPoint, std::vector<localEdge>& result, std::vector<localEdge> theEdges) {
+	//! 点的识别精度会影响效果
 	for (localEdge theEdge : theEdges) {
-		if (now.endPoint.IsEqual(theEdge.startPoint, 1e-2))
+		if (endPoint.IsEqual(theEdge.startPoint, 1e-2))
 		{
-			now = theEdge;
+			endPoint = theEdge.endPoint;
+			result.push_back(theEdge);
+			return true;
+		}
+		if (startPoint.IsEqual(theEdge.endPoint, 1e-2))
+		{
+			startPoint = theEdge.startPoint;
+			result.push_back(theEdge);
 			return true;
 		}
 	}
@@ -288,9 +300,8 @@ static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
 	gp_Vec Z(0.0, 0.0, 1.0);
 	localEdge currentEdge;
 	// 去除垂直的边
-	//! 有的边可能不是垂直的，可能是斜着的,设置阈值为20°
 	for (localEdge theEdge : theRing.Edges) {
-		if (!gp_Vec(theEdge.startPoint, theEdge.endPoint).IsParallel(Z, M_PI * (2.0 / 18.0)))
+		if (!gp_Vec(theEdge.startPoint, theEdge.endPoint).IsParallel(Z, 0.1))
 		{
 			removedEdges.push_back(theEdge);
 		}
@@ -308,14 +319,13 @@ static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
 			return a.startPoint.X() < b.startPoint.X();
 			});
 	}
-	// 找到数值最小的起始边
+	// 任取一个起始边
 	currentEdge = removedEdges.front();
 	// 构建第一条线
+	gp_Pnt firstStart = currentEdge.startPoint;
+	gp_Pnt firstEnd = currentEdge.endPoint;
 	firstEdges.push_back(currentEdge);
-	while (MoreEdge(currentEdge, removedEdges))
-	{
-		firstEdges.push_back(currentEdge);
-	}
+	while (MoreEdge(firstStart, firstEnd, firstEdges, removedEdges)) {}
 	// 构建第二条线
 	for (const localEdge& theEdge : removedEdges) {
 		bool found = false;
@@ -438,10 +448,10 @@ static void GetCorners(TopoDS_Shape theShape, BasePlate& theBasePlate) {
 /// <param name="theShape"></param>
 /// <param name="theZ"></param>
 /// <returns></returns>
-static void MakeBasePlateShape(BasePlate& theBaseplate, double theZ) {
+static void MakeBasePlateShape(BasePlate& theBaseplate) {
 	// 根据边界框尺寸创建立方体
-	gp_Pnt theLowLeft(theBaseplate.X - theBaseplate.OffsetX, theBaseplate.Y - theBaseplate.OffsetY, theZ);
-	gp_Pnt theTopRight(theBaseplate.X + theBaseplate.dX + theBaseplate.OffsetX, theBaseplate.Y + theBaseplate.dY + theBaseplate.OffsetY, theZ);
+	gp_Pnt theLowLeft(theBaseplate.X - theBaseplate.OffsetX, theBaseplate.Y - theBaseplate.OffsetY, theBaseplate.Z);
+	gp_Pnt theTopRight(theBaseplate.X + theBaseplate.dX + theBaseplate.OffsetX, theBaseplate.Y + theBaseplate.dY + theBaseplate.OffsetY, theBaseplate.Z);
 	theBaseplate.shape = MakePiece(theLowLeft, theTopRight, Direction::Z);
 }
 /// <summary>
@@ -458,7 +468,7 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 	theBaseplate.OffsetY = theOffsetY;
 	GetCorners(theWorkpiece, theBaseplate);
 	theBaseplate.Z -= theOffsetZ;
-	MakeBasePlateShape(theBaseplate, theBaseplate.Z);
+	MakeBasePlateShape(theBaseplate);
 	return theBaseplate;
 }
 
@@ -957,6 +967,15 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	onePlate.clearances = theClearances;
 	onePlate.minSupportLen = theMinSupportLen;
 	onePlate.cuttiDistance = theCutDistance;
+	if (theDir == X)
+	{
+		onePlate.XY = theBasePlate.Y;
+	}
+	if (theDir == Y)
+	{
+		onePlate.XY = theBasePlate.X;
+	}
+	onePlate.Z = theBasePlate.Z;
 
 	TopoDS_Face aPlane = MakeCrossPlane(theLoc, theDir);
 	TopoDS_Shape aSection = MakeSection(aPlane, theWorkpiece);
@@ -964,7 +983,11 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	std::vector<VerticalPiece> theTrimedPieces = TrimEdgeEnds(theOriginPieces, theClearances);
 	std::vector<VerticalPiece> theRemovedPieces = RemoveShortEdge(theTrimedPieces, theMinSupportLen);
 	std::vector<VerticalPiece> theCuttedPieces = CutLongEdge(theRemovedPieces, theMinSupportLen, theCutDistance);
-
+	if (theCuttedPieces.size() == 0)
+	{
+		//# 如果最终不产生结果，则返回原始Piece
+		theCuttedPieces = theOriginPieces;
+	}
 	//前面都是在操作Edge，这一步需要把Edge生成为Piece片体形状
 	for (auto& aP : theCuttedPieces) {
 		MakePieceFromEdge(aP, theBasePlate.Z);
@@ -992,9 +1015,8 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 	BRepBuilderAPI_MakeWire wire;
 	double theX = theBasePlate.X, theY = theBasePlate.Y;
 	// 线段生成逻辑见飞书
-	switch (thePlate.dir)
+	if (thePlate.dir == X)
 	{
-	case X:
 		/// 首先对输入的Pieces排序
 		for (VerticalPiece onePiece : thePlate.pieces) {
 			thePieces.push_back(onePiece);
@@ -1055,8 +1077,9 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 		end_l1 = BRepBuilderAPI_MakeEdge(end_p1, start_p0);
 		wire.Add(end_l0);
 		wire.Add(end_l1);
-		break;
-	case Y:
+	}
+	if (thePlate.dir == Y)
+	{
 		/// 首先对输入的Pieces排序
 		for (VerticalPiece onePiece : thePlate.pieces) {
 			thePieces.push_back(onePiece);
@@ -1117,9 +1140,6 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 		end_l1 = BRepBuilderAPI_MakeEdge(end_p1, start_p0);
 		wire.Add(end_l0);
 		wire.Add(end_l1);
-		break;
-	default:
-		throw std::runtime_error("Unexpected Direction in switch");
 	}
 
 	// 创建面
@@ -1139,9 +1159,7 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 /// <param name="theFilletRadius"></param>
 void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius) {
 	double offset = 0.9;
-	switch (thePlate.dir)
-	{
-	case Direction::X:
+	if (thePlate.dir == X)
 	{
 		// 先在Y平面创建一个槽(从下往上）
 		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z - 999);
@@ -1156,11 +1174,10 @@ void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<doubl
 			transform.Build();
 			TopoDS_Shape localSlot = transform.Shape();
 			//更新shape
-			//thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
+			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
 		}
-		break;
 	}
-	case Direction::Y:
+	if (thePlate.dir == Y)
 	{
 		// 先在X平面创建一个槽(从上往下）
 		gp_Pnt p1(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + (theConnectionHight / 2) * offset);
@@ -1176,11 +1193,309 @@ void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<doubl
 			//更新shape
 			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
 		}
-		break;
 	}
-	default:
-		break;
+}
+
+// 构建数字Face
+static TopoDS_Face MakeNumber(int number, Direction dir) {
+	std::map<int, std::vector<std::array<double, 2>>> numberMap;
+	numberMap[1] = {
+		{0.0, 0.0},
+		{0.0, 10.0},
+		{10.0, 10.0},
+		{10.0, 50.0},
+		{0.0, 50.0},
+		{0.0, 60.0},
+		{20.0, 60.0},
+		{20.0, 10.0},
+		{30.0, 10.0},
+		{30.0, 0.0}
+	};
+	numberMap[2] = {
+			{0.0, 0.0},
+			{0.0, 10.0},
+			{18.94, 50.0},
+			{10.0, 50.0},
+			{10.0, 40.0},
+			{0.0, 40.0},
+			{0.0, 60.0},
+			{30.0, 60.0},
+			{30.0, 50.0},
+			{11.06, 10.0},
+			{30.0, 10.0},
+			{30.0, 0.0},
+	};
+	numberMap[3] = {
+			{0.0, 0.0},
+			{30.0, 0.0},
+			{30.0, 60.0},
+			{0.0, 60.0},
+			{0.0, 50.0},
+			{20.0, 50.0},
+			{20.0, 35.0},
+			{8.0, 35.0},
+			{8.0, 25.0},
+			{20.0, 25.0},
+			{20.0, 10.0},
+			{0.0, 10.0},
+	};
+	numberMap[4] = {
+		{15.0, 0.0},
+		{15.0, 10.0},
+		{0.0, 10.0},
+		{0.0, 20.0},
+		{5.0, 60.0},
+		{15.0, 60.0},
+		{10.0, 20.0},
+		{15.0, 20.0},
+		{15.0, 30.0},
+		{25.0, 30.0},
+		{25.0, 20.0},
+		{30.0, 20.0},
+		{30.0, 10.0},
+		{25.0, 10.0},
+		{25.0, 0.0},
+	};
+	numberMap[5] = {
+			{0.0, 0.0},
+			{0.0, 10.0},
+			{20.0, 10.0},
+			{20.0, 25.0},
+			{0.0, 25.0},
+			{0.0, 60.0},
+			{30.0, 60.0},
+			{30.0, 50.0},
+			{10.0, 50.0},
+			{10.0, 35.0},
+			{30.0, 35.0},
+			{30.0, 0.0},
+	};
+	numberMap[6] = {
+		{0.0, 0.0},
+		{0.0, 60.0},
+		{30.0, 60.0},
+		{30.0, 50.0},
+		{10.0, 50.0},
+		{10.0, 10.0},
+		{20.0, 10.0},
+		{20.0, 20.0},
+		{12.0, 20.0},
+		{12.0, 30.0},
+		{30.0, 30.0},
+		{30.0, 0.0},
+	};
+	numberMap[7] = {
+		{0.0, 0.0},
+		{20.0, 50.0},
+		{10.0, 50.0},
+		{10.0, 40.0},
+		{0.0, 40.0},
+		{0.0, 60.0},
+		{30.0, 60.0},
+		{30.0, 50.0},
+		{10.0, 0.0},
+	};
+	numberMap[8] = {
+		{0.0, 0.0},
+		{0.0, 35.0},
+		{20.0, 35.0},
+		{20.0, 50.0},
+		{10.0, 50.0},
+		{10.0, 38.0},
+		{0.0, 38.0},
+		{0.0, 60.0},
+		{30.0, 60.0},
+		{30.0, 25.0},
+		{10.0, 25.0},
+		{10.0, 10.0},
+		{20.0, 10.0},
+		{20.0, 22.0},
+		{30.0, 22.0},
+		{30.0, 0.0},
+	};
+	numberMap[9] = {
+		{20.0, 0.0},
+		{20.0, 50.0},
+		{10.0, 50.0},
+		{10.0, 40.0},
+		{18.0, 40.0},
+		{18.0, 30.0},
+		{0.0, 30.0},
+		{0.0, 60.0},
+		{30.0, 60.0},
+		{30.0, 0.0},
+	};
+	numberMap[0] = {
+		{0.0, 0.0},
+		{0.0, 60.0},
+		{30.0, 60.0},
+		{30.0, 0.0},
+		{15, 0.0},
+		{15, 10.0},
+		{20, 10.0},
+		{20, 50.0},
+		{10, 50.0},
+		{10, 10.0},
+		{14, 10.0},
+		{14, 0.0},
+	};
+
+	BRepBuilderAPI_MakeWire wireMaker;
+	std::array<double, 3> last_value{ 0.0,0.0,0.0 };
+	if (dir == Y)
+	{
+		for (std::array<double, 2> p : numberMap[number])
+		{
+			if (std::all_of(last_value.begin(), last_value.end(), [](double v) { return v == 0.0; }))
+			{
+				last_value[0] = p[0];
+				last_value[1] = 0.0;
+				last_value[2] = p[1];
+				continue;
+			}
+			std::array<double, 3> value{ p[0] , 0.0, p[1] };
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(last_value[0], last_value[1], last_value[2]), gp_Pnt(value[0], value[1], value[2])));
+			last_value = value;
+		}
+		std::array<double, 3>end_value{ numberMap[number][0][0] ,0.0,numberMap[number][0][1] };
+		wireMaker.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(last_value[0], last_value[1], last_value[2]), gp_Pnt(end_value[0], end_value[1], end_value[2])));
+		BRepBuilderAPI_MakeFace faceMaker(wireMaker.Wire());
+		return faceMaker.Face();
 	}
+	if (dir == X)
+	{
+		for (std::array<double, 2> p : numberMap[number])
+		{
+			if (std::all_of(last_value.begin(), last_value.end(), [](double v) { return v == 0.0; }))
+			{
+				last_value[0] = 0.0;
+				last_value[1] = p[0];
+				last_value[2] = p[1];
+				continue;
+			}
+			std::array<double, 3> value{ 0.0,p[0] , p[1] };
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(last_value[0], last_value[1], last_value[2]), gp_Pnt(value[0], value[1], value[2])));
+			last_value = value;
+		}
+		std::array<double, 3>end_value{ 0.0, numberMap[number][0][0] , numberMap[number][0][1] };
+		wireMaker.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(last_value[0], last_value[1], last_value[2]), gp_Pnt(end_value[0], end_value[1], end_value[2])));
+		BRepBuilderAPI_MakeFace faceMaker(wireMaker.Wire());
+		return faceMaker.Face();
+	}
+}
+// 拆分多位整数为单位数
+static std::vector<int> GetDigitValues(int number) {
+	std::vector<int> digits;
+	if (number < 0) {
+		number = -number; // 处理负数
+	}
+	do {
+		digits.push_back(number % 10); // 获取当前最低位数字
+		number /= 10; // 去掉最低位数字
+	} while (number != 0);
+	std::reverse(digits.begin(), digits.end()); // 反转结果
+	return digits;
+}
+
+/// <summary>
+/// 在板上烙印数字
+/// </summary>
+/// <param name="thePlate"></param>
+/// <param name="hight"></param>
+/// <param name="number"></param>
+VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number)
+{
+	VerticalPlate newPlate = thePlate;
+	double scaleFactor = hight / 60.0;
+	std::vector<int> theNumbers = GetDigitValues(number);
+	for (size_t i = 0; i < theNumbers.size(); i++)
+	{
+		gp_Trsf theTrsf;
+		gp_Trsf scaleTrsf;
+		scaleTrsf.SetScale(gp_Pnt(), scaleFactor);
+
+		if (thePlate.dir == X)
+		{
+			TopoDS_Face theFace = MakeNumber(theNumbers[i], thePlate.dir);
+			// 缩放
+			TopoDS_Shape scaledFace = BRepBuilderAPI_Transform(theFace, scaleTrsf).Shape();
+			// 移动到定位点
+			theTrsf.SetTranslation(gp_Vec(thePlate.location, thePlate.XY + (5.0 + i * 35.0) * scaleFactor, thePlate.Z + 5.0 * scaleFactor));
+			scaledFace.Move(TopLoc_Location(theTrsf));
+
+			BRepPrimAPI_MakePrism prismer(scaledFace, gp_Vec(99, 0, 0));
+			BRepAlgoAPI_Cut cutter(newPlate.shape, prismer.Shape());
+			//newPlate.shape = prismer.Shape();
+			newPlate.shape = cutter.Shape();
+		}
+		if (thePlate.dir == Y)
+		{
+			TopoDS_Face theFace = MakeNumber(theNumbers[i], thePlate.dir);
+			TopoDS_Shape scaledFace = BRepBuilderAPI_Transform(theFace, scaleTrsf).Shape();
+			theTrsf.SetTranslation(gp_Vec(thePlate.XY + (5.0 + i * 35.0) * scaleFactor, thePlate.location, thePlate.Z + 5.0 * scaleFactor));
+			scaledFace.Move(TopLoc_Location(theTrsf));
+
+			BRepPrimAPI_MakePrism prismer(scaledFace, gp_Vec(0, 99, 0));
+			BRepAlgoAPI_Cut cutter(newPlate.shape, prismer.Shape());
+			//newPlate.shape = prismer.Shape();
+			newPlate.shape = cutter.Shape();
+		}
+	}
+	return newPlate;
+}
+/// <summary>
+/// 在板上烙印数字，数字左下角位于thePoint的位置
+/// </summary>
+/// <param name="thePlate"></param>
+/// <param name="hight"></param>
+/// <param name="number"></param>
+/// <param name="thePoint"></param>
+/// <returns></returns>
+VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number, gp_Pnt thePoint)
+{
+	VerticalPlate newPlate = thePlate;
+	double scaleFactor = hight / 60.0;
+	std::vector<int> theNumbers = GetDigitValues(number);
+	for (size_t i = 0; i < theNumbers.size(); i++)
+	{
+		gp_Trsf theTrsf;
+		gp_Trsf scaleTrsf;
+		scaleTrsf.SetScale(gp_Pnt(), scaleFactor);
+
+		if (thePlate.dir == X)
+		{
+			TopoDS_Face theFace = MakeNumber(theNumbers[i], thePlate.dir);
+			TopoDS_Shape scaledFace = BRepBuilderAPI_Transform(theFace, scaleTrsf).Shape();
+			gp_Pnt toPoint = thePoint;
+			toPoint.SetY(thePoint.Y() + i * 35.0 * scaleFactor);
+			gp_Vec theVec(gp_Pnt(), toPoint);
+			theVec.SetX(0);
+			theTrsf.SetTranslation(theVec);
+			scaledFace.Move(TopLoc_Location(theTrsf));
+
+			BRepPrimAPI_MakePrism prismer(scaledFace, gp_Vec(99, 0, 0));
+			BRepAlgoAPI_Cut cutter(newPlate.shape, prismer.Shape());
+			//newPlate.shape = prismer.Shape();
+			newPlate.shape = cutter.Shape();
+		}
+		if (thePlate.dir == Y)
+		{
+			TopoDS_Face theFace = MakeNumber(theNumbers[i], thePlate.dir);
+			TopoDS_Shape scaledFace = BRepBuilderAPI_Transform(theFace, scaleTrsf).Shape();
+			gp_Pnt toPoint = thePoint;
+			toPoint.SetX(thePoint.X() + i * 35.0 * scaleFactor);
+			gp_Vec theVec(gp_Pnt(), toPoint);
+			theVec.SetY(0);
+			theTrsf.SetTranslation(theVec);
+			scaledFace.Move(TopLoc_Location(theTrsf));
+
+			BRepPrimAPI_MakePrism prismer(scaledFace, gp_Vec(0, 99, 0));
+			BRepAlgoAPI_Cut cutter(newPlate.shape, prismer.Shape());
+			//newPlate.shape = prismer.Shape();
+			newPlate.shape = cutter.Shape();
+		}
+	}
+	return newPlate;
 }
 
 #pragma endregion
@@ -1257,19 +1572,5 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> the
 	return result;
 }
 
-bool saveSTEP(TopoDS_Shape theShape, TCollection_AsciiString filePath) {
-	//初始化写入对象
-	STEPControl_Writer aWriter;
-
-	aWriter.Transfer(theShape, STEPControl_AsIs);
-	IFSelect_ReturnStatus status = aWriter.Write(filePath.ToCString());
-
-	if (status == IFSelect_RetDone)
-	{
-		return true;
-	}
-	return false;
-
-}
 }
 }

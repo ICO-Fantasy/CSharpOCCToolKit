@@ -123,6 +123,8 @@ struct VerticalPlate
 	std::vector<VerticalPiece> pieces;
 	Direction dir;
 	double location;
+	double XY;
+	double Z;
 	double clearances;
 	double minSupportLen;
 	double cuttiDistance;
@@ -287,12 +289,13 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlate, Direction theDir, double theLoc, double theClearances, double theMinSupportLen, double theCuttiDistance);
 void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight);
 void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius);
+VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number);
+VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number, gp_Pnt thePoint);
 
 ///==============================
 ///得到结果
 ///==============================
 
 TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> theVerticalPlates);
-bool saveSTEP(TopoDS_Shape theShape, TCollection_AsciiString filePath);
 }
 }

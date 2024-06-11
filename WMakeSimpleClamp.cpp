@@ -1,19 +1,15 @@
 ﻿#include "WMakeSimpleClamp.h"
 #include <TopoDS_Shape.hxx>
 #include "MakeSimpleClamp.h"
-#include <AIS_Shape.hxx>
-#include <STEPControl_Reader.hxx>
 #include <vector>
 #include <TopoDS.hxx>
-#include "String.h"
 using namespace System::Collections::Generic;
 
 namespace OCCTK::Laser {
 
-/// <summary>
-/// 委托结构和cpp结构的转换
-/// </summary>
-/// <returns></returns>
+#pragma region 互相转换
+
+// 委托结构和cpp结构的转换
 OCCTK::SimpleClamp::BasePlate BasePlate::GetOCC()
 {
 	OCCTK::SimpleClamp::BasePlate occBasePlate{
@@ -29,11 +25,7 @@ OCCTK::SimpleClamp::BasePlate BasePlate::GetOCC()
 
 	return occBasePlate;
 }
-
-/// <summary>
-/// 委托结构和cpp结构的转换
-/// </summary>
-/// <returns></returns>
+// 委托结构和cpp结构的转换
 OCCTK::SimpleClamp::VerticalPlate VerticalPlate::GetOCC()
 {
 	//TopoDS_Shape shape;
@@ -69,6 +61,8 @@ OCCTK::SimpleClamp::VerticalPlate VerticalPlate::GetOCC()
 		occpieces,
 		thedir,
 		this->location,
+		this->XY,
+		this->Z,
 		this->clearances,
 		this->minSupportLen,
 		this->cuttingDistance,
@@ -76,7 +70,7 @@ OCCTK::SimpleClamp::VerticalPlate VerticalPlate::GetOCC()
 	};
 	return occVerticalPlate;
 }
-
+// 委托结构和cpp结构的转换
 OCCTK::SimpleClamp::VerticalPiece VerticalPiece::GetOCC()
 {
 	//Direction dir;
@@ -108,7 +102,7 @@ OCCTK::SimpleClamp::VerticalPiece VerticalPiece::GetOCC()
 	return occVerticalPiece;
 }
 
-//把CPP结构体封装为委托结构体
+// 把CPP结构体封装为委托结构体
 static auto getDelegate(OCCTK::SimpleClamp::BasePlate cppBase) {
 	BasePlate^ theBase = gcnew BasePlate();
 	theBase->shape = gcnew WTopoDS_Shape(cppBase.shape);
@@ -122,7 +116,7 @@ static auto getDelegate(OCCTK::SimpleClamp::BasePlate cppBase) {
 
 	return theBase;
 }
-//把CPP结构体封装为委托结构体
+// 把CPP结构体封装为委托结构体
 static auto getDelegate(OCCTK::SimpleClamp::VerticalPiece cppPiece) {
 	VerticalPiece^ thePiece = gcnew VerticalPiece();
 	switch (cppPiece.dir)
@@ -143,7 +137,7 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPiece cppPiece) {
 	thePiece->end = gcnew Wgp_Pnt(cppPiece.endPoint);
 	return thePiece;
 }
-//把CPP结构体封装为委托结构体
+// 把CPP结构体封装为委托结构体
 static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) {
 	VerticalPlate^ thePlate = gcnew VerticalPlate();
 
@@ -159,6 +153,8 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) {
 		break;
 	}
 	thePlate->location = cppPlate.location;
+	thePlate->XY = cppPlate.XY;
+	thePlate->Z = cppPlate.Z;
 	thePlate->pieces = gcnew List<VerticalPiece^>();
 	for (auto oneCPPPiece : cppPlate.pieces)
 	{
@@ -174,27 +170,7 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) {
 	return thePlate;
 }
 
-#pragma region demo测试用方法
-WTopoDS_Shape^ SimpleClampMaker::TestInputWorkpiece(String^ filePath) {
-	auto cPath = OCCTK::DataExchange::toAsciiString(filePath);
-	TopoDS_Shape InputWorkpiece;
-#pragma region readStep
-
-	//生成一个step模型类
-	STEPControl_Reader reader;
-	//加载一个文件并且返回一个状态枚举值
-	IFSelect_ReturnStatus status = reader.ReadFile(cPath.ToCString());
-	//IFSelect_ReturnStatus status = reader.ReadFile("testWorkPiece.STEP");
-	if (status == IFSelect_RetDone) {
-		reader.TransferRoot(1);
-		InputWorkpiece = reader.Shape(1);
-	}
-
 #pragma endregion
-	return gcnew WTopoDS_Shape(InputWorkpiece);
-}
-#pragma endregion
-
 
 /// <summary>
 /// 非交互的创建底板
@@ -204,10 +180,10 @@ WTopoDS_Shape^ SimpleClampMaker::TestInputWorkpiece(String^ filePath) {
 /// <param name="BasePlateOffsetX"></param>
 /// <param name="BasePlateOffsetY"></param>
 /// <returns></returns>
-BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(WTopoDS_Shape^ InputAISWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
-	TopoDS_Shape InputWorkpiece = *InputAISWorkpiece->GetOCC();
+BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(WTopoDS_Shape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
+	TopoDS_Shape occInputWorkpiece = *InputWorkpiece->GetOCC();
 
-	OCCTK::SimpleClamp::BasePlate theCPPBasePlate = OCCTK::SimpleClamp::MakeBasePlate(InputWorkpiece, OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
+	OCCTK::SimpleClamp::BasePlate theCPPBasePlate = OCCTK::SimpleClamp::MakeBasePlate(occInputWorkpiece, OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
 
 	BasePlate^ theBasePlate = gcnew BasePlate();
 	theBasePlate->shape = gcnew WTopoDS_Shape(theCPPBasePlate.shape);
@@ -232,26 +208,28 @@ BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(WTopoDS_Shape^ InputAISWor
 /// <param name="theClearances"></param>
 /// <param name="theCuttingDistance"></param>
 /// <returns></returns>
-VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WTopoDS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, Direction theDirection, double theLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
+VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WTopoDS_Shape^ InputWorkpiece, BasePlate^ BasePlate, Direction theDirection, double theLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
 {
 	VerticalPlate^ onePlate = gcnew VerticalPlate();
 	OCCTK::SimpleClamp::VerticalPlate cppPlate;
 
-	TopoDS_Shape InputWorkpiece = *InputAISWorkpiece->GetOCC();
+	TopoDS_Shape occInputWorkpiece = *InputWorkpiece->GetOCC();
 	switch (theDirection)
 	{
 	case OCCTK::Laser::Direction::X:
-		cppPlate = OCCTK::SimpleClamp::MakeVerticalPlate(InputWorkpiece, BasePlate->GetOCC(), OCCTK::SimpleClamp::Direction::X, theLocation, theClearances, theMinSupportLen, theCuttingDistance);
+		cppPlate = OCCTK::SimpleClamp::MakeVerticalPlate(occInputWorkpiece, BasePlate->GetOCC(), OCCTK::SimpleClamp::Direction::X, theLocation, theClearances, theMinSupportLen, theCuttingDistance);
 		break;
 	case OCCTK::Laser::Direction::Y:
-		cppPlate = OCCTK::SimpleClamp::MakeVerticalPlate(InputWorkpiece, BasePlate->GetOCC(), OCCTK::SimpleClamp::Direction::Y, theLocation, theClearances, theMinSupportLen, theCuttingDistance);
+		cppPlate = OCCTK::SimpleClamp::MakeVerticalPlate(occInputWorkpiece, BasePlate->GetOCC(), OCCTK::SimpleClamp::Direction::Y, theLocation, theClearances, theMinSupportLen, theCuttingDistance);
 		break;
 	default:
 		break;
 	}
 	//把CPP结构体封装为委托结构体
 	onePlate->direction = theDirection;
-	onePlate->location = theLocation;
+	onePlate->XY = cppPlate.XY;
+	onePlate->Z = cppPlate.Z;
+	onePlate->location = cppPlate.location;
 	onePlate->pieces = gcnew List<VerticalPiece^>();
 	for (auto oneCPPPiece : cppPlate.pieces)
 	{
@@ -285,19 +263,19 @@ VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(WTopoDS_Shape^ InputAISWorkpi
 /// <param name="theMinSupportLen"></param>
 /// <param name="theCuttingDistance"></param>
 /// <returns></returns>
-List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, List<double>^ XLocation, List<double>^ YLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
+List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputWorkpiece, BasePlate^ BasePlate, List<double>^ XLocation, List<double>^ YLocation, double theClearances, double theMinSupportLen, double theCuttingDistance)
 {
 	List<VerticalPlate^>^ Plates = gcnew List<VerticalPlate^>(); // result
-	TopoDS_Shape InputWorkpiece = *InputAISWorkpiece->GetOCC();
+	TopoDS_Shape occInputWorkpiece = *InputWorkpiece->GetOCC();
 
 	for each (double aXLoc in XLocation)
 	{
-		VerticalPlate^ aXPlate = MakeVerticalPlate(InputAISWorkpiece, BasePlate, Direction::X, aXLoc, theClearances, theMinSupportLen, theCuttingDistance);
+		VerticalPlate^ aXPlate = MakeVerticalPlate(InputWorkpiece, BasePlate, Direction::X, aXLoc, theClearances, theMinSupportLen, theCuttingDistance);
 		Plates->Add(aXPlate);
 	}
 	for each (double aYLoc in YLocation)
 	{
-		VerticalPlate^ aYPlate = MakeVerticalPlate(InputAISWorkpiece, BasePlate, Direction::Y, aYLoc, theClearances, theMinSupportLen, theCuttingDistance);
+		VerticalPlate^ aYPlate = MakeVerticalPlate(InputWorkpiece, BasePlate, Direction::Y, aYLoc, theClearances, theMinSupportLen, theCuttingDistance);
 		Plates->Add(aYPlate);
 	}
 	return Plates;
@@ -316,7 +294,7 @@ List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputA
 /// <param name="theMinSupportLen"></param>
 /// <param name="theCuttingDistance"></param>
 /// <returns></returns>
-List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputAISWorkpiece, BasePlate^ BasePlate, int XNum, int YNum, double initialOffsetX, double initialOffsetY, double theClearances, double theMinSupportLen, double theCuttingDistance)
+List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputWorkpiece, BasePlate^ BasePlate, int XNum, int YNum, double initialOffsetX, double initialOffsetY, double theClearances, double theMinSupportLen, double theCuttingDistance)
 {
 	// 计算 XLocation
 	double XLoc = BasePlate->X + initialOffsetX;
@@ -340,7 +318,7 @@ List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputA
 	}
 	YLocation->Add(BasePlate->Y + BasePlate->dY - initialOffsetY);
 
-	return MakeVerticalPlates(InputAISWorkpiece, BasePlate, XLocation, YLocation, theClearances, theMinSupportLen, theCuttingDistance);
+	return MakeVerticalPlates(InputWorkpiece, BasePlate, XLocation, YLocation, theClearances, theMinSupportLen, theCuttingDistance);
 }
 
 /// <summary>
@@ -396,7 +374,11 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 		default:
 			break;
 		}
-		plates->Add(getDelegate(theoccVP));
+		VerticalPlate^ WPlate = getDelegate(theoccVP);
+		WPlate->connectionHeight = theConnectHight;
+		WPlate->connectionThickness = theConnectThickness;
+		WPlate->filletRadius = theFilletRadius;
+		plates->Add(WPlate);
 
 	}
 #pragma endregion
@@ -415,15 +397,21 @@ WTopoDS_Shape^ SimpleClampMaker::DeployPlates(List<VerticalPlate^>^ verticalPlat
 	return gcnew WTopoDS_Shape(result);
 }
 
-bool SimpleClampMaker::SaveSTEP(WTopoDS_Shape^ theShape, String^ filePath)
+void SimpleClampMaker::BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number)
 {
-	TopoDS_Shape theoccShape = *(theShape->GetOCC());
-	auto theStr = OCCTK::DataExchange::toAsciiString(filePath);
-	if (OCCTK::SimpleClamp::saveSTEP(theoccShape, theStr))
-	{
-		return true;
-	}
-	return false;
+	OCCTK::SimpleClamp::VerticalPlate theoccPlate = theVerticalPlate->GetOCC();
+	OCCTK::SimpleClamp::VerticalPlate newplate = OCCTK::SimpleClamp::BrandNumber(theoccPlate, hight, number);
+	VerticalPlate^ WPlate = getDelegate(newplate);
+	WPlate->tagValue = number;
+	theVerticalPlate = WPlate;
+}
+void SimpleClampMaker::BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint)
+{
+	OCCTK::SimpleClamp::VerticalPlate theoccPlate = theVerticalPlate->GetOCC();
+	OCCTK::SimpleClamp::VerticalPlate newplate = OCCTK::SimpleClamp::BrandNumber(theoccPlate, hight, number, *thePoint->GetOCC());
+	VerticalPlate^ WPlate = getDelegate(newplate);
+	WPlate->tagValue = number;
+	theVerticalPlate = WPlate;
 }
 
 

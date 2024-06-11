@@ -158,7 +158,8 @@
     <ClCompile Include="convertChinese.cpp" />
     <ClCompile Include="CSharpViewer.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
-    <ClCompile Include="String.cpp" />
+    <ClCompile Include="STEPExchange.cpp" />
+    <ClCompile Include="StringExchange.cpp" />
     <ClCompile Include="WAIS_InteractiveObject.cpp" />
     <ClCompile Include="WAIS_Shape.cpp" />
     <ClCompile Include="WAIS_ViewCube.cpp" />
@@ -171,10 +172,11 @@
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
+    <ClInclude Include="STEPExchange.h" />
     <ClInclude Include="WAIS_InteractiveObject.h" />
     <ClInclude Include="WAIS_Shape.h" />
     <ClInclude Include="WAIS_ViewCube.h" />
-    <ClInclude Include="String.h" />
+    <ClInclude Include="StringExchange.h" />
     <ClInclude Include="Wgp_Pnt.h" />
     <ClInclude Include="Wgp_Trsf.h" />
     <ClInclude Include="WMakeSimpleClamp.h" />
