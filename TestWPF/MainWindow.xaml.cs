@@ -25,6 +25,7 @@ public partial class MainWindow : Window
 
     private WTopoDS_Shape _InputWorkpiece;
     private WAIS_Shape _AISInputWorkpiece;
+    private bool _useManipulator = false;
     private WTopoDS_Shape InputWorkpiece
     {
         get { return _InputWorkpiece; }
@@ -279,15 +280,16 @@ public partial class MainWindow : Window
 
     private void Test_Button_Click(object sender, RoutedEventArgs e)
     {
-        InputWorkpiece = Viewer.viewer.TestMakeBox().Shape();
-        Viewer.Display(AISInputWorkpiece, true);
+        _AISInputWorkpiece = Viewer.Viewer.TestMakeBox();
+        Viewer.Display(_AISInputWorkpiece, true);
+        Viewer.FitAll();
     }
     #endregion
 
     #region 导入
     private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
         InputWorkpiece = new STEPExchange("mods\\test4Small.STEP").Shape();
@@ -298,7 +300,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         InputWorkpiece = new STEPExchange("mods\\test1.stp").Shape();
         BasePlate = null;
         Viewer.Display(AISInputWorkpiece, true);
@@ -307,7 +309,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         InputWorkpiece = new STEPExchange("mods\\test2.stp").Shape();
         BasePlate = null;
         Viewer.Display(AISInputWorkpiece, true);
@@ -316,7 +318,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_3_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         InputWorkpiece = new STEPExchange("mods\\test3.STEP").Shape();
         BasePlate = null;
         Viewer.Display(AISInputWorkpiece, true);
@@ -325,7 +327,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         InputWorkpiece = new STEPExchange("mods\\test4.stp").Shape();
         BasePlate = null;
         Viewer.Display(AISInputWorkpiece, true);
@@ -334,7 +336,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         InputWorkpiece = new STEPExchange("mods\\test5.stp").Shape();
         BasePlate = null;
         Viewer.Display(AISInputWorkpiece, true);
@@ -368,7 +370,7 @@ public partial class MainWindow : Window
     #endregion
     private void Erase_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseObjects();
+        Viewer.EraseSelect();
     }
 
     #region 监听事件
@@ -593,19 +595,19 @@ public partial class MainWindow : Window
             //显示选中板的坐标
             CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString("F1");
             //清空画布并重新显示
-            Viewer.viewer.EraseAll();
-            Viewer.viewer.Display(AISInputWorkpiece, false);
-            Viewer.viewer.Display(AISBasePlate, false);
+            Viewer.EraseAll();
+            Viewer.Display(AISInputWorkpiece, false);
+            Viewer.Display(AISBasePlate, false);
             if (CurrentPlate.shape != null)
             {
-                Viewer.viewer.Display(AISCurrentPlate, true);
+                Viewer.Display(AISCurrentPlate, true);
                 return;
             }
             foreach (var item in CurrentPlate.pieces)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
             }
-            Viewer.viewer.UpdateCurrentViewer();
+            Viewer.Viewer.UpdateCurrentViewer();
         }
     }
 
@@ -623,20 +625,20 @@ public partial class MainWindow : Window
             //显示选中板的坐标
             CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString("F1");
             //清空画布并重新显示
-            Viewer.viewer.EraseAll();
-            Viewer.viewer.Display(AISInputWorkpiece, false);
+            Viewer.EraseAll();
+            Viewer.Display(AISInputWorkpiece, false);
             WAIS_Shape theshape = new(BasePlate.shape);
-            Viewer.viewer.Display(theshape, false);
+            Viewer.Display(theshape, false);
             if (CurrentPlate.shape != null)
             {
-                Viewer.viewer.Display(AISCurrentPlate, true);
+                Viewer.Display(AISCurrentPlate, true);
                 return;
             }
             foreach (var item in CurrentPlate.pieces)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
             }
-            Viewer.viewer.UpdateCurrentViewer();
+            Viewer.Viewer.UpdateCurrentViewer();
         }
     }
 
@@ -667,14 +669,14 @@ public partial class MainWindow : Window
 
         // 创建要添加到 StackPanel 中的子元素
         Label PieceLabel = new Label();
-        PieceLabel.Content = "位置: " + thePiece.ToString("F2");
+        PieceLabel.Content = "位置: " + thePiece.Location().ToString("F2");
         PieceLabel.HorizontalContentAlignment = HorizontalAlignment.Left; // 设置 Label 的水平内容对齐方式为 Left
 
         Button selectButton = new Button();
         selectButton.Content = "选中";
         selectButton.Click += (sender, e) =>
         {
-            Viewer.viewer.SelectAIS(thePiece.aisShape);
+            Viewer.Viewer.SelectAIS(thePiece.aisShape);
         };
 
         Button deletButton = new Button();
@@ -700,7 +702,7 @@ public partial class MainWindow : Window
             }
             #endregion
             #region 删除AIS对象和piece对象
-            Viewer.viewer.Erase(thePiece.aisShape, true);
+            Viewer.Erase(thePiece.aisShape, true);
             CurrentPlate.pieces.Remove(thePiece);
             #endregion
         };
@@ -715,7 +717,7 @@ public partial class MainWindow : Window
         outerStackPanel.Children.Add(selectButton);
         outerStackPanel.Children.Add(deletButton);
         //显示
-        Viewer.viewer.Display(thePiece.aisShape, false);
+        Viewer.Display(thePiece.aisShape, false);
         return outerStackPanel;
     }
     #endregion
@@ -729,9 +731,9 @@ public partial class MainWindow : Window
             //更新视图显示
             foreach (var item in CurrentPlate.pieces)
             {
-                Viewer.viewer.Erase(item.aisShape, false);
+                Viewer.Erase(item.aisShape, false);
             }
-            Viewer.viewer.UpdateCurrentViewer();
+            Viewer.Viewer.UpdateCurrentViewer();
             // 更新CurrentPlateValueLable的值
             if (double.TryParse(CurrentPlateAddLocation_TextBox.Text, out newValue))
             {
@@ -754,9 +756,9 @@ public partial class MainWindow : Window
             //显示新创建的板
             foreach (var item in CurrentPlate.pieces)
             {
-                Viewer.viewer.Display(item.aisShape, theToUpdateViewer: false);
+                Viewer.Display(item.aisShape, false);
             }
-            Viewer.viewer.UpdateCurrentViewer();
+            Viewer.Viewer.UpdateCurrentViewer();
         }
     }
 
@@ -880,7 +882,7 @@ public partial class MainWindow : Window
         #endregion
         if (InputWorkpiece != null && BasePlate != null)
         {
-            Viewer.viewer.EraseAll();
+            Viewer.EraseAll();
             Viewer.Display(AISInputWorkpiece, true);
             Viewer.Display(AISBasePlate, true);
 
@@ -921,7 +923,7 @@ public partial class MainWindow : Window
     // 创建底板
     private void MakeBasePlate_Button_Clcik(object sender, RoutedEventArgs e)
     {
-        Viewer.viewer.EraseAll();
+        Viewer.EraseAll();
         if (AISInputWorkpiece == null)
         {
             InputWorkpiece = new STEPExchange("mods\\mytest.STEP").Shape();
@@ -944,7 +946,7 @@ public partial class MainWindow : Window
         //重新显示更新后的shape
         if (AISInputWorkpiece != null && AISBasePlate != null)
         {
-            Viewer.viewer.EraseAll();
+            Viewer.EraseAll();
             Viewer.Display(AISInputWorkpiece, true);
             Viewer.Display(AISBasePlate, true);
 
@@ -1025,7 +1027,7 @@ public partial class MainWindow : Window
         //重新显示更新后的shape
         if (InputWorkpiece != null && BasePlate != null)
         {
-            Viewer.viewer.EraseAll();
+            Viewer.EraseAll();
         }
         CombinedFixtureBoard = SimpleClampMaker.DeployPlates(VerticalPlates, BasePlate);
         Viewer.Display(new WAIS_Shape(CombinedFixtureBoard), true);
@@ -1054,7 +1056,7 @@ public partial class MainWindow : Window
         //重新显示更新后的shape
         if (AISInputWorkpiece != null && AISBasePlate != null)
         {
-            Viewer.viewer.EraseAll();
+            Viewer.EraseAll();
             Viewer.Display(AISInputWorkpiece, true);
             Viewer.Display(AISBasePlate, true);
 
@@ -1064,5 +1066,20 @@ public partial class MainWindow : Window
             }
         }
         Viewer.FitAll();
+    }
+
+    private void Manipulator_Button_Click(object sender, RoutedEventArgs e)
+    {
+        _useManipulator = !_useManipulator;
+        Viewer.CurrentActionMode = _useManipulator ? ActionMode.Manipulator : ActionMode.Normal;
+
+        //if (_useManipulator)
+        //{
+        //    Viewer.MyManipulator.Attach(AISInputWorkpiece);
+        //}
+        //else
+        //{
+        //    Viewer.MyManipulator.Detach();
+        //}
     }
 }

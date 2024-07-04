@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <TCollection_ExtendedString.hxx>
 #include <Resource_Unicode.hxx>
+namespace OCCTK {
+namespace Tool {
 
 /// <summary>
 /// 转换中文字符为Unicode
@@ -12,5 +14,8 @@ static TCollection_ExtendedString ConvertChineseToUnicode(const char* chineseStr
 	TCollection_ExtendedString unicodeString("");
 	Resource_Unicode::ConvertGBToUnicode(Standard_CString(chineseString), unicodeString);
 	return unicodeString;
+}
+
+}
 }
 

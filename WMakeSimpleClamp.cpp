@@ -328,13 +328,13 @@ List<VerticalPlate^>^ SimpleClampMaker::MakeVerticalPlates(WTopoDS_Shape^ InputW
 /// <param name="theConnectHight"></param>
 void SimpleClampMaker::SuturePLate(VerticalPlate^% theVerticalPlate, BasePlate^ BasePlate, double theConnectHight)
 {
-	theVerticalPlate->connectionHeight = theConnectHight;
-	OCCTK::SimpleClamp::VerticalPlate theoccVP = theVerticalPlate->GetOCC();
-	OCCTK::SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
-	OCCTK::SimpleClamp::SuturePiece(theoccVP, theoccBP, theConnectHight);
-	//shape写回对象中
-	theVerticalPlate->shape = gcnew WTopoDS_Shape(theoccVP.shape);
-	theVerticalPlate->aisShape = gcnew WAIS_Shape(theoccVP.shape);
+	//theVerticalPlate->connectionHeight = theConnectHight;
+	//OCCTK::SimpleClamp::VerticalPlate theoccVP = theVerticalPlate->GetOCC();
+	//OCCTK::SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
+	//OCCTK::SimpleClamp::SuturePiece(theoccVP, theoccBP, theConnectHight);
+	////shape写回对象中
+	//theVerticalPlate->shape = gcnew WTopoDS_Shape(theoccVP.shape);
+	//theVerticalPlate->aisShape = gcnew WAIS_Shape(theoccVP.shape);
 }
 
 List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verticalPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness, double theFilletRadius)
@@ -359,10 +359,14 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 	int testNum = 0;
 	for each (auto theP in verticalPlates) {
 		auto oneVP = theP;
-		//先完成板的连接
-		SuturePLate(oneVP, BasePlate, theConnectHight);
+		oneVP->connectionHeight = theConnectHight;
+		// 板的连接
 		OCCTK::SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
 		OCCTK::SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
+		OCCTK::SimpleClamp::SuturePiece(theoccVP, theoccBP, theConnectHight);
+		oneVP->shape = gcnew WTopoDS_Shape(theoccVP.shape);
+		oneVP->aisShape = gcnew WAIS_Shape(theoccVP.shape);
+		// 切连接槽
 		switch (oneVP->direction)
 		{
 		case Direction::X:
@@ -379,7 +383,6 @@ List<VerticalPlate^>^ SimpleClampMaker::SuturePLates(List<VerticalPlate^>^ verti
 		WPlate->connectionThickness = theConnectThickness;
 		WPlate->filletRadius = theFilletRadius;
 		plates->Add(WPlate);
-
 	}
 #pragma endregion
 

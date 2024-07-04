@@ -51,6 +51,24 @@
     <Filter Include="头文件\OCCProxy\TopoDS">
       <UniqueIdentifier>{47be04fe-9e35-4d2e-b1dd-fb077ca6de0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\V3d">
+      <UniqueIdentifier>{a23b89b4-8c77-42bd-ad5f-187ef72b63c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\V3d">
+      <UniqueIdentifier>{8cf14add-e5e7-4675-bd97-d332f6c0f54b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\TopAbs">
+      <UniqueIdentifier>{0b354585-3943-4558-8241-aa69bc4f6e60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\TopAbs">
+      <UniqueIdentifier>{708f690a-62d2-4d9d-9191-7c2afd3cb073}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Extension">
+      <UniqueIdentifier>{7ca7f509-81c4-4cd9-ac59-3ac12a460bda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Extension">
+      <UniqueIdentifier>{523322f2-d6ce-46b2-a856-2073723ea9a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -92,6 +110,21 @@
     <ClCompile Include="STEPExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
+    <ClCompile Include="WAIS_Manipulator.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="WV3d_View.cpp">
+      <Filter>源文件\OCCProxy\V3d</Filter>
+    </ClCompile>
+    <ClCompile Include="WAIS_InteractiveContext.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="WTopAbs_ShapeEnum.cpp">
+      <Filter>源文件\OCCProxy\TopAbs</Filter>
+    </ClCompile>
+    <ClCompile Include="WColor.cpp">
+      <Filter>源文件\Extension</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -129,6 +162,21 @@
     </ClInclude>
     <ClInclude Include="STEPExchange.h">
       <Filter>头文件\DataExchange</Filter>
+    </ClInclude>
+    <ClInclude Include="WAIS_Manipulator.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="WV3d_View.h">
+      <Filter>头文件\OCCProxy\V3d</Filter>
+    </ClInclude>
+    <ClInclude Include="WAIS_InteractiveContext.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="WTopAbs_ShapeEnum.h">
+      <Filter>头文件\OCCProxy\TopAbs</Filter>
+    </ClInclude>
+    <ClInclude Include="WColor.h">
+      <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

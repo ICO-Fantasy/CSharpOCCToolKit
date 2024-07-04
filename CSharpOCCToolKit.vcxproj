@@ -102,7 +102,7 @@
       </PrecompiledHeaderFile>
       <WarningLevel>Level1</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(OCC_IncludeTKDebug);$(OCC_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ConformanceMode>true</ConformanceMode>
@@ -160,20 +160,29 @@
     <ClCompile Include="MakeSimpleClamp.cpp" />
     <ClCompile Include="STEPExchange.cpp" />
     <ClCompile Include="StringExchange.cpp" />
+    <ClCompile Include="WColor.cpp" />
+    <ClCompile Include="WTopAbs_ShapeEnum.cpp" />
+    <ClCompile Include="WAIS_InteractiveContext.cpp" />
     <ClCompile Include="WAIS_InteractiveObject.cpp" />
+    <ClCompile Include="WAIS_Manipulator.cpp" />
     <ClCompile Include="WAIS_Shape.cpp" />
     <ClCompile Include="WAIS_ViewCube.cpp" />
     <ClCompile Include="Wgp_Pnt.cpp" />
     <ClCompile Include="Wgp_Trsf.cpp" />
     <ClCompile Include="WMakeSimpleClamp.cpp" />
     <ClCompile Include="WTopoDS_Shape.cpp" />
+    <ClCompile Include="WV3d_View.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="STEPExchange.h" />
+    <ClInclude Include="WColor.h" />
+    <ClInclude Include="WTopAbs_ShapeEnum.h" />
+    <ClInclude Include="WAIS_InteractiveContext.h" />
     <ClInclude Include="WAIS_InteractiveObject.h" />
+    <ClInclude Include="WAIS_Manipulator.h" />
     <ClInclude Include="WAIS_Shape.h" />
     <ClInclude Include="WAIS_ViewCube.h" />
     <ClInclude Include="StringExchange.h" />
@@ -181,6 +190,7 @@
     <ClInclude Include="Wgp_Trsf.h" />
     <ClInclude Include="WMakeSimpleClamp.h" />
     <ClInclude Include="WTopoDS_Shape.h" />
+    <ClInclude Include="WV3d_View.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

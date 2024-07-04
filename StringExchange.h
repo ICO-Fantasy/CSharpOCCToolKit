@@ -5,8 +5,10 @@
 #include <vcclr.h> 
 
 using namespace System;
-namespace OCCTK::DataExchange
+namespace OCCTK {
+namespace DataExchange
 {
+
 /// <summary>
 /// 将C#字符串转换为TCollection_AsciiString字符串
 /// </summary>
@@ -27,4 +29,5 @@ TCollection_AsciiString toAsciiString(System::String^ theString) {
 	return TCollection_AsciiString(aWCharPtr);
 }
 
+}
 }

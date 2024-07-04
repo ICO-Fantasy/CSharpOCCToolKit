@@ -3,15 +3,14 @@
 #include "WTopoDS_Shape.h"
 #include "WAIS_Shape.h"
 #include "Wgp_Pnt.h"
-#include <vcclr.h>
+//#include <vcclr.h>
 
-using namespace  OCCTK::OCC::gp;
-using namespace  OCCTK::OCC::AIS;
-using namespace  OCCTK::OCC::TopoDS;
 using namespace System::Collections::Generic;
-using namespace System;
-
-namespace OCCTK::Laser
+using namespace OCCTK::OCC::gp;
+using namespace OCCTK::OCC::AIS;
+using namespace OCCTK::OCC::TopoDS;
+namespace OCCTK {
+namespace Laser
 {
 public enum class Direction {
 	X,
@@ -37,38 +36,31 @@ public ref struct VerticalPiece {
 	Wgp_Pnt^ start;
 	Wgp_Pnt^ end;
 public:
-	OCCTK::SimpleClamp::VerticalPiece GetOCC();
-	virtual String^ ToString() override {
+	double Location() {
 		if (dir == Direction::X)
 		{
-			String^ piecesStr = String::Format("{0}", start->Y());
+			return start->Y();
+		}
+		if (dir == Direction::Y)
+		{
+			return start->X();
+		}
+		return 0;
+	}
+	OCCTK::SimpleClamp::VerticalPiece GetOCC();
+	virtual System::String^ ToString() override {
+		if (dir == Direction::X)
+		{
+			System::String^ piecesStr = System::String::Format("{0}", start->Y());
 			return piecesStr;
 		}
 		if (dir == Direction::Y)
 		{
-			String^ piecesStr = String::Format("{0}", start->X());
+			System::String^ piecesStr = System::String::Format("{0}", start->X());
 			return piecesStr;
 		}
-		String^ piecesStr = "Unexpected Direction";
+		System::String^ piecesStr = "Unexpected Direction";
 		return piecesStr;
-	}
-	virtual String^ ToString(String^ format) override {
-		if (format == "F2")
-		{
-			if (dir == Direction::X)
-			{
-				String^ piecesStr = String::Format("{0:0.00}", start->Y());;
-				return piecesStr;
-			}
-			if (dir == Direction::Y)
-			{
-				String^ piecesStr = String::Format("{0:0.00}", start->X());;
-				return piecesStr;
-			}
-			String^ piecesStr = "Unexpected Direction";
-			return piecesStr;
-		}
-		return "";
 	}
 };
 public ref struct VerticalPlate {
@@ -102,8 +94,8 @@ public ref struct VerticalPlate {
 public:
 	OCCTK::SimpleClamp::VerticalPlate GetOCC();
 	// 添加 ToString 方法，默认返回1位小数
-	virtual String^ ToString() override {
-		String^ piecesStr = String::Format("{0:0.0}", location);
+	virtual System::String^ ToString() override {
+		System::String^ piecesStr = System::String::Format("{0:0.0}", location);
 		return piecesStr;
 	}
 };
@@ -120,5 +112,6 @@ public:
 	static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number);
 	static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint);
 };
+}
 }
 

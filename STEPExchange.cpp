@@ -4,15 +4,19 @@
 #include "StringExchange.h"
 #include <STEPControl_Writer.hxx>
 
-namespace OCCTK::IO {
+namespace OCCTK {
+namespace IO {
+
 STEPExchange::STEPExchange(WTopoDS_Shape^ theShape)
 {
 	myShape = theShape;
 }
+
 STEPExchange::STEPExchange(String^ filePath)
 {
 	this->ReadFile(filePath);
 }
+
 void STEPExchange::ReadFile(String^ filePath)
 {
 	auto cPath = OCCTK::DataExchange::toAsciiString(filePath);
@@ -53,6 +57,8 @@ bool STEPExchange::SaveFile(String^ filePath)
 		return true;
 	}
 	return false;
+
+}
 
 }
 }

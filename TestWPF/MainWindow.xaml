@@ -160,6 +160,11 @@
                 Content="Erase"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
+            <Button
+                Click="Manipulator_Button_Click"
+                Content="移动工件"
+                Style="{StaticResource dgButton}"
+                Template="{StaticResource buttonTemplate}" />
         </ToolBar>
         <ToolBar Grid.Row="1">
             <System:String xml:space="preserve"> Test </System:String>
@@ -407,7 +412,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Click="SetXYOffset_Button_Click"
-                            Content="固定偏移量"
+                            Content="XY方向板间距"
                             Style="{StaticResource dgButton}"
                             Template="{StaticResource buttonTemplate}" />
 

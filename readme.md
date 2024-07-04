@@ -22,14 +22,18 @@
 
 # OCCView 的交互逻辑
 
-|     交互     | mouseButton | ModifierKeys |  CurrentAction3d   |     Cursor      |
-| :----------: | :---------: | :----------: | :----------------: | :-------------: |
-|     单选     |    Left     |              |    SingleSelect    |  Cursors.Hand   |
-|   连续选择   |    Left     |   Control    |   MultipleSelect   |  Cursors.Hand   |
-|   异或选择   |    Left     |    Shift     |  XORSelect  |                 |
-|     框选     |    Left     |              |   AreaSelect   |  Cursors.Cross  |
-|   连续框选   |    Left     |   Control    | MultipleAreaSelect |  Cursors.Cross  |
-|   异或框选   |    Left     |    Shift     |  XORAreaSelect  |                 |
-| 框选区域放大 |    Right    |    Shift     |    AreaZooming     |   "Zoom.cur"    |
-|     旋转     |   Middle    |              |  DynamicRotation   | "Rotation.cur"  |
-|     平移     |   Middle    |   Control    |   DynamicPanning   | Cursors.SizeAll |
+| 模式        |       交互       | mouseButton | ModifierKeys |      CurrentAction3d      |     Cursor      |
+| ----------- | :--------------: | :---------: | :----------: | :-----------------------: | :-------------: |
+| Normal      |      无操作      |             |              |      Normal_Nothing       | Cursors.Default |
+| Normal      |       单选       |    Left     |              |    Normal_SingleSelect    |  Cursors.Hand   |
+| Normal      |     连续选择     |    Left     |   Control    |   Normal_MultipleSelect   |  Cursors.Hand   |
+| Normal      |     异或选择     |    Left     |    Shift     |     Normal_XORSelect      |  "XOR.cur"   |
+| Normal      |       框选       |    Left     |              |     Normal_AreaSelect     |  Cursors.Cross  |
+| Normal      |     连续框选     |    Left     |   Control    | Normal_MultipleAreaSelect |  Cursors.Cross  |
+| Normal      |     异或框选     |    Left     |    Shift     |   Normal_XORAreaSelect    |   "XOR.cur"   |
+| Normal      |   框选区域放大   |    Right    |    Shift     |    Normal_AreaZooming     |   "Zoom.cur"    |
+| Normal      |       旋转       |   Middle    |              |  Normal_DynamicRotation   | "Rotation.cur"  |
+| Normal      |       平移       |   Middle    |   Control    |   Normal_DynamicPanning   | Cursors.SizeAll |
+| Manipulator |      无操作      |             |              |    Manipulator_Nothing    | Cursors.Default |
+| Manipulator | 单选并应用操作器 |    Left     |              | Manipulator_SingleSelect  |  Cursors.Hand   |
+| Manipulator |    移动操作器    |    Left     |              |  Manipulator_Translation  |  Cursors.Cross  |

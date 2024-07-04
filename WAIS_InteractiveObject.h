@@ -1,19 +1,27 @@
 ﻿#pragma once
 #include <AIS_InteractiveObject.hxx>
 #include <Standard_Handle.hxx>
-//using namespace OCCTK::OCC;
-namespace OCCTK::OCC::AIS {
-ref class InteractiveObject
+//包装C++类到托管类
+#include <NCollection_Haft.h> 
+namespace OCCTK
+{
+namespace OCC
+{
+namespace AIS {
+
+public ref class WAIS_InteractiveObject abstract
 {
 public:
-	InteractiveObject(Handle(Standard_Transient)* nativeHandle);
+	WAIS_InteractiveObject();
+	WAIS_InteractiveObject(Handle(Standard_Transient)nativeHandle);
 	bool IsNull();
-	virtual Handle(Standard_Transient)* GetOCC();
-	//Wgp_Trsf^ GetOCC();
-	System::String^ ObjectID;
-	int ObjectType; // 0 for Point, 1 for Line, 2 for Circle, 3 for Spline
+	// 纯虚函数，必须在派生类中实现
+	virtual Handle(Standard_Transient) GetStd() abstract;
 protected:
-	Handle(Standard_Transient)* nativeHandle;
+	NCollection_Haft<Handle(Standard_Transient)> nativeHandle;
 };
+
+}
+}
 }
 

@@ -5,7 +5,9 @@ using namespace System;
 using namespace OCCTK::OCC::TopoDS;
 
 #pragma once
-namespace OCCTK::IO {
+namespace OCCTK {
+namespace IO {
+
 public ref class STEPExchange
 {
 public:
@@ -17,5 +19,7 @@ public:
 private:
 	WTopoDS_Shape^ myShape;
 };
+
+}
 }
 

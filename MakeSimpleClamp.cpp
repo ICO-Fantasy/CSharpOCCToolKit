@@ -89,7 +89,7 @@ static std::vector<Ring> GetRings(std::vector<localEdge> Edges) {
 		Edges.erase(Edges.begin());
 		AddEdgeToRing(aRing, Edges);
 		Rings.push_back(aRing);
-		//重新初始化ring
+		// 重新初始化 ring
 		aRing.Edges.clear();
 	}
 	return Rings;
@@ -123,9 +123,9 @@ static bool IsLine(Handle(Geom_Curve) theGeomCurve, double Tol) {
 }
 static std::vector<TopoDS_Edge> ConvertBSplineToLine(TopoDS_Edge theBSpline) {
 	std::vector<TopoDS_Edge> results;
-	double anADeflect = 0.25 * 3.1415; // 角度偏差Angular deflection
-	double aCDeflect = 1e-1; // 曲率偏差Curvature deflection
-	//得到Geom_Curve
+	double anADeflect = 0.25 * 3.1415; // 角度偏差 Angular deflection
+	double aCDeflect = 1e-1; // 曲率偏差 Curvature deflection
+	//得到 Geom_Curve
 	BRepAdaptor_Curve aBAC(theBSpline);
 	double first, last;
 	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theBSpline, first, last);
@@ -146,25 +146,8 @@ static std::vector<TopoDS_Edge> ConvertBSplineToLine(TopoDS_Edge theBSpline) {
 	}
 	return results;
 }
-//static Ring ConvertRing(Ring theRing) {
-//	Ring newRing;
-//	for (auto aEdge : theRing.Edges) {
-//		BRepAdaptor_Curve aBAC(aEdge.Edge);
-//		// 曲线类型
-//		if (aBAC.GetType() == GeomAbs_BSplineCurve) {
-//			std::vector<TopoDS_Edge>newEdges = ConvertBSplineToLine(aEdge.Edge);
-//			for (auto newEdge : newEdges) {
-//				newRing.Edges.push_back(localEdge(newEdge));
-//			}
-//		}
-//		else {
-//			auto theType = aBAC.GetType();
-//			newRing.Edges.push_back(aEdge);
-//		}
-//	}
-//	return newRing;
-//}
-//todo 采用直接删去垂直线段（沿Z方向）的逻辑，如果有超过两段线是垂直的，将会出错。
+
+//todo 采用直接删去垂直线段（沿 Z 方向）的逻辑，如果有超过两段线是垂直的，将会出错。
 static std::vector<localEdge>GetConstructionLinesFromRing(Ring theRing) {
 	std::vector<localEdge> results;
 	gp_Dir theZDir = gp_Dir(0, 0, 1);
@@ -191,37 +174,6 @@ static std::vector<localEdge>GetConstructionLinesFromRing(Ring theRing) {
 		if (edgeDir.IsParallel(theZDir, 1e-2) || edgeDir.IsParallel(theMinusZDir, 1e-2)) {
 			addedEdge.push_back(anEdge);
 		}
-		//根据长度找到另一个线（行不通）
-		//else
-		//{
-		//	addedEdge.push_back(anEdge);
-		//	double edgeLen = anEdge.startPoint.Distance(anEdge.endPoint);
-		//	for (size_t j = 0; j < theEdges.size(); j++)
-		//	{
-		//		localEdge otherEdge = theEdges[j];
-		//		if (std::find(addedEdge.begin(), addedEdge.end(), otherEdge) != addedEdge.end())//在数组中
-		//		{
-		//			continue;
-		//		}
-		//		double otherLen = otherEdge.startPoint.Distance(otherEdge.endPoint);
-		//		if (std::fabs(edgeLen - otherLen) < 0.2)
-		//		{
-		//			gp_Pnt middlePoint1 = gp_Pnt((anEdge.startPoint.XYZ() + anEdge.endPoint.XYZ()) / 2);
-		//			gp_Pnt middlePoint2 = gp_Pnt((otherEdge.startPoint.XYZ() + otherEdge.endPoint.XYZ()) / 2);
-		//			if (middlePoint1.Z() < middlePoint2.Z())
-		//			{
-		//				results.push_back(anEdge);
-		//			}
-		//			else
-		//			{
-		//				results.push_back(otherEdge);
-		//			}
-		//			//找到了对应的边，跳出循环
-		//			addedEdge.push_back(otherEdge);
-		//			break;
-		//		}
-		//	}
-		//}
 
 		//根据两端点找到较低的边
 		else {
@@ -294,6 +246,10 @@ static bool MoreEdge(gp_Pnt& startPoint, gp_Pnt& endPoint, std::vector<localEdge
 }
 
 static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
+	if (theRing.Edges.size() < 2)
+	{
+		return theRing.Edges;
+	}
 	std::vector<localEdge> firstEdges, secondEdges;
 	std::vector<localEdge> restEdges;
 	std::vector<localEdge> removedEdges;
@@ -306,7 +262,7 @@ static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
 			removedEdges.push_back(theEdge);
 		}
 	}
-	// 把Edge按坐标排序
+	// 把 Edge 按坐标排序
 	if (theDirection == X)
 	{
 		std::sort(removedEdges.begin(), removedEdges.end(), [](const localEdge& a, const localEdge& b) {
@@ -341,7 +297,7 @@ static std::vector<localEdge> SplitRing(Ring theRing, Direction theDirection) {
 		}
 	}
 	// 比较高度
-	//! 使用两端的Z值比较可能不准确（由于斜着的边缘）
+	//! 使用两端的 Z 值比较可能不准确（由于斜着的边缘）
 	for (size_t i = 1; i < firstEdges.size() - 1; ++i) {
 		const localEdge& firstEdge = firstEdges[i];
 		bool isSame = false;
@@ -427,7 +383,7 @@ static TopoDS_Shape MakeConnectionPiece(double theX, double theY, double theZ, d
 #pragma region 生成底板
 
 /// <summary>
-/// 根据工件的AABB包围盒得到两个角点（Z值为0）
+/// 根据工件的 AABB 包围盒得到两个角点（Z 值为 0）
 /// </summary>
 /// <param name="theShape"></param>
 /// <returns></returns>
@@ -443,7 +399,7 @@ static void GetCorners(TopoDS_Shape theShape, BasePlate& theBasePlate) {
 	theBasePlate.dY = ymax - ymin;
 }
 /// <summary>
-/// 根据两个角点和Z值创建底板
+/// 根据两个角点和 Z 值创建底板
 /// </summary>
 /// <param name="theShape"></param>
 /// <param name="theZ"></param>
@@ -527,7 +483,7 @@ static TopoDS_Shape MakeSection(TopoDS_Face theFace, TopoDS_Shape theShape) {
 static std::vector<VerticalPiece> MakeVerticalPieceWithSection(TopoDS_Shape theSection, Direction theDirection) {
 	std::vector<VerticalPiece>result;
 #pragma region 得到原始构造线
-	//!首先判断有几个环，对环进行处理
+	//! 首先判断有几个环，对环进行处理
 	std::vector<localEdge>TempEdges;
 	std::vector<Ring>Rings;
 	TopExp_Explorer aEdgeExp = TopExp_Explorer(theSection, TopAbs_EDGE);
@@ -560,7 +516,7 @@ static std::vector<VerticalPiece> MakeVerticalPieceWithSection(TopoDS_Shape theS
 }
 
 /// <summary>
-/// 更新Piece从线得到板的形状
+/// 更新 Piece 从线得到板的形状
 /// </summary>
 /// <param name="thePiece"></param>
 /// <param name="theZ"></param>
@@ -608,7 +564,7 @@ static TopoDS_Edge TrimEdge(TopoDS_Edge theOriginEdge, gp_Pnt p1, gp_Pnt p2) {
 	// 有时底层曲线没有创建，要手动创建
 	if (aCurve.IsNull())
 	{
-		BRepLib::BuildCurves3d(theOriginEdge, 1.0e-5, GeomAbs_C1);//创建曲线(一阶导数的连续性)
+		BRepLib::BuildCurves3d(theOriginEdge, 1.0e-5, GeomAbs_C1);//创建曲线 (一阶导数的连续性)
 		aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
 	}
 	if (!aCurve.IsNull()) {
@@ -644,7 +600,7 @@ static std::vector<VerticalPiece> TrimEdgeEnds(std::vector<VerticalPiece> thePie
 	for (VerticalPiece& aPiece : thePieces) {
 		if (aPiece.Length() < theClearances * 2)
 		{
-			// 去掉修剪后长度小于0的边
+			// 去掉修剪后长度小于 0 的边
 			continue;
 		}
 		gp_Pnt p1 = aPiece.startPoint;
@@ -917,7 +873,7 @@ static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double
 /// <param name="theDirection"></param>
 /// <param name="VerticalPlateClearances"></param>
 static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePieces, double theSupportLen, double theCuttingDistance) {
-	//如果两个参数值均为0，则不处理
+	//如果两个参数值均为 0，则不处理
 	if (theSupportLen + theCuttingDistance == 0) {
 		return thePieces;
 	}
@@ -949,7 +905,7 @@ static std::vector<VerticalPiece> CutLongEdge(std::vector<VerticalPiece>& thePie
 }
 
 /// <summary>
-/// 生成Pieces
+/// 生成 Pieces
 /// </summary>
 /// <param name="theWorkpiece"></param>
 /// <param name="theBasePlate"></param>
@@ -985,10 +941,10 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	std::vector<VerticalPiece> theCuttedPieces = CutLongEdge(theRemovedPieces, theMinSupportLen, theCutDistance);
 	if (theCuttedPieces.size() == 0)
 	{
-		//# 如果最终不产生结果，则返回原始Piece
+		//# 如果最终不产生结果，则返回原始 Piece
 		theCuttedPieces = theOriginPieces;
 	}
-	//前面都是在操作Edge，这一步需要把Edge生成为Piece片体形状
+	//前面都是在操作 Edge，这一步需要把 Edge 生成为 Piece 片体形状
 	for (auto& aP : theCuttedPieces) {
 		MakePieceFromEdge(aP, theBasePlate.Z);
 		onePlate.pieces.push_back(aP);
@@ -1005,7 +961,7 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 /// <param name="theZ"></param>
 /// <returns></returns>
 void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight) {
-	//! 板宽度不包含Offset的部分
+	//! 板宽度不包含 Offset 的部分
 	double Z = theBasePlate.Z;
 	double ZC = theBasePlate.Z + theConnectionHight;
 	gp_Pnt start_p0, start_p1, start_p2, end_p0, end_p1;
@@ -1017,7 +973,7 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 	// 线段生成逻辑见飞书
 	if (thePlate.dir == X)
 	{
-		/// 首先对输入的Pieces排序
+		/// 首先对输入的 Pieces 排序
 		for (VerticalPiece onePiece : thePlate.pieces) {
 			thePieces.push_back(onePiece);
 		}
@@ -1028,11 +984,11 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 		// 首段点
 		start_p0 = gp_Pnt(thePlate.location, theBasePlate.Y, Z);
 		start_p1 = gp_Pnt(thePlate.location, theBasePlate.Y, ZC);
-		// start_p2为首个Edge的start.X&Y
+		// start_p2 为首个 Edge 的 start.X&Y
 		start_pnt = thePieces.front().startPoint;
 		start_p2 = gp_Pnt(thePlate.location, start_pnt.Y(), ZC);
 		// 末段点
-		// end_p0为最后一个Edge的End.X&Y
+		// end_p0 为最后一个 Edge 的 End.X&Y
 		end_pnt = thePieces.back().endPoint;
 		end_p0 = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, ZC);
 		end_p1 = gp_Pnt(thePlate.location, theBasePlate.Y + theBasePlate.dY, Z);
@@ -1058,12 +1014,12 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 			p1 = gp_Pnt(thePlate.location, onePiece.startPoint.Y(), ZC);
 			p2 = onePiece.startPoint;
 			p3 = onePiece.endPoint;
-			//更新theY
+			//更新 theY
 			p4 = gp_Pnt(thePlate.location, p3.Y(), ZC);
 			p5 = gp_Pnt(thePlate.location, nextPnt.Y(), ZC);
 			// 创建边
 			BRepBuilderAPI_MakeEdge l1(p1, p2);
-			// l2为Edge
+			// l2 为 Edge
 			BRepBuilderAPI_MakeEdge l3(p3, p4);
 			BRepBuilderAPI_MakeEdge l4(p4, p5);
 			wire.Add(l1);
@@ -1080,7 +1036,7 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 	}
 	if (thePlate.dir == Y)
 	{
-		/// 首先对输入的Pieces排序
+		/// 首先对输入的 Pieces 排序
 		for (VerticalPiece onePiece : thePlate.pieces) {
 			thePieces.push_back(onePiece);
 		}
@@ -1091,11 +1047,11 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 		// 首段点
 		start_p0 = gp_Pnt(theBasePlate.X, thePlate.location, Z);
 		start_p1 = gp_Pnt(theBasePlate.X, thePlate.location, ZC);
-		// start_p2为首个Edge的start.X&Y
+		// start_p2 为首个 Edge 的 start.X&Y
 		start_pnt = thePieces.front().startPoint;
 		start_p2 = gp_Pnt(start_pnt.X(), thePlate.location, ZC);
 		// 末段点
-		// end_p0为最后一个Edge的End.X&Y
+		// end_p0 为最后一个 Edge 的 End.X&Y
 		end_pnt = thePieces.back().endPoint;
 		end_p0 = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, ZC);
 		end_p1 = gp_Pnt(theBasePlate.X + theBasePlate.dX, thePlate.location, Z);
@@ -1121,12 +1077,12 @@ void SuturePiece(VerticalPlate& thePlate, BasePlate theBasePlate, double theConn
 			p1 = gp_Pnt(onePiece.startPoint.X(), thePlate.location, ZC);
 			p2 = onePiece.startPoint;
 			p3 = onePiece.endPoint;
-			//更新theY
+			//更新 theY
 			p4 = gp_Pnt(p3.X(), thePlate.location, ZC);
 			p5 = gp_Pnt(nextPnt.X(), thePlate.location, ZC);
 			// 创建边
 			BRepBuilderAPI_MakeEdge l1(p1, p2);
-			// l2为Edge
+			// l2 为 Edge
 			BRepBuilderAPI_MakeEdge l3(p3, p4);
 			BRepBuilderAPI_MakeEdge l4(p4, p5);
 			wire.Add(l1);
@@ -1161,7 +1117,7 @@ void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<doubl
 	double offset = 0.9;
 	if (thePlate.dir == X)
 	{
-		// 先在Y平面创建一个槽(从下往上）
+		// 先在 Y 平面创建一个槽 (从下往上）
 		gp_Pnt p1(thePlate.location, -theConnectWidth / 2, theBasePlate.Z - 999);
 		gp_Pnt p3(thePlate.location, theConnectWidth / 2, theBasePlate.Z + (theConnectionHight / 2) * (2 - offset));
 		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::X, theFilletRadius);
@@ -1169,34 +1125,34 @@ void Slotting(VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<doubl
 		// 在每个位置切槽
 		for (double aloc : theLocations) {
 			gp_Trsf move;
-			move.SetTranslation(gp_Vec(0, aloc, 0)); // 沿着Y
+			move.SetTranslation(gp_Vec(0, aloc, 0)); // 沿着 Y
 			BRepBuilderAPI_Transform transform(theSlot, move);
 			transform.Build();
 			TopoDS_Shape localSlot = transform.Shape();
-			//更新shape
+			//更新 shape
 			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
 		}
 	}
 	if (thePlate.dir == Y)
 	{
-		// 先在X平面创建一个槽(从上往下）
+		// 先在 X 平面创建一个槽 (从上往下）
 		gp_Pnt p1(-theConnectWidth / 2, thePlate.location, theBasePlate.Z + (theConnectionHight / 2) * offset);
 		gp_Pnt p3(theConnectWidth / 2, thePlate.location, theBasePlate.Z + 99999);
 		TopoDS_Face theSlot = MakePiece(p1, p3, Direction::Y, theFilletRadius);
 		// 在每个位置切槽
 		for (double aloc : theLocations) {
 			gp_Trsf move;
-			move.SetTranslation(gp_Vec(aloc, 0, 0)); // 沿着X
+			move.SetTranslation(gp_Vec(aloc, 0, 0)); // 沿着 X
 			BRepBuilderAPI_Transform transform(theSlot, move);
 			transform.Build();
 			TopoDS_Shape localSlot = transform.Shape();
-			//更新shape
+			//更新 shape
 			thePlate.shape = BRepAlgoAPI_Cut(thePlate.shape, localSlot).Shape();
 		}
 	}
 }
 
-// 构建数字Face
+// 构建数字 Face
 static TopoDS_Face MakeNumber(int number, Direction dir) {
 	std::map<int, std::vector<std::array<double, 2>>> numberMap;
 	numberMap[1] = {
@@ -1382,6 +1338,7 @@ static TopoDS_Face MakeNumber(int number, Direction dir) {
 		BRepBuilderAPI_MakeFace faceMaker(wireMaker.Wire());
 		return faceMaker.Face();
 	}
+	throw std::runtime_error("Unexpected Direction");
 }
 // 拆分多位整数为单位数
 static std::vector<int> GetDigitValues(int number) {
@@ -1444,7 +1401,7 @@ VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number)
 	return newPlate;
 }
 /// <summary>
-/// 在板上烙印数字，数字左下角位于thePoint的位置
+/// 在板上烙印数字，数字左下角位于 thePoint 的位置
 /// </summary>
 /// <param name="thePlate"></param>
 /// <param name="hight"></param>
@@ -1530,7 +1487,7 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> the
 			gp_Trsf vp_trsf = gp_Trsf();
 			vp_toOrigin.SetTranslationPart(gp_Vec(-theVP.location, -Y, -Z));
 			theVP.shape = theVP.shape.Located(TopLoc_Location(vp_toOrigin));
-			//! 注意,齐次变换是先旋转后平移的
+			//! 注意，齐次变换是先旋转后平移的
 			gp_Quaternion vp_quat = gp_Quaternion();
 			vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, -M_PI / 2, 0);
 			vp_trsf.SetRotationPart(vp_quat);
@@ -1547,7 +1504,7 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> the
 			gp_Trsf vp_trsf = gp_Trsf();
 			vp_toOrigin.SetTranslationPart(gp_Vec(-X, -theVP.location, -Z));
 			theVP.shape = theVP.shape.Located(TopLoc_Location(vp_toOrigin));
-			//! 注意,齐次变换是先旋转后平移的
+			//! 注意，齐次变换是先旋转后平移的
 			gp_Quaternion vp_quat = gp_Quaternion();
 			vp_quat.SetEulerAngles(gp_Extrinsic_ZYX, 0, 0, M_PI / 2);
 			vp_trsf.SetRotationPart(vp_quat);
