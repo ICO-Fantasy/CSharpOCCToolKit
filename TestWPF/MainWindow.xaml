@@ -404,7 +404,7 @@
                             Click="SetXYNum_Button_Click"
                             Content="XY方向数量"
                             Style="{StaticResource dgButton}"
-                            Template="{StaticResource buttonTemplate}" />
+                            Template="{StaticResource buttonTemplate}" VerticalAlignment="Top" />
                         <Button
                             x:Name="SetXYOffset_Button"
                             Grid.Column="1"

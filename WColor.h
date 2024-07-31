@@ -5,9 +5,9 @@
 namespace OCCTK {
 namespace Ex {
 
-public ref class WColor
-{
+public ref class WColor {
 public:
+	WColor() { myColor() = Quantity_Color(Quantity_NOC_GRAY); }
 	WColor(int R, int G, int B) {
 		Quantity_Color theColor((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
 		myColor() = theColor;

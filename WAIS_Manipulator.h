@@ -15,6 +15,15 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS
 {
+
+public enum class WAIS_ManipulatorMode {
+	None = AIS_ManipulatorMode::AIS_MM_None,
+	Translation = AIS_ManipulatorMode::AIS_MM_Translation,
+	Rotation = AIS_ManipulatorMode::AIS_MM_Rotation,
+	Scaling = AIS_ManipulatorMode::AIS_MM_Scaling,
+	TranslationPlane = AIS_ManipulatorMode::AIS_MM_TranslationPlane,
+};
+
 public ref class WAIS_Manipulator : public WAIS_InteractiveObject
 {
 public:
@@ -30,12 +39,16 @@ public:
 	void StopTransform();
 	void StopTransform(bool thetoApply);
 	void Attach(WAIS_Shape^ theAIS);
+	void Attach(WAIS_Shape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes);
 	void Detach();
 	void DeactivateCurrentMode();
+	void SetPart(WAIS_ManipulatorMode^ theMode, bool isEnable);
+	void EnableMode(WAIS_ManipulatorMode^ theMode);
 	virtual Handle(Standard_Transient) GetStd() override;
 private:
 	NCollection_Haft<Handle(AIS_Manipulator)> _pManipulator;
 };
+
 }
 }
 }

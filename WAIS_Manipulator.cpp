@@ -63,12 +63,12 @@ bool WAIS_Manipulator::IsAttached()
 
 void WAIS_Manipulator::StartTransform(double theX, double theY, WV3d_View^ theView)
 {
-	_pManipulator()->StartTransform(theX, theY, *theView->getOCC());
+	_pManipulator()->StartTransform(theX, theY, theView->getOCC());
 }
 
 void WAIS_Manipulator::Transform(double theX, double theY, WV3d_View^ theView)
 {
-	_pManipulator()->Transform(theX, theY, *theView->getOCC());
+	_pManipulator()->Transform(theX, theY, theView->getOCC());
 }
 
 void WAIS_Manipulator::StopTransform(bool thetoApply)
@@ -83,11 +83,20 @@ void WAIS_Manipulator::StopTransform()
 
 void WAIS_Manipulator::Attach(WAIS_Shape^ theAIS)
 {
+	_pManipulator()->Attach(theAIS->GetOCC());
+	// 让操作器自动激活
+	_pManipulator()->SetModeActivationOnDetection(true);
+}
+
+void WAIS_Manipulator::Attach(WAIS_Shape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes)
+{
 	AIS_Manipulator::OptionsForAttach anOptions;
-	anOptions.SetAdjustPosition(false);
-	anOptions.SetAdjustSize(false);
-	anOptions.SetEnableModes(false);
+	anOptions.SetAdjustPosition(adjustPosition);
+	anOptions.SetAdjustSize(adjustSize);
+	anOptions.SetEnableModes(enableModes);
 	_pManipulator()->Attach(theAIS->GetOCC(), anOptions);
+	// 让操作器自动激活
+	_pManipulator()->SetModeActivationOnDetection(true);
 }
 
 void WAIS_Manipulator::Detach()
@@ -98,6 +107,18 @@ void WAIS_Manipulator::Detach()
 void WAIS_Manipulator::DeactivateCurrentMode()
 {
 	_pManipulator()->DeactivateCurrentMode();
+}
+
+// 设置显示哪个部分,默认全部显示
+void WAIS_Manipulator::SetPart(WAIS_ManipulatorMode^ theMode, bool isEnable)
+{
+	_pManipulator()->SetPart(AIS_ManipulatorMode((int)*theMode), isEnable);
+}
+
+// 开启操作器模式
+void WAIS_Manipulator::EnableMode(WAIS_ManipulatorMode^ theMode)
+{
+	_pManipulator()->EnableMode(AIS_ManipulatorMode((int)*theMode));
 }
 
 Handle(Standard_Transient) WAIS_Manipulator::GetStd()

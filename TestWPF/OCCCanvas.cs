@@ -51,6 +51,33 @@ public enum ViewOrientation
     Right,
 }
 
+public class SingleManipulator
+{
+    // 私有静态变量用于保存单例实例
+    private static WAIS_Manipulator _instance;
+    private static readonly object _lock = new object();
+
+    // 私有构造函数，防止外部实例化
+    private SingleManipulator() { }
+
+    // 公共静态属性，用于访问单例实例
+    public static WAIS_Manipulator Instance
+    {
+        get
+        {
+            // 确保线程安全
+            lock (_lock)
+            {
+                if (_instance == null)
+                {
+                    _instance = new WAIS_Manipulator();
+                }
+                return _instance;
+            }
+        }
+    }
+}
+
 public class OCCCanvas : Form
 {
     #region 属性
@@ -91,6 +118,11 @@ public class OCCCanvas : Form
     /// C++委托的交互对象管理器
     /// </summary>
     public WAIS_InteractiveContext InteractiveContext { get; set; }
+
+    /// <summary>
+    /// AIS操作器
+    /// </summary>
+    private WAIS_Manipulator myManipulator = SingleManipulator.Instance;
 
     /// <summary>
     /// 重设滚轮光标计时器
@@ -179,7 +211,7 @@ public class OCCCanvas : Form
     /// <summary>
     /// 隐藏线显示模式
     /// </summary>
-    public bool degenerateMode { get; private set; }
+    public bool DegenerateMode { get; private set; }
 
     /// <summary>
     /// 框线模式
@@ -229,15 +261,17 @@ public class OCCCanvas : Form
         }
         InteractiveContext = Viewer.CSharpAISContext;
         Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
+        #region 设置鼠标样式
         CursorResetTimer = new System.Windows.Forms.Timer();
         CursorResetTimer.Interval = 500; // 设置计时器间隔为100毫秒
         CursorResetTimer.Tick += CursorResetTimer_Tick; // 绑定计时器的Tick事件处理方法
+        #endregion
         CurrentActionMode = ActionMode.Normal;
         CurrentAction3d = Action3d.Normal_Nothing;
         IsActivateGrid = false;
 
         IsDrawRect = false;
-        degenerateMode = true;
+        DegenerateMode = true;
         Viewer.DisplayViewCube(5);
         this.SetDisplayMode(DisplayMode.Shading);
         this.SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
@@ -245,9 +279,10 @@ public class OCCCanvas : Form
 
     private void InitializeComponent()
     {
+        // 标题栏中不显示控制框的值
         ControlBox = false;
+        // 设置不为顶层窗口
         TopLevel = false;
-
         this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
 
         SizeChanged += new System.EventHandler(OnSizeChanged);
@@ -256,8 +291,11 @@ public class OCCCanvas : Form
         MouseDown += new System.Windows.Forms.MouseEventHandler(OnMouseDown);
         MouseUp += new System.Windows.Forms.MouseEventHandler(OnMouseUp);
         MouseMove += new System.Windows.Forms.MouseEventHandler(OnMouseMove);
-        // Form基类中包含OnMouseWheel方法，不需要在此注册
-        //KeyDown += new System.Windows.Forms.KeyEventHandler(OnKeyDown);
+        MouseWheel += new System.Windows.Forms.MouseEventHandler(OnMouseWheel);
+
+        //todo 键盘事件未生效
+        KeyPreview = true;
+        KeyDown += new System.Windows.Forms.KeyEventHandler(OnKeyDown);
     }
 
     /// <summary>
@@ -318,17 +356,18 @@ public class OCCCanvas : Form
         {
             case ActionMode.Normal:
             {
-                //默认设置为点击，如果鼠标移动了会替换掉默认模式
+                // 默认设置为点击，如果鼠标移动了会替换掉默认模式
                 CurrentAction3d = Action3d.Normal_SingleSelect;
                 break;
             }
             case ActionMode.Manipulator:
             {
-                //if (MyManipulator.HasActiveMode())
-                //{
-                //    MyManipulator.StartTransform(mouseDownX, mouseDownY, Viewer.GetMainView());
-                //}
-                CurrentAction3d = Action3d.Manipulator_SingleSelect;
+                if (myManipulator.HasActiveMode())
+                {
+                    // 记录开始变换的点
+                    myManipulator.StartTransform(mouseDownX, mouseDownY, Viewer.GetMainView());
+                    CurrentAction3d = Action3d.Manipulator_SingleSelect;
+                }
                 break;
             }
         }
@@ -384,7 +423,6 @@ public class OCCCanvas : Form
                         Viewer.Rotation(e.X, e.Y);
                         Viewer.RedrawView();
                         CurrentAction3d = Action3d.Normal_DynamicRotation;
-                        Cursor = new Cursor("rotation.cur");
                     }
                     else if (modifiers == Keys.Control)
                     {
@@ -394,7 +432,6 @@ public class OCCCanvas : Form
                         mouseDownX = mouseCurrentX;
                         mouseDownY = mouseCurrentY;
                         CurrentAction3d = Action3d.Normal_DynamicPanning;
-                        Cursor = Cursors.SizeAll;
                     }
                 }
                 else
@@ -414,13 +451,13 @@ public class OCCCanvas : Form
                 { }
                 else if (mouseButton == MouseButtons.Left)
                 {
-                    CurrentAction3d = Action3d.Manipulator_Translation;
-                    //// 操作器执行移动
-                    //MyManipulator.Transform(
-                    //    mouseCurrentX - mouseDownX,
-                    //    mouseDownY - mouseCurrentY,
-                    //    Viewer.GetMainView()
-                    //);
+                    if (myManipulator.HasActiveMode())
+                    {
+                        // 操作器执行移动
+                        myManipulator.Transform(mouseCurrentX, mouseCurrentY, Viewer.GetMainView());
+                        Viewer.RedrawView();
+                        CurrentAction3d = Action3d.Manipulator_Translation;
+                    }
                 }
                 else
                 {
@@ -520,35 +557,17 @@ public class OCCCanvas : Form
                 switch (CurrentAction3d)
                 {
                     case Action3d.Manipulator_SingleSelect:
-                        // 单选并绑定
+                        // 单选并将操作器到添加到选中
                         Viewer.Select();
-                        //if (Viewer.IsSelected())
-                        //{
-                        //    if (!MyManipulator.IsAttached())
-                        //    {
-                        //        var a = Viewer.GetSelectedAIS();
-                        //        Debug.WriteLine(a.HasInteractiveContext());
-                        //        // 如果选中则绑定
-                        //        MyManipulator.Attach(Viewer.GetSelectedAIS());
-                        //        Debug.WriteLine(a.HasInteractiveContext());
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    if (MyManipulator.IsAttached())
-                        //    {
-                        //        // 如果选中则绑定
-                        //        MyManipulator.Detach();
-                        //    }
-                        //    // 选中空白，则取消绑定
-                        //}
+                        InteractiveContext.InitSelected();
+                        while (InteractiveContext.MoreSelected())
+                        {
+                            var a = InteractiveContext.SelectedInteractive();
+                        }
                         break;
                     case Action3d.Manipulator_Translation:
-                        // 停止移动
-                        //if (MyManipulator.HasActiveMode())
-                        //{
-                        //    MyManipulator.StopTransform();
-                        //}
+                        // 结束拖动
+                        myManipulator.StopTransform();
                         break;
                     case Action3d.Manipulator_Nothing:
                         break;
@@ -565,9 +584,8 @@ public class OCCCanvas : Form
         Cursor = Cursors.Default;
     }
 
-    protected override void OnMouseWheel(MouseEventArgs e)
+    private void OnMouseWheel(object sender, MouseEventArgs e)
     {
-        base.OnMouseWheel(e);
         Keys modifiers = ModifierKeys;
         // 处理鼠标滚轮事件
         int delta = e.Delta; // 获取鼠标滚轮滚动的增量
@@ -602,15 +620,13 @@ public class OCCCanvas : Form
         CursorResetTimer.Start();
     }
 
-    //无效设置
-    //private void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-    //{
-    //    if (e.KeyCode == Keys.F)
-    //    {
-    //        this.FitAll();
-    //    }
-    //}
-
+    private void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.F)
+        {
+            this.FitAll();
+        }
+    }
 
     public interface ICanvasInteraction
     {
@@ -749,7 +765,7 @@ public class OCCCanvas : Form
     public void SetHidden(bool theMode)
     {
         Viewer.SetDegenerateMode(theMode);
-        degenerateMode = theMode;
+        DegenerateMode = theMode;
     }
 
     /// <summary>
@@ -892,6 +908,13 @@ public class OCCCanvas : Form
         WAIS_Shape result = Viewer.GetSelectedAIS();
         return result;
     }
+
+    public void Attach(WAIS_Shape theAIS)
+    {
+        myManipulator.Attach(theAIS);
+        CurrentActionMode = ActionMode.Manipulator;
+    }
+
     #endregion
     #region 其它设置
 

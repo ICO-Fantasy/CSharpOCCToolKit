@@ -160,7 +160,10 @@
     <ClCompile Include="MakeSimpleClamp.cpp" />
     <ClCompile Include="STEPExchange.cpp" />
     <ClCompile Include="StringExchange.cpp" />
+    <ClCompile Include="WBaseObject.cpp" />
+    <ClCompile Include="WBRepPrimAPI_MakeBox.cpp" />
     <ClCompile Include="WColor.cpp" />
+    <ClCompile Include="Wgp_Dir.cpp" />
     <ClCompile Include="WTopAbs_ShapeEnum.cpp" />
     <ClCompile Include="WAIS_InteractiveContext.cpp" />
     <ClCompile Include="WAIS_InteractiveObject.cpp" />
@@ -178,7 +181,10 @@
     <ClInclude Include="CSharpViewer.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="STEPExchange.h" />
+    <ClInclude Include="WBaseObject.h" />
+    <ClInclude Include="WBRepPrimAPI_MakeBox.h" />
     <ClInclude Include="WColor.h" />
+    <ClInclude Include="Wgp_Dir.h" />
     <ClInclude Include="WTopAbs_ShapeEnum.h" />
     <ClInclude Include="WAIS_InteractiveContext.h" />
     <ClInclude Include="WAIS_InteractiveObject.h" />

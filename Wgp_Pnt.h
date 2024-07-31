@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include <gp_Pnt.hxx>
 
-namespace OCCTK::OCC::gp
-{
+namespace OCCTK {
+namespace OCC {
+namespace gp {
+
 public ref class Wgp_Pnt {
 public:
 	Wgp_Pnt();
@@ -16,6 +18,7 @@ public:
 private:
 	gp_Pnt* _nativeHandle;
 };
+
 }
-
-
+}
+}

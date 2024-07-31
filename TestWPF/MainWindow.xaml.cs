@@ -7,14 +7,46 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using System.Windows.Forms.VisualStyles;
+using Microsoft.Windows.Themes;
+using OCCTK.Ex;
 using OCCTK.IO;
 using OCCTK.Laser;
 using OCCTK.OCC.AIS;
+using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.TopoDS;
 using OCCViewForm;
 
 namespace TestWPF;
+
+public class InputWorkpiece
+{
+    public InputWorkpiece(WTopoDS_Shape theShape)
+    {
+        _InputWorkpiece = theShape;
+        _AISInputWorkpiece = new WAIS_Shape(theShape);
+    }
+
+    private WTopoDS_Shape _InputWorkpiece;
+    private WAIS_Shape _AISInputWorkpiece;
+    public WTopoDS_Shape Shape
+    {
+        get { return _InputWorkpiece; }
+    }
+    public WAIS_Shape AIS
+    {
+        get { return _AISInputWorkpiece; }
+    }
+}
+
+/// <summary>
+/// 创建竖板的模式 Vertical Plate Creation Mode
+/// </summary>
+public enum VPCMode
+{
+    Num,
+    Offset,
+}
 
 /// <summary>
 /// 交互逻辑 MainWindow.xaml
@@ -22,65 +54,47 @@ namespace TestWPF;
 public partial class MainWindow : Window
 {
     private OCCCanvas Viewer;
+    private WAIS_InteractiveContext AISContext;
 
-    private WTopoDS_Shape _InputWorkpiece;
-    private WAIS_Shape _AISInputWorkpiece;
     private bool _useManipulator = false;
-    private WTopoDS_Shape InputWorkpiece
-    {
-        get { return _InputWorkpiece; }
-        set
-        {
-            _InputWorkpiece = value;
-            _AISInputWorkpiece = new WAIS_Shape(value);
-        }
-    }
-    public WAIS_Shape AISInputWorkpiece
-    {
-        get
-        {
-            var a = _AISInputWorkpiece;
-            a.SetColor(125, 125, 125);
-            a.SetTransparency(0.4);
-            return a;
-        }
-        set
-        {
-            _AISInputWorkpiece = value;
-            _InputWorkpiece = value.Shape();
-        }
-    }
 
-    public WAIS_Shape AISBasePlate
-    {
-        get
-        {
-            WAIS_Shape a = new WAIS_Shape(BasePlate.shape);
-            a.SetColor(0, 0, 255);
-            a.SetTransparency(0.4);
-            return a;
-        }
-    }
-
-    public WAIS_Shape AISCurrentPlate
-    {
-        get
-        {
-            WAIS_Shape a = new WAIS_Shape(CurrentPlate.shape);
-            if (CurrentPlate.direction == Direction.X)
-            {
-                a.SetColor(255, 0, 0);
-            }
-            if (CurrentPlate.direction == Direction.Y)
-            {
-                a.SetColor(0, 255, 0);
-            }
-            return a;
-        }
-    }
-
+    /// <summary>
+    /// 创建的竖板列表
+    /// </summary>
     public List<VerticalPlate> VerticalPlates = new List<VerticalPlate>();
+
+    /// <summary>
+    /// 展平后的结果
+    /// </summary>
     public WTopoDS_Shape CombinedFixtureBoard;
+
+    /// <summary>
+    /// 输入的工件
+    /// </summary>
+    private InputWorkpiece InputWorkpiece;
+
+    /// <summary>
+    /// 当前展示的AIS对象列表
+    /// </summary>
+    private List<WAIS_Shape> _CurrentAIS = new List<WAIS_Shape>();
+
+    // 显示AIS，并加入当前AIS列表
+    private void Display(WAIS_Shape theAIS, bool update)
+    {
+        _CurrentAIS.Add(theAIS);
+        AISContext.Display(theAIS, update);
+    }
+
+    // 移除AIS列表中的所有AIS对象
+    private void EraseAll(bool update)
+    {
+        var aisToRemove = _CurrentAIS.ToList();
+        foreach (var theAIS in aisToRemove)
+        {
+            _CurrentAIS.Remove(theAIS);
+            AISContext.Erase(theAIS, update);
+        }
+    }
 
     #region 创建横板参数
     /// <summary>
@@ -94,9 +108,19 @@ public partial class MainWindow : Window
 
     public double BasePlateOffsetZ { get; set; } = 100.0;
 
+    private static readonly Wgp_Dir wgp_Dir = new Wgp_Dir(1.0, 0.0, 0.0);
+
     #endregion
 
     #region 创建竖板参数
+    private static readonly Wgp_Dir DirectionX = new(1.0, 0.0, 0.0);
+    private static readonly Wgp_Dir DirectionY = new(0.0, 1.0, 0.0);
+
+    /// <summary>
+    /// 创建竖板所用模式
+    /// </summary>
+    public VPCMode VPCMode { get; set; } = 0;
+
     public int XNum { get; set; } = 3;
 
     public int YNum { get; set; } = 3;
@@ -168,6 +192,7 @@ public partial class MainWindow : Window
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
         Viewer = new OCCCanvas();
+        AISContext = Viewer.InteractiveContext;
         Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
         Viewer.Show();
         aHost.Child = Viewer;
@@ -280,8 +305,8 @@ public partial class MainWindow : Window
 
     private void Test_Button_Click(object sender, RoutedEventArgs e)
     {
-        _AISInputWorkpiece = Viewer.Viewer.TestMakeBox();
-        Viewer.Display(_AISInputWorkpiece, true);
+        InputWorkpiece = new(new WBRepPrimAPI_MakeBox(20, 20, 0.1).Shape());
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
     #endregion
@@ -292,54 +317,54 @@ public partial class MainWindow : Window
         Viewer.EraseAll();
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
-        InputWorkpiece = new STEPExchange("mods\\test4Small.STEP").Shape();
+        InputWorkpiece = new(new STEPExchange("mods\\test4Small.STEP").Shape());
         BasePlate = null;
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll();
-        InputWorkpiece = new STEPExchange("mods\\test1.stp").Shape();
+        InputWorkpiece = new(new STEPExchange("mods\\test1.stp").Shape());
         BasePlate = null;
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll();
-        InputWorkpiece = new STEPExchange("mods\\test2.stp").Shape();
+        InputWorkpiece = new(new STEPExchange("mods\\test2.stp").Shape());
         BasePlate = null;
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
 
     private void Test_input_test_3_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll();
-        InputWorkpiece = new STEPExchange("mods\\test3.STEP").Shape();
+        InputWorkpiece = new(new STEPExchange("mods\\test3.STEP").Shape());
         BasePlate = null;
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
 
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll();
-        InputWorkpiece = new STEPExchange("mods\\test4.stp").Shape();
+        InputWorkpiece = new(new STEPExchange("mods\\test4.stp").Shape());
         BasePlate = null;
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
 
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll();
-        InputWorkpiece = new STEPExchange("mods\\test5.stp").Shape();
+        InputWorkpiece = new(new STEPExchange("mods\\test5.stp").Shape());
         BasePlate = null;
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
 
@@ -593,17 +618,19 @@ public partial class MainWindow : Window
         if (CurrentPlate != null)
         {
             //显示选中板的坐标
-            CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString("F1");
+            CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate
+                .Direction.Point.X()
+                .ToString("F1");
             //清空画布并重新显示
             Viewer.EraseAll();
-            Viewer.Display(AISInputWorkpiece, false);
-            Viewer.Display(AISBasePlate, false);
-            if (CurrentPlate.shape != null)
+            Viewer.Display(InputWorkpiece.AIS, false);
+            Viewer.Display(BasePlate.AIS, false);
+            if (CurrentPlate.AIS != null)
             {
-                Viewer.Display(AISCurrentPlate, true);
+                Viewer.Display(CurrentPlate.AIS, true);
                 return;
             }
-            foreach (var item in CurrentPlate.pieces)
+            foreach (var item in CurrentPlate.Pieces)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
             }
@@ -623,18 +650,19 @@ public partial class MainWindow : Window
         if (CurrentPlate != null)
         {
             //显示选中板的坐标
-            CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate.location.ToString("F1");
+            CurrentPlateSelectedLocation_TextBox.Text = CurrentPlate
+                .Direction.Point.X()
+                .ToString("F1");
             //清空画布并重新显示
             Viewer.EraseAll();
-            Viewer.Display(AISInputWorkpiece, false);
-            WAIS_Shape theshape = new(BasePlate.shape);
-            Viewer.Display(theshape, false);
-            if (CurrentPlate.shape != null)
+            Viewer.Display(InputWorkpiece.AIS, false);
+            Viewer.Display(BasePlate.AIS, false);
+            if (CurrentPlate.AIS != null)
             {
-                Viewer.Display(AISCurrentPlate, true);
+                Viewer.Display(CurrentPlate.AIS, true);
                 return;
             }
-            foreach (var item in CurrentPlate.pieces)
+            foreach (var item in CurrentPlate.Pieces)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
             }
@@ -669,55 +697,16 @@ public partial class MainWindow : Window
 
         // 创建要添加到 StackPanel 中的子元素
         Label PieceLabel = new Label();
-        PieceLabel.Content = "位置: " + thePiece.Location().ToString("F2");
+        PieceLabel.Content = "位置: " + thePiece.Number.ToString();
         PieceLabel.HorizontalContentAlignment = HorizontalAlignment.Left; // 设置 Label 的水平内容对齐方式为 Left
-
-        Button selectButton = new Button();
-        selectButton.Content = "选中";
-        selectButton.Click += (sender, e) =>
-        {
-            Viewer.Viewer.SelectAIS(thePiece.aisShape);
-        };
-
-        Button deletButton = new Button();
-        deletButton.Content = "删除";
-        // 创建删除按钮的 Click 事件处理程序
-        deletButton.Click += (sender, e) =>
-        {
-            #region 删除按钮所在的Grid
-            // 获取删除按钮所在的 Grid
-            Grid parentStackPanel = (Grid)deletButton.Parent;
-
-            // 如果父 StackPanel 不为空，则从其父元素中移除
-            if (parentStackPanel != null)
-            {
-                // 获取父元素的父元素，一般来说应该是一个容器，比如一个 Grid 或者另一个 StackPanel
-                Panel parentContainer = (Panel)parentStackPanel.Parent;
-
-                // 从父容器中移除父 StackPanel
-                if (parentContainer != null)
-                {
-                    parentContainer.Children.Remove(parentStackPanel);
-                }
-            }
-            #endregion
-            #region 删除AIS对象和piece对象
-            Viewer.Erase(thePiece.aisShape, true);
-            CurrentPlate.pieces.Remove(thePiece);
-            #endregion
-        };
 
         // 将子元素添加到 Grid 中，并指定列索引
         Grid.SetColumn(PieceLabel, 0);
-        Grid.SetColumn(selectButton, 1);
-        Grid.SetColumn(deletButton, 2);
 
         // 将子元素添加到 StackPanel 的 Children 集合中
         outerStackPanel.Children.Add(PieceLabel);
-        outerStackPanel.Children.Add(selectButton);
-        outerStackPanel.Children.Add(deletButton);
         //显示
-        Viewer.Display(thePiece.aisShape, false);
+        Viewer.Display(thePiece.AIS, false);
         return outerStackPanel;
     }
     #endregion
@@ -729,138 +718,61 @@ public partial class MainWindow : Window
         if (CurrentPlate != null)
         {
             //更新视图显示
-            foreach (var item in CurrentPlate.pieces)
+            foreach (var item in CurrentPlate.Pieces)
             {
-                Viewer.Erase(item.aisShape, false);
+                Display(item.AIS, false);
             }
             Viewer.Viewer.UpdateCurrentViewer();
             // 更新CurrentPlateValueLable的值
             if (double.TryParse(CurrentPlateAddLocation_TextBox.Text, out newValue))
             {
                 CurrentPlate = SimpleClampMaker.MakeVerticalPlate(
-                    InputWorkpiece,
+                    InputWorkpiece.Shape,
                     BasePlate,
-                    CurrentPlate.direction,
-                    newValue,
-                    CurrentPlate.clearances,
-                    CurrentPlate.minSupportLen,
-                    CurrentPlate.cuttingDistance
+                    new PlatePose(new Wgp_Pnt(5, 0, 0), DirectionY),
+                    CurrentPlate.Clearances,
+                    CurrentPlate.MinSupportLen,
+                    CurrentPlate.CuttingDistance
                 );
             }
             //更新stack中的元素
             CurrentPlate_StackPanel.Children.Clear();
-            foreach (var item in CurrentPlate.pieces)
+            foreach (var item in CurrentPlate.Pieces)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
             }
             //显示新创建的板
-            foreach (var item in CurrentPlate.pieces)
+            foreach (var item in CurrentPlate.Pieces)
             {
-                Viewer.Display(item.aisShape, false);
+                Viewer.Display(item.AIS, false);
             }
             Viewer.Viewer.UpdateCurrentViewer();
         }
     }
 
     // 添加板
-    private void addPlate_Button_Click(object sender, RoutedEventArgs e)
-    {
-        VerticalPlate newPLate;
-        // 尝试将输入的文本转换为 double 类型
-        if (!double.TryParse(CurrentPlateAddLocation_TextBox.Text, out double addedLocation))
-        {
-            // 转换失败，则清除文本
-            CurrentPlateAddLocation_TextBox.Text = "输入不合法";
-        }
-        if (CurrentPlateLocationX_ComboBox.IsVisible)
-        {
-            newPLate = SimpleClampMaker.MakeVerticalPlate(
-                InputWorkpiece,
-                BasePlate,
-                Direction.X,
-                addedLocation,
-                ClearancesParameter,
-                MinSupportingLenParameter,
-                CuttingDistanceParameter
-            );
-            CurrentPlateLocationX_ComboBox.Items.Add(newPLate);
-            // 设置 ComboBox 的 SelectedItem 为新添加的项
-            CurrentPlateLocationX_ComboBox.SelectedItem = newPLate;
-            VerticalPlates.Add(newPLate);
-
-            // 获取 ComboBox 的 ItemsSource
-            var items =
-                CurrentPlateLocationX_ComboBox.ItemsSource as ObservableCollection<VerticalPlate>;
-
-            // 对集合进行排序（示例中按照字符串排序，你可以根据需要修改比较器）
-            if (items != null)
-            {
-                var sortedItems = new ObservableCollection<VerticalPlate>(
-                    items.OrderBy(item => double.Parse(item.ToString()))
-                );
-
-                // 更新 ComboBox 的 ItemsSource
-                CurrentPlateLocationX_ComboBox.ItemsSource = sortedItems;
-
-                // 如果需要，选中排序后的第一个项
-                CurrentPlateLocationX_ComboBox.SelectedIndex = 0;
-            }
-        }
-        if (CurrentPlateLocationY_ComboBox.IsVisible)
-        {
-            newPLate = SimpleClampMaker.MakeVerticalPlate(
-                InputWorkpiece,
-                BasePlate,
-                Direction.Y,
-                addedLocation,
-                ClearancesParameter,
-                MinSupportingLenParameter,
-                CuttingDistanceParameter
-            );
-            CurrentPlateLocationY_ComboBox.Items.Add(newPLate);
-            // 设置 ComboBox 的 SelectedItem 为新添加的项
-            CurrentPlateLocationY_ComboBox.SelectedItem = newPLate;
-            VerticalPlates.Add(newPLate);
-
-            // 获取 ComboBox 的 ItemsSource
-            var items =
-                CurrentPlateLocationY_ComboBox.ItemsSource as ObservableCollection<VerticalPlate>;
-
-            // 对集合进行排序（示例中按照字符串排序，你可以根据需要修改比较器）
-            if (items != null)
-            {
-                var sortedItems = new ObservableCollection<VerticalPlate>(
-                    items.OrderBy(item => double.Parse(item.ToString()))
-                );
-
-                // 更新 ComboBox 的 ItemsSource
-                CurrentPlateLocationY_ComboBox.ItemsSource = sortedItems;
-                // 如果需要，选中排序后的第一个项
-                CurrentPlateLocationY_ComboBox.SelectedIndex = 0;
-            }
-        }
-    }
+    private void addPlate_Button_Click(object sender, RoutedEventArgs e) { }
 
     private void SetXYNum_Button_Click(object sender, RoutedEventArgs e)
     {
+        XNum_TextBox.Text = XNum.ToString();
+        YNum_TextBox.Text = YNum.ToString();
         XNum_StackPanel.Visibility = Visibility.Visible;
         YNum_StackPanel.Visibility = Visibility.Visible;
         OffsetX_StackPanel.Visibility = Visibility.Collapsed;
         OffsetY_StackPanel.Visibility = Visibility.Collapsed;
+        VPCMode = VPCMode.Num;
     }
 
     private void SetXYOffset_Button_Click(object sender, RoutedEventArgs e)
     {
+        OffsetX_TextBox.Text = OffsetXParameter.ToString();
+        OffsetY_TextBox.Text = OffsetYParameter.ToString();
         XNum_StackPanel.Visibility = Visibility.Collapsed;
         YNum_StackPanel.Visibility = Visibility.Collapsed;
         OffsetX_StackPanel.Visibility = Visibility.Visible;
         OffsetY_StackPanel.Visibility = Visibility.Visible;
-        XNum = 0;
-        XNum_TextBox.Text = "0";
-        YNum = 0;
-        YNum_TextBox.Text = "0";
-        OffsetX_TextBox.Text = OffsetXParameter.ToString();
-        OffsetY_TextBox.Text = OffsetYParameter.ToString();
+        VPCMode = VPCMode.Offset;
     }
 
     // 创建竖板
@@ -869,50 +781,50 @@ public partial class MainWindow : Window
         #region 测试用代码，之后删除
         if (InputWorkpiece == null)
         {
-            InputWorkpiece = new STEPExchange("mods\\mytest.STEP").Shape();
-            Viewer.Display(AISInputWorkpiece, true);
+            InputWorkpiece = new(new STEPExchange("mods\\mytest.STEP").Shape());
+            Display(InputWorkpiece.AIS, false);
         }
         if (BasePlate == null)
         {
             MakeBasePlate();
         }
         #endregion
+
         #region 更新界面的逻辑
+        //清空原来的板
+        VerticalPlates.Clear();
         clearPlates();
         #endregion
+
         if (InputWorkpiece != null && BasePlate != null)
         {
-            Viewer.EraseAll();
-            Viewer.Display(AISInputWorkpiece, true);
-            Viewer.Display(AISBasePlate, true);
+            EraseAll(false);
+            Display(InputWorkpiece.AIS, true);
+            AISContext.SetTransparency(InputWorkpiece.AIS, 0.3, false);
+            AISContext.SetColor(InputWorkpiece.AIS, new WColor(255, 255, 0), false);
 
-            VerticalPlates = SimpleClampMaker.MakeVerticalPlates(
-                InputWorkpiece,
-                BasePlate,
-                XNum,
-                YNum,
-                InitialOffsetXParameter,
-                InitialOffsetYParameter,
-                ClearancesParameter,
-                MinSupportingLenParameter,
-                CuttingDistanceParameter
-            );
+            Display(BasePlate.AIS, true);
+            AISContext.SetTransparency(BasePlate.AIS, 0.5, false);
+            AISContext.SetColor(BasePlate.AIS, new WColor(204, 102, 51), false);
+
+            MakeVerticalPlates();
             UpdateComboBox();
             foreach (var onePlate in VerticalPlates)
             {
-                foreach (var onePiece in onePlate.pieces)
+                WColor TempColor = new();
+                if (onePlate.Direction.Dir.IsParallel(DirectionX, 0.1))
                 {
-                    var theAIS = onePiece.aisShape;
-                    if (onePiece.dir == Direction.X)
-                    {
-                        theAIS.SetColor(255, 0, 0);
-                    }
-                    if (onePiece.dir == Direction.Y)
-                    {
-                        theAIS.SetColor(0, 255, 0);
-                    }
-                    theAIS.SetTransparency(0.5);
-                    Viewer.Display(theAIS, false);
+                    TempColor = new(255, 0, 0);
+                }
+                if (onePlate.Direction.Dir.IsParallel(DirectionY, 0.1))
+                {
+                    TempColor = new(0, 255, 0);
+                }
+                foreach (var onePiece in onePlate.Pieces)
+                {
+                    Display(onePiece.AIS, false);
+                    AISContext.SetTransparency(onePiece.AIS, 0.3, false);
+                    AISContext.SetColor(onePiece.AIS, TempColor, false);
                 }
             }
         }
@@ -920,68 +832,130 @@ public partial class MainWindow : Window
         Viewer.FitAll();
     }
 
+    // 创建竖板
+    void MakeVerticalPlates()
+    {
+        double OffextX = 0.0;
+        double OffextY = 0.0;
+        double tempX = BasePlate.X + InitialOffsetXParameter;
+        double tempY = BasePlate.Y + InitialOffsetYParameter;
+        switch (VPCMode)
+        {
+            case VPCMode.Num:
+                OffextX = (BasePlate.DX - InitialOffsetXParameter * 2) / (float)(XNum - 2 + 1);
+                OffextY = (BasePlate.DY - InitialOffsetYParameter * 2) / (float)(YNum - 2 + 1);
+                break;
+            case VPCMode.Offset:
+                OffextX = OffsetXParameter;
+                OffextY = OffsetYParameter;
+                break;
+        }
+
+        //创建X方向竖板
+        while (BasePlate.X < tempX && tempX < BasePlate.X + BasePlate.DX)
+        {
+            VerticalPlates.Add(
+                SimpleClampMaker.MakeVerticalPlate(
+                    InputWorkpiece.Shape,
+                    BasePlate,
+                    new PlatePose(new Wgp_Pnt(tempX, BasePlate.Y, 0.0), DirectionX),
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                )
+            );
+            tempX += OffextX;
+        }
+
+        //创建Y方向竖板
+        while (BasePlate.Y < tempY && tempY < BasePlate.Y + BasePlate.DY)
+        {
+            VerticalPlates.Add(
+                SimpleClampMaker.MakeVerticalPlate(
+                    InputWorkpiece.Shape,
+                    BasePlate,
+                    new PlatePose(new Wgp_Pnt(BasePlate.X, tempY, 0.0), DirectionY),
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                )
+            );
+            tempY += OffextY;
+        }
+
+        //! test
+        foreach (var onePlate in VerticalPlates)
+        {
+            var tempa = onePlate;
+            var c = tempa.Clearances;
+            var m = tempa.MinSupportLen;
+            var cd = tempa.CuttingDistance;
+            Debug.WriteLine($"Clearances: {c}, MinSupportLen: {m}, CuttingDistance: {cd}");
+        }
+    }
+
     // 创建底板
     private void MakeBasePlate_Button_Clcik(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll();
-        if (AISInputWorkpiece == null)
+        if (InputWorkpiece == null)
         {
-            InputWorkpiece = new STEPExchange("mods\\mytest.STEP").Shape();
+            InputWorkpiece = new(new STEPExchange("mods\\mytest.STEP").Shape());
         }
-        Viewer.Display(AISInputWorkpiece, true);
+        Viewer.Display(InputWorkpiece.AIS, true);
         MakeBasePlate();
     }
 
     // 连接竖板
     private void ConnectPlate_Button_Click(object sender, RoutedEventArgs e)
     {
-        VerticalPlates = SimpleClampMaker.SuturePLates(
-            VerticalPlates,
-            BasePlate,
-            ConnectionHeightParameter,
-            ConnectionThicknessParameter,
-            FilletRadiusParameter
-        );
+        //VerticalPlates = SimpleClampMaker.SuturePLates(
+        //    VerticalPlates,
+        //    BasePlate,
+        //    ConnectionHeightParameter,
+        //    ConnectionThicknessParameter,
+        //    FilletRadiusParameter
+        //);
         UpdateComboBox();
         //重新显示更新后的shape
-        if (AISInputWorkpiece != null && AISBasePlate != null)
-        {
-            Viewer.EraseAll();
-            Viewer.Display(AISInputWorkpiece, true);
-            Viewer.Display(AISBasePlate, true);
+        //if (AISInputWorkpiece != null && AISBasePlate != null)
+        //{
+        //    Viewer.EraseAll();
+        //    Viewer.Display(AISInputWorkpiece, true);
+        //    Viewer.Display(AISBasePlate, true);
 
-            foreach (var onePlate in VerticalPlates)
-            {
-                Viewer.Display(onePlate.aisShape, true);
-            }
-        }
+        //    foreach (var onePlate in VerticalPlates)
+        //    {
+        //        Viewer.Display(onePlate.aisShape, true);
+        //    }
+        //}
         Viewer.FitAll();
     }
 
     private void testconnect()
     {
-        VerticalPlates = SimpleClampMaker.SuturePLates(
-            VerticalPlates,
-            BasePlate,
-            ConnectionHeightParameter,
-            ConnectionThicknessParameter,
-            FilletRadiusParameter
-        );
+        //VerticalPlates = SimpleClampMaker.SuturePLates(
+        //    VerticalPlates,
+        //    BasePlate,
+        //    ConnectionHeightParameter,
+        //    ConnectionThicknessParameter,
+        //    FilletRadiusParameter
+        //);
     }
 
     private void MakeBasePlate()
     {
         BasePlate = SimpleClampMaker.MakeBasePlate_NoInteract(
-            InputWorkpiece,
+            InputWorkpiece.Shape,
             BasePlateOffsetZ,
             BasePlateOffsetX,
             BasePlateOffsetY
         );
-        Viewer.Display(AISBasePlate, true);
+        Display(BasePlate.AIS, true);
         //根据计算结果，设置推荐值
-        InitialOffsetXParameter = Math.Round(BasePlate.dX * 0.1);
+        InitialOffsetXParameter = Math.Round(BasePlate.DX * 0.1);
         InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString("F1");
-        InitialOffsetYParameter = Math.Round(BasePlate.dY * 0.1);
+        InitialOffsetYParameter = Math.Round(BasePlate.DY * 0.1);
         InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString("F1");
     }
 
@@ -990,17 +964,20 @@ public partial class MainWindow : Window
         clearPlates();
         foreach (var onePlate in VerticalPlates)
         {
-            if (onePlate.direction == Direction.X)
+            if (onePlate.Direction.Dir.IsParallel(DirectionX, 0.1))
             {
                 CurrentPlateLocationX_ComboBox.Items.Add(onePlate);
             }
-            if (onePlate.direction == Direction.Y)
+            if (onePlate.Direction.Dir.IsParallel(DirectionY, 0.1))
             {
                 CurrentPlateLocationY_ComboBox.Items.Add(onePlate);
             }
         }
     }
 
+    /// <summary>
+    /// 删除控件中板的信息
+    /// </summary>
     private void clearPlates()
     {
         CurrentPlate_StackPanel.Children.Clear();
@@ -1019,7 +996,8 @@ public partial class MainWindow : Window
     {
         Button button = (Button)sender;
         VerticalPlate thePlate = (VerticalPlate)button.Tag;
-        CurrentPlateSelectedLocation_TextBox.Text = thePlate.location.ToString("F1");
+        //todo 改变PlateDirection的点
+        CurrentPlateSelectedLocation_TextBox.Text = thePlate.Direction.Point.X().ToString("F1");
     }
 
     private void PermutationPlate_Button_Click(object sender, RoutedEventArgs e)
@@ -1029,8 +1007,8 @@ public partial class MainWindow : Window
         {
             Viewer.EraseAll();
         }
-        CombinedFixtureBoard = SimpleClampMaker.DeployPlates(VerticalPlates, BasePlate);
-        Viewer.Display(new WAIS_Shape(CombinedFixtureBoard), true);
+        //CombinedFixtureBoard = SimpleClampMaker.DeployPlates(VerticalPlates, BasePlate);
+        //Viewer.Display(new WAIS_Shape(CombinedFixtureBoard), true);
         Viewer.FitAll();
     }
 
@@ -1045,27 +1023,28 @@ public partial class MainWindow : Window
         for (int i = 0; i < VerticalPlates.Count; i++)
         {
             VerticalPlate thePlate = VerticalPlates[i];
-            SimpleClampMaker.BrandNumber(
-                ref thePlate,
-                thePlate.connectionHeight * 0.8,
-                4
-            //new Wgp_Pnt(40.0, 40.0, -80.0)
-            );
+            //SimpleClampMaker.BrandNumber(
+            //    ref thePlate,
+            //    thePlate.connectionHeight * 0.8,
+            //    4
+            ////new Wgp_Pnt(40.0, 40.0, -80.0)
+            //);
             VerticalPlates[i] = thePlate; // 将修改后的对象重新赋值给集合中的元素
         }
         //重新显示更新后的shape
-        if (AISInputWorkpiece != null && AISBasePlate != null)
+        if (InputWorkpiece != null && BasePlate != null)
         {
-            Viewer.EraseAll();
-            Viewer.Display(AISInputWorkpiece, true);
-            Viewer.Display(AISBasePlate, true);
+            EraseAll(false);
+            Viewer.Display(InputWorkpiece.AIS, false);
+            Viewer.Display(BasePlate.AIS, false);
 
             foreach (var onePlate in VerticalPlates)
             {
-                Viewer.Display(onePlate.aisShape, true);
+                Viewer.Display(onePlate.AIS, true);
             }
         }
         Viewer.FitAll();
+        Viewer.Update();
     }
 
     private void Manipulator_Button_Click(object sender, RoutedEventArgs e)
@@ -1073,13 +1052,10 @@ public partial class MainWindow : Window
         _useManipulator = !_useManipulator;
         Viewer.CurrentActionMode = _useManipulator ? ActionMode.Manipulator : ActionMode.Normal;
 
-        //if (_useManipulator)
-        //{
-        //    Viewer.MyManipulator.Attach(AISInputWorkpiece);
-        //}
-        //else
-        //{
-        //    Viewer.MyManipulator.Detach();
-        //}
+        if (_useManipulator)
+        {
+            Viewer.Attach(InputWorkpiece.AIS);
+        }
+        else { }
     }
 }

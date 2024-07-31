@@ -7,7 +7,6 @@ namespace OCC {
 namespace TopoAbs {
 
 
-
 public ref class WTopAbs_ShapeEnum {
 public:
 	enum class Value {
@@ -27,15 +26,6 @@ public:
 	// Allow switch and comparisons.
 	operator Value() { return value; }
 
-	bool operator==(WTopAbs_ShapeEnum^ other) {
-		if (other == nullptr) return false;
-		return value == other->value;
-	}
-
-	bool operator!=(WTopAbs_ShapeEnum^ other) {
-		return !(*this == other);
-	}
-
 	TopAbs_ShapeEnum GetOCC() {
 		return static_cast<TopAbs_ShapeEnum>(value);
 	}
@@ -43,7 +33,6 @@ public:
 private:
 	Value value;
 };
-
 
 }
 }

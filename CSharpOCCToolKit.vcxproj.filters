@@ -69,6 +69,12 @@
     <Filter Include="源文件\Extension">
       <UniqueIdentifier>{523322f2-d6ce-46b2-a856-2073723ea9a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\OCCProxy\BRepPrimAPI">
+      <UniqueIdentifier>{58c7abab-d2ed-498b-901f-b3ffeb6082f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRepPrimAPI">
+      <UniqueIdentifier>{8f94fd1e-0731-4523-86c8-c6af6d8ef4da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -125,6 +131,15 @@
     <ClCompile Include="WColor.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
+    <ClCompile Include="Wgp_Dir.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="WBRepPrimAPI_MakeBox.cpp">
+      <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="WBaseObject.cpp">
+      <Filter>源文件\OCCProxy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -177,6 +192,15 @@
     </ClInclude>
     <ClInclude Include="WColor.h">
       <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Wgp_Dir.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="WBRepPrimAPI_MakeBox.h">
+      <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="WBaseObject.h">
+      <Filter>头文件\OCCProxy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

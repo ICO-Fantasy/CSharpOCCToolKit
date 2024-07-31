@@ -5,13 +5,13 @@
 #include <Standard_Handle.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
+#include <AIS_Manipulator.hxx>
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 
 #include "WAIS_Shape.h"
 #include "WAIS_InteractiveObject.h"
 #include "WAIS_Manipulator.h"
-#include <AIS_InteractiveObject.hxx>
 #include "WV3d_View.h"
 #include "WAIS_InteractiveContext.h"
 
@@ -60,6 +60,7 @@ public:
 	void SetDisplayMode(int theMode);
 #pragma endregion
 #pragma region 交互对象管理
+	// 只有部分与Viewer相关的交互对象管理方法，剩余由交互对象管理器控制
 	void EraseSelect(void);
 	void MoveTo(int theX, int theY);
 	void SetSelectionMode(SelectionMode theMode);
@@ -70,13 +71,6 @@ public:
 	void AreaSelect(int theX1, int theY1, int theX2, int theY2);
 	void MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2);
 	void XORAreaSelect(int theX1, int theY1, int theX2, int theY2);
-	//void Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
-	//void Display(AIS::WAIS_Shape^ theAIS, bool theToUpdateViewer);
-	//void Display(AIS::WAIS_Manipulator^ theManipulator, bool theToUpdateViewer);
-	//void EraseAll();
-	//void Erase(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
-	//void Erase(AIS::WAIS_Shape^ theAIS, bool theToUpdateViewer);
-	//bool IsSelected(void);
 	AIS::WAIS_Shape^ GetSelectedAIS(void);
 	void DisplayOriginTrihedron();
 #pragma region Manipulator
@@ -97,9 +91,9 @@ public:
 	AIS::WAIS_Shape^ TestMakeBox(void);
 public:
 	AIS::WAIS_InteractiveContext^ CSharpAISContext;
+	//V3d::WV3d_Viewer^ CSharpViewer;
 private:
 	// 将成员变为托管类型
-	NCollection_Haft<Handle(AIS_Manipulator)> myManipulator;
 	NCollection_Haft<Handle(V3d_Viewer)> myViewer;
 	NCollection_Haft<Handle(V3d_View)> myMainView;
 	NCollection_Haft<Handle(V3d_View)> mySecondView;
