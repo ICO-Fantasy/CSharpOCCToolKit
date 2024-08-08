@@ -3,17 +3,12 @@
 #include "BRepBuilderAPI_MakeEdge.hxx"
 #include "BRepBuilderAPI_MakeFace.hxx"
 #include "BRepBuilderAPI_MakeWire.hxx"
-#include "GC_MakeSegment.hxx"
 #include "TopoDS_Edge.hxx"
 #include "TopoDS_Shape.hxx"
-#include <BRepFilletAPI_MakeFillet2d.hxx>
-#include <BRepTools_WireExplorer.hxx>
 #include <gp_Dir.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
-#include <Precision.hxx>
 #include <TopoDS_Face.hxx>
-#include <TopoDS_Vertex.hxx>
 #include <vector>
 
 //! 所有板均无厚度
@@ -32,22 +27,25 @@ public struct BasePlate {
 	double dY;
 	double offsetX;
 	double offsetY;
+	double offsetZ;
+	double lowestZ;// 零件最低点
+	double hight;// 零件高度
 };
 
 // 横截方向必须垂直于XY方向，Z值由底板决定
 public class PlatePose {
 public:
 	PlatePose() {};
-	PlatePose(const gp_Pnt thePnt, const gp_Dir theDir) { point = thePnt, pose = theDir; }
+	PlatePose(const gp_Pnt thePnt, const gp_Dir theDir) { point = thePnt, dir = theDir; }
 	gp_Pnt point;
-	gp_Dir pose;
+	gp_Dir dir; // dir 与 pln 在同一平面
 	gp_Pln Plane() {
 		if (myPlant != nullptr) return *myPlant;
-		myPlant = new gp_Pln(point, pose);
+		myPlant = new gp_Pln(point, dir);
 		return *myPlant;
 	}
 	// 拷贝构造函数
-	PlatePose(const PlatePose& other) :point(other.point), pose(other.pose) {
+	PlatePose(const PlatePose& other) :point(other.point), dir(other.dir) {
 		if (other.myPlant) {
 			myPlant = other.myPlant;
 		}
@@ -56,7 +54,7 @@ public:
 	PlatePose& operator=(const PlatePose& other) {
 		if (this != &other) {
 			point = other.point;
-			pose = other.pose;
+			dir = other.dir;
 		}
 		return *this;
 	}
@@ -176,16 +174,26 @@ private:
 	mutable double myLength = -1.0;// 使用一个无效的默认值来表示长度尚未计算
 };
 
-public class VerticalPlate {
+public struct VerticalPlate {
 public:
 	TopoDS_Shape shape;
 	std::vector<VerticalPiece> pieces = std::vector<VerticalPiece>();
 	PlatePose pose;
+	gp_Pnt start;
+	gp_Pnt middle;
+	gp_Pnt end;
 	double Z;
 	double clearances;
 	double minSupportLen;
 	double cuttingDistance;
-	int number;
+	double avoidanceHeight;
+	double connectionThickness;
+	double slotLength = 10.0;//todo 暂不开放 连接槽长度
+	double slotHight = 10.0;//todo 暂不开放 连接槽高度
+	double filletRadius;
+	TCollection_AsciiString numberString = "unset";
+
+	BRepBuilderAPI_MakeWire _unclosedWire;
 };
 
 ///==============================Function==============================
@@ -227,19 +235,21 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 
 VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlate, PlatePose theDir, double theClearances, double theMinSupportLen, double theCutDistance);
 
-//void SuturePiece(const VerticalPlate& thePlate, BasePlate theBasePlate, double theConnectionHight);
-//
-//void Slotting(const VerticalPlate& thePlate, BasePlate theBasePlate, std::vector<double> theLocations, double theConnectionHight, double theConnectWidth, double theFilletRadius);
-//
-//VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number);
-//
-//VerticalPlate BrandNumber(VerticalPlate thePlate, double hight, int number, gp_Pnt thePoint);
+VerticalPlate SuturePiece(VerticalPlate& thePlate, const BasePlate theBase, double theConnectionHight, double theConnectionThickness);
+
+VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPlate> otherPlates, double theFilletRadius, bool middleToDown);
+
+BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> middleDownPlates, std::vector<VerticalPlate> middleUpPlates);
+
+VerticalPlate BrandNumber(VerticalPlate thePlate, double hight);
+
+VerticalPlate BrandNumber(VerticalPlate thePlate, gp_Pnt aimPoint, double hight);
 
 ///==============================
 ///得到结果
 ///==============================
 
-//TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> theVerticalPlates);
+TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> middleToDownPlates, std::vector<VerticalPlate> middleToUpPlates);
 
 }
 }

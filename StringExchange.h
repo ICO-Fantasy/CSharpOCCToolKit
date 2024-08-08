@@ -9,12 +9,8 @@ using namespace System;
 namespace OCCTK {
 namespace DataExchange {
 
-/// <summary>
-/// 将C#字符串转换为TCollection_AsciiString字符串
-/// </summary>
-/// <param name="theString"></param>
-/// <returns></returns>
-TCollection_AsciiString toAsciiString(System::String^ theString) {
+// 将C#字符串转换为TCollection_AsciiString字符串
+inline TCollection_AsciiString ToAsciiString(System::String^ theString) {
 	if (theString == nullptr) {
 		return TCollection_AsciiString();
 	}

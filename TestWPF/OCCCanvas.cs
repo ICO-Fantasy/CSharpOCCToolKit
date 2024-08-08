@@ -724,6 +724,11 @@ public class OCCCanvas : Form
     //}
     #endregion
     #region 视图控制
+    public new void Update()
+    {
+        Viewer.UpdateView();
+    }
+
     /// <summary>
     /// 相机缩放至最佳尺寸
     /// </summary>
@@ -792,6 +797,7 @@ public class OCCCanvas : Form
         RaiseZoomingFinished();
     }
     #endregion
+
     #region 显示
     public void Display(WAIS_Shape theAIS, bool Toupdate)
     {
@@ -814,6 +820,7 @@ public class OCCCanvas : Form
     }
 
     #endregion
+
     #region 对象交互
     #region 选择框
     /// <summary>
@@ -916,6 +923,7 @@ public class OCCCanvas : Form
     }
 
     #endregion
+
     #region 其它设置
 
     #endregion

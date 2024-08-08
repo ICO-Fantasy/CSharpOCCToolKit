@@ -1,5 +1,5 @@
-﻿#include <TopoDS_Shape.hxx>
-#include <vcclr.h>
+﻿#pragma once
+#include <TopoDS_Shape.hxx>
 #include "WTopoDS_Shape.h"
 using namespace System;
 using namespace OCCTK::OCC::TopoDS;
@@ -8,8 +8,7 @@ using namespace OCCTK::OCC::TopoDS;
 namespace OCCTK {
 namespace IO {
 
-public ref class STEPExchange
-{
+public ref class STEPExchange {
 public:
 	STEPExchange(WTopoDS_Shape^ theShape);
 	STEPExchange(String^ filePath);
