@@ -9,8 +9,7 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-public ref class WAIS_InteractiveObject : WBaseObject
-{
+public ref class WAIS_InteractiveObject : WBaseObject {
 public:
 	WAIS_InteractiveObject();
 	WAIS_InteractiveObject(Handle(AIS_InteractiveObject) theAISObject);

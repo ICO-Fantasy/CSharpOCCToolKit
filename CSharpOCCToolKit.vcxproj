@@ -160,6 +160,7 @@
     <ClCompile Include="MakeSimpleClamp.cpp" />
     <ClCompile Include="STEPExchange.cpp" />
     <ClCompile Include="StringExchange.cpp" />
+    <ClCompile Include="WAIS_Trihedron.cpp" />
     <ClCompile Include="WBaseObject.cpp" />
     <ClCompile Include="WBRepPrimAPI_MakeBox.cpp" />
     <ClCompile Include="WColor.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="CSharpViewer.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="STEPExchange.h" />
+    <ClInclude Include="WAIS_Trihedron.h" />
     <ClInclude Include="WBaseObject.h" />
     <ClInclude Include="WBRepPrimAPI_MakeBox.h" />
     <ClInclude Include="WColor.h" />

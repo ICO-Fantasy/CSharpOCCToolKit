@@ -140,6 +140,9 @@
     <ClCompile Include="WBaseObject.cpp">
       <Filter>源文件\OCCProxy</Filter>
     </ClCompile>
+    <ClCompile Include="WAIS_Trihedron.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -201,6 +204,9 @@
     </ClInclude>
     <ClInclude Include="WBaseObject.h">
       <Filter>头文件\OCCProxy</Filter>
+    </ClInclude>
+    <ClInclude Include="WAIS_Trihedron.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

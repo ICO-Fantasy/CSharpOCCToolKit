@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -396,6 +398,11 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// 当前展示的AIS对象列表
+    /// </summary>
+    private List<WAIS_Shape> _CurrentAIS = new List<WAIS_Shape>();
+
+    /// <summary>
     /// 展平后的结果
     /// </summary>
     public CombinedFixtureBoard CombinedFixtureBoard;
@@ -404,17 +411,14 @@ public partial class MainWindow : Window
     /// 输入的工件
     /// </summary>
     private InputWorkpiece InputWorkpiece;
+    private bool ShowInputWorkpiece = true;
 
+    #region 创建底板参数
     /// <summary>
-    /// 当前展示的AIS对象列表
-    /// </summary>
-    private List<WAIS_Shape> _CurrentAIS = new List<WAIS_Shape>();
-
-    #region 创建横板参数
-    /// <summary>
-    /// 横板
+    /// 底板
     /// </summary>
     private BasePlate? BasePlate;
+    private bool ShowBasePlate = true;
 
     public double BasePlateOffsetX { get; set; } = 5;
 
@@ -505,6 +509,10 @@ public partial class MainWindow : Window
         get { return _CurrentPlate; }
         set
         {
+            if (value == null)
+            {
+                return;
+            }
             if (_CurrentPlate != value)
             {
                 _CurrentPlate = value;
@@ -668,7 +676,7 @@ public partial class MainWindow : Window
     #region 导入
     private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll();
+        Viewer.EraseAll(false);
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
         InputWorkpiece = new(new STEPExchange("mods\\test4Small.STEP").Shape());
@@ -679,7 +687,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll();
+        Viewer.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test1.stp").Shape());
         BasePlate = null;
         Viewer.Display(InputWorkpiece.AIS, true);
@@ -688,7 +696,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll();
+        Viewer.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test2.stp").Shape());
         BasePlate = null;
         Viewer.Display(InputWorkpiece.AIS, true);
@@ -697,7 +705,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_3_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll();
+        Viewer.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test3.STEP").Shape());
         BasePlate = null;
         Viewer.Display(InputWorkpiece.AIS, true);
@@ -706,7 +714,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll();
+        Viewer.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test4.stp").Shape());
         BasePlate = null;
         Viewer.Display(InputWorkpiece.AIS, true);
@@ -715,7 +723,7 @@ public partial class MainWindow : Window
 
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll();
+        Viewer.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test5.stp").Shape());
         BasePlate = null;
         Viewer.Display(InputWorkpiece.AIS, true);
@@ -747,10 +755,7 @@ public partial class MainWindow : Window
     }
 
     #endregion
-    private void Erase_Button_Click(object sender, RoutedEventArgs e)
-    {
-        Viewer.EraseSelect();
-    }
+
 
     #region 监听事件
     private void BasePlateOffsetX_TextChanged(object sender, EventArgs e)
@@ -988,6 +993,13 @@ public partial class MainWindow : Window
             DisplayBasePlates(false);
             DisplaySinglePlate(CurrentPlate, false);
             Viewer.Update();
+            CurrentPlate
+                .Pieces.OrderBy(item =>
+                {
+                    var plate = item;
+                    return plate.Order;
+                })
+                .ToList();
             for (global::System.Int32 i = 0; i < CurrentPlate.Pieces.Count; ++i)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(CurrentPlate.Pieces[i], i));
@@ -1271,7 +1283,53 @@ public partial class MainWindow : Window
         }
         else { }
     }
+
+    private void Erase_Button_Click(object sender, RoutedEventArgs e)
+    {
+        Viewer.EraseSelect();
+    }
+
+    /// <summary>
+    /// 显示当前片
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DisplayCurrentPieces_Button_Click(object sender, RoutedEventArgs e)
+    {
+        if (CurrentPlate != null)
+        {
+            EraseAll(false);
+            //DisplayInputWorkpiece(false);
+            //DisplayBasePlates(false);
+            DisplayCurrentPieces(false);
+
+            Viewer.Update();
+            Viewer.FitAll();
+        }
+    }
+
+    /// <summary>
+    /// 显示当前板
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DisplayCurrentPlate_Button_Click(object sender, RoutedEventArgs e)
+    {
+        if (CurrentPlate != null)
+        {
+            EraseAll(false);
+            //DisplayInputWorkpiece(false);
+            //DisplayBasePlates(false);
+            DisplayCurrentPlate(false);
+
+            Viewer.Update();
+            Viewer.FitAll();
+        }
+    }
+
     #endregion
+
+    #region 算法逻辑
 
     /// <summary>
     /// 创建底板逻辑
@@ -1306,8 +1364,8 @@ public partial class MainWindow : Window
         {
             case VPCMode.Num:
                 // 计算偏移值
-                OffextX = (BasePlate.DX - InitialOffsetXParameter * 2) / (float)(XNum - 2 + 1);
-                OffextY = (BasePlate.DY - InitialOffsetYParameter * 2) / (float)(YNum - 2 + 1);
+                OffextX = (BasePlate.DX - InitialOffsetXParameter * 2) / (float)(XNum - 1);
+                OffextY = (BasePlate.DY - InitialOffsetYParameter * 2) / (float)(YNum - 1);
                 break;
             case VPCMode.Offset:
                 // 直接使用设定的偏移值
@@ -1318,7 +1376,10 @@ public partial class MainWindow : Window
 
         // 创建X方向竖板
         int num = 0;
-        while (BasePlate.X < tempX && tempX < BasePlate.X + BasePlate.DX)
+        while (
+            BasePlate.X + InitialOffsetXParameter <= tempX
+            && tempX <= BasePlate.X + BasePlate.DX - InitialOffsetXParameter
+        )
         {
             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
                 InputWorkpiece.Shape,
@@ -1332,12 +1393,13 @@ public partial class MainWindow : Window
             MiddleToDownPlates.Add(tempPlate);
             num += 1;
             tempX += OffextX;
-            //! test
-            return;
         }
         // 创建Y方向竖板
         num = 0;
-        while (BasePlate.Y < tempY && tempY < BasePlate.Y + BasePlate.DY)
+        while (
+            BasePlate.Y + InitialOffsetYParameter <= tempY
+            && tempY <= BasePlate.Y + BasePlate.DY - InitialOffsetYParameter
+        )
         {
             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
                 InputWorkpiece.Shape,
@@ -1474,6 +1536,8 @@ public partial class MainWindow : Window
         exchanger.SaveFile("mods\\test_output.STEP");
     }
 
+    #endregion
+
     /// <summary>
     /// 更新控件
     /// </summary>
@@ -1499,8 +1563,12 @@ public partial class MainWindow : Window
     /// <param name="update"></param>
     private void Display(WAIS_Shape theAIS, bool update)
     {
-        _CurrentAIS.Add(theAIS);
-        AISContext.Display(theAIS, update);
+        Viewer.Display(theAIS, update);
+    }
+
+    private void Erase(WAIS_Shape theAIS, bool update)
+    {
+        Viewer.Erase(theAIS, update);
     }
 
     /// <summary>
@@ -1509,12 +1577,7 @@ public partial class MainWindow : Window
     /// <param name="update"></param>
     private void EraseAll(bool update)
     {
-        var aisToRemove = _CurrentAIS.ToList();
-        foreach (var theAIS in aisToRemove)
-        {
-            _CurrentAIS.Remove(theAIS);
-            AISContext.Erase(theAIS, update);
-        }
+        Viewer.EraseAll(update);
     }
 
     /// <summary>
@@ -1525,9 +1588,16 @@ public partial class MainWindow : Window
     {
         if (InputWorkpiece != null)
         {
-            Display(InputWorkpiece.AIS, update);
-            AISContext.SetTransparency(InputWorkpiece.AIS, 0.3, false);
-            AISContext.SetColor(InputWorkpiece.AIS, new WColor(255, 255, 0), false);
+            if (ShowInputWorkpiece)
+            {
+                Display(InputWorkpiece.AIS, false);
+                //AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
+                AISContext.SetColor(InputWorkpiece.AIS, new WColor(125, 125, 125), false);
+            }
+            else
+            {
+                Erase(InputWorkpiece.AIS, false);
+            }
         }
     }
 
@@ -1539,9 +1609,16 @@ public partial class MainWindow : Window
     {
         if (BasePlate != null)
         {
-            Display(BasePlate.AIS, update);
-            AISContext.SetTransparency(BasePlate.AIS, 0.5, false);
-            AISContext.SetColor(BasePlate.AIS, new WColor(204, 102, 51), false);
+            if (ShowBasePlate)
+            {
+                Display(BasePlate.AIS, false);
+                //AISContext.SetTransparency(BasePlate.AIS, 0.8, false);
+                AISContext.SetColor(BasePlate.AIS, new WColor(204, 102, 51), false);
+            }
+            else
+            {
+                Erase(InputWorkpiece.AIS, update);
+            }
         }
     }
 
@@ -1555,7 +1632,7 @@ public partial class MainWindow : Window
             foreach (var onePiece in onePlate.Pieces)
             {
                 Display(onePiece.AIS, false);
-                AISContext.SetTransparency(onePiece.AIS, 0.3, false);
+                //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
                 AISContext.SetColor(onePiece.AIS, new WColor(255, 0, 0), update);
             }
         }
@@ -1564,7 +1641,7 @@ public partial class MainWindow : Window
             foreach (var onePiece in onePlate.Pieces)
             {
                 Display(onePiece.AIS, false);
-                AISContext.SetTransparency(onePiece.AIS, 0.3, false);
+                //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
                 AISContext.SetColor(onePiece.AIS, new(0, 255, 0), update);
             }
         }
@@ -1590,7 +1667,7 @@ public partial class MainWindow : Window
         if (thePlate.Sutured)
         {
             Display(thePlate.AIS, false);
-            AISContext.SetTransparency(thePlate.AIS, 0.3, false);
+            //AISContext.SetTransparency(thePlate.AIS, 0.3, false);
             AISContext.SetColor(thePlate.AIS, theColor, update);
         }
         else
@@ -1598,7 +1675,7 @@ public partial class MainWindow : Window
             foreach (var onePiece in thePlate.Pieces)
             {
                 Display(onePiece.AIS, false);
-                AISContext.SetTransparency(onePiece.AIS, 0.3, false);
+                //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
                 AISContext.SetColor(onePiece.AIS, theColor, update);
             }
         }
@@ -1615,7 +1692,7 @@ public partial class MainWindow : Window
             if (onePlate.Sutured)
             {
                 Display(onePlate.AIS, false);
-                AISContext.SetTransparency(onePlate.AIS, 0.3, false);
+                //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
                 AISContext.SetColor(onePlate.AIS, new WColor(255, 0, 0), update);
             }
         }
@@ -1624,9 +1701,28 @@ public partial class MainWindow : Window
             if (onePlate.Sutured)
             {
                 Display(onePlate.AIS, false);
-                AISContext.SetTransparency(onePlate.AIS, 0.3, false);
+                //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
                 AISContext.SetColor(onePlate.AIS, new(0, 255, 0), update);
             }
+        }
+    }
+
+    private void DisplayCurrentPieces(bool update)
+    {
+        if (CurrentPlate != null)
+        {
+            foreach (var Piece in CurrentPlate.Pieces)
+            {
+                Display(Piece.AIS, update);
+            }
+        }
+    }
+
+    private void DisplayCurrentPlate(bool update)
+    {
+        if (CurrentPlate != null)
+        {
+            Display(CurrentPlate.AIS, update);
         }
     }
 
@@ -1660,6 +1756,6 @@ public partial class MainWindow : Window
 
     private void TestInput()
     {
-        InputWorkpiece = new(new STEPExchange("mods\\test1Small01.stp").Shape());
+        InputWorkpiece = new(new STEPExchange("mods\\mytest.stp").Shape());
     }
 }

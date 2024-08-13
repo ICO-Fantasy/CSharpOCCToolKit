@@ -810,6 +810,24 @@
                                 Content="更新选中竖板"
                                 Style="{StaticResource dgButton}"
                                 Template="{StaticResource buttonTemplate}" />
+                            <Button
+                                x:Name="DisplayCurrentPieces_Button"
+                                Grid.Row="10"
+                                Grid.Column="4"
+                                Height="40"
+                                Click="DisplayCurrentPieces_Button_Click"
+                                Content="显示片"
+                                Style="{StaticResource dgButton}"
+                                Template="{StaticResource buttonTemplate}" />
+                            <Button
+                                x:Name="DisplayCurrentPlate_Button"
+                                Grid.Row="10"
+                                Grid.Column="5"
+                                Height="40"
+                                Click="DisplayCurrentPlate_Button_Click"
+                                Content="显示板"
+                                Style="{StaticResource dgButton}"
+                                Template="{StaticResource buttonTemplate}" />
                         </Grid>
 
                         <ScrollViewer

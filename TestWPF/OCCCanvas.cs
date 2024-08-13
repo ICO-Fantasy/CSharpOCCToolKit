@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using OCCTK;
 using OCCTK.OCC.AIS;
 using OCCTK.Visualization;
+using Windows.Devices.Display.Core;
 
 namespace OCCViewForm;
 
@@ -80,6 +82,18 @@ public class SingleManipulator
 
 public class OCCCanvas : Form
 {
+    #region 私有字段
+
+    private List<WAIS_Shape> _CurrentAIS = new List<WAIS_Shape>();
+
+    public bool ShowViewCube = true;
+
+    public bool ShowViewTrihedron = false;
+
+    public bool ShowOriginTrihedron = false;
+
+    #endregion
+
     #region 属性
 
     /// <summary>
@@ -122,7 +136,7 @@ public class OCCCanvas : Form
     /// <summary>
     /// AIS操作器
     /// </summary>
-    private WAIS_Manipulator myManipulator = SingleManipulator.Instance;
+    private readonly WAIS_Manipulator myManipulator = SingleManipulator.Instance;
 
     /// <summary>
     /// 重设滚轮光标计时器
@@ -261,20 +275,25 @@ public class OCCCanvas : Form
         }
         InteractiveContext = Viewer.CSharpAISContext;
         Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
+
         #region 设置鼠标样式
+
         CursorResetTimer = new System.Windows.Forms.Timer();
         CursorResetTimer.Interval = 500; // 设置计时器间隔为100毫秒
         CursorResetTimer.Tick += CursorResetTimer_Tick; // 绑定计时器的Tick事件处理方法
         #endregion
+
         CurrentActionMode = ActionMode.Normal;
         CurrentAction3d = Action3d.Normal_Nothing;
         IsActivateGrid = false;
 
         IsDrawRect = false;
         DegenerateMode = true;
-        Viewer.DisplayViewCube(5);
-        this.SetDisplayMode(DisplayMode.Shading);
-        this.SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
+        SetDisplayMode(DisplayMode.Shading);
+        SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
+        Viewer.DisplayViewCube(ShowViewCube);
+        Viewer.DisplayOriginTrihedron(ShowOriginTrihedron);
+        Viewer.DisplayViewTrihedron(ShowViewTrihedron);
     }
 
     private void InitializeComponent()
@@ -713,6 +732,7 @@ public class OCCCanvas : Form
     }
 
     #endregion
+
     #region 设置按键
     //设置未成功
     //private void OCCViewer_KeyDown(object sender, KeyEventArgs e)
@@ -723,7 +743,9 @@ public class OCCCanvas : Form
     //    }
     //}
     #endregion
+
     #region 视图控制
+
     public new void Update()
     {
         Viewer.UpdateView();
@@ -796,16 +818,20 @@ public class OCCCanvas : Form
 
         RaiseZoomingFinished();
     }
+
     #endregion
 
     #region 显示
+
     public void Display(WAIS_Shape theAIS, bool Toupdate)
     {
+        _CurrentAIS.Add(theAIS);
         InteractiveContext.Display(theAIS, Toupdate);
     }
 
     public void EraseSelect()
     {
+        _CurrentAIS.Remove(InteractiveContext.SelectedAIS());
         InteractiveContext.EraseObjects();
     }
 
@@ -814,15 +840,20 @@ public class OCCCanvas : Form
         InteractiveContext.Erase(theAIS, Toupdate);
     }
 
-    public void EraseAll()
+    public void EraseAll(bool Toupdate)
     {
-        InteractiveContext.EraseAll();
+        InteractiveContext.EraseAll(Toupdate);
+        Viewer.DisplayViewCube(ShowViewCube);
+        Viewer.DisplayOriginTrihedron(ShowOriginTrihedron);
+        Viewer.DisplayViewTrihedron(ShowViewTrihedron);
     }
 
     #endregion
 
     #region 对象交互
+
     #region 选择框
+
     /// <summary>
     /// 连续框选
     /// </summary>
@@ -904,7 +935,13 @@ public class OCCCanvas : Form
             Math.Abs(mouseCurrentY - mouseDownY)
         );
     }
+
     #endregion
+
+    /// <summary>
+    /// 设置选择模式
+    /// </summary>
+    /// <param name="theMode"></param>
     public void SetSelectionMode(OCCTK.Visualization.SelectionMode theMode)
     {
         Viewer.SetSelectionMode(theMode);
@@ -912,15 +949,24 @@ public class OCCCanvas : Form
 
     public WAIS_Shape GetSelectedShape()
     {
-        WAIS_Shape result = Viewer.GetSelectedAIS();
-        return result;
+        return InteractiveContext.SelectedAIS();
     }
+
+    #region 操作器
 
     public void Attach(WAIS_Shape theAIS)
     {
         myManipulator.Attach(theAIS);
         CurrentActionMode = ActionMode.Manipulator;
     }
+
+    public void Dettach()
+    {
+        myManipulator.Detach();
+        CurrentActionMode = ActionMode.Normal;
+    }
+
+    #endregion
 
     #endregion
 

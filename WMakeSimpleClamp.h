@@ -53,8 +53,10 @@ public ref struct VerticalPiece {
 	}
 public:
 	int NumberString = -1;
-	property WTopoDS_Shape^ Shape {WTopoDS_Shape^ get() { return gcnew WTopoDS_Shape(myPiece().Shape()); }};
-	property WAIS_Shape^ AIS { WAIS_Shape^ get() { if (myAIS == nullptr) { myAIS = gcnew WAIS_Shape(Shape); } return myAIS; }	}
+	property WTopoDS_Shape^ Shape {WTopoDS_Shape^ get() { return gcnew WTopoDS_Shape(myPiece().Shape()); }}
+	property WAIS_Shape^ AIS { WAIS_Shape^ get() { if (myAIS == nullptr) { myAIS = gcnew WAIS_Shape(Shape); } return myAIS; }}
+	property PlatePose^ Pose {PlatePose^ get() { return gcnew PlatePose(myPiece().pose); }}
+	property double Order {double get() { return myPiece().order; }}
 	OCCTK::SimpleClamp::VerticalPiece GetOCC() { return myPiece(); };
 
 	virtual System::String^ ToString() override { return NumberString.ToString(); }

@@ -4,18 +4,19 @@
 #include <Standard_Handle.hxx>
 //字符编码转换
 #include "ConvertChinese.h"
+
 namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-ViewCube::ViewCube(float axisSize) {
+WAIS_ViewCube::WAIS_ViewCube(float axesRadius) {
 	int R, G, B;
 	myViewCube() = new AIS_ViewCube();
 	nativeHandle() = myViewCube();
 	// 设置坐标轴半径
-	myViewCube()->SetAxesRadius(axisSize);
-	myViewCube()->SetAxesConeRadius(axisSize * 1.5);
-	myViewCube()->SetAxesSphereRadius(axisSize * 1.5);
+	myViewCube()->SetAxesRadius(axesRadius);
+	myViewCube()->SetAxesConeRadius(axesRadius * 1.5);
+	myViewCube()->SetAxesSphereRadius(axesRadius * 1.5);
 	//修改坐标轴文字颜色
 	Handle(Prs3d_Drawer) aDrawer = myViewCube()->Attributes();
 	aDrawer->SetDatumAspect(new Prs3d_DatumAspect());  // 动态设置
@@ -23,9 +24,9 @@ ViewCube::ViewCube(float axisSize) {
 	aDatumAsp->TextAspect(Prs3d_DP_XAxis)->SetColor(Quantity_NOC_RED2);
 	aDatumAsp->TextAspect(Prs3d_DP_YAxis)->SetColor(Quantity_NOC_GREEN2);
 	aDatumAsp->TextAspect(Prs3d_DP_ZAxis)->SetColor(Quantity_NOC_BLUE2);
-	aDatumAsp->TextAspect(Prs3d_DP_XAxis)->SetHeight(axisSize * 5);
-	aDatumAsp->TextAspect(Prs3d_DP_YAxis)->SetHeight(axisSize * 5);
-	aDatumAsp->TextAspect(Prs3d_DP_ZAxis)->SetHeight(axisSize * 5);
+	aDatumAsp->TextAspect(Prs3d_DP_XAxis)->SetHeight(axesRadius * 5);
+	aDatumAsp->TextAspect(Prs3d_DP_YAxis)->SetHeight(axesRadius * 5);
+	aDatumAsp->TextAspect(Prs3d_DP_ZAxis)->SetHeight(axesRadius * 5);
 	// 修改坐标轴颜色
 	aDatumAsp->ShadingAspect(Prs3d_DP_XAxis)->SetColor(Quantity_NOC_RED2);
 	aDatumAsp->ShadingAspect(Prs3d_DP_YAxis)->SetColor(Quantity_NOC_GREEN2);
@@ -67,13 +68,12 @@ ViewCube::ViewCube(float axisSize) {
 	// myViewCube()->SetBoxEdgeGap(0)
 }
 
-Handle(AIS_ViewCube) ViewCube::GetOCC() {
+Handle(AIS_ViewCube) WAIS_ViewCube::GetOCC() {
 	return myViewCube();
 
 }
 
-Handle(Standard_Transient) ViewCube::GetStd()
-{
+Handle(Standard_Transient) WAIS_ViewCube::GetStd() {
 	return myViewCube();
 }
 

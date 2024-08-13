@@ -66,38 +66,36 @@ public class myEdge {
 public:
 	myEdge() {};
 	// 构造函数使用初始化列表
-	myEdge(TopoDS_Edge theEdge, PlatePose thePose)
-		: edge(theEdge), pose(thePose) // 初始化列表初始化 edge 和 dir
+	myEdge(TopoDS_Edge theEdge)
+		: edge(theEdge) // 初始化列表初始化 edge 和 dir
 	{
 		gp_Pnt a, b;
 		BRepAdaptor_Curve aBAC(theEdge);
-		a = aBAC.Value(aBAC.FirstParameter());
-		b = aBAC.Value(aBAC.LastParameter());
-		if (b.Distance(gp_Pnt()) > a.Distance(gp_Pnt())) {
-			start = a;
-			end = b;
-		}
-		else {
-			start = b;
-			end = a;
-		}
+		start = aBAC.Value(aBAC.FirstParameter());
+		end = aBAC.Value(aBAC.LastParameter());
 		middle = aBAC.Value(aBAC.FirstParameter() + (aBAC.LastParameter() - aBAC.FirstParameter()) / 2);
 	};
+	gp_Pnt2d start2D() {
+		return gp_Pnt2d(start.X(), start.Y());
+	}
+	gp_Pnt2d end2D() {
+		return gp_Pnt2d(end.X(), end.Y());
+	}
 
 	TopoDS_Edge edge;
-	PlatePose pose;
 	gp_Pnt start;
 	gp_Pnt end;
 	gp_Pnt middle;
+	bool dir = true;
 
 	// 拷贝赋值操作符
 	myEdge& operator=(const myEdge& other) {
 		if (this != &other) {
 			edge = other.edge;
-			pose = other.pose;
 			start = other.start;
 			end = other.end;
 			middle = other.middle;
+			dir = other.dir;
 		}
 		return *this;
 	}
@@ -113,39 +111,41 @@ using Ring = std::vector<myEdge>;
 public struct VerticalPiece {
 	VerticalPiece() {};
 	VerticalPiece(PlatePose thePose, myEdge theMyEdge, double theZ) :pose(thePose), myEdge(theMyEdge), Z(theZ) {}
-	// 拷贝构造函数
-	VerticalPiece(const VerticalPiece& other)
-		: pose(other.pose), myEdge(other.myEdge), Z(other.Z), myLength(other.myLength) {
-		if (other.myShape) {
-			myShape = new TopoDS_Shape(*other.myShape);
-		}
-		else {
-			myShape = nullptr;
-		}
-	}
-	// 拷贝赋值运算符
-	VerticalPiece& operator=(const VerticalPiece& other) {
-		if (this != &other) {
-			pose = other.pose;
-			myEdge = other.myEdge;
-			Z = other.Z;
-			myLength = other.myLength;
-			if (myShape) {
-				delete myShape;
-			}
-			if (other.myShape) {
-				myShape = new TopoDS_Shape(*other.myShape);
-			}
-			else {
-				myShape = nullptr;
-			}
-		}
-		return *this;
-	}
+
+	//// 拷贝构造函数
+	//VerticalPiece(const VerticalPiece& other)
+	//	: pose(other.pose), myEdge(other.myEdge), Z(other.Z), myLength(other.myLength) {
+	//	if (other.myShape) {
+	//		myShape = new TopoDS_Shape(*other.myShape);
+	//	}
+	//	else {
+	//		myShape = nullptr;
+	//	}
+	//}
+	//// 拷贝赋值运算符
+	//VerticalPiece& operator=(const VerticalPiece& other) {
+	//	if (this != &other) {
+	//		pose = other.pose;
+	//		myEdge = other.myEdge;
+	//		Z = other.Z;
+	//		myLength = other.myLength;
+	//		if (myShape) {
+	//			delete myShape;
+	//		}
+	//		if (other.myShape) {
+	//			myShape = new TopoDS_Shape(*other.myShape);
+	//		}
+	//		else {
+	//			myShape = nullptr;
+	//		}
+	//	}
+	//	return *this;
+	//}
 
 	PlatePose pose;
 	myEdge myEdge;
 	double Z;
+	double order;// 用于记录排序的依据
 	// 由 Edge 和 Z 值生成形状
 	TopoDS_Shape* Shape() {
 		if (myShape != nullptr) return myShape;

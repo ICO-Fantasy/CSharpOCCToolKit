@@ -13,8 +13,7 @@ namespace OCC {
 namespace AIS {
 
 
-public ref class WAIS_InteractiveContext
-{
+public ref class WAIS_InteractiveContext {
 public:
 	WAIS_InteractiveContext(Handle(AIS_InteractiveContext) theAISContext);
 	void EraseObjects(void);
@@ -27,6 +26,7 @@ public:
 	void InitSelected();
 	bool MoreSelected();
 	WAIS_InteractiveObject^ SelectedInteractive();
+	WAIS_Shape^ SelectedAIS();
 	//void AreaSelect(int theX1, int theY1, int theX2, int theY2);
 	//void MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2);
 	//void XORAreaSelect(int theX1, int theY1, int theX2, int theY2);
@@ -35,7 +35,7 @@ public:
 	void Display(WAIS_InteractiveObject^ theAISObject, bool theToUpdateViewer);
 	void Display(WAIS_Shape^ theAIS, bool theToUpdateViewer);
 
-	void EraseAll();
+	void EraseAll(bool theToUpdateViewer);
 	void Erase(WAIS_InteractiveObject^ theAIS, bool theToUpdateViewer);
 	void Erase(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 	void Erase(WAIS_Shape^ theAIS, bool theToUpdateViewer);

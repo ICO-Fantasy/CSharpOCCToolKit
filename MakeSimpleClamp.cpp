@@ -33,7 +33,7 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <ShapeFix_Shape.hxx>
 
-static const double LINEAR_TOLERANCE = 1e-2;
+static const double LINEAR_TOLERANCE = 2e-2;
 
 namespace OCCTK {
 namespace SimpleClamp {
@@ -108,20 +108,24 @@ static bool Get2DLineIntersection(double x1, double y1, double x2, double y2,
 }
 
 // 判断是否可以继续向线段中添加线
-static bool AddEdge(Ring& theWire, std::vector<myEdge>& Edges, gp_Pnt& start, gp_Pnt& end) {
+static bool AddEdge(Ring& theWire, std::vector<myEdge>& Edges, gp_Pnt& start, gp_Pnt& end, bool originDir) {
 	for (size_t i = 0; i < Edges.size(); ++i) {
-		auto const& oneEdge = Edges[i];
+		myEdge oneEdge = Edges[i];
 		if (end.Distance(oneEdge.start) < LINEAR_TOLERANCE) {
-			end = oneEdge.end;
-			theWire.push_back(oneEdge);
-			Edges.erase(Edges.begin() + i);
-			return true;
+			if (oneEdge.dir == originDir) {
+				end = oneEdge.end;
+				theWire.push_back(oneEdge);
+				Edges.erase(Edges.begin() + i);
+				return true;
+			}
 		}
 		if (start.Distance(oneEdge.end) < LINEAR_TOLERANCE) {
-			start = oneEdge.start;
-			theWire.insert(theWire.begin(), oneEdge);
-			Edges.erase(Edges.begin() + i);
-			return true;
+			if (oneEdge.dir == originDir) {
+				start = oneEdge.start;
+				theWire.insert(theWire.begin(), oneEdge);
+				Edges.erase(Edges.begin() + i);
+				return true;
+			}
 		}
 	}
 	return false;
@@ -197,83 +201,119 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 		return theRing;
 	}
 
-	std::vector<myEdge> removedEdges;
-	removedEdges = theRing;
+	std::vector<myEdge> originRing = theRing;
 
 
 #pragma region 取基准点，并排序
 
-	// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序然后用addEdge方法划分两条线
-	gp_Pnt maxPoint;
-	double maxDis = 0.0;
-	for (auto oneEdge : removedEdges) {
-		gp_Pnt tempa = gp_Pnt(oneEdge.start);
-		tempa.SetZ(0.0);
-		if (maxDis < tempa.SquareDistance(gp_Pnt())) {
-			maxDis = tempa.SquareDistance(gp_Pnt());
-			maxPoint = tempa;
-		}
-		gp_Pnt tempb = gp_Pnt(oneEdge.end);
-		tempb.SetZ(0.0);
-		if (maxDis < tempb.SquareDistance(gp_Pnt())) {
-			maxDis = tempb.SquareDistance(gp_Pnt());
-			maxPoint = tempb;
-		}
-	}
-	// average Z
-	double totalZ = 0.0;
-	double totalNum = 0.0;
-	for (auto oneEdge : removedEdges) {
-		totalZ += oneEdge.start.Z();
-		totalZ += oneEdge.end.Z();
-		totalNum += 2.0;
-	}
-	// get Max Point
-	maxPoint.SetX(maxPoint.X() * 99.0);
-	maxPoint.SetY(maxPoint.Y() * 99.0);
-	maxPoint.SetZ(totalZ / totalNum);
+	//// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序然后划分两条线
+	//gp_Pnt maxPoint;
+	//double maxDis = 0.0;
+	//for (auto oneEdge : originRing) {
+	//	gp_Pnt tempa = gp_Pnt(oneEdge.start);
+	//	tempa.SetZ(0.0);
+	//	if (maxDis < tempa.SquareDistance(gp_Pnt())) {
+	//		maxDis = tempa.SquareDistance(gp_Pnt());
+	//		maxPoint = tempa;
+	//	}
+	//	gp_Pnt tempb = gp_Pnt(oneEdge.end);
+	//	tempb.SetZ(0.0);
+	//	if (maxDis < tempb.SquareDistance(gp_Pnt())) {
+	//		maxDis = tempb.SquareDistance(gp_Pnt());
+	//		maxPoint = tempb;
+	//	}
+	//}
+	//// average Z
+	//double totalZ = 0.0;
+	//double totalNum = 0.0;
+	//for (auto oneEdge : originRing) {
+	//	totalZ += oneEdge.start.Z();
+	//	totalZ += oneEdge.end.Z();
+	//	totalNum += 2.0;
+	//}
+	//// get Max Point
+	//maxPoint.SetX(maxPoint.X() * 99.0);
+	//maxPoint.SetY(maxPoint.Y() * 99.0);
+	//maxPoint.SetZ(totalZ / totalNum);
 
-	// 对Edge两端点重新排序(start更近)
-	for (size_t i = 0; i < removedEdges.size(); i++) {
-		auto oneEdge = removedEdges[i];
-		gp_Pnt tempStart = removedEdges[i].start;
-		gp_Pnt  tempEnd = removedEdges[i].end;
-		if (maxPoint.SquareDistance(tempStart) > maxPoint.SquareDistance(tempEnd)) {
-			std::swap(tempStart, tempEnd);
-		}
-		removedEdges[i].start = tempStart;
-		removedEdges[i].end = tempEnd;
-	}
+	//// 对Edge两端点重新排序(start更近)
+	//for (size_t i = 0; i < originRing.size(); i++) {
+	//	auto oneEdge = originRing[i];
+	//	gp_Pnt tempStart = originRing[i].start;
+	//	gp_Pnt  tempEnd = originRing[i].end;
+	//	if (maxPoint.SquareDistance(tempStart) > maxPoint.SquareDistance(tempEnd)) {
+	//		std::swap(tempStart, tempEnd);
+	//	}
+	//	originRing[i].start = tempStart;
+	//	originRing[i].end = tempEnd;
+	//}
 
-	// 对Edges重新排序(start更近)
-	std::sort(removedEdges.begin(), removedEdges.end(),
-		[&](const myEdge& edge1, const myEdge& edge2) {
-			return maxPoint.SquareDistance(edge1.start) < maxPoint.SquareDistance(edge2.start);
-		});
+	//对Edges重新排序(start更近)
+	//std::sort(removedEdges.begin(), removedEdges.end(),
+	//	[&](const myEdge& edge1, const myEdge& edge2) {
+	//		return maxPoint.SquareDistance(edge1.start) < maxPoint.SquareDistance(edge2.start);
+	//	});
 
 #pragma endregion
+	//对线排序
+	std::vector<myEdge> orderedEdges;
+	TopTools_ListOfShape edgeList;
+	BRepBuilderAPI_MakeWire wireMaker = BRepBuilderAPI_MakeWire();
+	for (size_t i = 0; i < originRing.size(); i++) { edgeList.Append(originRing[i].edge); }
+	gp_Vec2d baseVec2d = gp_Vec2d(originRing.front().start2D(), originRing.front().end2D());
+	if (baseVec2d.Magnitude() == 0.0) { baseVec2d = gp_Vec2d(originRing.back().start2D(), originRing.back().end2D()); }
+	wireMaker.Add(edgeList);
+	BRepTools_WireExplorer wireExplorer(wireMaker);
+	while (wireExplorer.More()) {
+		myEdge anEdge(wireExplorer.Current());
+		// 对Edge两端点重新排序
+		gp_Pnt theStart = BRep_Tool::Pnt(wireExplorer.CurrentVertex());
+		if (anEdge.start.Distance(theStart) > anEdge.end.Distance(theStart)) { std::swap(anEdge.start, anEdge.end); }
+		// 获取线的相对方向
+		gp_Vec2d edgeVec2d = gp_Vec2d(anEdge.start2D(), anEdge.end2D());
+		if (edgeVec2d.Magnitude() != 0.0) {
+			if (edgeVec2d.IsOpposite(baseVec2d, 1e-2)) { anEdge.dir = true; }
+			else { anEdge.dir = false; }
+		}
+		orderedEdges.push_back(anEdge);
+		wireExplorer.Next();
+	}
+	int trueCount = 0;
+	int falseCount = 0;
+
+	for (auto d : orderedEdges) {
+		if (d.dir) {
+			trueCount += 1;
+		}
+		else {
+			falseCount += 1;
+		}
+	}
+
 
 	// 构建第一条线
 	std::vector<myEdge> firstWire, secondWire;
-	gp_Pnt startP = removedEdges.front().start;
-	gp_Pnt endP = removedEdges.front().end;
-	firstWire.push_back(removedEdges.front());
-	removedEdges.erase(removedEdges.begin());
-	while (AddEdge(firstWire, removedEdges, startP, endP)) {}
+	gp_Pnt startP = orderedEdges.front().start;
+	gp_Pnt endP = orderedEdges.front().end;
+	bool originDir = orderedEdges.front().dir;
+	firstWire.push_back(orderedEdges.front());
+	orderedEdges.erase(orderedEdges.begin());
+	while (AddEdge(firstWire, orderedEdges, startP, endP, originDir)) {}
 
 	// 直接取剩余线作为第二条
-	for (const auto& oneEdge : removedEdges) {
-		bool found = false;
-		for (const auto& firstEdge : firstWire) {
-			if (oneEdge == firstEdge) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			secondWire.push_back(oneEdge);
-		}
-	}
+	secondWire = orderedEdges;
+	//for (const auto& oneEdge : orderedEdges) {
+	//	bool found = false;
+	//	for (const auto& firstEdge : firstWire) {
+	//		if (oneEdge == firstEdge) {
+	//			found = true;
+	//			break;
+	//		}
+	//	}
+	//	if (!found) {
+	//		secondWire.push_back(oneEdge);
+	//	}
+	//}
 
 	// 比较高度
 
@@ -452,7 +492,7 @@ VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape
 	std::vector<Ring> Rings;
 	TopExp_Explorer aEdgeExp = TopExp_Explorer(theSection, TopAbs_EDGE);
 	while (aEdgeExp.More()) {
-		myEdge anEdge(TopoDS::Edge(aEdgeExp.Current()), thePose);// 遍历得到每一个边
+		myEdge anEdge(TopoDS::Edge(aEdgeExp.Current()));// 遍历得到每一个边
 		aEdgeExp.Next();
 		TempEdges.push_back(anEdge);
 	}
@@ -463,13 +503,70 @@ VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape
 		bottomEdges = SplitRing(aRing);
 
 #pragma region 构造 Pieces
+
+#pragma region 取基准点，并排序
+
+		double refZ;
+		// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序
+		gp_Pnt maxPoint;
+		double maxDis = 0.0;
+		for (auto oneEdge : bottomEdges) {
+			gp_Pnt tempa = gp_Pnt(oneEdge.start);
+			tempa.SetZ(0.0);
+			if (maxDis < tempa.SquareDistance(gp_Pnt())) {
+				maxDis = tempa.SquareDistance(gp_Pnt());
+				maxPoint = tempa;
+			}
+			gp_Pnt tempb = gp_Pnt(oneEdge.end);
+			tempb.SetZ(0.0);
+			if (maxDis < tempb.SquareDistance(gp_Pnt())) {
+				maxDis = tempb.SquareDistance(gp_Pnt());
+				maxPoint = tempb;
+			}
+		}
+		// average Z
+		double totalZ = 0.0;
+		double totalNum = 0.0;
+		for (auto oneEdge : bottomEdges) {
+			totalZ += oneEdge.start.Z();
+			totalZ += oneEdge.end.Z();
+			totalNum += 2.0;
+		}
+		// get Max Point
+		maxPoint.SetX(maxPoint.X() * 99.0);
+		maxPoint.SetY(maxPoint.Y() * 99.0);
+		refZ = totalZ / totalNum;
+		maxPoint.SetZ(refZ);
+
+		// 对Edge两端点重新排序(start更近)
+		for (size_t i = 0; i < bottomEdges.size(); i++) {
+			auto oneEdge = bottomEdges[i];
+			gp_Pnt tempStart = bottomEdges[i].start;
+			gp_Pnt tempEnd = bottomEdges[i].end;
+			if (maxPoint.SquareDistance(tempStart) > maxPoint.SquareDistance(tempEnd)) {
+				std::swap(tempStart, tempEnd);
+			}
+			bottomEdges[i].start = tempStart;
+			bottomEdges[i].end = tempEnd;
+		}
+
+		// 对Edges重新排序(start更近)
+		std::sort(bottomEdges.begin(), bottomEdges.end(),
+			[&](const myEdge& edge1, const myEdge& edge2) {
+				return maxPoint.SquareDistance(edge1.start) < maxPoint.SquareDistance(edge2.start);
+			});
+
+#pragma endregion
+
 		for (myEdge anEdge : bottomEdges) {
 			VerticalPiece anPiece(thePose, anEdge, theZ);
+			anPiece.order = anEdge.start.SquareDistance(maxPoint);// 保存距离基准点的平方距离，用于排序
 			thePalte.pieces.push_back(anPiece);
 		}
 #pragma endregion
 
 	}
+
 #pragma endregion
 
 	return thePalte;
@@ -529,7 +626,7 @@ static VerticalPlate TrimEdgeEnds(VerticalPlate& thePlate) {
 
 		TopoDS_Edge outEdge = TrimEdge(aPiece.myEdge.edge, p1, p2);
 		if (!outEdge.IsNull()) {
-			tempPieces.push_back(VerticalPiece(aPiece.pose, myEdge(outEdge, aPiece.pose), aPiece.Z));
+			tempPieces.push_back(VerticalPiece(aPiece.pose, myEdge(outEdge), aPiece.Z));
 		}
 	}
 	thePlate.pieces = tempPieces;
@@ -587,7 +684,7 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 		param2 = ppc2S.LowerDistanceParameter();
 
 		TopoDS_Edge newEdge = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-		myEdge newmyEdge(newEdge, thePiece.pose);
+		myEdge newmyEdge(newEdge);
 		//newEdge.Orientation(thePiece.myEdge.edge.Orientation());//设置线的方向为同向
 
 		VerticalPiece newPiece(thePiece.pose, newmyEdge, thePiece.Z);
@@ -763,6 +860,7 @@ VerticalPlate SuturePiece(VerticalPlate& thePlate, const BasePlate theBase, doub
 	}
 
 #pragma region 取基准点，并排序
+
 	double refZ;
 	// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序
 	gp_Pnt maxPoint;
@@ -818,6 +916,7 @@ VerticalPlate SuturePiece(VerticalPlate& thePlate, const BasePlate theBase, doub
 	const gp_Vec plateDir(tempEdges.front().start, tempEdges.back().end);
 
 #pragma region 线段生成
+
 	// basePlate
 	double X1 = theBase.X; double X2 = theBase.X + theBase.dX;
 	if (X1 > X2) { std::swap(X1, X2); }
@@ -1099,19 +1198,21 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 		//}
 	}
 	thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(lastP, thePlate.start));
-	TopoDS_Shape finalShape = BRepBuilderAPI_MakeFace(thePlate._unclosedWire).Shape();
-	// 还需要额外处理切除
-	if (!middleToDown) {
-		double ZC = thePlate.Z + thePlate.slotHight;
-		// 创建一个圆柱 (从中间往上）
-		for (gp_Pnt aPnt : cutPoints) {
-			gp_Pnt cutPnt = aPnt;
-			cutPnt.SetZ(ZC);
-			TopoDS_Shape theSlot = BRepPrimAPI_MakeCylinder(gp_Ax2(cutPnt, gp_Dir(0.0, 0.0, 1.0)), thePlate.connectionThickness, 999.0).Shape();
-			finalShape = BRepAlgoAPI_Cut(finalShape, theSlot).Shape();
+	if (thePlate._unclosedWire.IsDone()) {
+		TopoDS_Shape finalShape = BRepBuilderAPI_MakeFace(thePlate._unclosedWire).Shape();
+		// 还需要额外处理切除
+		if (!middleToDown) {
+			double ZC = thePlate.Z + thePlate.slotHight;
+			// 创建一个圆柱 (从中间往上）
+			for (gp_Pnt aPnt : cutPoints) {
+				gp_Pnt cutPnt = aPnt;
+				cutPnt.SetZ(ZC);
+				TopoDS_Shape theSlot = BRepPrimAPI_MakeCylinder(gp_Ax2(cutPnt, gp_Dir(0.0, 0.0, 1.0)), thePlate.connectionThickness, 999.0).Shape();
+				finalShape = BRepAlgoAPI_Cut(finalShape, theSlot).Shape();
+			}
 		}
+		thePlate.shape = finalShape;
 	}
-	thePlate.shape = finalShape;
 
 	//todo 倒圆角 目前构建会失败
 	//// 缝合组合体为一个面
@@ -1139,20 +1240,19 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 	//	thePlate.shape = filleter.Shape();
 	//}
 
-	// 缝合组合体为一个面
-	if (middleToDown) {
-		// 执行倒圆角
-		BRepFilletAPI_MakeFillet2d filleter(TopoDS::Face(thePlate.shape));
-		BRepTools_WireExplorer wireExplorer(thePlate._unclosedWire.Wire());
-		while (wireExplorer.More()) {
-			TopoDS_Vertex vertex = wireExplorer.CurrentVertex();
-			filleter.AddFillet(vertex, theFilletRadius);
-			wireExplorer.Next();
-		}
-		if (filleter.IsDone()) {
-			thePlate.shape = filleter.Shape();
-		}
-	}
+	// 执行倒圆角
+	//if (middleToDown) {
+	//	BRepFilletAPI_MakeFillet2d filleter(TopoDS::Face(thePlate.shape));
+	//	BRepTools_WireExplorer wireExplorer(thePlate._unclosedWire.Wire());
+	//	while (wireExplorer.More()) {
+	//		TopoDS_Vertex vertex = wireExplorer.CurrentVertex();
+	//		filleter.AddFillet(vertex, theFilletRadius);
+	//		wireExplorer.Next();
+	//	}
+	//	if (filleter.IsDone()) {
+	//		thePlate.shape = filleter.Shape();
+	//	}
+	//}
 	return thePlate;
 }
 
@@ -1504,7 +1604,7 @@ VerticalPlate BrandNumber(VerticalPlate thePlate, double hight = 60.0) {
 	gp_Trsf tempT;
 	tempT.SetTranslation(gp_Vec(thePlate.start, thePlate.end).Normalized().Multiplied(5.0));
 	gp_Pnt aimPnt = thePlate.start.Transformed(tempT);
-	aimPnt.SetZ(thePlate.Z + 5.0);
+	aimPnt.SetZ(thePlate.Z + 10.0);
 	transT.SetTranslation(gp_Pnt(), aimPnt);
 	// 旋转
 	gp_Trsf rotT;
