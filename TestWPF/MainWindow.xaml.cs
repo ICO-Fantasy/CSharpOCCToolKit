@@ -14,53 +14,64 @@ using System.Windows.Forms.Integration;
 using System.Windows.Forms.VisualStyles;
 using Microsoft.VisualBasic;
 using Microsoft.Windows.Themes;
-using OCCTK.Ex;
+using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.Laser;
+using OCCTK.OCC;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.TopoDS;
 using OCCViewForm;
-using static System.Net.Mime.MediaTypeNames;
+//设置别名
+using AShape = OCCTK.OCC.AIS.Shape;
+using Color = OCCTK.Extension.Color;
+using TShape = OCCTK.OCC.TopoDS.Shape;
 
 namespace TestWPF;
 
 public class InputWorkpiece
 {
-    public InputWorkpiece(WTopoDS_Shape theShape)
+    public InputWorkpiece(TShape theShape)
     {
         _InputWorkpiece = theShape;
-        _AISInputWorkpiece = new WAIS_Shape(theShape);
+        _AISInputWorkpiece = new AShape(theShape);
     }
 
-    private WTopoDS_Shape _InputWorkpiece;
-    private WAIS_Shape _AISInputWorkpiece;
-    public WTopoDS_Shape Shape
+    private TShape _InputWorkpiece;
+    private AShape _AISInputWorkpiece;
+    public TShape Shape
     {
         get { return _InputWorkpiece; }
     }
-    public WAIS_Shape AIS
+    public AShape AIS
     {
         get { return _AISInputWorkpiece; }
+    }
+
+    public void Transform(Trsf T)
+    {
+        var trans = new OCCTK.OCC.BRepBuilderAPI.Transform(_InputWorkpiece, T);
+        _InputWorkpiece = trans.Shape();
+        _AISInputWorkpiece = new AShape(_InputWorkpiece);
     }
 }
 
 public class CombinedFixtureBoard
 {
-    public CombinedFixtureBoard(WTopoDS_Shape theShape)
+    public CombinedFixtureBoard(TShape theShape)
     {
         _InputShape = theShape;
-        _AIS = new WAIS_Shape(theShape);
+        _AIS = new AShape(theShape);
     }
 
-    private WTopoDS_Shape _InputShape;
-    private WAIS_Shape _AIS;
-    public WTopoDS_Shape Shape
+    private TShape _InputShape;
+    private AShape _AIS;
+    public TShape Shape
     {
         get { return _InputShape; }
     }
-    public WAIS_Shape AIS
+    public AShape AIS
     {
         get { return _AIS; }
     }
@@ -376,9 +387,12 @@ public enum VPCMode
 public partial class MainWindow : Window
 {
     private OCCCanvas Viewer;
-    private WAIS_InteractiveContext AISContext;
+    private InteractiveContext AISContext;
 
-    private bool _useManipulator = false;
+    private AShape? manipulatedObject = null;
+
+    private Ax2 StartPosition;
+    private Ax2 EndPosition;
 
     /// <summary>
     /// 创建的竖板列表，分为两部分储存
@@ -400,7 +414,7 @@ public partial class MainWindow : Window
     /// <summary>
     /// 当前展示的AIS对象列表
     /// </summary>
-    private List<WAIS_Shape> _CurrentAIS = new List<WAIS_Shape>();
+    private List<AShape> _CurrentAIS = new List<AShape>();
 
     /// <summary>
     /// 展平后的结果
@@ -430,8 +444,8 @@ public partial class MainWindow : Window
 
     #region 创建竖板参数
 
-    private static readonly Wgp_Dir DirectionX = new(1.0, 0.0, 0.0);
-    private static readonly Wgp_Dir DirectionY = new(0.0, 1.0, 0.0);
+    private static readonly Dir DirectionX = new(1.0, 0.0, 0.0);
+    private static readonly Dir DirectionY = new(0.0, 1.0, 0.0);
 
     /// <summary>
     /// 创建竖板所用模式
@@ -517,9 +531,9 @@ public partial class MainWindow : Window
             {
                 _CurrentPlate = value;
                 CurrentPlateSelectedLocation_TextBox.Text =
-                    $"{value.Pose.Point.X():F1}, {value.Pose.Point.Y():F1}, {value.Pose.Point.Z():F1}";
+                    $"{value.Pose.Location.X():F1}, {value.Pose.Location.Y():F1}, {value.Pose.Location.Z():F1}";
                 CurrentPlateSelectedDirection_TextBox.Text =
-                    $"{value.Pose.Dir.X():F1}, {value.Pose.Dir.Y():F1}, {value.Pose.Dir.Z():F1}";
+                    $"{value.Pose.Direction.X():F1}, {value.Pose.Direction.Y():F1}, {value.Pose.Direction.Z():F1}";
                 CurrentPlateConnectionThickness_TextBox.Text = $"{value.ConnectionThickness}";
                 CurrentPlateNumberString_TextBox.Text = $"{value.NumberString}";
                 CurrentPlateFilletRadius_TextBox.Text = $"{value.FilletRadius}";
@@ -543,6 +557,7 @@ public partial class MainWindow : Window
     }
     //
     #endregion
+
     //public MainViewModel ViewModel { get; set; }
 
     public MainWindow()
@@ -667,7 +682,7 @@ public partial class MainWindow : Window
 
     private void Test_Button_Click(object sender, RoutedEventArgs e)
     {
-        InputWorkpiece = new(new WBRepPrimAPI_MakeBox(20, 20, 0.1).Shape());
+        InputWorkpiece = new(new MakeBox(20, 20, 20).Shape());
         Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
     }
@@ -755,7 +770,6 @@ public partial class MainWindow : Window
     }
 
     #endregion
-
 
     #region 监听事件
     private void BasePlateOffsetX_TextChanged(object sender, EventArgs e)
@@ -1089,7 +1103,7 @@ public partial class MainWindow : Window
         //        CurrentPlate = SimpleClampMaker.MakeVerticalPlate(
         //            InputWorkpiece.Shape,
         //            BasePlate,
-        //            new PlatePose(new Wgp_Pnt(5, 0, 0), DirectionY),
+        //            new PlatePose(new Pnt(5, 0, 0), DirectionY),
         //            CurrentPlate.Clearances,
         //            CurrentPlate.MinSupportLen,
         //            CurrentPlate.CuttingDistance
@@ -1241,47 +1255,39 @@ public partial class MainWindow : Window
         OutputSTEP();
     }
 
-    //todo
-    private void NumberMark_Button_Click(object sender, RoutedEventArgs e)
-    {
-        for (int i = 0; i < VerticalPlates.Count; i++)
-        {
-            VerticalPlate thePlate = VerticalPlates[i];
-            //SimpleClampMaker.BrandNumber(
-            //    ref thePlate,
-            //    thePlate.connectionHeight * 0.8,
-            //    4
-            ////new Wgp_Pnt(40.0, 40.0, -80.0)
-            //);
-            VerticalPlates[i] = thePlate; // 将修改后的对象重新赋值给集合中的元素
-        }
-        //重新显示更新后的shape
-        if (InputWorkpiece != null && BasePlate != null)
-        {
-            EraseAll(false);
-            Viewer.Display(InputWorkpiece.AIS, false);
-            Viewer.Display(BasePlate.AIS, false);
-
-            foreach (var onePlate in VerticalPlates)
-            {
-                Viewer.Display(onePlate.AIS, true);
-            }
-        }
-        Viewer.FitAll();
-        Viewer.Update();
-    }
-
-    //todo
+    /// <summary>
+    /// 操作器
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Manipulator_Button_Click(object sender, RoutedEventArgs e)
     {
-        _useManipulator = !_useManipulator;
-        Viewer.CurrentActionMode = _useManipulator ? ActionMode.Manipulator : ActionMode.Normal;
-
-        if (_useManipulator)
+        if (InputWorkpiece != null)
         {
-            Viewer.Attach(InputWorkpiece.AIS);
+            if (manipulatedObject == null)
+            {
+                Viewer.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Scaling, false);
+                Viewer.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
+                manipulatedObject = InputWorkpiece.AIS;
+                Viewer.Attach(manipulatedObject);
+                StartPosition = Viewer.GetManipulatorPosition();
+            }
+            else
+            {
+                if (BasePlate != null)
+                {
+                    Viewer.Remove(BasePlate.AIS, false);
+                    BasePlate = null;
+                }
+                EndPosition = Viewer.GetManipulatorPosition();
+                Viewer.Remove(InputWorkpiece.AIS, false);
+                InputWorkpiece.Transform(new Trsf(StartPosition, EndPosition));
+                Viewer.ResetManipulatorPart();
+                manipulatedObject = null;
+                DisplayInputWorkpiece(false);
+            }
+            Viewer.Update();
         }
-        else { }
     }
 
     private void Erase_Button_Click(object sender, RoutedEventArgs e)
@@ -1384,7 +1390,7 @@ public partial class MainWindow : Window
             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
                 InputWorkpiece.Shape,
                 BasePlate,
-                new PlatePose(new Wgp_Pnt(tempX, BasePlate.Y, 0.0), DirectionX),
+                new PlatePose(new Pnt(tempX, BasePlate.Y, 0.0), DirectionX),
                 ClearancesParameter,
                 MinSupportingLenParameter,
                 CuttingDistanceParameter
@@ -1404,7 +1410,7 @@ public partial class MainWindow : Window
             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
                 InputWorkpiece.Shape,
                 BasePlate,
-                new PlatePose(new Wgp_Pnt(BasePlate.X, tempY, 0.0), DirectionY),
+                new PlatePose(new Pnt(BasePlate.X, tempY, 0.0), DirectionY),
                 ClearancesParameter,
                 MinSupportingLenParameter,
                 CuttingDistanceParameter
@@ -1432,7 +1438,7 @@ public partial class MainWindow : Window
         //                var tempPlate = SimpleClampMaker.MakeVerticalPlate(
         //                    InputWorkpiece.Shape,
         //                    BasePlate,
-        //                    new PlatePose(new Wgp_Pnt(currentX, BasePlate.Y, 0.0), DirectionX),
+        //                    new PlatePose(new Pnt(currentX, BasePlate.Y, 0.0), DirectionX),
         //                    ClearancesParameter,
         //                    MinSupportingLenParameter,
         //                    CuttingDistanceParameter
@@ -1460,7 +1466,7 @@ public partial class MainWindow : Window
         //                var tempPlate = SimpleClampMaker.MakeVerticalPlate(
         //                    InputWorkpiece.Shape,
         //                    BasePlate,
-        //                    new PlatePose(new Wgp_Pnt(BasePlate.X, currentY, 0.0), DirectionY),
+        //                    new PlatePose(new Pnt(BasePlate.X, currentY, 0.0), DirectionY),
         //                    ClearancesParameter,
         //                    MinSupportingLenParameter,
         //                    CuttingDistanceParameter
@@ -1561,12 +1567,12 @@ public partial class MainWindow : Window
     /// </summary>
     /// <param name="theAIS"></param>
     /// <param name="update"></param>
-    private void Display(WAIS_Shape theAIS, bool update)
+    private void Display(AShape theAIS, bool update)
     {
         Viewer.Display(theAIS, update);
     }
 
-    private void Erase(WAIS_Shape theAIS, bool update)
+    private void Erase(AShape theAIS, bool update)
     {
         Viewer.Erase(theAIS, update);
     }
@@ -1592,7 +1598,7 @@ public partial class MainWindow : Window
             {
                 Display(InputWorkpiece.AIS, false);
                 //AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
-                AISContext.SetColor(InputWorkpiece.AIS, new WColor(125, 125, 125), false);
+                AISContext.SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), false);
             }
             else
             {
@@ -1613,11 +1619,11 @@ public partial class MainWindow : Window
             {
                 Display(BasePlate.AIS, false);
                 //AISContext.SetTransparency(BasePlate.AIS, 0.8, false);
-                AISContext.SetColor(BasePlate.AIS, new WColor(204, 102, 51), false);
+                AISContext.SetColor(BasePlate.AIS, new Color(204, 102, 51), false);
             }
             else
             {
-                Erase(InputWorkpiece.AIS, update);
+                Erase(BasePlate.AIS, update);
             }
         }
     }
@@ -1633,7 +1639,7 @@ public partial class MainWindow : Window
             {
                 Display(onePiece.AIS, false);
                 //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
-                AISContext.SetColor(onePiece.AIS, new WColor(255, 0, 0), update);
+                AISContext.SetColor(onePiece.AIS, new Color(255, 0, 0), update);
             }
         }
         foreach (var onePlate in MiddleToUpPlates)
@@ -1654,7 +1660,7 @@ public partial class MainWindow : Window
     /// <param name="update"></param>
     private void DisplaySinglePlate(VerticalPlate thePlate, bool update)
     {
-        WColor theColor = new(125, 125, 125);
+        Color theColor = new(125, 125, 125);
         if (MiddleToDownPlates.Contains(thePlate))
         {
             theColor = new(255, 0, 0);
@@ -1693,7 +1699,7 @@ public partial class MainWindow : Window
             {
                 Display(onePlate.AIS, false);
                 //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
-                AISContext.SetColor(onePlate.AIS, new WColor(255, 0, 0), update);
+                AISContext.SetColor(onePlate.AIS, new Color(255, 0, 0), update);
             }
         }
         foreach (var onePlate in MiddleToUpPlates)
@@ -1757,5 +1763,19 @@ public partial class MainWindow : Window
     private void TestInput()
     {
         InputWorkpiece = new(new STEPExchange("mods\\mytest.stp").Shape());
+    }
+
+    private void Display_Input_Button_Click(object sender, RoutedEventArgs e)
+    {
+        ShowInputWorkpiece = !ShowInputWorkpiece;
+        DisplayInputWorkpiece(ShowInputWorkpiece);
+        Viewer.Update();
+    }
+
+    private void Display_Base_Button_Click(object sender, RoutedEventArgs e)
+    {
+        ShowBasePlate = !ShowBasePlate;
+        DisplayBasePlates(ShowBasePlate);
+        Viewer.Update();
     }
 }

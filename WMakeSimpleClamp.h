@@ -1,18 +1,18 @@
 ﻿#pragma once
 #include "MakeSimpleClamp.h"
-#include "Wgp_Pnt.h"
-#include "Wgp_Dir.h"
-#include "WTopoDS_Shape.h"
-#include "WAIS_Shape.h"
+#include "ICO_Pnt.h"
+#include "ICO_Dir.h"
+#include "ICO_TopoDS_Shape.h"
+#include "ICO_AIS_Shape.h"
 #include "StringExchange.h"
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 
 using namespace System::Collections::Generic;
 using namespace OCCTK;
-using namespace OCCTK::OCC::AIS;
 using namespace OCCTK::OCC::gp;
-using namespace OCCTK::OCC::TopoDS;
+typedef OCCTK::OCC::AIS::Shape AShape;
+typedef OCCTK::OCC::TopoDS::Shape TShape;
 
 namespace OCCTK {
 namespace Laser {
@@ -20,9 +20,9 @@ namespace Laser {
 
 public ref struct PlatePose {
 	PlatePose(SimpleClamp::PlatePose theOCCPose) { myDir() = theOCCPose; }
-	PlatePose(Wgp_Pnt^ thePoint, Wgp_Dir^ theDir) { myDir() = SimpleClamp::PlatePose(*thePoint->GetOCC(), *theDir->GetOCC()); }
-	property Wgp_Pnt^ Point {Wgp_Pnt^ get() { return gcnew Wgp_Pnt(myDir().point); }};
-	property Wgp_Dir^ Dir { Wgp_Dir^ get() { return  gcnew Wgp_Dir(myDir().dir); } };
+	PlatePose(Pnt^ thePoint, Dir^ theDir) { myDir() = SimpleClamp::PlatePose(thePoint->GetOCC(), theDir->GetOCC()); }
+	property Pnt^ Location {Pnt^ get() { return gcnew Pnt(myDir().point); }};
+	property Dir^ Direction { Dir^ get() { return  gcnew Dir(myDir().dir); } };
 public:
 	SimpleClamp::PlatePose GetOCC() { return myDir(); };
 private:
@@ -31,7 +31,7 @@ private:
 
 public ref struct BasePlate {
 	BasePlate(SimpleClamp::BasePlate theBasePlate) { myBP() = theBasePlate; }
-	property WTopoDS_Shape^ Shape {WTopoDS_Shape^ get() { return gcnew WTopoDS_Shape(myBP().shape); }};
+	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().shape); }};
 	property double X {double get() { return myBP().X; }};
 	property double Y {double get() { return myBP().Y; }};
 	property double Z {double get() { return myBP().Z; }};
@@ -39,12 +39,12 @@ public ref struct BasePlate {
 	property double DY {double get() { return myBP().dY; }};
 	property double OffsetX {double get() { return myBP().offsetX; }};
 	property double OffsetY {double get() { return myBP().offsetY; }};
-	property WAIS_Shape^ AIS {WAIS_Shape^ get() { if (myAIS == nullptr) { myAIS = gcnew WAIS_Shape(Shape); } return myAIS; }};
+	property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }};
 public:
 	SimpleClamp::BasePlate GetOCC() { return myBP(); };
 private:
 	NCollection_Haft<SimpleClamp::BasePlate> myBP;
-	WAIS_Shape^ myAIS;
+	AShape^ myAIS;
 };
 
 public ref struct VerticalPiece {
@@ -53,8 +53,8 @@ public ref struct VerticalPiece {
 	}
 public:
 	int NumberString = -1;
-	property WTopoDS_Shape^ Shape {WTopoDS_Shape^ get() { return gcnew WTopoDS_Shape(myPiece().Shape()); }}
-	property WAIS_Shape^ AIS { WAIS_Shape^ get() { if (myAIS == nullptr) { myAIS = gcnew WAIS_Shape(Shape); } return myAIS; }}
+	property TShape^ Shape {TShape^ get() { return gcnew TShape(myPiece().Shape()); }}
+	property AShape^ AIS { AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }}
 	property PlatePose^ Pose {PlatePose^ get() { return gcnew PlatePose(myPiece().pose); }}
 	property double Order {double get() { return myPiece().order; }}
 	OCCTK::SimpleClamp::VerticalPiece GetOCC() { return myPiece(); };
@@ -62,7 +62,7 @@ public:
 	virtual System::String^ ToString() override { return NumberString.ToString(); }
 private:
 	NCollection_Haft<OCCTK::SimpleClamp::VerticalPiece> myPiece;
-	WAIS_Shape^ myAIS;
+	AShape^ myAIS;
 };
 
 public ref struct VerticalPlate {
@@ -89,7 +89,7 @@ public ref struct VerticalPlate {
 	// 标签编号
 	property String^ NumberString { String^ get() { return gcnew String(myPlate().numberString.ToCString()); }void set(String^ value) { myPlate().numberString = DataExchange::ToAsciiString(value); }};
 	// 最终的竖板形状
-	property WAIS_Shape^ AIS {WAIS_Shape^ get() { if (sutured) { return myAIS; } return nullptr; }};
+	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
 	// 用于判断是否已连接
 	property bool Sutured {bool get() { return sutured; } };
 public:
@@ -103,17 +103,17 @@ private:
 	NCollection_Haft<SimpleClamp::VerticalPlate> myPlate;
 internal:
 	bool sutured = false;
-	WTopoDS_Shape^ myShape;
-	WAIS_Shape^ myAIS;
+	TShape^ myShape;
+	AShape^ myAIS;
 };
 
 #pragma endregion
 
 public ref class SimpleClampMaker {
 public:
-	static BasePlate^ MakeBasePlate_NoInteract(WTopoDS_Shape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY);
+	static BasePlate^ MakeBasePlate_NoInteract(TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY);
 
-	static VerticalPlate^ MakeVerticalPlate(WTopoDS_Shape^ InputWorkpiece, BasePlate^ BasePlate, PlatePose^ theDirection, double theClearances, double theMinSupportLen, double theCuttingDistance);
+	static VerticalPlate^ MakeVerticalPlate(TShape^ InputWorkpiece, BasePlate^ BasePlate, PlatePose^ theDirection, double theClearances, double theMinSupportLen, double theCuttingDistance);
 
 	static VerticalPlate^ SuturePLate(VerticalPlate^ theVerticalPlate, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness);
 	static cli::array<List<VerticalPlate^>^>^ ConnectVerticalPLates(List<VerticalPlate^>^ toDownPlates, List<VerticalPlate^>^ toUpPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness, double theFilletRadius);
@@ -122,7 +122,7 @@ public:
 	static VerticalPlate^ BrandNumber(VerticalPlate^ theVerticalPlate, double hight);
 	//static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint);
 
-	static WTopoDS_Shape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);
+	static TShape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);
 };
 
 }

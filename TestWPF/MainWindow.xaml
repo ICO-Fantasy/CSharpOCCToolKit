@@ -165,6 +165,17 @@
                 Content="移动工件"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
+            <Separator />
+            <Button
+                Click="Display_Input_Button_Click"
+                Content="显示工件"
+                Style="{StaticResource dgButton}"
+                Template="{StaticResource buttonTemplate}" />
+            <Button
+                Click="Display_Base_Button_Click"
+                Content="显示底板"
+                Style="{StaticResource dgButton}"
+                Template="{StaticResource buttonTemplate}" />
         </ToolBar>
         <ToolBar Grid.Row="1">
             <System:String xml:space="preserve"> Test </System:String>

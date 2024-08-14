@@ -24,7 +24,7 @@
 //                _location = value;
 //            }
 //        }
-//        private WAIS_Shape Workpiece { get; }
+//        private AShape Workpiece { get; }
 //        private BasePlate BasePlate { get; }
 //        public VerticalPlateDirection Direction { get; set; }
 //        public double maxVerticalLength { get; set; }
@@ -34,7 +34,7 @@
 //        private List<Piece> _slices { get; set; } = new List<Piece>();
 //        public List<Piece> Slices { get { return _slices; } }
 
-//        public VerticalPlate(WAIS_Shape theWorkpiece, BasePlate theBasePlate, VerticalPlateDirection theDirection, double theValue, double clearancesParameter, double minSupportingLenParameter, double cuttingDistanceParameter)
+//        public VerticalPlate(AShape theWorkpiece, BasePlate theBasePlate, VerticalPlateDirection theDirection, double theValue, double clearancesParameter, double minSupportingLenParameter, double cuttingDistanceParameter)
 //        {
 //            Workpiece = theWorkpiece;
 //            BasePlate = theBasePlate;

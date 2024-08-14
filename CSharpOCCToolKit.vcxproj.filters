@@ -75,6 +75,12 @@
     <Filter Include="头文件\OCCProxy\BRepPrimAPI">
       <UniqueIdentifier>{8f94fd1e-0731-4523-86c8-c6af6d8ef4da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\BRepBuilderAPI">
+      <UniqueIdentifier>{31108cba-08ca-45ad-a27a-d1115c480893}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepBuilderAPI">
+      <UniqueIdentifier>{971f9255-d1fe-4499-80ea-eb69545ceb43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -89,13 +95,13 @@
     <ClCompile Include="convertChinese.cpp">
       <Filter>源文件\OCCTools</Filter>
     </ClCompile>
-    <ClCompile Include="WAIS_ViewCube.cpp">
+    <ClCompile Include="ICO_ViewCube.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="WAIS_InteractiveObject.cpp">
+    <ClCompile Include="ICO_InteractiveObject.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="Wgp_Trsf.cpp">
+    <ClCompile Include="ICO_Trsf.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
     <ClCompile Include="MakeSimpleClamp.cpp">
@@ -104,44 +110,50 @@
     <ClCompile Include="WMakeSimpleClamp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WAIS_Shape.cpp">
+    <ClCompile Include="ICO_Shape.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="Wgp_Pnt.cpp">
+    <ClCompile Include="ICO_Pnt.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
-    <ClCompile Include="WTopoDS_Shape.cpp">
+    <ClCompile Include="ICO_TopoDS_Shape.cpp">
       <Filter>源文件\OCCProxy\TopoDS</Filter>
     </ClCompile>
     <ClCompile Include="STEPExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
-    <ClCompile Include="WAIS_Manipulator.cpp">
+    <ClCompile Include="ICO_Manipulator.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="WV3d_View.cpp">
+    <ClCompile Include="ICO_View.cpp">
       <Filter>源文件\OCCProxy\V3d</Filter>
     </ClCompile>
-    <ClCompile Include="WAIS_InteractiveContext.cpp">
+    <ClCompile Include="ICO_InteractiveContext.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="WTopAbs_ShapeEnum.cpp">
+    <ClCompile Include="ICO_ShapeEnum.cpp">
       <Filter>源文件\OCCProxy\TopAbs</Filter>
     </ClCompile>
-    <ClCompile Include="WColor.cpp">
+    <ClCompile Include="ICO_Color.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
-    <ClCompile Include="Wgp_Dir.cpp">
+    <ClCompile Include="ICO_Dir.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
-    <ClCompile Include="WBRepPrimAPI_MakeBox.cpp">
+    <ClCompile Include="ICO_MakeBox.cpp">
       <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
     </ClCompile>
-    <ClCompile Include="WBaseObject.cpp">
+    <ClCompile Include="ICO_BaseObject.cpp">
       <Filter>源文件\OCCProxy</Filter>
     </ClCompile>
-    <ClCompile Include="WAIS_Trihedron.cpp">
+    <ClCompile Include="ICO_Trihedron.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Ax2.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Transform.cpp">
+      <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,59 +166,65 @@
     <ClInclude Include="StringExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
-    <ClInclude Include="WAIS_ViewCube.h">
+    <ClInclude Include="ICO_ViewCube.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
-    <ClInclude Include="WAIS_InteractiveObject.h">
+    <ClInclude Include="ICO_InteractiveObject.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
-    <ClInclude Include="Wgp_Trsf.h">
+    <ClInclude Include="ICO_Trsf.h">
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
     <ClInclude Include="WMakeSimpleClamp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WAIS_Shape.h">
+    <ClInclude Include="ICO_AIS_Shape.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
     <ClInclude Include="MakeSimpleClamp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Wgp_Pnt.h">
+    <ClInclude Include="ICO_Pnt.h">
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
-    <ClInclude Include="WTopoDS_Shape.h">
+    <ClInclude Include="ICO_TopoDS_Shape.h">
       <Filter>头文件\OCCProxy\TopoDS</Filter>
     </ClInclude>
     <ClInclude Include="STEPExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
-    <ClInclude Include="WAIS_Manipulator.h">
+    <ClInclude Include="ICO_Manipulator.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
-    <ClInclude Include="WV3d_View.h">
+    <ClInclude Include="ICO_View.h">
       <Filter>头文件\OCCProxy\V3d</Filter>
     </ClInclude>
-    <ClInclude Include="WAIS_InteractiveContext.h">
+    <ClInclude Include="ICO_InteractiveContext.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
-    <ClInclude Include="WTopAbs_ShapeEnum.h">
+    <ClInclude Include="ICO_ShapeEnum.h">
       <Filter>头文件\OCCProxy\TopAbs</Filter>
     </ClInclude>
-    <ClInclude Include="WColor.h">
+    <ClInclude Include="ICO_Color.h">
       <Filter>头文件\Extension</Filter>
     </ClInclude>
-    <ClInclude Include="Wgp_Dir.h">
+    <ClInclude Include="ICO_Dir.h">
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
-    <ClInclude Include="WBRepPrimAPI_MakeBox.h">
+    <ClInclude Include="ICO_MakeBox.h">
       <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
     </ClInclude>
-    <ClInclude Include="WBaseObject.h">
+    <ClInclude Include="ICO_BaseObject.h">
       <Filter>头文件\OCCProxy</Filter>
     </ClInclude>
-    <ClInclude Include="WAIS_Trihedron.h">
+    <ClInclude Include="ICO_Trihedron.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Ax2.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Transform.h">
+      <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,7 @@
 namespace OCCTK {
 namespace IO {
 
-STEPExchange::STEPExchange(WTopoDS_Shape^ theShape) {
+STEPExchange::STEPExchange(TShape^ theShape) {
 	myShape = theShape;
 }
 
@@ -31,15 +31,15 @@ void STEPExchange::ReadFile(String^ filePath) {
 	}
 
 #pragma endregion
-	myShape = gcnew WTopoDS_Shape(InputWorkpiece);
+	myShape = gcnew TShape(InputWorkpiece);
 }
 
-WTopoDS_Shape^ STEPExchange::Shape() {
+TShape^ STEPExchange::Shape() {
 	return myShape;
 }
 
 bool STEPExchange::SaveFile(String^ filePath) {
-	TopoDS_Shape theoccShape = *(myShape->GetOCC());
+	TopoDS_Shape theoccShape = myShape->GetOCC();
 	TCollection_AsciiString cPath = DataExchange::ToAsciiString(filePath);
 
 	//初始化写入对象

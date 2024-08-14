@@ -11,14 +11,15 @@
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 //local
-#include "WAIS_Shape.h"
-#include "WAIS_InteractiveObject.h"
-#include "WAIS_Trihedron.h"
-#include "WAIS_Manipulator.h"
-#include "WV3d_View.h"
-#include "WAIS_InteractiveContext.h"
+#include "ICO_AIS_Shape.h"
+#include "ICO_InteractiveObject.h"
+#include "ICO_Trihedron.h"
+#include "ICO_Manipulator.h"
+#include "ICO_InteractiveContext.h"
+#include "ICO_View.h"
 
 using namespace OCCTK::OCC;
+using namespace OCCTK::OCC::AIS;
 
 namespace OCCTK {
 namespace Visualization {
@@ -36,7 +37,7 @@ public:
 	void InitOCCViewer(void);
 	bool InitViewer(System::IntPtr theWnd);
 	bool InitSecondViewer(System::IntPtr theSecondWnd);
-	V3d::WV3d_View^ GetMainView(void);
+	V3d::View^ GetMainView(void);
 
 #pragma region 视图设置
 
@@ -56,6 +57,8 @@ public:
 	void Place(int theX, int theY, float theZoomFactor);
 	void AreaZoom(int theX1, int theY1, int theX2, int theY2);
 	void Zoom(double theZoomFactor, bool update);
+	void StartZoomAtPoint(double startX, double startY);
+	void ZoomAtPoint(double startX, double startY, double endX, double endY);
 	void Pan(int theX, int theY);
 	void StartRotation(int theX, int theY);
 	void Rotation(int theX, int theY);
@@ -73,30 +76,33 @@ public:
 #pragma endregion
 
 #pragma region 交互对象管理
-
 	// 只有部分与Viewer相关的交互对象管理方法，剩余由交互对象管理器控制
+
 	void EraseSelect(void);
 	void MoveTo(int theX, int theY);
 	void SetSelectionMode(SelectionMode theMode);
 	void Select(void);
-	void SelectAIS(AIS::WAIS_Shape^ theAIS);
+	void SelectAIS(AIS::Shape^ theAIS);
 	void MultipleSelect(void);
 	void XORSelect(void);
 	void AreaSelect(int theX1, int theY1, int theX2, int theY2);
 	void MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2);
 	void XORAreaSelect(int theX1, int theY1, int theX2, int theY2);
-	//AIS::WAIS_Shape^ GetSelectedAIS(void);
+	//WAIS_Shape^ GetSelectedAIS(void);
 
 #pragma region Manipulator
-	void ActivatedModes(AIS::WAIS_InteractiveObject^ theAISObject);
-	void DeactiveObject(AIS::WAIS_InteractiveObject^ theAISObject);
-	void Active(AIS::WAIS_InteractiveObject^ theAISObject, int theSelectionMode);
-	//void Attach(AIS::WAIS_InteractiveObject^);
+
+	void ActivatedModes(InteractiveObject^ theAISObject);
+	void DeactiveObject(InteractiveObject^ theAISObject);
+	void Active(InteractiveObject^ theAISObject, int theSelectionMode);
+	//void Attach(WAIS_InteractiveObject^);
+
 #pragma endregion
 
 #pragma endregion
 
 #pragma region 持久变换对象
+
 	void SetViewCube(float axesRadius);
 	void SetOriginTrihedron(float axisSize);
 	void SetViewTrihedron(float axisSize);
@@ -108,10 +114,11 @@ private:
 	NCollection_Haft<Handle(AIS_ViewCube)> myViewCube;
 	NCollection_Haft<Handle(AIS_Trihedron)> myOriginTri;
 	NCollection_Haft<Handle(AIS_Trihedron)> myViewTri;
+
 #pragma endregion	
 
 public:
-	AIS::WAIS_InteractiveContext^ CSharpAISContext;
+	InteractiveContext^ CSharpAISContext;
 	//V3d::WV3d_Viewer^ CSharpViewer;
 private:
 	// 将成员变为托管类型

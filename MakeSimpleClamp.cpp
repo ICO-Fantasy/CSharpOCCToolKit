@@ -86,10 +86,10 @@ static bool Get2DLineIntersection(double x1, double y1, double x2, double y2,
 		return true;
 	}
 	// 如果两直线为 X 和 Y 方向，此时叉积也为 0
-	double tx1;
-	double ty1;
-	double tx2;
-	double ty2;
+	double tx1 = 0.0;
+	double ty1 = 0.0;
+	double tx2 = 0.0;
+	double ty2 = 0.0;
 	if (std::abs(d1x) < 1e-6) {
 		outX = (x1 * y2 - x2 * y1) / (y2 - y1);
 		if (std::abs(d2y) < 1e-6) {
@@ -144,7 +144,7 @@ static Ring FindARing(std::vector<myEdge>& Edges) {
 	while (!Edges.empty()) {
 		bool endFlag = true;
 		for (size_t i = 0; i < Edges.size(); ++i) {
-			auto oneEdge = Edges[i];
+			myEdge oneEdge = Edges[i];
 			if (end.Distance(oneEdge.start) < LINEAR_TOLERANCE) {
 				end = oneEdge.end;
 				theRing.push_back(oneEdge);
