@@ -241,9 +241,11 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 
 BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> middleDownPlates, std::vector<VerticalPlate> middleUpPlates);
 
-VerticalPlate BrandNumber(VerticalPlate thePlate, double hight);
+VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight);
 
-VerticalPlate BrandNumber(VerticalPlate thePlate, gp_Pnt aimPoint, double hight);
+VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, gp_Pnt aimPoint, double hight);
+
+BasePlate BrandNumberBasePlate(BasePlate thePlate, double hight);
 
 ///==============================
 ///得到结果

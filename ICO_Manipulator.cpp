@@ -129,11 +129,15 @@ void Manipulator::DeactivateCurrentMode() {
 
 // 设置显示哪个部分,默认全部显示
 void Manipulator::SetPart(ManipulatorMode^ theMode, bool isEnable) {
+	if (*theMode == ManipulatorMode::None) { return; }
 	_pManipulator()->SetPart(AIS_ManipulatorMode((int)*theMode), isEnable);
 }
+
 //设置显示哪个轴的哪个部分，0=x、1=y、2=z
-void Manipulator::SetPart(int theAxisIndex, ManipulatorMode^ theMode, bool isEnable) {
-	_pManipulator()->SetPart(theAxisIndex, AIS_ManipulatorMode((int)*theMode), isEnable);
+void Manipulator::SetPart(ManipulatorAxisIndex^ theAxisIndex, ManipulatorMode^ theMode, bool isEnable) {
+	if (*theAxisIndex == ManipulatorAxisIndex::None) { return; }
+	if (*theMode == ManipulatorMode::None) { return; }
+	_pManipulator()->SetPart((int)*theAxisIndex, AIS_ManipulatorMode((int)*theMode), isEnable);
 }
 
 // 开启操作器模式

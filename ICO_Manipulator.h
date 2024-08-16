@@ -62,7 +62,7 @@ public:
 
 	void DeactivateCurrentMode();
 	void SetPart(ManipulatorMode^ theMode, bool isEnable);
-	void SetPart(int theAxisIndex, ManipulatorMode^ theMode, bool isEnable);
+	void SetPart(ManipulatorAxisIndex^ theAxisIndex, ManipulatorMode^ theMode, bool isEnable);
 	void EnableMode(ManipulatorMode^ theMode);
 	virtual Handle(Standard_Transient) GetStd() override;
 private:

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "WMakeSimpleClamp.h"
 #include "MakeSimpleClamp.h"
-#include "StringExchange.h"
+#include "ICO_StringExchange.h"
 using namespace System::Collections::Generic;
 
 namespace OCCTK {
@@ -128,9 +128,9 @@ BasePlate^ SimpleClampMaker::SlotBasePLates(BasePlate^ theBasePlate, List<Vertic
 	return gcnew BasePlate(newOccBP);
 }
 
-VerticalPlate^ SimpleClampMaker::BrandNumber(VerticalPlate^ theVerticalPlate, double hight) {
+VerticalPlate^ SimpleClampMaker::BrandNumberVerticalPlate(VerticalPlate^ theVerticalPlate, double hight) {
 	SimpleClamp::VerticalPlate theoccPlate = theVerticalPlate->GetOCC();
-	SimpleClamp::VerticalPlate newoccplate = SimpleClamp::BrandNumber(theoccPlate, hight);
+	SimpleClamp::VerticalPlate newoccplate = SimpleClamp::BrandNumberVerticalPlate(theoccPlate, hight);
 	VerticalPlate^ newPlate = gcnew VerticalPlate(newoccplate);
 	// 更新Shape和AISShape
 	newPlate->sutured = true;
@@ -138,7 +138,12 @@ VerticalPlate^ SimpleClampMaker::BrandNumber(VerticalPlate^ theVerticalPlate, do
 	newPlate->myAIS = gcnew AShape(newoccplate.shape);
 	return newPlate;
 }
-
+BasePlate^ SimpleClampMaker::BrandNumberBasePlate(BasePlate^ theBasePlate, double hight) {
+	SimpleClamp::BasePlate theoccBasePlate = theBasePlate->GetOCC();
+	SimpleClamp::BasePlate newoccBasePlate = SimpleClamp::BrandNumberBasePlate(theoccBasePlate, hight);
+	BasePlate^ newbasePlate = gcnew BasePlate(newoccBasePlate);
+	return newbasePlate;
+}
 //void SimpleClampMaker::BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint)
 //{
 //	OCCTK::SimpleClamp::VerticalPlate theoccPlate = theVerticalPlate->GetOCC();

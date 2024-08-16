@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Windows.Forms;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
@@ -87,6 +88,8 @@ public class OCCCanvas : Form
     float devicePixelRatioY;
 
     private List<AShape> _CurrentAIS = new List<AShape>();
+
+    public List<AShape> SelectedAISList = new List<AShape>();
 
     public bool ShowViewCube = true;
 
@@ -273,7 +276,7 @@ public class OCCCanvas : Form
         {
             MessageBox.Show("图形初始化失败", "Error!");
         }
-        InteractiveContext = Viewer.CSharpAISContext;
+        InteractiveContext = Viewer.GetContext();
         Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
 
         float dpiX = CreateGraphics().DpiX;
@@ -296,7 +299,6 @@ public class OCCCanvas : Form
         IsDrawRect = false;
         DegenerateMode = true;
         SetDisplayMode(DisplayMode.Shading);
-        SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
         Viewer.DisplayViewCube(ShowViewCube);
         Viewer.DisplayOriginTrihedron(ShowOriginTrihedron);
         Viewer.DisplayViewTrihedron(ShowViewTrihedron);
@@ -491,8 +493,11 @@ public class OCCCanvas : Form
 
         //将鼠标位置发送给OCC交互上下文管理器，用于获取该位置的所选对象
         //! 单选等操作均需要基于该位置进行
-        Viewer.MoveTo(mouseCurrentX, mouseCurrentY);
-
+        try
+        {
+            Viewer.MoveTo(mouseCurrentX, mouseCurrentY);
+        }
+        catch { }
         // 工厂类构建
         var interaction = CanvasInteractionFactory.CreateInteraction(this, CurrentAction3d);
         // 执行操作
@@ -511,10 +516,10 @@ public class OCCCanvas : Form
         {
             case Action3d.SingleSelect:
                 // 单选
-                Viewer.Select();
+                InteractiveContext.Select();
                 break;
             case Action3d.MultipleSelect:
-                Viewer.XORSelect();
+                InteractiveContext.XORSelect();
                 break;
             case Action3d.AreaSelect:
                 if (
@@ -529,7 +534,7 @@ public class OCCCanvas : Form
                 else
                 {
                     // 单选
-                    Viewer.Select();
+                    InteractiveContext.Select();
                 }
                 break;
             case Action3d.MultipleAreaSelect:
@@ -544,7 +549,7 @@ public class OCCCanvas : Form
                 }
                 else
                 {
-                    Viewer.XORSelect();
+                    InteractiveContext.XORSelect();
                 }
                 break;
             case Action3d.AreaZooming:
@@ -573,6 +578,13 @@ public class OCCCanvas : Form
                 break;
         }
 
+        //保存选中的AIS对象
+        while (InteractiveContext.MoreSelected())
+        {
+            SelectedAISList.Add(InteractiveContext.SelectedAIS());
+            InteractiveContext.NextSelected();
+        }
+
         // 结束操作
         CurrentAction3d = Action3d.Nothing;
         _manipulatorMode = ManipulatorMode.None;
@@ -593,12 +605,10 @@ public class OCCCanvas : Form
         mouseCurrentY = e.Y;
         int endX = e.X;
         int endY = e.Y;
-        bool isScrollingUp = delta > 0;
-        bool isScrollingDown = delta < 0;
         double zoomFactor = 1.0;
         // 根据需要执行相应操作
 
-        if (isScrollingUp)
+        if (delta > 0)
         {
             // 向上滚动
             Cursor = Cursors.PanNorth;
@@ -613,7 +623,7 @@ public class OCCCanvas : Form
                 endY += (int)(zoomDistance * 0.1);
             }
         }
-        else if (isScrollingDown)
+        else
         {
             // 向下滚动
             Cursor = Cursors.PanSouth;
@@ -958,6 +968,11 @@ public class OCCCanvas : Form
         Viewer.SetSelectionMode(theMode);
     }
 
+    public void SetSelectionMode(int theMode)
+    {
+        Viewer.SetSelectionMode(theMode);
+    }
+
     /// <summary>
     /// 获取选中的AIS对象
     /// </summary>
@@ -971,7 +986,7 @@ public class OCCCanvas : Form
 
     public void Attach(AShape theAIS)
     {
-        myManipulator.Attach(theAIS, false, true, true);
+        myManipulator.Attach(theAIS, true, true, true);
     }
 
     public void Dettach()
@@ -985,24 +1000,28 @@ public class OCCCanvas : Form
     }
 
     /// <summary>
-    /// 0=x\1=y\2=z
+    /// 设置对应轴的可视部分
     /// </summary>
     /// <param name="axisIndex"></param>
     /// <param name="theMode"></param>
     /// <param name="enable"></param>
-    public void SetManipulatorPart(int axisIndex, ManipulatorMode theMode, bool enable)
+    public void SetManipulatorPart(
+        ManipulatorAxisIndex axisIndex,
+        ManipulatorMode theMode,
+        bool enable
+    )
     {
         myManipulator.SetPart(axisIndex, theMode, enable);
     }
 
     public void ResetManipulatorPart()
     {
-        myManipulator.DeactivateCurrentMode();
+        //myManipulator.DeactivateCurrentMode();
         myManipulator.Detach();
-        myManipulator.SetPart(ManipulatorMode.TranslationPlane, true);
-        myManipulator.SetPart(ManipulatorMode.Rotation, true);
-        myManipulator.SetPart(ManipulatorMode.Translation, true);
-        myManipulator.SetPart(ManipulatorMode.Scaling, true);
+        //myManipulator.SetPart(ManipulatorMode.TranslationPlane, true);
+        //myManipulator.SetPart(ManipulatorMode.Rotation, true);
+        //myManipulator.SetPart(ManipulatorMode.Translation, true);
+        //myManipulator.SetPart(ManipulatorMode.Scaling, true);
     }
 
     public Ax2 GetManipulatorPosition()

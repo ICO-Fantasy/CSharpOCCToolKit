@@ -9,6 +9,7 @@ namespace AIS {
 InteractiveContext::InteractiveContext(Handle(AIS_InteractiveContext) theAISContext) {
 	myAISContext() = theAISContext;
 }
+
 // 删除选中的物体（首先需要选中物体）
 void InteractiveContext::EraseObjects(void) {
 	if (myAISContext().IsNull()) return;
@@ -18,7 +19,6 @@ void InteractiveContext::EraseObjects(void) {
 	myAISContext()->UpdateCurrentViewer();
 }
 
-// 单选
 void InteractiveContext::SetSelectionMode(TopoAbs::ShapeEnum theMode) {
 	if (myAISContext().IsNull()) return;
 
@@ -27,6 +27,7 @@ void InteractiveContext::SetSelectionMode(TopoAbs::ShapeEnum theMode) {
 	myAISContext()->UpdateSelected(true);
 }
 
+// 单选
 void InteractiveContext::Select(void) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->SelectDetected(AIS_SelectionScheme_Replace); // 将检测到的对象替换当前选择
@@ -34,11 +35,10 @@ void InteractiveContext::Select(void) {
 }
 
 // 选中输入的对象
-void InteractiveContext::SelectAIS(Shape^ theAIS) {
+void InteractiveContext::SelectAIS(Shape^ theAIS, bool update) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->ClearSelected(Standard_True); // 清除当前选中的对象
-	myAISContext()->AddOrRemoveSelected(theAIS->GetOCC(), true);// 选中AIS
-	myAISContext()->UpdateCurrentViewer();
+	myAISContext()->AddOrRemoveSelected(theAIS->GetOCC(), update);// 选中AIS
 }
 
 // 多选
@@ -65,6 +65,11 @@ bool InteractiveContext::MoreSelected() {
 	if (myAISContext().IsNull()) return false;
 	return myAISContext()->MoreSelected();
 
+}
+
+bool InteractiveContext::NextSelected() {
+	if (myAISContext().IsNull()) return false;
+	myAISContext()->NextSelected();
 }
 
 InteractiveObject^ InteractiveContext::SelectedInteractive() {
@@ -196,6 +201,14 @@ bool InteractiveContext::IsSelected(void) {
 	if (myAISContext().IsNull()) return false;
 	myAISContext()->InitSelected();
 	return myAISContext()->MoreSelected();
+}
+
+Handle(AIS_InteractiveContext) InteractiveContext::GetOCC() {
+	return myAISContext();
+}
+
+System::IntPtr InteractiveContext::GetIntPtr() {
+	return System::IntPtr(&*myAISContext());
 }
 
 }

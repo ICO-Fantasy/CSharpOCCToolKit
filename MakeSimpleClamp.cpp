@@ -399,6 +399,9 @@ static std::vector<int> GetNumberString(TCollection_AsciiString numberString) {
 		else if (text == 'Y') {
 			digits.push_back(11);
 		}
+		else if (text == 'A') {
+			digits.push_back(44);
+		}
 		else {
 			digits.push_back(12);
 		}
@@ -1355,7 +1358,7 @@ BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> midd
 }
 
 // 构建数字 Face (默认在原点沿着XOZ平面正方向构建)
-static TopoDS_Compound MakeNumber(TCollection_AsciiString numberString, double scaleRatio, double spacing) {
+static TopoDS_Compound MakeNumber(TCollection_AsciiString numberString, double scaleRatio, double spacing, bool XOY = false) {
 	std::map<int, std::vector<std::array<double, 2>>> numberMap;
 	numberMap[0] = {
 		{0.0, 0.0},
@@ -1539,13 +1542,70 @@ static TopoDS_Compound MakeNumber(TCollection_AsciiString numberString, double s
 		{10.0, 10.0},
 		{0.0, 10.0},
 	};
-
+	// Axis
+	numberMap[44] = {
+		{10.0, 10.0},
+		{68.0, 10.0},
+		{68.0, 0.0},
+		{78.0, 15.0},
+		{68.0, 30.0},
+		{68.0, 20.0},
+		{57.0, 20.0},
+		{47.0, 50.0},
+		{57.0, 80.0},
+		{47.0, 80.0},
+		{42.0, 65.0},
+		{37.0, 80.0},
+		{27.0, 80.0},
+		{37.0, 50.0},
+		{27.0, 20.0},
+		{20.0, 20.0},
+		{20.0, 91.0},
+		{50.0, 91.0},
+		{80.0, 81.0},
+		{80.0, 91.0},
+		{65.0, 96.0},
+		{80.0, 101.0},
+		{80.0, 111.0},
+		{50.0, 101.0},
+		{20.0, 101.0},
+		{20.0, 110.0},
+		{30.0, 110.0},
+		{15.0, 120.0},
+		{0.0, 110.0},
+		{10.0, 110.0},
+	};
 	TopoDS_Compound result;
 	BRep_Builder builder;
 	builder.MakeCompound(result);
 	double offset = (spacing + 30.0) * scaleRatio;
 
 	auto numbers = GetNumberString(numberString);
+	if (XOY) {
+		int currentIndex = numbers[0];
+		// 开始构建
+		BRepBuilderAPI_MakeWire wireMaker;
+		std::array<double, 3> lastValue{ 999.0,999.0,999.0 };
+		for (std::array<double, 2> p : numberMap[currentIndex]) {
+			if (std::all_of(lastValue.begin(), lastValue.end(), [](double v) { return v == 999.0; })) {
+				lastValue[0] = p[0];
+				lastValue[1] = p[1];
+				lastValue[2] = 0.0;
+				continue;
+			}
+			std::array<double, 3> value{ p[0] , p[1], 0.0 };
+
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(lastValue[0] * scaleRatio, lastValue[1] * scaleRatio, 0.0), gp_Pnt(value[0] * scaleRatio, value[1] * scaleRatio, 0.0)));
+			lastValue = value;
+		}
+		// 最后连接
+		std::array<double, 3>end_value{ numberMap[currentIndex][0][0] ,numberMap[currentIndex][0][1] ,0.0 };
+		wireMaker.Add(BRepBuilderAPI_MakeEdge(gp_Pnt(lastValue[0] * scaleRatio, lastValue[1] * scaleRatio, 0.0), gp_Pnt(end_value[0] * scaleRatio, end_value[1] * scaleRatio, 0.0)));
+		// 构造面
+		BRepBuilderAPI_MakeFace faceMaker(wireMaker.Wire());
+		builder.Add(result, faceMaker.Face());
+		return result;
+	}
 	for (size_t i = 0; i < numbers.size(); ++i) {
 		int currentIndex = numbers[i];
 		// 开始构建
@@ -1574,7 +1634,7 @@ static TopoDS_Compound MakeNumber(TCollection_AsciiString numberString, double s
 }
 
 // 在板上烙印数字（在左下角点，借助输入判断左下角）
-VerticalPlate BrandNumber(VerticalPlate thePlate, double hight = 60.0) {
+VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight = 60.0) {
 	if (thePlate.pieces.empty()) {
 		return thePlate;
 	}
@@ -1632,7 +1692,7 @@ VerticalPlate BrandNumber(VerticalPlate thePlate, double hight = 60.0) {
 }
 
 // 在板上烙印数字（在指定点）
-VerticalPlate BrandNumber(VerticalPlate thePlate, gp_Pnt aimPoint, double hight = 60.0) {
+VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, gp_Pnt aimPoint, double hight = 60.0) {
 	if (thePlate.pieces.empty()) {
 		return thePlate;
 	}
@@ -1673,6 +1733,48 @@ VerticalPlate BrandNumber(VerticalPlate thePlate, gp_Pnt aimPoint, double hight 
 	BRepAlgoAPI_Cut cutter(thePlate.shape, transformedFace.Shape());
 
 	thePlate.shape = cutter.Shape();
+
+	return thePlate;
+}
+
+BasePlate BrandNumberBasePlate(BasePlate thePlate, double hight) {
+	if (thePlate.shape.IsNull()) {
+		return thePlate;
+	}
+
+	TCollection_AsciiString numberString = "A";
+	double scaleFactor = hight / 60.0;
+
+	TopoDS_Compound originFace = MakeNumber(numberString, 1.0, 10.0, true);
+	//往前(Z)挪1(为了烙印板)
+	gp_Trsf temp;
+	temp.SetTranslation(gp_Pnt(), gp_Pnt(0, 0, -1));
+	BRepBuilderAPI_Transform theFace(originFace, temp);
+	// 缩放
+	gp_Trsf scaleT;
+	scaleT.SetScaleFactor(scaleFactor);
+	// 平移
+	gp_Trsf transT;
+	gp_Pnt aimPnt = gp_Pnt(thePlate.X + 1.0, thePlate.Y + 1.0, thePlate.Z);
+	transT.SetTranslation(gp_Pnt(), aimPnt);
+	// 往后(Z)走2，相当于前后各1
+	BRepPrimAPI_MakePrism prismer(theFace, gp_Vec(0, 0, 2));
+
+	BRepBuilderAPI_Transform transformedFace = BRepBuilderAPI_Transform(prismer.Shape(), transT.Multiplied(scaleT));
+
+	BRepAlgoAPI_Cut cutter(thePlate.shape, transformedFace.Shape());
+
+	thePlate.shape = cutter.Shape();
+
+	////! test
+	//thePlate.shape = transformedFace.Shape();
+
+	//TopoDS_Compound testShape;
+	//BRep_Builder b;
+	//b.MakeCompound(testShape);
+	//b.Add(testShape, thePlate.shape);
+	//b.Add(testShape, transformedFace);
+	//thePlate.shape = testShape;
 
 	return thePlate;
 }

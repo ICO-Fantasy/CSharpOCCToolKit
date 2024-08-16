@@ -4,7 +4,7 @@
 #include "ICO_Dir.h"
 #include "ICO_TopoDS_Shape.h"
 #include "ICO_AIS_Shape.h"
-#include "StringExchange.h"
+#include "ICO_StringExchange.h"
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 
@@ -37,8 +37,8 @@ public ref struct BasePlate {
 	property double Z {double get() { return myBP().Z; }};
 	property double DX {double get() { return myBP().dX; }};
 	property double DY {double get() { return myBP().dY; }};
-	property double OffsetX {double get() { return myBP().offsetX; }};
-	property double OffsetY {double get() { return myBP().offsetY; }};
+	property double OffsetX {double get() { return myBP().offsetX; }void set(double value) { myBP().offsetX = value; }};
+	property double OffsetY {double get() { return myBP().offsetY; }void set(double value) { myBP().offsetY = value; }};
 	property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }};
 public:
 	SimpleClamp::BasePlate GetOCC() { return myBP(); };
@@ -87,7 +87,9 @@ public ref struct VerticalPlate {
 	// 开槽圆角半径
 	property double FilletRadius { double get() { return myPlate().filletRadius; } };
 	// 标签编号
-	property String^ NumberString { String^ get() { return gcnew String(myPlate().numberString.ToCString()); }void set(String^ value) { myPlate().numberString = DataExchange::ToAsciiString(value); }};
+	property String^ NumberString { String^ get() { return gcnew String(myPlate().numberString.ToCString()); }void set(String^ value) {
+		myPlate().numberString = DataExchange::ToAsciiString(value);
+	}};
 	// 最终的竖板形状
 	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
 	// 用于判断是否已连接
@@ -116,10 +118,15 @@ public:
 	static VerticalPlate^ MakeVerticalPlate(TShape^ InputWorkpiece, BasePlate^ BasePlate, PlatePose^ theDirection, double theClearances, double theMinSupportLen, double theCuttingDistance);
 
 	static VerticalPlate^ SuturePLate(VerticalPlate^ theVerticalPlate, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness);
+
 	static cli::array<List<VerticalPlate^>^>^ ConnectVerticalPLates(List<VerticalPlate^>^ toDownPlates, List<VerticalPlate^>^ toUpPlates, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness, double theFilletRadius);
+
 	static BasePlate^ SlotBasePLates(BasePlate^ BasePlate, List<VerticalPlate^>^ toDownPlates, List<VerticalPlate^>^ toUpPlates);
 
-	static VerticalPlate^ BrandNumber(VerticalPlate^ theVerticalPlate, double hight);
+	static VerticalPlate^ BrandNumberVerticalPlate(VerticalPlate^ theVerticalPlate, double hight);
+
+	static BasePlate^ BrandNumberBasePlate(BasePlate^ theBasePlate, double hight);
+
 	//static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint);
 
 	static TShape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);

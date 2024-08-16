@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "STEPExchange.h"
+#include "ICO_STEPExchange.h"
 #include <IFSelect_ReturnStatus.hxx>
 #include <STEPControl_Reader.hxx>
-#include "StringExchange.h"
+#include "ICO_StringExchange.h"
 #include <STEPControl_Writer.hxx>
 
 namespace OCCTK {

@@ -7,7 +7,6 @@
 #include <Standard_Handle.hxx>
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
-#include <AIS_Manipulator.hxx>
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 //local
@@ -17,6 +16,7 @@
 #include "ICO_Manipulator.h"
 #include "ICO_InteractiveContext.h"
 #include "ICO_View.h"
+#include "ICO_SelectionMode.h"
 
 using namespace OCCTK::OCC;
 using namespace OCCTK::OCC::AIS;
@@ -24,13 +24,6 @@ using namespace OCCTK::OCC::AIS;
 namespace OCCTK {
 namespace Visualization {
 
-public enum class SelectionMode {
-	Vertex,
-	Edge,
-	Face,
-	Shell,
-	Shape,
-};
 
 public ref class CSharpViewer {
 public:
@@ -81,10 +74,12 @@ public:
 	void EraseSelect(void);
 	void MoveTo(int theX, int theY);
 	void SetSelectionMode(SelectionMode theMode);
-	void Select(void);
-	void SelectAIS(AIS::Shape^ theAIS);
-	void MultipleSelect(void);
-	void XORSelect(void);
+	void SetSelectionMode(int theMode);
+	void SetSelectionMode(TopoAbs::ShapeEnum^ theMode);
+	//void Select(void);
+	//void SelectAIS(AIS::Shape^ theAIS);
+	//void MultipleSelect(void);
+	//void XORSelect(void);
 	void AreaSelect(int theX1, int theY1, int theX2, int theY2);
 	void MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2);
 	void XORAreaSelect(int theX1, int theY1, int theX2, int theY2);
@@ -118,7 +113,7 @@ private:
 #pragma endregion	
 
 public:
-	InteractiveContext^ CSharpAISContext;
+	InteractiveContext^ GetContext();
 	//V3d::WV3d_Viewer^ CSharpViewer;
 private:
 	// 将成员变为托管类型

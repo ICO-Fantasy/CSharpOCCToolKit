@@ -86,7 +86,7 @@
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="StringExchange.cpp">
+    <ClCompile Include="ICO_StringExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="CSharpViewer.cpp">
@@ -110,7 +110,7 @@
     <ClCompile Include="WMakeSimpleClamp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ICO_Shape.cpp">
+    <ClCompile Include="ICO_AIS_Shape.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
     <ClCompile Include="ICO_Pnt.cpp">
@@ -119,7 +119,7 @@
     <ClCompile Include="ICO_TopoDS_Shape.cpp">
       <Filter>源文件\OCCProxy\TopoDS</Filter>
     </ClCompile>
-    <ClCompile Include="STEPExchange.cpp">
+    <ClCompile Include="ICO_STEPExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="ICO_Manipulator.cpp">
@@ -163,7 +163,7 @@
     <ClInclude Include="ConvertChinese.h">
       <Filter>头文件\OCCTools</Filter>
     </ClInclude>
-    <ClInclude Include="StringExchange.h">
+    <ClInclude Include="ICO_StringExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="ICO_ViewCube.h">
@@ -190,7 +190,7 @@
     <ClInclude Include="ICO_TopoDS_Shape.h">
       <Filter>头文件\OCCProxy\TopoDS</Filter>
     </ClInclude>
-    <ClInclude Include="STEPExchange.h">
+    <ClInclude Include="ICO_STEPExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="ICO_Manipulator.h">
@@ -225,6 +225,9 @@
     </ClInclude>
     <ClInclude Include="ICO_Transform.h">
       <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_SelectionMode.h">
+      <Filter>头文件\Visualization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

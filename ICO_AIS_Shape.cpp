@@ -27,6 +27,17 @@ Shape::Shape(TopoDS_Shape aShape) {
 	nativeHandle() = _pAISShape();
 }
 
+// 传入TopoDS_Shape的指针（不要轻易使用指针构造方法）
+Shape::Shape(System::IntPtr aShapePtr) {
+	// 将 IntPtr 转换为原生指针
+	TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(aShapePtr.ToPointer());
+	// 创建新的 AIS_Shape 对象
+	_pAISShape() = new AIS_Shape(*pShape);
+
+	// 保存原始句柄
+	nativeHandle() = _pAISShape();
+}
+
 Shape::Shape(TopoDS::Shape^ aShape) {
 	_pAISShape() = new AIS_Shape(aShape->GetOCC());
 	// 保存原始句柄
@@ -69,6 +80,11 @@ Handle(AIS_Shape) Shape::GetOCC() {
 
 Handle(Standard_Transient)Shape::GetStd() {
 	return nativeHandle();
+}
+
+// 用于底层OCC对象传递，不要轻易使用
+System::IntPtr Shape::GetIntPtr() {
+	return System::IntPtr(&*_pAISShape());
 }
 
 }

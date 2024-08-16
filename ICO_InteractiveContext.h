@@ -1,13 +1,14 @@
 ﻿#pragma once
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_InteractiveObject.hxx>
-// 包装C++类到托管类
+//包装C++类到托管类
 #include <NCollection_Haft.h> 
-// local
+//Local
 #include "ICO_AIS_Shape.h"
 #include "ICO_Color.h"
 #include "ICO_ShapeEnum.h"
 #include "ICO_InteractiveObject.h"
+
 namespace OCCTK {
 namespace OCC {
 namespace AIS {
@@ -22,12 +23,13 @@ public:
 
 	void SetSelectionMode(TopoAbs::ShapeEnum theMode);
 	void Select(void);
-	void SelectAIS(Shape^ theAIS);
+	void SelectAIS(Shape^ theAIS, bool update);
 	void MultipleSelect(void);
 	void XORSelect(void);
 
 	void InitSelected();
 	bool MoreSelected();
+	bool NextSelected();
 	InteractiveObject^ SelectedInteractive();
 	Shape^ SelectedAIS();
 	//void AreaSelect(int theX1, int theY1, int theX2, int theY2);
@@ -69,6 +71,9 @@ public:
 #pragma endregion
 
 	bool IsSelected(void);
+
+	Handle(AIS_InteractiveContext) GetOCC();
+	System::IntPtr GetIntPtr();
 protected:
 	NCollection_Haft<Handle(AIS_InteractiveContext)> myAISContext;
 };

@@ -21,6 +21,7 @@ using OCCTK.OCC;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
+using OCCTK.OCC.TopoAbs;
 using OCCTK.OCC.TopoDS;
 using OCCViewForm;
 //设置别名
@@ -386,6 +387,7 @@ public enum VPCMode
 /// </summary>
 public partial class MainWindow : Window
 {
+    const double LINEAR_TOL = 1e-10;
     private OCCCanvas Viewer;
     private InteractiveContext AISContext;
 
@@ -478,6 +480,8 @@ public partial class MainWindow : Window
     /// </summary>
     public double OffsetYParameter { get; set; } = 20;
 
+    private string AddPlateDirection = "";
+
     #endregion
 
     #region 竖板全局参数
@@ -530,10 +534,11 @@ public partial class MainWindow : Window
             if (_CurrentPlate != value)
             {
                 _CurrentPlate = value;
-                CurrentPlateSelectedLocation_TextBox.Text =
-                    $"{value.Pose.Location.X():F1}, {value.Pose.Location.Y():F1}, {value.Pose.Location.Z():F1}";
-                CurrentPlateSelectedDirection_TextBox.Text =
-                    $"{value.Pose.Direction.X():F1}, {value.Pose.Direction.Y():F1}, {value.Pose.Direction.Z():F1}";
+                CurrentPlateLocationX_TextBox.Text = $"{value.Pose.Location.X():F1}";
+                CurrentPlateLocationY_TextBox.Text = $"{value.Pose.Location.Y():F1}";
+                CurrentPlateLocationZ_TextBox.Text = $"{value.Pose.Location.Z():F1}";
+                CurrentPlateDirectionX_TextBox.Text = $"{value.Pose.Direction.X():F1}";
+                CurrentPlateDirectionY_TextBox.Text = $"{value.Pose.Direction.Y():F1}";
                 CurrentPlateConnectionThickness_TextBox.Text = $"{value.ConnectionThickness}";
                 CurrentPlateNumberString_TextBox.Text = $"{value.NumberString}";
                 CurrentPlateFilletRadius_TextBox.Text = $"{value.FilletRadius}";
@@ -746,27 +751,40 @@ public partial class MainWindow : Window
     }
 
     #endregion
+    public int testSelect = -1;
 
     #region 选择模式
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
+        testSelect++;
+        Viewer.SetSelectionMode(testSelect);
+        //Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
+        Debug.WriteLine(testSelect.ToString());
         Debug.WriteLine(OCCTK.Visualization.SelectionMode.Shape.ToString());
     }
 
     private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
     {
         Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
+        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Face.ToString());
     }
 
     private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
     {
         Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Edge);
+        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Edge.ToString());
     }
 
     private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
     {
         Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Vertex);
+        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Vertex.ToString());
+    }
+
+    private void Select_Shell_Button_Click(object sender, RoutedEventArgs e)
+    {
+        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shell);
+        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Shell.ToString());
     }
 
     #endregion
@@ -1003,8 +1021,8 @@ public partial class MainWindow : Window
         {
             //清空画布并重新显示
             EraseAll(false);
-            DisplayInputWorkpiece(false);
-            DisplayBasePlates(false);
+            DisplayEraseInputWorkpiece(false);
+            DisplayEraseBasePlates(false);
             DisplaySinglePlate(CurrentPlate, false);
             Viewer.Update();
             CurrentPlate
@@ -1039,14 +1057,43 @@ public partial class MainWindow : Window
         {
             //清空画布并重新显示
             EraseAll(false);
-            DisplayInputWorkpiece(false);
-            DisplayBasePlates(false);
+            DisplayEraseInputWorkpiece(false);
+            DisplayEraseBasePlates(false);
             DisplaySinglePlate(CurrentPlate, false);
             Viewer.Update();
             for (global::System.Int32 i = 0; i < CurrentPlate.Pieces.Count; ++i)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(CurrentPlate.Pieces[i], i));
             }
+        }
+    }
+
+    /// <summary>
+    /// 选择添加的方向
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void AddPlateDirection_ComboBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e
+    )
+    {
+        //! 方向虽然用X、Y做区分，实际上还包括XY以外的方向，但只分为两种。
+        ComboBoxItem seletedItem = (ComboBoxItem)CurrentPlateDirection_ComboBox.SelectedItem;
+        if (seletedItem != null)
+        {
+            AddPlateDirection = seletedItem.Content.ToString();
+        }
+
+        if (AddPlateDirection == "X")
+        {
+            AddPlateDirectionX_TextBox.Text = DirectionX.X().ToString();
+            AddPlateDirectionY_TextBox.Text = DirectionX.Y().ToString();
+        }
+        else if (AddPlateDirection == "Y")
+        {
+            AddPlateDirectionX_TextBox.Text = DirectionY.X().ToString();
+            AddPlateDirectionY_TextBox.Text = DirectionY.Y().ToString();
         }
     }
 
@@ -1092,57 +1139,205 @@ public partial class MainWindow : Window
 
     #region 按钮
 
-    //todo 更新当前板坐标
-    private void UpdateCurrentPlateLocation_Button_Click(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// 更新选中竖板
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void UpdateCurrentPlate_Button_Click(object sender, RoutedEventArgs e)
     {
-        //if (CurrentPlate != null)
-        //{
-        //    // 更新CurrentPlateValueLable的值
-        //    if (double.TryParse(CurrentPlateAddLocation_TextBox.Text, out newValue))
-        //    {
-        //        CurrentPlate = SimpleClampMaker.MakeVerticalPlate(
-        //            InputWorkpiece.Shape,
-        //            BasePlate,
-        //            new PlatePose(new Pnt(5, 0, 0), DirectionY),
-        //            CurrentPlate.Clearances,
-        //            CurrentPlate.MinSupportLen,
-        //            CurrentPlate.CuttingDistance
-        //        );
-        //    }
-        //    //更新stack中的元素
-        //    CurrentPlate_StackPanel.Children.Clear();
-        //    foreach (var item in CurrentPlate.Pieces)
-        //    {
-        //        CurrentPlate_StackPanel.Children.Add(MakeStackItem(item));
-        //    }
+        if (CurrentPlate == null)
+        {
+            return;
+        }
+        string oldNumberString = CurrentPlate.NumberString;
+        // 更新CurrentPlateValueLable的值
+        double theX,
+            theY,
+            theZ,
+            theW,
+            theP,
+            theClearances,
+            theMinSupportLen,
+            theCuttingDistance;
 
-        //    Viewer.Update();
-        //}
+        // 转换 X 位置
+        if (!double.TryParse(CurrentPlateLocationX_TextBox.Text, out theX))
+        {
+            MessageBox.Show("X 位置输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 Y 位置
+        if (!double.TryParse(CurrentPlateLocationY_TextBox.Text, out theY))
+        {
+            MessageBox.Show("Y 位置输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 Z 位置
+        if (!double.TryParse(CurrentPlateLocationZ_TextBox.Text, out theZ))
+        {
+            MessageBox.Show("Z 位置输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 X 方向
+        if (!double.TryParse(CurrentPlateDirectionX_TextBox.Text, out theW))
+        {
+            MessageBox.Show("X 方向输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 Y 方向
+        if (!double.TryParse(CurrentPlateDirectionY_TextBox.Text, out theP))
+        {
+            MessageBox.Show("Y 方向输入的值不是有效的数字。");
+            return;
+        }
+        // 转换 板两侧偏置
+        if (!double.TryParse(CurrentPlateClearances_TextBox.Text, out theClearances))
+        {
+            MessageBox.Show("两侧偏置量输入的值不是有效的数字。");
+            return;
+        }
+        // 转换 最小支撑长度
+        if (!double.TryParse(CurrentPlateMinSupportLen_TextBox.Text, out theMinSupportLen))
+        {
+            MessageBox.Show("两侧偏置量输入的值不是有效的数字。");
+            return;
+        }
+        // 转换 切断距离
+        if (!double.TryParse(CurrentPlateCuttingDistance_TextBox.Text, out theCuttingDistance))
+        {
+            MessageBox.Show("两侧偏置量输入的值不是有效的数字。");
+            return;
+        }
+
+        var newPlate = SimpleClampMaker.MakeVerticalPlate(
+            InputWorkpiece.Shape,
+            BasePlate,
+            new PlatePose(new Pnt(theX, theY, theZ), new Dir(theW, theP, 0.0)),
+            theClearances,
+            theMinSupportLen,
+            theCuttingDistance
+        );
+        newPlate.NumberString = oldNumberString;
+        MiddleToDownPlates.RemoveAll(item => item.NumberString == oldNumberString);
+        if (oldNumberString[0] == 'X')
+        {
+            MiddleToDownPlates.Add(newPlate);
+        }
+        MiddleToUpPlates.RemoveAll(item => item.NumberString == oldNumberString);
+        if (oldNumberString[0] == 'Y')
+        {
+            MiddleToUpPlates.Add(newPlate);
+        }
+        //删除旧的板的显示
+        if (CurrentPlate.AIS != null)
+        {
+            Viewer.Remove(CurrentPlate.AIS, false);
+        }
+        if (CurrentPlate.Pieces.Count() != 0)
+        {
+            foreach (var onePiece in CurrentPlate.Pieces)
+            {
+                Viewer.Remove(onePiece.AIS, false);
+            }
+        }
+        //替换为新的
+        CurrentPlate = newPlate;
+        //更新控件
+        UpdateComboBox();
+        //更新stack中的元素
+        CurrentPlate_StackPanel.Children.Clear();
+        for (global::System.Int32 i = 0; i < CurrentPlate.Pieces.Count; ++i)
+        {
+            CurrentPlate_StackPanel.Children.Add(MakeStackItem(CurrentPlate.Pieces[i], i));
+        }
+        DisplaySinglePlate(CurrentPlate, false);
+        Viewer.Update();
     }
 
-    // 添加板
-    private void addPlate_Button_Click(object sender, RoutedEventArgs e) { }
-
-    private void SetXYNum_Button_Click(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// 添加板
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void AddPlate_Button_Click(object sender, RoutedEventArgs e)
     {
-        XNum_TextBox.Text = XNum.ToString();
-        YNum_TextBox.Text = YNum.ToString();
-        XNum_StackPanel.Visibility = Visibility.Visible;
-        YNum_StackPanel.Visibility = Visibility.Visible;
-        OffsetX_StackPanel.Visibility = Visibility.Collapsed;
-        OffsetY_StackPanel.Visibility = Visibility.Collapsed;
-        VPCMode = VPCMode.Num;
-    }
+        if (InputWorkpiece == null)
+        {
+            return;
+        }
 
-    private void SetXYOffset_Button_Click(object sender, RoutedEventArgs e)
-    {
-        OffsetX_TextBox.Text = OffsetXParameter.ToString();
-        OffsetY_TextBox.Text = OffsetYParameter.ToString();
-        XNum_StackPanel.Visibility = Visibility.Collapsed;
-        YNum_StackPanel.Visibility = Visibility.Collapsed;
-        OffsetX_StackPanel.Visibility = Visibility.Visible;
-        OffsetY_StackPanel.Visibility = Visibility.Visible;
-        VPCMode = VPCMode.Offset;
+        if (BasePlate == null)
+        {
+            return;
+        }
+
+        double theX,
+            theY,
+            theZ,
+            theW,
+            theP,
+            theR;
+
+        // 转换 X 位置
+        if (!double.TryParse(AddPlateLocationX_TextBox.Text, out theX))
+        {
+            MessageBox.Show("X 位置输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 Y 位置
+        if (!double.TryParse(AddPlateLocationY_TextBox.Text, out theY))
+        {
+            MessageBox.Show("Y 位置输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 Z 位置
+        if (!double.TryParse(AddPlateLocationZ_TextBox.Text, out theZ))
+        {
+            MessageBox.Show("Z 位置输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 X 方向
+        if (!double.TryParse(AddPlateDirectionX_TextBox.Text, out theW))
+        {
+            MessageBox.Show("X 方向输入的值不是有效的数字。");
+            return;
+        }
+
+        // 转换 Y 方向
+        if (!double.TryParse(AddPlateDirectionY_TextBox.Text, out theP))
+        {
+            MessageBox.Show("Y 方向输入的值不是有效的数字。");
+            return;
+        }
+
+        var newPlate = SimpleClampMaker.MakeVerticalPlate(
+            InputWorkpiece.Shape,
+            BasePlate,
+            new PlatePose(new Pnt(theX, theY, theZ), new Dir(theW, theP, 0.0)),
+            ClearancesParameter,
+            MinSupportingLenParameter,
+            CuttingDistanceParameter
+        );
+        //按照选择的方向添加
+        if (AddPlateDirection == "X")
+        {
+            MiddleToDownPlates.Add(newPlate);
+        }
+        if (AddPlateDirection == "Y")
+        {
+            MiddleToUpPlates.Add(newPlate);
+        }
+        UpdateComboBox();
+        DisplaySinglePlate(newPlate, false);
+        Viewer.Update();
     }
 
     /// <summary>
@@ -1160,9 +1355,9 @@ public partial class MainWindow : Window
         #endregion
 
         EraseAll(false);
-        DisplayInputWorkpiece(true);
+        DisplayEraseInputWorkpiece(true);
         MakeBasePlate();
-        DisplayBasePlates(true);
+        DisplayEraseBasePlates(true);
         Viewer.Update();
     }
 
@@ -1191,8 +1386,8 @@ public partial class MainWindow : Window
         if (InputWorkpiece != null && BasePlate != null)
         {
             EraseAll(false);
-            DisplayInputWorkpiece(false);
-            DisplayBasePlates(false);
+            DisplayEraseInputWorkpiece(false);
+            DisplayEraseBasePlates(false);
 
             MakeVerticalPlates();
             UpdateComboBox();
@@ -1229,8 +1424,8 @@ public partial class MainWindow : Window
         UpdateComboBox();
 
         EraseAll(false);
-        DisplayInputWorkpiece(false);
-        DisplayBasePlates(false);
+        DisplayEraseInputWorkpiece(false);
+        DisplayEraseBasePlates(false);
         DisplayVerticalPlates(false);
 
         Viewer.Update();
@@ -1250,6 +1445,11 @@ public partial class MainWindow : Window
         Viewer.FitAll();
     }
 
+    /// <summary>
+    /// 导出展平后的板到STEP模型
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OutputSTEP_Button_Click(object sender, RoutedEventArgs e)
     {
         OutputSTEP();
@@ -1280,16 +1480,21 @@ public partial class MainWindow : Window
                     BasePlate = null;
                 }
                 EndPosition = Viewer.GetManipulatorPosition();
-                Viewer.Remove(InputWorkpiece.AIS, false);
                 InputWorkpiece.Transform(new Trsf(StartPosition, EndPosition));
                 Viewer.ResetManipulatorPart();
+                Viewer.Remove(InputWorkpiece.AIS, false);
                 manipulatedObject = null;
-                DisplayInputWorkpiece(false);
+                DisplayEraseInputWorkpiece(false);
             }
             Viewer.Update();
         }
     }
 
+    /// <summary>
+    /// 擦除选中的视图对象
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Erase_Button_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseSelect();
@@ -1305,8 +1510,8 @@ public partial class MainWindow : Window
         if (CurrentPlate != null)
         {
             EraseAll(false);
-            //DisplayInputWorkpiece(false);
-            //DisplayBasePlates(false);
+            //DisplayEraseInputWorkpiece(false);
+            //DisplayEraseBasePlates(false);
             DisplayCurrentPieces(false);
 
             Viewer.Update();
@@ -1324,13 +1529,37 @@ public partial class MainWindow : Window
         if (CurrentPlate != null)
         {
             EraseAll(false);
-            //DisplayInputWorkpiece(false);
-            //DisplayBasePlates(false);
+            //DisplayEraseInputWorkpiece(false);
+            //DisplayEraseBasePlates(false);
             DisplayCurrentPlate(false);
 
             Viewer.Update();
             Viewer.FitAll();
         }
+    }
+
+    /// <summary>
+    /// 显示或隐藏工件
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Display_Input_Button_Click(object sender, RoutedEventArgs e)
+    {
+        ShowInputWorkpiece = !ShowInputWorkpiece;
+        DisplayEraseInputWorkpiece(ShowInputWorkpiece);
+        Viewer.Update();
+    }
+
+    /// <summary>
+    /// 显示或隐藏底板
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Display_Base_Button_Click(object sender, RoutedEventArgs e)
+    {
+        ShowBasePlate = !ShowBasePlate;
+        DisplayEraseBasePlates(ShowBasePlate);
+        Viewer.Update();
     }
 
     #endregion
@@ -1383,8 +1612,8 @@ public partial class MainWindow : Window
         // 创建X方向竖板
         int num = 0;
         while (
-            BasePlate.X + InitialOffsetXParameter <= tempX
-            && tempX <= BasePlate.X + BasePlate.DX - InitialOffsetXParameter
+            BasePlate.X + InitialOffsetXParameter - LINEAR_TOL <= tempX
+            && tempX <= BasePlate.X + BasePlate.DX - InitialOffsetXParameter + LINEAR_TOL
         )
         {
             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
@@ -1403,8 +1632,8 @@ public partial class MainWindow : Window
         // 创建Y方向竖板
         num = 0;
         while (
-            BasePlate.Y + InitialOffsetYParameter <= tempY
-            && tempY <= BasePlate.Y + BasePlate.DY - InitialOffsetYParameter
+            BasePlate.Y + InitialOffsetYParameter - LINEAR_TOL <= tempY
+            && tempY <= BasePlate.Y + BasePlate.DY - InitialOffsetYParameter + LINEAR_TOL
         )
         {
             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
@@ -1503,14 +1732,14 @@ public partial class MainWindow : Window
         List<VerticalPlate> tempDown = new List<VerticalPlate>();
         foreach (var plate in MiddleToDownPlates)
         {
-            tempDown.Add(SimpleClampMaker.BrandNumber(plate, 10.0));
+            tempDown.Add(SimpleClampMaker.BrandNumberVerticalPlate(plate, 10.0));
         }
         MiddleToDownPlates = tempDown;
 
         List<VerticalPlate> tempUp = new List<VerticalPlate>();
         foreach (var plate in MiddleToUpPlates)
         {
-            tempUp.Add(SimpleClampMaker.BrandNumber(plate, 10.0));
+            tempUp.Add(SimpleClampMaker.BrandNumberVerticalPlate(plate, 10.0));
         }
         MiddleToUpPlates = tempUp;
 
@@ -1520,6 +1749,8 @@ public partial class MainWindow : Window
             MiddleToDownPlates,
             MiddleToUpPlates
         );
+        //给底板烙印标记
+        BasePlate = SimpleClampMaker.BrandNumberBasePlate(BasePlate, 10.0);
     }
 
     /// <summary>
@@ -1543,22 +1774,6 @@ public partial class MainWindow : Window
     }
 
     #endregion
-
-    /// <summary>
-    /// 更新控件
-    /// </summary>
-    private void UpdateComboBox()
-    {
-        ClearPlatesInfo();
-        foreach (var onePlate in MiddleToDownPlates)
-        {
-            CurrentPlateLocationX_ComboBox.Items.Add(onePlate);
-        }
-        foreach (var onePlate in MiddleToUpPlates)
-        {
-            CurrentPlateLocationY_ComboBox.Items.Add(onePlate);
-        }
-    }
 
     #region 视图显示
 
@@ -1587,10 +1802,10 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 显示工件
+    /// 显示或隐藏工件
     /// </summary>
     /// <param name="update"></param>
-    private void DisplayInputWorkpiece(bool update)
+    private void DisplayEraseInputWorkpiece(bool update)
     {
         if (InputWorkpiece != null)
         {
@@ -1608,10 +1823,10 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 显示底板
+    /// 显示或隐藏底板
     /// </summary>
     /// <param name="update"></param>
-    private void DisplayBasePlates(bool update)
+    private void DisplayEraseBasePlates(bool update)
     {
         if (BasePlate != null)
         {
@@ -1654,7 +1869,33 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 显示单块板的片
+    /// 显示竖板（整体）
+    /// </summary>
+    /// <param name="update"></param>
+    private void DisplayVerticalPlates(bool update)
+    {
+        foreach (var onePlate in MiddleToDownPlates)
+        {
+            if (onePlate.Sutured)
+            {
+                Display(onePlate.AIS, false);
+                //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
+                AISContext.SetColor(onePlate.AIS, new Color(255, 0, 0), update);
+            }
+        }
+        foreach (var onePlate in MiddleToUpPlates)
+        {
+            if (onePlate.Sutured)
+            {
+                Display(onePlate.AIS, false);
+                //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
+                AISContext.SetColor(onePlate.AIS, new(0, 255, 0), update);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 显示对应的竖板（若合并，则显示整体，否则显示分片）
     /// </summary>
     /// <param name="thePlate"></param>
     /// <param name="update"></param>
@@ -1688,31 +1929,9 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 显示竖板（整体）
+    /// 显示当前选中的竖板（分片）
     /// </summary>
     /// <param name="update"></param>
-    private void DisplayVerticalPlates(bool update)
-    {
-        foreach (var onePlate in MiddleToDownPlates)
-        {
-            if (onePlate.Sutured)
-            {
-                Display(onePlate.AIS, false);
-                //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
-                AISContext.SetColor(onePlate.AIS, new Color(255, 0, 0), update);
-            }
-        }
-        foreach (var onePlate in MiddleToUpPlates)
-        {
-            if (onePlate.Sutured)
-            {
-                Display(onePlate.AIS, false);
-                //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
-                AISContext.SetColor(onePlate.AIS, new(0, 255, 0), update);
-            }
-        }
-    }
-
     private void DisplayCurrentPieces(bool update)
     {
         if (CurrentPlate != null)
@@ -1724,6 +1943,10 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// 显示当前选中的竖板（整体）
+    /// </summary>
+    /// <param name="update"></param>
     private void DisplayCurrentPlate(bool update)
     {
         if (CurrentPlate != null)
@@ -1748,34 +1971,26 @@ public partial class MainWindow : Window
         CurrentPlateLocationY_ComboBox.Visibility = Visibility.Collapsed;
         CurrentPlateLocationX_ComboBox.Items.Clear();
         CurrentPlateLocationY_ComboBox.Items.Clear();
-        CurrentPlateSelectedLocation_TextBox.Text = null;
     }
 
-    //todo 改变位置
-    private void ChangeCurrentLocation(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// 更新控件
+    /// </summary>
+    private void UpdateComboBox()
     {
-        Button button = (Button)sender;
-        VerticalPlate thePlate = (VerticalPlate)button.Tag;
-        //todo 改变PlateDirection的点
-        CurrentPlateSelectedLocation_TextBox.Text = thePlate.NumberString;
+        ClearPlatesInfo();
+        foreach (var onePlate in MiddleToDownPlates)
+        {
+            CurrentPlateLocationX_ComboBox.Items.Add(onePlate);
+        }
+        foreach (var onePlate in MiddleToUpPlates)
+        {
+            CurrentPlateLocationY_ComboBox.Items.Add(onePlate);
+        }
     }
 
     private void TestInput()
     {
         InputWorkpiece = new(new STEPExchange("mods\\mytest.stp").Shape());
-    }
-
-    private void Display_Input_Button_Click(object sender, RoutedEventArgs e)
-    {
-        ShowInputWorkpiece = !ShowInputWorkpiece;
-        DisplayInputWorkpiece(ShowInputWorkpiece);
-        Viewer.Update();
-    }
-
-    private void Display_Base_Button_Click(object sender, RoutedEventArgs e)
-    {
-        ShowBasePlate = !ShowBasePlate;
-        DisplayBasePlates(ShowBasePlate);
-        Viewer.Update();
     }
 }

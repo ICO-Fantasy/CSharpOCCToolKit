@@ -62,6 +62,7 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="1*" />
             <RowDefinition Height="30*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <!--  Toolbar  -->
@@ -103,27 +104,32 @@
             <!--  视图控制的两个按钮  -->
             <Button
                 Click="FitAll_Button_Click"
-                Content="十"
+                Content="Fit"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Button
                 Click="Select_Shape_Button_Click"
-                Content="S"
+                Content="Shape"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Button
                 Click="Select_Face_Button_Click"
-                Content="F"
+                Content="Face"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Button
                 Click="Select_Wire_Button_Click"
-                Content="W"
+                Content="Edge"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Button
                 Click="Select_Vertex_Button_Click"
-                Content="V"
+                Content="Vertex"
+                Style="{StaticResource dgButton}"
+                Template="{StaticResource buttonTemplate}" />
+            <Button
+                Click="Select_Shell_Button_Click"
+                Content="Shell"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Separator />
@@ -540,7 +546,7 @@
                                 x:Name="ConnectionThickness_Label"
                                 Grid.Column="0"
                                 VerticalAlignment="Stretch"
-                                Content="板宽度（连接槽宽）" />
+                                Content="板厚（连接槽宽）" />
                             <TextBox
                                 x:Name="ConnectionThickness_TextBox"
                                 Grid.Column="1"
@@ -666,22 +672,71 @@
                             SelectionChanged="CurrentPlateLocationY_ComboBox_SelectionChanged"
                             Visibility="Collapsed" />
                     </Grid>
-                    <StackPanel
-                        x:Name="CurrentPlateAddLocation_StackPanel"
+                    <Label
                         Grid.Row="2"
-                        Orientation="Vertical">
+                        Grid.ColumnSpan="2"
+                        HorizontalAlignment="Center"
+                        Background="LightGreen"
+                        Content="添加一个竖板" />
+                    <Grid
+                        x:Name="AddPlatePosition_StackPanel"
+                        Grid.Row="3"
+                        Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
                         <Label
-                            x:Name="CurrentPlateAddLocation_Label"
+                            x:Name="AddPlateLocation_Label"
+                            Grid.Row="0"
                             VerticalAlignment="Stretch"
                             Content="添加竖板位置" />
-                        <TextBox x:Name="CurrentPlateAddLocation_TextBox" VerticalAlignment="Stretch" />
-                    </StackPanel>
+                        <TextBox
+                            x:Name="AddPlateLocationX_TextBox"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            VerticalAlignment="Stretch" />
+                        <TextBox
+                            x:Name="AddPlateLocationY_TextBox"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalAlignment="Stretch" />
+                        <TextBox
+                            x:Name="AddPlateLocationZ_TextBox"
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            VerticalAlignment="Stretch" />
+                        <TextBox
+                            x:Name="AddPlateDirectionX_TextBox"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            VerticalAlignment="Stretch" />
+                        <TextBox
+                            x:Name="AddPlateDirectionY_TextBox"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            VerticalAlignment="Stretch" />
+                        <ComboBox
+                            x:Name="AddPlateDirection_ComboBox"
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            SelectionChanged="AddPlateDirection_ComboBox_SelectionChanged">
+                            <ComboBoxItem Content="X" />
+                            <ComboBoxItem Content="Y" />
+                        </ComboBox>
+                    </Grid>
                     <Button
-                        x:Name="addPlate_Button"
-                        Grid.Row="2"
+                        x:Name="AddPlate_Button"
+                        Grid.Row="3"
                         Grid.Column="1"
                         Margin="5,5,5,5"
-                        Click="addPlate_Button_Click"
+                        Click="AddPlate_Button_Click"
                         Content="添加一块板"
                         Style="{StaticResource dgButton}"
                         Template="{StaticResource buttonTemplate}" />
@@ -731,30 +786,71 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <StackPanel
-                                x:Name="CurrentPlateSelectedLocation_StackPanel"
+                            <Grid
+                                x:Name="CurrentPlateSelectedLocation_Grid"
                                 Grid.Row="0"
                                 Grid.Column="0"
-                                Grid.ColumnSpan="2"
-                                Orientation="Vertical">
+                                Grid.ColumnSpan="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
                                 <Label
                                     x:Name="CurrentPlateSelectedLocation_Label"
+                                    Grid.Row="0"
                                     VerticalAlignment="Stretch"
                                     Content="位置" />
-                                <TextBox x:Name="CurrentPlateSelectedLocation_TextBox" VerticalAlignment="Stretch" />
-                            </StackPanel>
-                            <StackPanel
+                                <TextBox
+                                    x:Name="CurrentPlateLocationX_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateLocationY_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateLocationZ_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    VerticalAlignment="Stretch" />
+                            </Grid>
+                            <Grid
                                 x:Name="CurrentPlateSelectedDirection_StackPanel"
                                 Grid.Row="0"
                                 Grid.Column="2"
-                                Grid.ColumnSpan="2"
-                                Orientation="Vertical">
+                                Grid.ColumnSpan="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
                                 <Label
                                     x:Name="CurrentPlateSelectedDirection_Label"
+                                    Grid.Row="0"
                                     VerticalAlignment="Stretch"
                                     Content="方向" />
-                                <TextBox x:Name="CurrentPlateSelectedDirection_TextBox" VerticalAlignment="Stretch" />
-                            </StackPanel>
+                                <TextBox
+                                    x:Name="CurrentPlateDirectionX_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateDirectionY_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Stretch" />
+                            </Grid>
                             <StackPanel
                                 Grid.Row="1"
                                 Grid.Column="4"
@@ -813,11 +909,11 @@
                                 Background="LawnGreen"
                                 Content="未合并" />
                             <Button
-                                x:Name="UpdateCurrentPlateLocation_Button"
+                                x:Name="UpdateCurrentPlate_Button"
                                 Grid.Row="10"
                                 Grid.ColumnSpan="4"
                                 Height="40"
-                                Click="UpdateCurrentPlateLocation_Button_Click"
+                                Click="UpdateCurrentPlate_Button_Click"
                                 Content="更新选中竖板"
                                 Style="{StaticResource dgButton}"
                                 Template="{StaticResource buttonTemplate}" />
@@ -900,6 +996,47 @@
                 </Grid.ColumnDefinitions>
             </Grid>
         </Grid>
+        <!--  botton info  -->
+        <Grid
+            x:Name="botton_info_grid"
+            Grid.Row="4"
+            Grid.ColumnSpan="3"
+            Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Label
+                x:Name="currentPressKey_Label"
+                Grid.Row="0"
+                Content="按下的按键: " />
+            <Label
+                x:Name="currentMouse_Label"
+                Grid.Row="1"
+                Content="鼠标坐标: " />
+            <Label
+                x:Name="currentLocation_Label"
+                Grid.Row="0"
+                Grid.Column="1"
+                Content="位置: " />
+            <Label
+                x:Name="currentDirection_Label"
+                Grid.Row="1"
+                Grid.Column="1"
+                Content="姿态: " />
 
+
+        </Grid>
     </Grid>
 </Window>

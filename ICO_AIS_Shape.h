@@ -10,6 +10,7 @@
 #include "ICO_InteractiveObject.h"
 
 using namespace OCCTK::OCC::TopoDS;
+using namespace System;
 
 namespace OCCTK {
 namespace OCC {
@@ -19,6 +20,7 @@ public ref class Shape :public InteractiveObject {
 public:
 	Shape(Handle(AIS_InteractiveObject) aInteractive);
 	Shape(TopoDS_Shape aShape);
+	Shape(System::IntPtr aShapePtr);
 	Shape(TopoDS::Shape^ aShape);
 	Shape(Handle(AIS_Shape) aAISShape);
 	Shape(AIS_Shape aAISShape);
@@ -28,6 +30,7 @@ public:
 	bool HasInteractiveContext();
 	Handle(AIS_Shape) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
+	System::IntPtr GetIntPtr();
 private:
 	NCollection_Haft<Handle(AIS_Shape)> _pAISShape;
 };

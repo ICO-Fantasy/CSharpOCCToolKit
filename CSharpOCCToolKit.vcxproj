@@ -160,8 +160,8 @@
     <ClCompile Include="ICO_Ax2.cpp" />
     <ClCompile Include="ICO_Transform.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
-    <ClCompile Include="STEPExchange.cpp" />
-    <ClCompile Include="StringExchange.cpp" />
+    <ClCompile Include="ICO_STEPExchange.cpp" />
+    <ClCompile Include="ICO_StringExchange.cpp" />
     <ClCompile Include="ICO_Trihedron.cpp" />
     <ClCompile Include="ICO_BaseObject.cpp" />
     <ClCompile Include="ICO_MakeBox.cpp" />
@@ -171,7 +171,7 @@
     <ClCompile Include="ICO_InteractiveContext.cpp" />
     <ClCompile Include="ICO_InteractiveObject.cpp" />
     <ClCompile Include="ICO_Manipulator.cpp" />
-    <ClCompile Include="ICO_Shape.cpp" />
+    <ClCompile Include="ICO_AIS_Shape.cpp" />
     <ClCompile Include="ICO_ViewCube.cpp" />
     <ClCompile Include="ICO_Pnt.cpp" />
     <ClCompile Include="ICO_Trsf.cpp" />
@@ -185,7 +185,7 @@
     <ClInclude Include="ICO_Ax2.h" />
     <ClInclude Include="ICO_Transform.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
-    <ClInclude Include="STEPExchange.h" />
+    <ClInclude Include="ICO_STEPExchange.h" />
     <ClInclude Include="ICO_Trihedron.h" />
     <ClInclude Include="ICO_BaseObject.h" />
     <ClInclude Include="ICO_MakeBox.h" />
@@ -197,12 +197,13 @@
     <ClInclude Include="ICO_Manipulator.h" />
     <ClInclude Include="ICO_AIS_Shape.h" />
     <ClInclude Include="ICO_ViewCube.h" />
-    <ClInclude Include="StringExchange.h" />
+    <ClInclude Include="ICO_StringExchange.h" />
     <ClInclude Include="ICO_Pnt.h" />
     <ClInclude Include="ICO_Trsf.h" />
     <ClInclude Include="WMakeSimpleClamp.h" />
     <ClInclude Include="ICO_TopoDS_Shape.h" />
     <ClInclude Include="ICO_View.h" />
+    <ClInclude Include="ICO_SelectionMode.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
