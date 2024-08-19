@@ -28,6 +28,7 @@ public:
 	void SetColor(int R, int G, int B);
 	void SetTransparency(double theFactor);
 	bool HasInteractiveContext();
+	virtual bool Equals(System::Object^ obj) override;
 	Handle(AIS_Shape) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 	System::IntPtr GetIntPtr();

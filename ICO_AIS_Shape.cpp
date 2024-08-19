@@ -74,6 +74,15 @@ bool Shape::HasInteractiveContext() {
 	return _pAISShape()->HasInteractiveContext();
 }
 
+bool Shape::Equals(System::Object^ obj) {
+	// 检查 obj 是否是同一类型
+	Shape^ other = dynamic_cast<Shape^>(obj);
+	if (other != nullptr) {
+		return _pAISShape()->Shape().IsEqual(other->GetOCC()->Shape());
+	}
+	return false;
+}
+
 Handle(AIS_Shape) Shape::GetOCC() {
 	return _pAISShape();
 }

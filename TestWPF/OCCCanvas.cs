@@ -11,6 +11,8 @@ using TShape = OCCTK.OCC.TopoDS.Shape;
 
 namespace OCCViewForm;
 
+#region Enum
+
 public enum ActionMode
 {
     Normal,
@@ -53,6 +55,15 @@ public enum ViewOrientation
     Right,
 }
 
+#endregion
+
+public interface IAISSelectionHandler
+{
+    void OnSelectionMade(AShape theAIS);
+}
+
+public delegate void AISSelectionMadeHandler(AShape theAIS);
+
 public class SingleManipulator
 {
     // 私有静态变量用于保存单例实例
@@ -82,6 +93,9 @@ public class SingleManipulator
 
 public class OCCCanvas : Form
 {
+    // 定义事件
+    public event AISSelectionMadeHandler OnAISSelected;
+
     #region 私有字段
 
     float devicePixelRatioX;
@@ -358,6 +372,9 @@ public class OCCCanvas : Form
     }
 
     #region 重写虚方法
+
+    #region 渲染
+
     protected override void OnPaintBackground(PaintEventArgs e)
     {
         // 不调用基类方法，避免系统背景绘制
@@ -373,6 +390,10 @@ public class OCCCanvas : Form
     {
         Viewer.UpdateView();
     }
+
+    #endregion
+
+    #region 鼠标
 
     private void OnMouseDown(object sender, MouseEventArgs e)
     {
@@ -517,6 +538,8 @@ public class OCCCanvas : Form
             case Action3d.SingleSelect:
                 // 单选
                 InteractiveContext.Select();
+                // 触发事件，调用所有订阅的方法
+                OnAISSelected?.Invoke(InteractiveContext.SelectedAIS());
                 break;
             case Action3d.MultipleSelect:
                 InteractiveContext.XORSelect();
@@ -654,6 +677,7 @@ public class OCCCanvas : Form
         CursorResetTimer.Start();
     }
 
+    #endregion
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.F)

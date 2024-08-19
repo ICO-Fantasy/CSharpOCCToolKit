@@ -59,7 +59,7 @@ public:
 	property double Order {double get() { return myPiece().order; }}
 	OCCTK::SimpleClamp::VerticalPiece GetOCC() { return myPiece(); };
 
-	virtual System::String^ ToString() override { return NumberString.ToString(); }
+	virtual System::String^ ToString() override { return Order.ToString(); }
 private:
 	NCollection_Haft<OCCTK::SimpleClamp::VerticalPiece> myPiece;
 	AShape^ myAIS;

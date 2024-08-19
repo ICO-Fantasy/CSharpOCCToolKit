@@ -131,6 +131,36 @@ static bool AddEdge(Ring& theWire, std::vector<myEdge>& Edges, gp_Pnt& start, gp
 	return false;
 }
 
+//对Pieces排序
+static std::vector<VerticalPiece> SortingPieces(const PlatePose& thePose, std::vector<VerticalPiece>& thePieces) {
+	std::vector<VerticalPiece> orderedPieces = thePieces;
+	// 设置start为左边点
+	gp_Trsf tempswapT;
+	tempswapT.SetRotation(gp_Ax1(thePose.point, gp_Dir(0, 0, 1)), thePose.dir.AngleWithRef(gp_Vec(0.0, 1.0, 0.0), gp_Vec(0.0, 0.0, 1.0)));
+	for (size_t i = 0; i < thePieces.size(); i++) {
+		auto thePiece = &thePieces[i];
+		gp_Pnt tempStart = thePiece->myEdge.start.Transformed(tempswapT);
+		gp_Pnt tempEnd = thePiece->myEdge.end.Transformed(tempswapT);
+		//对Edge的两端点排序
+		if (tempStart.X() > tempEnd.X()) {
+			std::swap(thePiece->myEdge.start, thePiece->myEdge.end);
+		}
+		thePiece->order = tempStart.X();
+	}
+	//// 对Edges重新排序(start更小)
+	//std::sort(orderedPieces.begin(), orderedPieces.end(),
+	//	[&](const myEdge& edge1, const myEdge& edge2) {
+	//		return edge1.start.Transformed(tempswapT).X() < edge2.start.Transformed(tempswapT).X();
+	//	});
+
+	// 对Edges重新排序(start更小)
+	std::sort(thePieces.begin(), thePieces.end(),
+		[&](const VerticalPiece& piece1, const VerticalPiece& piece2) {
+			return piece1.order < piece2.order;
+		});
+	return thePieces;
+}
+
 // 找到并返回一个环
 static Ring FindARing(std::vector<myEdge>& Edges) {
 
@@ -204,37 +234,37 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 	std::vector<myEdge> originRing = theRing;
 
 
-#pragma region 取基准点，并排序
 
-	//// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序然后划分两条线
-	//gp_Pnt maxPoint;
-	//double maxDis = 0.0;
-	//for (auto oneEdge : originRing) {
-	//	gp_Pnt tempa = gp_Pnt(oneEdge.start);
-	//	tempa.SetZ(0.0);
-	//	if (maxDis < tempa.SquareDistance(gp_Pnt())) {
-	//		maxDis = tempa.SquareDistance(gp_Pnt());
-	//		maxPoint = tempa;
-	//	}
-	//	gp_Pnt tempb = gp_Pnt(oneEdge.end);
-	//	tempb.SetZ(0.0);
-	//	if (maxDis < tempb.SquareDistance(gp_Pnt())) {
-	//		maxDis = tempb.SquareDistance(gp_Pnt());
-	//		maxPoint = tempb;
-	//	}
-	//}
-	//// average Z
-	//double totalZ = 0.0;
-	//double totalNum = 0.0;
-	//for (auto oneEdge : originRing) {
-	//	totalZ += oneEdge.start.Z();
-	//	totalZ += oneEdge.end.Z();
-	//	totalNum += 2.0;
-	//}
-	//// get Max Point
-	//maxPoint.SetX(maxPoint.X() * 99.0);
-	//maxPoint.SetY(maxPoint.Y() * 99.0);
-	//maxPoint.SetZ(totalZ / totalNum);
+	// 取基准点，并排序
+		//// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序然后划分两条线
+		//gp_Pnt maxPoint;
+		//double maxDis = 0.0;
+		//for (auto oneEdge : originRing) {
+		//	gp_Pnt tempa = gp_Pnt(oneEdge.start);
+		//	tempa.SetZ(0.0);
+		//	if (maxDis < tempa.SquareDistance(gp_Pnt())) {
+		//		maxDis = tempa.SquareDistance(gp_Pnt());
+		//		maxPoint = tempa;
+		//	}
+		//	gp_Pnt tempb = gp_Pnt(oneEdge.end);
+		//	tempb.SetZ(0.0);
+		//	if (maxDis < tempb.SquareDistance(gp_Pnt())) {
+		//		maxDis = tempb.SquareDistance(gp_Pnt());
+		//		maxPoint = tempb;
+		//	}
+		//}
+		//// average Z
+		//double totalZ = 0.0;
+		//double totalNum = 0.0;
+		//for (auto oneEdge : originRing) {
+		//	totalZ += oneEdge.start.Z();
+		//	totalZ += oneEdge.end.Z();
+		//	totalNum += 2.0;
+		//}
+		//// get Max Point
+		//maxPoint.SetX(maxPoint.X() * 99.0);
+		//maxPoint.SetY(maxPoint.Y() * 99.0);
+		//maxPoint.SetZ(totalZ / totalNum);
 
 	//// 对Edge两端点重新排序(start更近)
 	//for (size_t i = 0; i < originRing.size(); i++) {
@@ -254,8 +284,7 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 	//		return maxPoint.SquareDistance(edge1.start) < maxPoint.SquareDistance(edge2.start);
 	//	});
 
-#pragma endregion
-	//对线排序
+		//对线排序
 	std::vector<myEdge> orderedEdges;
 	TopTools_ListOfShape edgeList;
 	BRepBuilderAPI_MakeWire wireMaker = BRepBuilderAPI_MakeWire();
@@ -302,20 +331,6 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 
 	// 直接取剩余线作为第二条
 	secondWire = orderedEdges;
-	//for (const auto& oneEdge : orderedEdges) {
-	//	bool found = false;
-	//	for (const auto& firstEdge : firstWire) {
-	//		if (oneEdge == firstEdge) {
-	//			found = true;
-	//			break;
-	//		}
-	//	}
-	//	if (!found) {
-	//		secondWire.push_back(oneEdge);
-	//	}
-	//}
-
-	// 比较高度
 
 	// 去除垂直的边
 	gp_Vec Z(0.0, 0.0, 1.0);
@@ -333,21 +348,21 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 	}
 	secondWire = Temp2;
 
-	//! 使用两端的 Z 值比较可能不准确（由于斜着的边缘）
+	//! 使用两端的 Z 值比较比较高度(可能不准确,由于斜着的边缘）
 	for (size_t i = 1; i < firstWire.size() - 1; ++i) {
 		const myEdge& firstEdge = firstWire[i];
 		bool isSame = false;
 		for (size_t j = 0; j < secondWire.size(); ++j) {
 			const myEdge& secondEdge = secondWire[j];
-			gp_Pnt2d a(firstEdge.start.X(), firstEdge.start.Y());
-			gp_Pnt2d b(secondEdge.start.X(), secondEdge.start.Y());
+			gp_Pnt2d a(firstEdge.middle.X(), firstEdge.middle.Y());
+			gp_Pnt2d b(secondEdge.middle.X(), secondEdge.middle.Y());
 
 			if (a.Distance(b) < 3.0) {
 				isSame = true;
 			}
 
 			if (isSame) {
-				if (firstEdge.start.Z() < secondEdge.start.Z()) {
+				if (firstEdge.middle.Z() < secondEdge.middle.Z()) {
 					return firstWire;
 				}
 				else {
@@ -501,74 +516,15 @@ VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape
 	}
 	Rings = GetRings(TempEdges);
 	//! 每个环中取最下边的线段作为原始构造线
-	std::vector<myEdge> bottomEdges;
+	std::vector<VerticalPiece>thePieces;
 	for (Ring aRing : Rings) {
-		bottomEdges = SplitRing(aRing);
-
-#pragma region 构造 Pieces
-
-#pragma region 取基准点，并排序
-
-		double refZ;
-		// 取最远点为基点，在基础上*99，Z为所有点Z的均值，对所有edge的方向进行排序
-		gp_Pnt maxPoint;
-		double maxDis = 0.0;
-		for (auto oneEdge : bottomEdges) {
-			gp_Pnt tempa = gp_Pnt(oneEdge.start);
-			tempa.SetZ(0.0);
-			if (maxDis < tempa.SquareDistance(gp_Pnt())) {
-				maxDis = tempa.SquareDistance(gp_Pnt());
-				maxPoint = tempa;
-			}
-			gp_Pnt tempb = gp_Pnt(oneEdge.end);
-			tempb.SetZ(0.0);
-			if (maxDis < tempb.SquareDistance(gp_Pnt())) {
-				maxDis = tempb.SquareDistance(gp_Pnt());
-				maxPoint = tempb;
-			}
-		}
-		// average Z
-		double totalZ = 0.0;
-		double totalNum = 0.0;
-		for (auto oneEdge : bottomEdges) {
-			totalZ += oneEdge.start.Z();
-			totalZ += oneEdge.end.Z();
-			totalNum += 2.0;
-		}
-		// get Max Point
-		maxPoint.SetX(maxPoint.X() * 99.0);
-		maxPoint.SetY(maxPoint.Y() * 99.0);
-		refZ = totalZ / totalNum;
-		maxPoint.SetZ(refZ);
-
-		// 对Edge两端点重新排序(start更近)
-		for (size_t i = 0; i < bottomEdges.size(); i++) {
-			auto oneEdge = bottomEdges[i];
-			gp_Pnt tempStart = bottomEdges[i].start;
-			gp_Pnt tempEnd = bottomEdges[i].end;
-			if (maxPoint.SquareDistance(tempStart) > maxPoint.SquareDistance(tempEnd)) {
-				std::swap(tempStart, tempEnd);
-			}
-			bottomEdges[i].start = tempStart;
-			bottomEdges[i].end = tempEnd;
-		}
-
-		// 对Edges重新排序(start更近)
-		std::sort(bottomEdges.begin(), bottomEdges.end(),
-			[&](const myEdge& edge1, const myEdge& edge2) {
-				return maxPoint.SquareDistance(edge1.start) < maxPoint.SquareDistance(edge2.start);
-			});
-
-#pragma endregion
-
+		std::vector<myEdge> bottomEdges = SplitRing(aRing);
 		for (myEdge anEdge : bottomEdges) {
 			VerticalPiece anPiece(thePose, anEdge, theZ);
-			anPiece.order = anEdge.start.SquareDistance(maxPoint);// 保存距离基准点的平方距离，用于排序
-			thePalte.pieces.push_back(anPiece);
+			thePieces.push_back(anPiece);
 		}
-#pragma endregion
-
 	}
+	thePalte.pieces = thePieces;
 
 #pragma endregion
 
@@ -648,6 +604,7 @@ static VerticalPlate RemoveShortEdge(VerticalPlate& ThePlate) {
 	return ThePlate;
 }
 
+//切开过长边
 static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double supLen, double cutLen) {
 	std::vector<VerticalPiece> result;
 	// 如果最小支撑长度不足，则不做切割
@@ -698,83 +655,6 @@ static std::vector<VerticalPiece> CutEdgeUniform(VerticalPiece thePiece, double 
 	return result;
 }
 
-//static std::vector<VerticalPiece> CutEdgeAlongDir(VerticalPiece thePiece, double theSupportLen, double theCutLen, int theNum) {
-//	std::vector<VerticalPiece> result;
-//	// 如果最小支撑长度不足，则不做切割
-//	if (theSupportLen <= 1) {
-//		result.push_back(thePiece);
-//		return result;
-//	}
-//	// 获取底层曲线
-//	double first, last;
-//	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(thePiece.edge, first, last);
-//	double start = 0, end = 0;
-//	gp_Pnt startP = thePiece.startPoint, endP = thePiece.startPoint;
-//	// 第一条
-//	switch (thePiece.dir) {
-//	case X:
-//		start = thePiece.startPoint.Y();
-//		end = thePiece.startPoint.Y() + theSupportLen;
-//
-//		startP.SetY(start);
-//		endP.SetY(end);
-//		break;
-//	case Y:
-//		start = thePiece.startPoint.X();
-//		end = thePiece.startPoint.X() + theSupportLen;
-//
-//		startP.SetX(start);
-//		endP.SetX(end);
-//		break;
-//	default:
-//		break;
-//	}
-//	// 投影点到曲线上，并获取投影点处的参数
-//	GeomAPI_ProjectPointOnCurve ppc1S(startP, aCurve);
-//	double param1S = ppc1S.LowerDistanceParameter();
-//	GeomAPI_ProjectPointOnCurve ppc2S(endP, aCurve);
-//	double param2S = ppc2S.LowerDistanceParameter();
-//	VerticalPiece newPieceS;
-//	newPieceS.dir = thePiece.dir;
-//	TopoDS_Edge newEdgeS = BRepBuilderAPI_MakeEdge(aCurve, param1S, param2S);
-//	newEdgeS.Orientation(thePiece.edge.Orientation());//同向
-//	newPieceS.edge = newEdgeS;
-//	result.push_back(newPieceS);
-//	// 第一条之后的
-//	for (size_t i = 0; i < theNum; i++) {
-//		switch (thePiece.dir) {
-//		case X:
-//			start += theSupportLen + theCutLen;
-//			end += theSupportLen + theCutLen;
-//
-//			startP.SetY(start);
-//			endP.SetY(end);
-//			break;
-//		case Y:
-//			start += theSupportLen + theCutLen;
-//			end += theSupportLen + theCutLen;
-//
-//			startP.SetX(start);
-//			endP.SetX(end);
-//			break;
-//		default:
-//			break;
-//		}
-//		//投影点到曲线上，并获取投影点处的参数
-//		GeomAPI_ProjectPointOnCurve ppc1(startP, aCurve);
-//		double param1 = ppc1.LowerDistanceParameter();
-//		GeomAPI_ProjectPointOnCurve ppc2(endP, aCurve);
-//		double param2 = ppc2.LowerDistanceParameter();
-//		VerticalPiece newPiece;
-//		newPiece.dir = thePiece.dir;
-//		TopoDS_Edge newEdge = BRepBuilderAPI_MakeEdge(aCurve, param1, param2);
-//		newEdge.Orientation(thePiece.edge.Orientation());//同向
-//		newPiece.edge = newEdge;
-//		result.push_back(newPiece);
-//	}
-//	return result;
-//}
-
 // 切开过长的边，与修剪两端类似的做法
 static VerticalPlate CutLongEdge(VerticalPlate& thePlate) {
 	double theSupportLen = thePlate.minSupportLen;
@@ -804,22 +684,6 @@ static VerticalPlate CutLongEdge(VerticalPlate& thePlate) {
 			tempPieces.push_back(aP);
 		}
 
-		////计算需要切割的间隙是奇数还是偶数
-		//int quotient = (int)(aPiece.Length() - theSupportLen) / (theSupportLen + theCuttingDistance);
-		//if (quotient % 2 == 0) {
-		//	// 商是偶数
-		//	for (auto aP : CutEdgeUniform(aPiece, theSupportLen, quotient)) {
-		//		tempPieces.push_back(aP);
-		//	}
-		//}
-		//else {
-		//	// 商是奇数，实际切割长度按照数目均分即可
-		//	double restLen = (aPiece.Length() - theSupportLen) / quotient;
-		//	double cutLen = restLen - theSupportLen;
-		//	for (auto aP : CutEdgeAlongDir(aPiece, theSupportLen, cutLen, quotient)) {
-		//		tempPieces.push_back(aP);
-		//	}
-		//}
 	}
 	thePlate.pieces = tempPieces;
 	return thePlate;
@@ -837,14 +701,11 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 	//切割工件
 	TopoDS_Shape aSection = MakeSection(thePose, theWorkpiece);
 	result = MakeVerticalPieceWithSection(result, aSection);
-	//auto debug1 = result.pieces;
 	result = TrimEdgeEnds(result);
-	//auto debug2 = result.pieces;
 	result = RemoveShortEdge(result);
-	//auto debug3 = result.pieces;
 	result = CutLongEdge(result);
-	//auto debug4 = result.pieces;
-
+	// 把最后得到的片体排序
+	result.pieces = SortingPieces(thePose, result.pieces);
 
 	return result;
 }

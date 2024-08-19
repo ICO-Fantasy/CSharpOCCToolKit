@@ -64,24 +64,28 @@ void InteractiveContext::InitSelected() {
 bool InteractiveContext::MoreSelected() {
 	if (myAISContext().IsNull()) return false;
 	return myAISContext()->MoreSelected();
-
 }
 
 bool InteractiveContext::NextSelected() {
 	if (myAISContext().IsNull()) return false;
 	myAISContext()->NextSelected();
+	return true;
 }
 
 InteractiveObject^ InteractiveContext::SelectedInteractive() {
 	if (myAISContext().IsNull()) return nullptr;
-	return gcnew InteractiveObject(myAISContext()->SelectedInteractive());
+	if (!myAISContext()->SelectedInteractive().IsNull()) {
+		return gcnew InteractiveObject(myAISContext()->SelectedInteractive());
+	}
+	return nullptr;
 }
 
 Shape^ InteractiveContext::SelectedAIS() {
 	if (myAISContext().IsNull()) return nullptr;
 	Handle(AIS_Shape) anAISShape;
-	if (myAISContext()->SelectedInteractive()->IsKind(STANDARD_TYPE(AIS_Shape))) {
-		anAISShape = Handle(AIS_Shape)::DownCast(myAISContext()->SelectedInteractive());
+	auto selectedObj = myAISContext()->SelectedInteractive();
+	if (!selectedObj.IsNull() && selectedObj->IsKind(STANDARD_TYPE(AIS_Shape))) {
+		anAISShape = Handle(AIS_Shape)::DownCast(selectedObj);
 		AIS::Shape^ result = gcnew AIS::Shape(*anAISShape);
 		return result;
 	}

@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Input;
 using Microsoft.VisualBasic;
 using Microsoft.Windows.Themes;
 using OCCTK.Extension;
@@ -26,6 +27,7 @@ using OCCTK.OCC.TopoDS;
 using OCCViewForm;
 //设置别名
 using AShape = OCCTK.OCC.AIS.Shape;
+using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
 using TShape = OCCTK.OCC.TopoDS.Shape;
 
@@ -385,7 +387,7 @@ public enum VPCMode
 /// <summary>
 /// 交互逻辑 MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow : Window, IAISSelectionHandler
 {
     const double LINEAR_TOL = 1e-10;
     private OCCCanvas Viewer;
@@ -549,12 +551,12 @@ public partial class MainWindow : Window
                 if (value.Sutured)
                 {
                     CurrentPlateSutured_Label.Content = $"已合并";
-                    CurrentPlateSutured_Label.Background = System.Windows.Media.Brushes.LawnGreen;
+                    CurrentPlateSutured_Label.Background = Brushes.LawnGreen;
                 }
                 else
                 {
                     CurrentPlateSutured_Label.Content = $"未合并";
-                    CurrentPlateSutured_Label.Background = System.Windows.Media.Brushes.Red;
+                    CurrentPlateSutured_Label.Background = Brushes.Red;
                 }
                 ;
             }
@@ -579,6 +581,7 @@ public partial class MainWindow : Window
         //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
         //ViewModel = new MainViewModel();
         //this.DataContext = ViewModel;
+        Viewer.OnAISSelected += OnSelectionMade;
         #region 全局属性绑定
 
         BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString();
@@ -627,12 +630,14 @@ public partial class MainWindow : Window
         FilletRadius_TextBox.Text = FilletRadiusParameter.ToString();
         FilletRadius_TextBox.TextChanged += FilletRadius_TextChanged;
         #endregion
+
         #region 创建竖板
         XNum_TextBox.Text = XNum.ToString();
         XNum_TextBox.TextChanged += XNum_TextChanged;
         YNum_TextBox.Text = YNum.ToString();
         YNum_TextBox.TextChanged += YNum_TextChanged;
         #endregion
+
         #region 单块板的属性
         #endregion
     }
@@ -1123,9 +1128,10 @@ public partial class MainWindow : Window
 
         // 创建要添加到 StackPanel 中的子元素
         Label PieceLabel = new Label();
-        PieceLabel.Content = theNum.ToString();
+        PieceLabel.Content = thePiece;
         PieceLabel.HorizontalContentAlignment = HorizontalAlignment.Left; // 设置 Label 的水平内容对齐方式为 Left
-
+        // 添加点击事件
+        PieceLabel.MouseLeftButtonDown += PieceLabel_MouseLeftButtonDown;
         // 将子元素添加到 Grid 中，并指定列索引
         Grid.SetColumn(PieceLabel, 0);
 
@@ -1955,6 +1961,76 @@ public partial class MainWindow : Window
         }
     }
 
+    // 选中单个片的交互
+    private void PieceLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        // 获取Label
+        Label clickedLabel = sender as Label;
+
+        // 确保Label不为空且Content不为空
+        if (clickedLabel != null && clickedLabel.Content != null)
+        {
+            // 如果 Label 已经被高亮显示，则恢复原始颜色
+            if (clickedLabel.Background == Brushes.Yellow)
+            {
+                clickedLabel.Background = Brushes.Transparent; // 恢复默认背景色
+            }
+            else
+            {
+                // 否则，将其设置为高亮颜色
+                clickedLabel.Background = Brushes.Yellow;
+            }
+
+            //选中AIS
+            var piece = clickedLabel.Content as VerticalPiece;
+            if (piece != null && piece.AIS != null)
+            {
+                Viewer.InteractiveContext.SelectAIS(piece.AIS, true);
+            }
+        }
+    }
+
+    public void OnSelectionMade(AShape theAIS)
+    {
+        if (CurrentPlate_StackPanel.Children.Count == 0)
+        {
+            return;
+        }
+        foreach (var child in CurrentPlate_StackPanel.Children)
+        {
+            // 确认子元素是否是 Grid 类型
+            if (child is Grid theGrid)
+            {
+                // 遍历 Grid 的 Children 集合，寻找 Label
+                foreach (var gridChild in theGrid.Children)
+                {
+                    if (gridChild is Label pieceLabel)
+                    {
+                        // 获取 Label 的 Content，即 thePiece
+                        var thePiece = pieceLabel.Content as VerticalPiece;
+                        if (thePiece != null)
+                        {
+                            // 在这里处理 thePiece 的逻辑
+                            if (thePiece.AIS.Equals(theAIS))
+                            {
+                                // 如果 Label 已经被高亮显示，则恢复原始颜色
+                                if (pieceLabel.Background == Brushes.Yellow)
+                                {
+                                    pieceLabel.Background = Brushes.Transparent; // 恢复默认背景色
+                                }
+                                else
+                                {
+                                    // 否则，将其设置为高亮颜色
+                                    pieceLabel.Background = Brushes.Yellow;
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     #endregion
 
     /// <summary>
