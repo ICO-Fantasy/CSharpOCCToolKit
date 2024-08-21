@@ -44,21 +44,45 @@ VerticalPlate^ SimpleClampMaker::SuturePLate(VerticalPlate^ theVerticalPlate, Ba
 	return newVP;
 }
 
+//给每块板开连接槽
 cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<VerticalPlate^>^ toDownPlates, List<VerticalPlate^>^ toUpPlates, BasePlate^ BasePlate, double theAvoidanceHeight, double theConnectThickness, double theFilletRadius) {
-	// 先把每块板连接起来，得到 start 和 end ，作为开槽的依据
+#pragma region 先把每块板连接起来，得到 start 和 end ，作为开槽的依据
+
 	SimpleClamp::BasePlate theoccBP = BasePlate->GetOCC();
 	std::vector<SimpleClamp::VerticalPlate> tempOccDownVP;
 	std::vector<SimpleClamp::VerticalPlate> tempOccUpVP;
+	List<VerticalPlate^>^ debugDown = gcnew List<VerticalPlate^>();
+	List<VerticalPlate^>^ debugUp = gcnew List<VerticalPlate^>();
+
 	for each (auto oneVP in toDownPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccDownVP.push_back(theoccVP);
+		////! debug
+		//auto newVP = gcnew VerticalPlate(theoccVP);
+		//newVP->sutured = true;
+		//newVP->myShape = gcnew TShape(theoccVP.shape);
+		//newVP->myAIS = gcnew AShape(theoccVP.shape);
+		//debugDown->Add(newVP);
 	}
 	for each (auto oneVP in toUpPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccUpVP.push_back(theoccVP);
+		////! debug
+		//auto newVP = gcnew VerticalPlate(theoccVP);
+		//newVP->sutured = true;
+		//newVP->myShape = gcnew TShape(theoccVP.shape);
+		//newVP->myAIS = gcnew AShape(theoccVP.shape);
+		//debugUp->Add(newVP);
 	}
+	////! debug
+	//cli::array<List<VerticalPlate^>^>^ result = gcnew cli::array<List<VerticalPlate^>^>(2);
+	//result[0] = debugDown;
+	//result[1] = debugUp;
+	//return result;
+
+#pragma endregion
 
 #pragma region 连接每块板，并在交错的位置开槽
 
@@ -73,9 +97,7 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 			auto otherVP = tempOccDownVP[j];
 			otherVPs.push_back(otherVP);
 		}
-		for (size_t i = 0; i < tempOccUpVP.size(); i++) {
-			otherVPs.push_back(tempOccUpVP[i]);
-		}
+		for (size_t i = 0; i < tempOccUpVP.size(); i++) { otherVPs.push_back(tempOccUpVP[i]); }
 
 		// 开槽
 		SimpleClamp::SlotVerticalPlate(oneVP, otherVPs, theFilletRadius, true);
@@ -132,10 +154,10 @@ VerticalPlate^ SimpleClampMaker::BrandNumberVerticalPlate(VerticalPlate^ theVert
 	SimpleClamp::VerticalPlate theoccPlate = theVerticalPlate->GetOCC();
 	SimpleClamp::VerticalPlate newoccplate = SimpleClamp::BrandNumberVerticalPlate(theoccPlate, hight);
 	VerticalPlate^ newPlate = gcnew VerticalPlate(newoccplate);
-	// 更新Shape和AISShape
+	// 更新NumberedShape和AIS
 	newPlate->sutured = true;
-	newPlate->myShape = gcnew TShape(newoccplate.shape);
-	newPlate->myAIS = gcnew AShape(newoccplate.shape);
+	newPlate->myNumberedShape = gcnew TShape(newoccplate.numberedShape);
+	newPlate->myAIS = gcnew AShape(newoccplate.numberedShape);
 	return newPlate;
 }
 BasePlate^ SimpleClampMaker::BrandNumberBasePlate(BasePlate^ theBasePlate, double hight) {

@@ -31,7 +31,7 @@ private:
 
 public ref struct BasePlate {
 	BasePlate(SimpleClamp::BasePlate theBasePlate) { myBP() = theBasePlate; }
-	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().shape); }};
+	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().Shape()); }};
 	property double X {double get() { return myBP().X; }};
 	property double Y {double get() { return myBP().Y; }};
 	property double Z {double get() { return myBP().Z; }};
@@ -94,6 +94,10 @@ public ref struct VerticalPlate {
 	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
 	// 用于判断是否已连接
 	property bool Sutured {bool get() { return sutured; } };
+	// debug
+	property Pnt^ Start {Pnt^ get() { return gcnew Pnt(myPlate().start); }};
+	property Pnt^ End {Pnt^ get() { return gcnew Pnt(myPlate().end); }};
+
 public:
 	List<VerticalPiece^>^ Pieces = gcnew List<VerticalPiece^>();
 	OCCTK::SimpleClamp::VerticalPlate GetOCC() { return myPlate(); };
@@ -106,6 +110,7 @@ private:
 internal:
 	bool sutured = false;
 	TShape^ myShape;
+	TShape^ myNumberedShape;
 	AShape^ myAIS;
 };
 

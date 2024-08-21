@@ -708,11 +708,6 @@
                             Grid.Column="1"
                             VerticalAlignment="Stretch" />
                         <TextBox
-                            x:Name="AddPlateLocationZ_TextBox"
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            VerticalAlignment="Stretch" />
-                        <TextBox
                             x:Name="AddPlateDirectionX_TextBox"
                             Grid.Row="2"
                             Grid.Column="0"

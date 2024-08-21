@@ -5,6 +5,8 @@
 #include "BRepBuilderAPI_MakeWire.hxx"
 #include "TopoDS_Edge.hxx"
 #include "TopoDS_Shape.hxx"
+#include <BRep_Builder.hxx>
+#include <BRepAlgoAPI_Cut.hxx>
 #include <gp_Dir.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
@@ -19,7 +21,39 @@ namespace SimpleClamp {
 #pragma region Utility
 
 public struct BasePlate {
-	TopoDS_Shape shape;
+	TopoDS_Shape Shape() {
+		// 根据边界框尺寸创建立方体
+		gp_Pnt theLowLeft(X - offsetX, Y - offsetY, Z);
+		gp_Pnt theTopRight(X + dX + offsetX, Y + dY + offsetY, Z);
+
+		gp_Pnt p1, p2, p3, p4;
+		p1 = theLowLeft;
+		p2 = gp_Pnt(theLowLeft.X(), theTopRight.Y(), Z);
+		p3 = theTopRight;
+		p4 = gp_Pnt(theTopRight.X(), theLowLeft.Y(), Z);
+		// 创建边
+		BRepBuilderAPI_MakeEdge l1(p1, p2);
+		BRepBuilderAPI_MakeEdge l2(p2, p3);
+		BRepBuilderAPI_MakeEdge l3(p3, p4);
+		BRepBuilderAPI_MakeEdge l4(p4, p1);
+		// 创建线段
+		BRepBuilderAPI_MakeWire wire;
+		wire.Add(l1);
+		wire.Add(l2);
+		wire.Add(l3);
+		wire.Add(l4);
+		// 创建面
+		BRepBuilderAPI_MakeFace face(wire.Wire(), true);
+		if (mySlotShape.IsNull()) {
+			TopoDS_Compound test;
+			mySlotBuilder.MakeCompound(test);
+			mySlotShape = test;
+			return face.Shape();
+		}
+		else {
+			return BRepAlgoAPI_Cut(face.Shape(), mySlotShape).Shape();
+		}
+	}
 	double X;
 	double Y;
 	double Z;
@@ -30,6 +64,8 @@ public struct BasePlate {
 	double offsetZ;
 	double lowestZ;// 零件最低点
 	double hight;// 零件高度
+	TopoDS_Shape mySlotShape = TopoDS_Shape();
+	BRep_Builder mySlotBuilder = BRep_Builder();
 };
 
 // 横截方向必须垂直于XY方向，Z值由底板决定
@@ -158,7 +194,16 @@ public struct VerticalPiece {
 		aWireMk.Add(myEdge.edge);
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(p3, p4));
 		aWireMk.Add(BRepBuilderAPI_MakeEdge(p4, p1));
+		if (!aWireMk.IsDone()) {
+			myShape = new TopoDS_Shape(myEdge.edge);
+			return myShape;
+		}
 		BRepBuilderAPI_MakeFace PieceProfile = BRepBuilderAPI_MakeFace(aWireMk.Wire());
+		if (!PieceProfile.IsDone()) {
+			myShape = new TopoDS_Shape(myEdge.edge);
+			return myShape; myShape = new TopoDS_Shape(myEdge.edge);
+			return myShape;
+		}
 		myShape = new TopoDS_Shape(PieceProfile);
 		return myShape;
 	};
@@ -177,20 +222,21 @@ private:
 public struct VerticalPlate {
 public:
 	TopoDS_Shape shape;
+	TopoDS_Shape numberedShape;
 	std::vector<VerticalPiece> pieces = std::vector<VerticalPiece>();
 	PlatePose pose;
 	gp_Pnt start;
-	gp_Pnt middle;
 	gp_Pnt end;
 	double Z;
 	double clearances;
 	double minSupportLen;
 	double cuttingDistance;
 	double avoidanceHeight;
-	double connectionThickness;
-	double slotLength = 10.0;//todo 暂不开放 连接槽长度
+	double connectionThickness;// 板厚
+	double slotLength = 6.0;//todo 暂不开放 连接槽长度
 	double slotHight = 10.0;//todo 暂不开放 连接槽高度
 	double filletRadius;
+	std::vector<gp_Pnt> cutPoints;
 	TCollection_AsciiString numberString = "unset";
 
 	BRepBuilderAPI_MakeWire _unclosedWire;

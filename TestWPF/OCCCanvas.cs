@@ -511,14 +511,12 @@ public class OCCCanvas : Form
                 CurrentAction3d = Action3d.DynamicPanning;
             }
         }
-
-        //将鼠标位置发送给OCC交互上下文管理器，用于获取该位置的所选对象
-        //! 单选等操作均需要基于该位置进行
-        try
+        else
         {
+            //将鼠标位置发送给OCC交互上下文管理器，用于获取该位置的所选对象
+            //! 单选等操作均需要基于该位置进行
             Viewer.MoveTo(mouseCurrentX, mouseCurrentY);
         }
-        catch { }
         // 工厂类构建
         var interaction = CanvasInteractionFactory.CreateInteraction(this, CurrentAction3d);
         // 执行操作
@@ -601,12 +599,13 @@ public class OCCCanvas : Form
                 break;
         }
 
+        //todo 会引发程序崩溃
         //保存选中的AIS对象
-        while (InteractiveContext.MoreSelected())
-        {
-            SelectedAISList.Add(InteractiveContext.SelectedAIS());
-            InteractiveContext.NextSelected();
-        }
+        //while (InteractiveContext.MoreSelected())
+        //{
+        //    SelectedAISList.Add(InteractiveContext.SelectedAIS());
+        //    InteractiveContext.NextSelected();
+        //}
 
         // 结束操作
         CurrentAction3d = Action3d.Nothing;

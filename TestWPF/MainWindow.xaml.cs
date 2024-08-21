@@ -389,7 +389,7 @@ public enum VPCMode
 /// </summary>
 public partial class MainWindow : Window, IAISSelectionHandler
 {
-    const double LINEAR_TOL = 1e-10;
+    const double LINEAR_TOL = 1e-1;
     private OCCCanvas Viewer;
     private InteractiveContext AISContext;
 
@@ -464,7 +464,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
     /// <summary>
     /// 竖板横向初始偏移
     /// </summary>
-    public double InitialOffsetXParameter { get; set; } = 5;
+    public double InitialOffsetXParameter { get; set; } = 20.0;
 
     /// <summary>
     /// 竖板横向偏移
@@ -475,7 +475,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
     /// <summary>
     /// 竖板纵向初始偏移
     /// </summary>
-    public double InitialOffsetYParameter { get; set; } = 5;
+    public double InitialOffsetYParameter { get; set; } = 20.0;
 
     /// <summary>
     /// 竖板纵向偏移
@@ -704,7 +704,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
         Viewer.EraseAll(false);
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
         //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
-        InputWorkpiece = new(new STEPExchange("mods\\test4Small.STEP").Shape());
+        InputWorkpiece = new(new STEPExchange("mods\\test4small03.STEP").Shape());
         BasePlate = null;
         Viewer.Display(InputWorkpiece.AIS, true);
         Viewer.FitAll();
@@ -756,15 +756,12 @@ public partial class MainWindow : Window, IAISSelectionHandler
     }
 
     #endregion
-    public int testSelect = -1;
 
     #region 选择模式
+
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        testSelect++;
-        Viewer.SetSelectionMode(testSelect);
-        //Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
-        Debug.WriteLine(testSelect.ToString());
+        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
         Debug.WriteLine(OCCTK.Visualization.SelectionMode.Shape.ToString());
     }
 
@@ -1083,22 +1080,32 @@ public partial class MainWindow : Window, IAISSelectionHandler
         SelectionChangedEventArgs e
     )
     {
-        //! 方向虽然用X、Y做区分，实际上还包括XY以外的方向，但只分为两种。
-        ComboBoxItem seletedItem = (ComboBoxItem)CurrentPlateDirection_ComboBox.SelectedItem;
+        if (BasePlate == null)
+        {
+            return;
+        }
+        ComboBoxItem seletedItem = (ComboBoxItem)AddPlateDirection_ComboBox.SelectedItem;
         if (seletedItem != null)
         {
             AddPlateDirection = seletedItem.Content.ToString();
         }
 
+        //! 方向虽然用X、Y做区分，实际上还包括XY以外的方向，但只分为两种。
         if (AddPlateDirection == "X")
         {
             AddPlateDirectionX_TextBox.Text = DirectionX.X().ToString();
             AddPlateDirectionY_TextBox.Text = DirectionX.Y().ToString();
+            AddPlateLocationY_TextBox.Text = BasePlate.Y.ToString();
+            AddPlateLocationY_TextBox.IsReadOnly = true;
+            AddPlateLocationX_TextBox.IsReadOnly = false;
         }
         else if (AddPlateDirection == "Y")
         {
             AddPlateDirectionX_TextBox.Text = DirectionY.X().ToString();
             AddPlateDirectionY_TextBox.Text = DirectionY.Y().ToString();
+            AddPlateLocationX_TextBox.Text = BasePlate.X.ToString();
+            AddPlateLocationX_TextBox.IsReadOnly = true;
+            AddPlateLocationY_TextBox.IsReadOnly = false;
         }
     }
 
@@ -1276,19 +1283,17 @@ public partial class MainWindow : Window, IAISSelectionHandler
         {
             return;
         }
-
         if (BasePlate == null)
         {
             return;
         }
 
+        #region 读取数字
+
         double theX,
             theY,
-            theZ,
             theW,
-            theP,
-            theR;
-
+            theP;
         // 转换 X 位置
         if (!double.TryParse(AddPlateLocationX_TextBox.Text, out theX))
         {
@@ -1302,14 +1307,6 @@ public partial class MainWindow : Window, IAISSelectionHandler
             MessageBox.Show("Y 位置输入的值不是有效的数字。");
             return;
         }
-
-        // 转换 Z 位置
-        if (!double.TryParse(AddPlateLocationZ_TextBox.Text, out theZ))
-        {
-            MessageBox.Show("Z 位置输入的值不是有效的数字。");
-            return;
-        }
-
         // 转换 X 方向
         if (!double.TryParse(AddPlateDirectionX_TextBox.Text, out theW))
         {
@@ -1323,26 +1320,39 @@ public partial class MainWindow : Window, IAISSelectionHandler
             MessageBox.Show("Y 方向输入的值不是有效的数字。");
             return;
         }
+        #endregion
 
-        var newPlate = SimpleClampMaker.MakeVerticalPlate(
-            InputWorkpiece.Shape,
-            BasePlate,
-            new PlatePose(new Pnt(theX, theY, theZ), new Dir(theW, theP, 0.0)),
-            ClearancesParameter,
-            MinSupportingLenParameter,
-            CuttingDistanceParameter
-        );
         //按照选择的方向添加
+        VerticalPlate? newPlate = null;
         if (AddPlateDirection == "X")
         {
+            newPlate = SimpleClampMaker.MakeVerticalPlate(
+                InputWorkpiece.Shape,
+                BasePlate,
+                new PlatePose(new Pnt(theX, BasePlate.Y, BasePlate.Z), new Dir(theW, theP, 0.0)),
+                ClearancesParameter,
+                MinSupportingLenParameter,
+                CuttingDistanceParameter
+            );
             MiddleToDownPlates.Add(newPlate);
         }
         if (AddPlateDirection == "Y")
         {
+            newPlate = SimpleClampMaker.MakeVerticalPlate(
+                InputWorkpiece.Shape,
+                BasePlate,
+                new PlatePose(new Pnt(BasePlate.X, theY, BasePlate.Z), new Dir(theW, theP, 0.0)),
+                ClearancesParameter,
+                MinSupportingLenParameter,
+                CuttingDistanceParameter
+            );
             MiddleToUpPlates.Add(newPlate);
         }
-        UpdateComboBox();
-        DisplaySinglePlate(newPlate, false);
+        if (newPlate != null)
+        {
+            UpdateComboBox();
+            DisplaySinglePlate(newPlate, false);
+        }
         Viewer.Update();
     }
 
@@ -1583,11 +1593,6 @@ public partial class MainWindow : Window, IAISSelectionHandler
             BasePlateOffsetX,
             BasePlateOffsetY
         );
-        // 根据计算结果，设置推荐值
-        InitialOffsetXParameter = Math.Round(BasePlate.DX * 0.1);
-        InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString("F1");
-        InitialOffsetYParameter = Math.Round(BasePlate.DY * 0.1);
-        InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString("F1");
     }
 
     /// <summary>
@@ -1614,107 +1619,152 @@ public partial class MainWindow : Window, IAISSelectionHandler
                 OffextY = OffsetYParameter;
                 break;
         }
-
-        // 创建X方向竖板
-        int num = 0;
-        while (
-            BasePlate.X + InitialOffsetXParameter - LINEAR_TOL <= tempX
-            && tempX <= BasePlate.X + BasePlate.DX - InitialOffsetXParameter + LINEAR_TOL
-        )
+        if (false)
         {
-            var tempPlate = SimpleClampMaker.MakeVerticalPlate(
-                InputWorkpiece.Shape,
-                BasePlate,
-                new PlatePose(new Pnt(tempX, BasePlate.Y, 0.0), DirectionX),
-                ClearancesParameter,
-                MinSupportingLenParameter,
-                CuttingDistanceParameter
-            );
-            tempPlate.NumberString = $"X{num}";
-            MiddleToDownPlates.Add(tempPlate);
-            num += 1;
-            tempX += OffextX;
+            // 创建X方向竖板
+            int num = 0;
+            while (
+                BasePlate.X + InitialOffsetXParameter - LINEAR_TOL <= tempX
+                && tempX <= BasePlate.X + BasePlate.DX - InitialOffsetXParameter + LINEAR_TOL
+            )
+            {
+                var tempPlate = SimpleClampMaker.MakeVerticalPlate(
+                    InputWorkpiece.Shape,
+                    BasePlate,
+                    new PlatePose(new Pnt(tempX, BasePlate.Y, 0.0), DirectionX),
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
+                tempPlate.NumberString = $"X{num}";
+                //! debug
+                foreach (var onePiece in tempPlate.Pieces)
+                {
+                    Debug.WriteLine($"{tempPlate.NumberString}: {onePiece.Order:F1}");
+                }
+                MiddleToDownPlates.Add(tempPlate);
+                num += 1;
+                tempX += OffextX;
+            }
+            // 创建Y方向竖板
+            num = 0;
+            while (
+                BasePlate.Y + InitialOffsetYParameter - LINEAR_TOL <= tempY
+                && tempY <= BasePlate.Y + BasePlate.DY - InitialOffsetYParameter + LINEAR_TOL
+            )
+            {
+                var tempPlate = SimpleClampMaker.MakeVerticalPlate(
+                    InputWorkpiece.Shape,
+                    BasePlate,
+                    new PlatePose(new Pnt(BasePlate.X, tempY, 0.0), DirectionY),
+                    ClearancesParameter,
+                    MinSupportingLenParameter,
+                    CuttingDistanceParameter
+                );
+                tempPlate.NumberString = $"Y{num}";
+                //! debug
+                foreach (var onePiece in tempPlate.Pieces)
+                {
+                    Debug.WriteLine($"{tempPlate.NumberString}: {onePiece.Order:F1}");
+                }
+                MiddleToUpPlates.Add(tempPlate);
+                num += 1;
+                tempY += OffextY;
+            }
         }
-        // 创建Y方向竖板
-        num = 0;
-        while (
-            BasePlate.Y + InitialOffsetYParameter - LINEAR_TOL <= tempY
-            && tempY <= BasePlate.Y + BasePlate.DY - InitialOffsetYParameter + LINEAR_TOL
-        )
+        else
         {
-            var tempPlate = SimpleClampMaker.MakeVerticalPlate(
-                InputWorkpiece.Shape,
-                BasePlate,
-                new PlatePose(new Pnt(BasePlate.X, tempY, 0.0), DirectionY),
-                ClearancesParameter,
-                MinSupportingLenParameter,
-                CuttingDistanceParameter
-            );
-            tempPlate.NumberString = $"Y{num}";
-            MiddleToUpPlates.Add(tempPlate);
-            num += 1;
-            tempY += OffextY;
+            #region 多线程创建
+
+            //创建X方向竖板
+            // 使用并发集合以便在线程间安全地添加元素
+            Debug.WriteLine("Create X");
+            ConcurrentBag<VerticalPlate> concurrentDownPlates = new ConcurrentBag<VerticalPlate>();
+            // 创建并行任务
+            var createXTask = Task.Run(() =>
+            {
+                Parallel.For(
+                    0,
+                    (int)
+                        Math.Ceiling(
+                            (BasePlate.DX - (InitialOffsetXParameter - LINEAR_TOL) * 2) / OffextX
+                        ),
+                    i =>
+                    {
+                        double currentX = InitX + i * OffextX;
+                        Debug.WriteLine(
+                            $"{BasePlate.X + InitialOffsetXParameter}, {currentX}, {BasePlate.X + BasePlate.DX - InitialOffsetXParameter}"
+                        );
+                        if (
+                            BasePlate.X + InitialOffsetXParameter - LINEAR_TOL <= currentX
+                            && currentX
+                                <= BasePlate.X + BasePlate.DX - InitialOffsetXParameter + LINEAR_TOL
+                        )
+                        {
+                            var tempPlate = SimpleClampMaker.MakeVerticalPlate(
+                                InputWorkpiece.Shape,
+                                BasePlate,
+                                new PlatePose(new Pnt(currentX, BasePlate.Y, 0.0), DirectionX),
+                                ClearancesParameter,
+                                MinSupportingLenParameter,
+                                CuttingDistanceParameter
+                            );
+                            tempPlate.NumberString = $"X{i}";
+                            concurrentDownPlates.Add(tempPlate);
+                        }
+                    }
+                );
+                // 将并发集合中的元素添加到最终的集合中
+                MiddleToDownPlates.AddRange(concurrentDownPlates);
+            });
+
+            //创建Y方向竖板
+            // 使用并发集合以便在线程间安全地添加元素
+            Debug.WriteLine("Create Y");
+            var createYTask = Task.Run(() =>
+            {
+                ConcurrentBag<VerticalPlate> concurrentUpPlates =
+                    new ConcurrentBag<VerticalPlate>();
+                Parallel.For(
+                    0,
+                    (int)
+                        Math.Ceiling(
+                            (BasePlate.DY - (InitialOffsetYParameter - LINEAR_TOL) * 2) / OffextY
+                        ),
+                    i =>
+                    {
+                        double currentY = InitY + i * OffextY;
+                        Debug.WriteLine(
+                            $"{BasePlate.Y + InitialOffsetYParameter}, {currentY}, {BasePlate.Y + BasePlate.DY - InitialOffsetYParameter}"
+                        );
+                        if (
+                            BasePlate.Y + InitialOffsetYParameter - LINEAR_TOL <= currentY
+                            && currentY
+                                <= BasePlate.Y + BasePlate.DY - InitialOffsetYParameter + LINEAR_TOL
+                        )
+                        {
+                            var tempPlate = SimpleClampMaker.MakeVerticalPlate(
+                                InputWorkpiece.Shape,
+                                BasePlate,
+                                new PlatePose(new Pnt(BasePlate.X, currentY, 0.0), DirectionY),
+                                ClearancesParameter,
+                                MinSupportingLenParameter,
+                                CuttingDistanceParameter
+                            );
+                            tempPlate.NumberString = $"Y{i}";
+                            concurrentUpPlates.Add(tempPlate);
+                        }
+                    }
+                );
+                // 将并发集合中的元素添加到最终的集合中
+                MiddleToUpPlates.AddRange(concurrentUpPlates);
+            });
+            // 等待两个任务完成
+            Task.WaitAll(createXTask, createYTask);
+            // 输出完成信息
+            Debug.WriteLine("Both X and Y plates have been created.");
+            #endregion
         }
-
-        //#region 多线程创建
-
-        ////创建X方向竖板
-        //// 使用并发集合以便在线程间安全地添加元素
-        //ConcurrentBag<VerticalPlate> concurrentDownPlates = new ConcurrentBag<VerticalPlate>();
-        //    Parallel.For(
-        //        0,
-        //        (int)Math.Ceiling((BasePlate.DX - InitX) / OffextX),
-        //        i =>
-        //        {
-        //            double currentX = InitX + i * OffextX;
-
-        //            if (BasePlate.X < currentX && currentX < BasePlate.X + BasePlate.DX)
-        //            {
-        //                var tempPlate = SimpleClampMaker.MakeVerticalPlate(
-        //                    InputWorkpiece.Shape,
-        //                    BasePlate,
-        //                    new PlatePose(new Pnt(currentX, BasePlate.Y, 0.0), DirectionX),
-        //                    ClearancesParameter,
-        //                    MinSupportingLenParameter,
-        //                    CuttingDistanceParameter
-        //                );
-        //                tempPlate.NumberString = $"X{i}";
-        //                concurrentDownPlates.Add(tempPlate);
-        //            }
-        //        }
-        //    );
-        //    // 将并发集合中的元素添加到最终的集合中
-        //    MiddleToDownPlates.AddRange(concurrentDownPlates);
-
-        //    //创建Y方向竖板
-        //    // 使用并发集合以便在线程间安全地添加元素
-        //    ConcurrentBag<VerticalPlate> concurrentUpPlates = new ConcurrentBag<VerticalPlate>();
-        //    Parallel.For(
-        //        0,
-        //        (int)Math.Ceiling((BasePlate.DY - InitY) / OffextY),
-        //        i =>
-        //        {
-        //            double currentY = InitY + i * OffextY;
-
-        //            if (BasePlate.Y < currentY && currentY < BasePlate.Y + BasePlate.DY)
-        //            {
-        //                var tempPlate = SimpleClampMaker.MakeVerticalPlate(
-        //                    InputWorkpiece.Shape,
-        //                    BasePlate,
-        //                    new PlatePose(new Pnt(BasePlate.X, currentY, 0.0), DirectionY),
-        //                    ClearancesParameter,
-        //                    MinSupportingLenParameter,
-        //                    CuttingDistanceParameter
-        //                );
-        //                tempPlate.NumberString = $"Y{i}";
-        //                concurrentUpPlates.Add(tempPlate);
-        //            }
-        //        }
-        //    );
-        //    // 将并发集合中的元素添加到最终的集合中
-        //    MiddleToUpPlates.AddRange(concurrentUpPlates);
-
-        //#endregion
     }
 
     /// <summary>
@@ -1733,7 +1783,22 @@ public partial class MainWindow : Window, IAISSelectionHandler
         );
         MiddleToDownPlates = temp[0];
         MiddleToUpPlates = temp[1];
-
+        //! debug
+        //foreach (var tempPlate in VerticalPlates)
+        //{
+        //    Debug.WriteLine(
+        //        $"{tempPlate.NumberString}_start: {tempPlate.Start.X():F1}, {tempPlate.Start.Y():F1}"
+        //    );
+        //    Debug.WriteLine(
+        //        $"{tempPlate.NumberString}_end: {tempPlate.End.X():F1}, {tempPlate.End.Y():F1}"
+        //    );
+        //    Debug.Write($"{tempPlate.NumberString}: ");
+        //    foreach (var onePiece in tempPlate.Pieces)
+        //    {
+        //        Debug.Write($"{onePiece.Order:F1}, ");
+        //    }
+        //    Debug.WriteLine("");
+        //}
         // 给板打标签
         List<VerticalPlate> tempDown = new List<VerticalPlate>();
         foreach (var plate in MiddleToDownPlates)
@@ -1741,7 +1806,6 @@ public partial class MainWindow : Window, IAISSelectionHandler
             tempDown.Add(SimpleClampMaker.BrandNumberVerticalPlate(plate, 10.0));
         }
         MiddleToDownPlates = tempDown;
-
         List<VerticalPlate> tempUp = new List<VerticalPlate>();
         foreach (var plate in MiddleToUpPlates)
         {
@@ -1818,7 +1882,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
             if (ShowInputWorkpiece)
             {
                 Display(InputWorkpiece.AIS, false);
-                //AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
+                AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
                 AISContext.SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), false);
             }
             else
@@ -1957,7 +2021,10 @@ public partial class MainWindow : Window, IAISSelectionHandler
     {
         if (CurrentPlate != null)
         {
-            Display(CurrentPlate.AIS, update);
+            if (CurrentPlate.AIS != null)
+            {
+                Display(CurrentPlate.AIS, update);
+            }
         }
     }
 
@@ -2050,16 +2117,41 @@ public partial class MainWindow : Window, IAISSelectionHandler
     }
 
     /// <summary>
+    /// 提取NumberString中的数字
+    /// </summary>
+    /// <param name="numberString"></param>
+    /// <returns></returns>
+    private static int ExtractNumber(string numberString)
+    {
+        // 去掉开头的字母部分
+        // 假设 NumberString 以字母 X 开头，数字在字母后面
+        if (numberString.Length > 1 && numberString[0] == 'X')
+        {
+            // 提取数字部分并转换为整数
+            if (int.TryParse(numberString.Substring(1), out int result))
+            {
+                return result;
+            }
+        }
+        return 0; // 默认值，如果无法提取数字
+    }
+
+    /// <summary>
     /// 更新控件
     /// </summary>
     private void UpdateComboBox()
     {
         ClearPlatesInfo();
-        foreach (var onePlate in MiddleToDownPlates)
+        // 按照 NumberString 中的数字进行排序
+        var sortedDownPlates = MiddleToDownPlates
+            .OrderBy(p => ExtractNumber(p.NumberString))
+            .ToList();
+        foreach (var onePlate in sortedDownPlates)
         {
             CurrentPlateLocationX_ComboBox.Items.Add(onePlate);
         }
-        foreach (var onePlate in MiddleToUpPlates)
+        var sortedUpPlates = MiddleToUpPlates.OrderBy(p => ExtractNumber(p.NumberString)).ToList();
+        foreach (var onePlate in sortedUpPlates)
         {
             CurrentPlateLocationY_ComboBox.Items.Add(onePlate);
         }
