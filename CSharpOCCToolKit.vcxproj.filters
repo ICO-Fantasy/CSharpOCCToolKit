@@ -158,6 +158,9 @@
     <ClCompile Include="ICO_MakeDir.cpp">
       <Filter>源文件\OCCTools</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_MakeCompound.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -234,6 +237,9 @@
     </ClInclude>
     <ClInclude Include="ICO_MakeDir.h">
       <Filter>头文件\OCCTools</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeCompound.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

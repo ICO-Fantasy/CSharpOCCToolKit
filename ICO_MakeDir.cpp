@@ -1,7 +1,9 @@
-﻿#include "ICO_MakeDir.h"
+﻿#pragma once
+#include "ICO_MakeDir.h"
 #include <gp_Dir.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_Quaternion.hxx>
+
 namespace OCCTK {
 namespace Tool {
 

@@ -31,7 +31,7 @@ private:
 
 public ref struct BasePlate {
 	BasePlate(SimpleClamp::BasePlate theBasePlate) { myBP() = theBasePlate; }
-	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().TShape()); }};
+	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().Shape()); }};
 	property double X {double get() { return myBP().X; }};
 	property double Y {double get() { return myBP().Y; }};
 	property double Z {double get() { return myBP().Z; }};
@@ -99,6 +99,7 @@ public ref struct VerticalPlate {
 	// 最终的竖板形状
 	//property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(myPlate().shape); }return myAIS; }};
 	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
+	property TShape^ Shape {TShape^ get() { if (sutured) { return gcnew TShape(myPlate().shape); } return nullptr; }};
 	// 用于判断是否已连接
 	property bool Sutured {bool get() { return sutured; } };
 	// debug

@@ -1903,8 +1903,21 @@ public partial class MainWindow : Window, IAISSelectionHandler
     /// </summary>
     void OutputSTEP()
     {
+        // 构造组合体
+        CompoundMaker theMaker = new CompoundMaker();
+        theMaker.Add(BasePlate.Shape);
+        foreach (var onePlate in VerticalPlates)
+        {
+            if (onePlate.Shape != null)
+            {
+                theMaker.Add(onePlate.Shape);
+            }
+        }
+        STEPExchange exchanger3D = new(theMaker.Shape());
+        exchanger3D.SaveFile("mods\\test_output_3d.STEP");
+        //保存排列后的板
         STEPExchange exchanger = new(CombinedFixtureBoard.Shape);
-        exchanger.SaveFile("mods\\test_output.STEP");
+        exchanger.SaveFile("mods\\test_output_Fixtured.STEP");
     }
 
     #endregion
@@ -2162,6 +2175,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
             }
         }
     }
+
     #endregion
 
     /// <summary>

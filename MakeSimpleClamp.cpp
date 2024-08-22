@@ -1015,7 +1015,7 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 
 // 在底板上开槽
 BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> middleDownPlates, std::vector<VerticalPlate> middleUpPlates) {
-	if (theBasePlate.TShape().IsNull()) {
+	if (theBasePlate.Shape().IsNull()) {
 		return theBasePlate;
 	}
 	double TOL = 1e-2;
@@ -1466,7 +1466,7 @@ VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight = 60
 
 // 在底板上烙印XY指示
 BasePlate BrandNumberBasePlate(BasePlate thePlate, double hight) {
-	if (thePlate.TShape().IsNull()) {
+	if (thePlate.Shape().IsNull()) {
 		return thePlate;
 	}
 
@@ -1527,7 +1527,7 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> mid
 	baseQuat.SetEulerAngles(gp_Extrinsic_ZYX, 0.0 * (M_PI / 180.0), 0.0 * (M_PI / 180.0), 90.0 * (M_PI / 180.0));
 	baseR.SetRotation(baseQuat);
 
-	TopoDS_Shape newBP = theBasePlate.TShape().Moved(TopLoc_Location(baseR.Multiplied(base_trsf)), true);
+	TopoDS_Shape newBP = theBasePlate.Shape().Moved(TopLoc_Location(baseR.Multiplied(base_trsf)), true);
 	builder.Add(result, newBP);
 
 #pragma endregion

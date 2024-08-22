@@ -21,7 +21,7 @@ namespace SimpleClamp {
 #pragma region Utility
 
 public struct BasePlate {
-	TopoDS_Shape TShape() {
+	TopoDS_Shape Shape() {
 		// 根据边界框尺寸创建立方体
 		gp_Pnt theLowLeft(X - offsetX, Y - offsetY, Z);
 		gp_Pnt theTopRight(X + dX + offsetX, Y + dY + offsetY, Z);
