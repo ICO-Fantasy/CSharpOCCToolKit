@@ -11,8 +11,8 @@
 using namespace System::Collections::Generic;
 using namespace OCCTK;
 using namespace OCCTK::OCC::gp;
-typedef OCCTK::OCC::AIS::Shape AShape;
-typedef OCCTK::OCC::TopoDS::Shape TShape;
+using namespace OCCTK::OCC::AIS;
+using namespace OCCTK::OCC::TopoDS;
 
 namespace OCCTK {
 namespace Laser {
@@ -31,7 +31,7 @@ private:
 
 public ref struct BasePlate {
 	BasePlate(SimpleClamp::BasePlate theBasePlate) { myBP() = theBasePlate; }
-	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().Shape()); }};
+	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().TShape()); }};
 	property double X {double get() { return myBP().X; }};
 	property double Y {double get() { return myBP().Y; }};
 	property double Z {double get() { return myBP().Z; }};
@@ -41,6 +41,12 @@ public ref struct BasePlate {
 	property double OffsetY {double get() { return myBP().offsetY; }void set(double value) { myBP().offsetY = value; }};
 	property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }};
 public:
+	void UpdateAIS() {
+		if (myAIS != nullptr) {
+			myAIS->RemoveSelf();
+		}
+		myAIS = gcnew AShape(Shape);
+	}
 	SimpleClamp::BasePlate GetOCC() { return myBP(); };
 private:
 	NCollection_Haft<SimpleClamp::BasePlate> myBP;
@@ -91,6 +97,7 @@ public ref struct VerticalPlate {
 		myPlate().numberString = DataExchange::ToAsciiString(value);
 	}};
 	// 最终的竖板形状
+	//property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(myPlate().shape); }return myAIS; }};
 	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
 	// 用于判断是否已连接
 	property bool Sutured {bool get() { return sutured; } };

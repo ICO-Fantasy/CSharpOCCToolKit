@@ -8,7 +8,6 @@
 #include "ICO_AIS_Shape.h"
 #include "ICO_Color.h"
 #include "ICO_Trsf.h"
-#include <Quantity_Color.hxx>
 
 namespace OCCTK {
 namespace OCC {
@@ -17,7 +16,7 @@ namespace AIS {
 public ref class Trihedron :public InteractiveObject {
 public:
 	Trihedron(float axisSize);
-	Trihedron(Shape^ theAIS, float axisSize);
+	Trihedron(AShape^ theAIS, float axisSize);
 	Trihedron(gp::Trsf^ theTrsf, float axisSize);
 	void SetArrowLength(double value);
 	void SetArrowWidth(double value);

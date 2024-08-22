@@ -5,9 +5,8 @@ using System.Linq.Expressions;
 using System.Windows.Forms;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
+using OCCTK.OCC.TopoDS;
 using OCCTK.Visualization;
-using AShape = OCCTK.OCC.AIS.Shape;
-using TShape = OCCTK.OCC.TopoDS.Shape;
 
 namespace OCCViewForm;
 

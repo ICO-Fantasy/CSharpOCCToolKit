@@ -10,8 +10,8 @@ MakeBox::MakeBox(double dX, double dY, double dZ) {
 	myMaker = new BRepPrimAPI_MakeBox(dX, dY, dZ);
 }
 
-TopoDS::Shape^ MakeBox::Shape() {
-	return gcnew TopoDS::Shape(myMaker->Shape());
+TShape^ MakeBox::Shape() {
+	return gcnew TShape(myMaker->Shape());
 }
 
 }

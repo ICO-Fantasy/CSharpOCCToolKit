@@ -9,13 +9,15 @@ namespace OCCTK {
 namespace OCC {
 namespace TopoDS {
 
-public ref class Shape {
+public ref class TShape {
 public:
-	Shape();
-	Shape(TopoDS_Shape theShape);
-	Shape(System::IntPtr theShapeIntPtr);
-	Shape(TopoDS_Shape* theShape);
+	TShape();
+	TShape(TopoDS_Shape theShape);
+	TShape(System::IntPtr theShapeIntPtr);
+	TShape(TopoDS_Shape* theShape);
 	void Move(Trsf^ theT);
+	bool IsEqual(TShape^ otherShape);
+	virtual bool Equals(System::Object^ obj) override;
 	TopoDS_Shape GetOCC();
 	System::IntPtr GetPtr();
 private:

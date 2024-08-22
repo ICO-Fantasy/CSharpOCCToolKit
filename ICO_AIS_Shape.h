@@ -16,19 +16,20 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-public ref class Shape :public InteractiveObject {
+public ref class AShape :public InteractiveObject {
 public:
-	Shape(Handle(AIS_InteractiveObject) aInteractive);
-	Shape(TopoDS_Shape aShape);
-	Shape(System::IntPtr aShapePtr);
-	Shape(TopoDS::Shape^ aShape);
-	Shape(Handle(AIS_Shape) aAISShape);
-	Shape(AIS_Shape aAISShape);
-	TopoDS::Shape^ TopoShape();
+	AShape(Handle(AIS_InteractiveObject) aInteractive);
+	AShape(TopoDS_Shape aShape);
+	AShape(System::IntPtr aShapePtr);
+	AShape(TopoDS::TShape^ aShape);
+	AShape(Handle(AIS_Shape) aAISShape);
+	AShape(AIS_Shape aAISShape);
+	TopoDS::TShape^ TopoShape();
 	void SetColor(int R, int G, int B);
 	void SetTransparency(double theFactor);
 	bool HasInteractiveContext();
 	virtual bool Equals(System::Object^ obj) override;
+	void RemoveSelf();
 	Handle(AIS_Shape) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 	System::IntPtr GetIntPtr();

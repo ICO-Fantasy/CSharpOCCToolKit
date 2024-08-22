@@ -32,7 +32,7 @@ Manipulator::Manipulator(Handle(AIS_Manipulator)theManipulator) {
 Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) {
 	AIS_Manipulator* aManipulator = new AIS_Manipulator();
 	AIS_ManipulatorObjectSequence* aSeq = new AIS_ManipulatorObjectSequence();
-	for each (Shape ^ var in theAISList) {
+	for each (AShape ^ var in theAISList) {
 		aSeq->Append((var->GetOCC()));
 	}
 	aManipulator->Attach(aSeq);
@@ -103,13 +103,13 @@ void Manipulator::StopTransform() {
 	_pManipulator()->StopTransform();
 }
 
-void Manipulator::Attach(Shape^ theAIS) {
+void Manipulator::Attach(AShape^ theAIS) {
 	_pManipulator()->Attach(theAIS->GetOCC());
 	// 让操作器自动激活
 	_pManipulator()->SetModeActivationOnDetection(true);
 }
 
-void Manipulator::Attach(Shape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes) {
+void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes) {
 	AIS_Manipulator::OptionsForAttach anOptions;
 	anOptions.SetAdjustPosition(adjustPosition);
 	anOptions.SetAdjustSize(!adjustSize);

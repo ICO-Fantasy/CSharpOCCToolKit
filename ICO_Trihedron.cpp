@@ -14,7 +14,7 @@ Trihedron::Trihedron(float axisSize) {
 }
 
 // 根据对象创建坐标轴
-Trihedron::Trihedron(Shape^ theAIS, float axisSize) {
+Trihedron::Trihedron(AShape^ theAIS, float axisSize) {
 	gp_Trsf t = theAIS->GetOCC()->LocalTransformation();
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(t);

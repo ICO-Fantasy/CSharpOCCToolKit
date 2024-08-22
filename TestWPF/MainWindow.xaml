@@ -275,6 +275,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
 
                 <StackPanel
@@ -310,8 +311,46 @@
                         Content="-Z向偏移" />
                     <TextBox x:Name="BasePlateHight_TextBox" VerticalAlignment="Stretch" />
                 </StackPanel>
+                <StackPanel
+                    x:Name="BasePlateXWidth_StackPanel"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Orientation="Vertical">
+                    <Label
+                        x:Name="BasePlateXWidth_Label"
+                        VerticalAlignment="Stretch"
+                        Content="X向宽度" />
+                    <TextBox
+                        x:Name="BasePlateXWidth_TextBox"
+                        VerticalAlignment="Stretch"
+                        Background="White" />
+                </StackPanel>
+                <StackPanel
+                    x:Name="BasePlateYWidth_StackPanel"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Orientation="Vertical">
+                    <Label
+                        x:Name="BasePlateYWidth_Label"
+                        VerticalAlignment="Stretch"
+                        Content="Y向宽度" />
+                    <TextBox
+                        x:Name="BasePlateYWidth_TextBox"
+                        VerticalAlignment="Stretch"
+                        Background="White" />
+                </StackPanel>
+                <Button
+                    x:Name="ResetBasePlate_Button"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Margin="2,2,2,2"
+                    Click="ResetBasePlate_Button_Clcik"
+                    Content="重置底板"
+                    Style="{StaticResource dgButton}"
+                    Template="{StaticResource buttonTemplate}" />
                 <Button
                     x:Name="MakeBasePlate_Button"
+                    Grid.RowSpan="2"
                     Grid.Column="3"
                     Margin="2,2,2,2"
                     Click="MakeBasePlate_Button_Clcik"
@@ -704,18 +743,15 @@
                             VerticalAlignment="Stretch" />
                         <TextBox
                             x:Name="AddPlateLocationY_TextBox"
-                            Grid.Row="1"
+                            Grid.RowSpan="2"
                             Grid.Column="1"
-                            VerticalAlignment="Stretch" />
+                            Height="17"
+                            Margin="0,25,0,0"
+                            VerticalAlignment="Top" />
                         <TextBox
-                            x:Name="AddPlateDirectionX_TextBox"
+                            x:Name="AddPlateDirection_TextBox"
                             Grid.Row="2"
                             Grid.Column="0"
-                            VerticalAlignment="Stretch" />
-                        <TextBox
-                            x:Name="AddPlateDirectionY_TextBox"
-                            Grid.Row="2"
-                            Grid.Column="1"
                             VerticalAlignment="Stretch" />
                         <ComboBox
                             x:Name="AddPlateDirection_ComboBox"
@@ -730,7 +766,9 @@
                         x:Name="AddPlate_Button"
                         Grid.Row="3"
                         Grid.Column="1"
-                        Margin="5,5,5,5"
+                        Height="54"
+                        Margin="5,5,5,0"
+                        VerticalAlignment="Top"
                         Click="AddPlate_Button_Click"
                         Content="添加一块板"
                         Style="{StaticResource dgButton}"
@@ -836,14 +874,9 @@
                                     VerticalAlignment="Stretch"
                                     Content="方向" />
                                 <TextBox
-                                    x:Name="CurrentPlateDirectionX_TextBox"
+                                    x:Name="CurrentPlateDirection_TextBox"
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    VerticalAlignment="Stretch" />
-                                <TextBox
-                                    x:Name="CurrentPlateDirectionY_TextBox"
-                                    Grid.Row="1"
-                                    Grid.Column="1"
                                     VerticalAlignment="Stretch" />
                             </Grid>
                             <StackPanel

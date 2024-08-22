@@ -32,6 +32,8 @@
 #include <BRepBuilderAPI_Sewing.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <ShapeFix_Shape.hxx>
+#include <BRepFeat_SplitShape.hxx>
+#include <BRepAlgoAPI_Splitter.hxx>
 
 static const double LINEAR_TOLERANCE = 0.2;
 
@@ -502,12 +504,29 @@ BasePlate MakeBasePlate(TopoDS_Shape theWorkpiece, double theOffsetZ, double the
 
 // 得到切割后的工件平面
 static TopoDS_Shape MakeSection(PlatePose thePose, const TopoDS_Shape& theWorkpiece) {
-	BRepAlgoAPI_Section aSection = BRepAlgoAPI_Section(theWorkpiece, BRepBuilderAPI_MakeFace(thePose.Plane()));
-	aSection.Build();
-	if (aSection.IsDone()) {
-		TopoDS_Shape sec_shape = aSection.Shape();
-		return sec_shape;
+	BRepAlgoAPI_Splitter aSplitter;
+	TopTools_ListOfShape aListOfArguments, aListOfTools;
+	aListOfArguments.Append(theWorkpiece);
+	aListOfTools.Append(BRepBuilderAPI_MakeFace(thePose.Plane()));
+	aSplitter.SetArguments(aListOfArguments);
+	aSplitter.SetTools(aListOfTools);
+	aSplitter.SetFuzzyValue(0.1);
+	aSplitter.Build();
+
+	TopoDS_Compound test;
+	BRep_Builder bb;
+	bb.MakeCompound(test);
+	//bb.Add(test, BRepBuilderAPI_MakeFace(thePose.Plane(), -5, 5, -5, 5));
+	TopoDS_Shape aSplitShape = aSplitter.Shape();
+	TopTools_ListOfShape edges = aSplitter.SectionEdges();
+	TopTools_ListIteratorOfListOfShape it(edges);
+	for (; it.More(); it.Next()) {
+		bb.Add(test, it.Value());
 	}
+	//return aSplitShape;
+	return test;
+
+
 	throw std::runtime_error("截面获取失败");
 }
 
@@ -515,7 +534,9 @@ static TopoDS_Shape MakeSection(PlatePose thePose, const TopoDS_Shape& theWorkpi
 VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape theSection) {
 	PlatePose thePose = thePalte.pose;
 	double theZ = thePalte.Z;
+
 #pragma region 得到原始构造线
+
 	//! 首先判断有几个环，对环进行处理
 	std::vector<myEdge> TempEdges;
 	std::vector<Ring> Rings;
@@ -528,14 +549,38 @@ VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape
 	Rings = GetRings(TempEdges);
 	//! 每个环中取最下边的线段作为原始构造线
 	std::vector<VerticalPiece>thePieces;
+	std::vector<VerticalPiece>finalPieces;
 	for (Ring aRing : Rings) {
 		std::vector<myEdge> bottomEdges = SplitRing(aRing);
-		for (myEdge anEdge : bottomEdges) {
-			VerticalPiece anPiece(thePose, anEdge, theZ);
-			thePieces.push_back(anPiece);
+		//for (myEdge anEdge : bottomEdges) {
+		//	VerticalPiece anPiece(thePose, anEdge, theZ);
+		//	thePieces.push_back(anPiece);
+		//}
+		// 检查是否存在分离失败的情况
+		gp_Trsf theT;
+		theT.SetRotation(gp_Ax1(thePose.point, gp_Dir(0, 0, 1)), thePose.dir.AngleWithRef(gp_Vec(0.0, 1.0, 0.0), gp_Vec(0.0, 0.0, 1.0)));
+		for (myEdge Edge_i : bottomEdges) {
+			bool collision = false;
+			gp_Pnt Start_i = Edge_i.start.Transformed(theT);
+			gp_Pnt Middle_i = Edge_i.middle.Transformed(theT);
+			gp_Pnt End_i = Edge_i.end.Transformed(theT);
+			for (myEdge Edge_j : bottomEdges) {
+				gp_Pnt Start_j = Edge_j.start.Transformed(theT);
+				gp_Pnt Middle_j = Edge_j.middle.Transformed(theT);
+				gp_Pnt End_j = Edge_j.end.Transformed(theT);
+				if (Start_j.X() <= Middle_i.X() && Middle_i.X() <= End_j.X()) {
+					if (Middle_i.Z() < Middle_j.Z()) {
+						bool collision = true;
+					}
+				}
+			}
+			if (!collision) {
+				VerticalPiece anPiece(thePose, Edge_i, theZ);
+				finalPieces.push_back(anPiece);
+			}
 		}
 	}
-	thePalte.pieces = thePieces;
+	thePalte.pieces = finalPieces;
 
 #pragma endregion
 
@@ -588,15 +633,21 @@ static VerticalPlate TrimEdgeEnds(VerticalPlate& thePlate) {
 		gp_Pnt p1 = aPiece.myEdge.start;
 		gp_Pnt p2 = aPiece.myEdge.end;
 		double ratio = thePlate.clearances / aPiece.Length();
-		p1.SetX(p1.X() + (p2.X() - p1.X()) * ratio);
-		p1.SetY(p1.Y() + (p2.Y() - p1.Y()) * ratio);
+		if (std::abs(ratio) > 1e-2) {
+			p1.SetX(p1.X() + (p2.X() - p1.X()) * ratio);
+			p1.SetY(p1.Y() + (p2.Y() - p1.Y()) * ratio);
 
-		p2.SetX(p2.X() + (p1.X() - p2.X()) * ratio);
-		p2.SetY(p2.Y() + (p1.Y() - p2.Y()) * ratio);
+			p2.SetX(p2.X() + (p1.X() - p2.X()) * ratio);
+			p2.SetY(p2.Y() + (p1.Y() - p2.Y()) * ratio);
 
-		TopoDS_Edge outEdge = TrimEdge(aPiece.myEdge.edge, p1, p2);
-		if (!outEdge.IsNull()) {
-			tempPieces.push_back(VerticalPiece(aPiece.pose, myEdge(outEdge), aPiece.Z));
+			TopoDS_Edge outEdge = TrimEdge(aPiece.myEdge.edge, p1, p2);
+			if (!outEdge.IsNull()) {
+				tempPieces.push_back(VerticalPiece(aPiece.pose, myEdge(outEdge), aPiece.Z));
+			}
+		}
+		else {
+			//不做改变
+			tempPieces.push_back(aPiece);
 		}
 	}
 	thePlate.pieces = tempPieces;
@@ -711,6 +762,8 @@ VerticalPlate MakeVerticalPlate(TopoDS_Shape theWorkpiece, BasePlate theBasePlat
 
 	//切割工件
 	TopoDS_Shape aSection = MakeSection(thePose, theWorkpiece);
+	//result.shape = aSection;
+	//return result;
 	result = MakeVerticalPieceWithSection(result, aSection);
 	result = TrimEdgeEnds(result);
 	result = RemoveShortEdge(result);
@@ -962,7 +1015,7 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 
 // 在底板上开槽
 BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> middleDownPlates, std::vector<VerticalPlate> middleUpPlates) {
-	if (theBasePlate.Shape().IsNull()) {
+	if (theBasePlate.TShape().IsNull()) {
 		return theBasePlate;
 	}
 	double TOL = 1e-2;
@@ -1388,18 +1441,20 @@ VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, gp_Pnt aimPoint, 
 VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight = 60.0) {
 	double width = 30.0;//默认宽度为30.0
 	double neededLen = ((double)GetNumberString(thePlate.numberString).size() * (width + 10.0) + thePlate.connectionThickness) * (hight / 60.0) + 10.0;
-	gp_Pnt lastP = thePlate.cutPoints[0];
-	for (size_t i = 1; i < thePlate.cutPoints.size(); i++) {
-		double dis = lastP.Distance(thePlate.cutPoints[i]);
-		std::cout << "Distance: " << dis << std::endl;
-		if (lastP.Distance(thePlate.cutPoints[i]) > neededLen) {
-			gp_Trsf tempT;
-			tempT.SetTranslation(gp_Vec(thePlate.start, thePlate.end).Normalized().Multiplied(5.0));
-			gp_Pnt aimPnt = lastP.Transformed(tempT);
-			aimPnt.SetZ(thePlate.Z + thePlate.slotHight + 5.0);
-			return BrandNumberVerticalPlate(thePlate, aimPnt, hight);
+	if (thePlate.cutPoints.size() > 0) {
+		gp_Pnt lastP = thePlate.cutPoints[0];
+		for (size_t i = 1; i < thePlate.cutPoints.size(); i++) {
+			double dis = lastP.Distance(thePlate.cutPoints[i]);
+			std::cout << "Distance: " << dis << std::endl;
+			if (lastP.Distance(thePlate.cutPoints[i]) > neededLen) {
+				gp_Trsf tempT;
+				tempT.SetTranslation(gp_Vec(thePlate.start, thePlate.end).Normalized().Multiplied(5.0));
+				gp_Pnt aimPnt = lastP.Transformed(tempT);
+				aimPnt.SetZ(thePlate.Z + thePlate.slotHight + 5.0);
+				return BrandNumberVerticalPlate(thePlate, aimPnt, hight);
+			}
+			lastP = thePlate.cutPoints[i];
 		}
-		lastP = thePlate.cutPoints[i];
 	}
 	//都失败的话在起点烙印
 	gp_Trsf tempT;
@@ -1411,7 +1466,7 @@ VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight = 60
 
 // 在底板上烙印XY指示
 BasePlate BrandNumberBasePlate(BasePlate thePlate, double hight) {
-	if (thePlate.Shape().IsNull()) {
+	if (thePlate.TShape().IsNull()) {
 		return thePlate;
 	}
 
@@ -1472,7 +1527,7 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> mid
 	baseQuat.SetEulerAngles(gp_Extrinsic_ZYX, 0.0 * (M_PI / 180.0), 0.0 * (M_PI / 180.0), 90.0 * (M_PI / 180.0));
 	baseR.SetRotation(baseQuat);
 
-	TopoDS_Shape newBP = theBasePlate.Shape().Moved(TopLoc_Location(baseR.Multiplied(base_trsf)), true);
+	TopoDS_Shape newBP = theBasePlate.TShape().Moved(TopLoc_Location(baseR.Multiplied(base_trsf)), true);
 	builder.Add(result, newBP);
 
 #pragma endregion

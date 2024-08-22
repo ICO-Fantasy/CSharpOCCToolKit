@@ -11,8 +11,8 @@ namespace BRepBuilderAPI {
 
 public ref class Transform {
 public:
-	Transform(TopoDS::Shape^ theShape, Trsf^ theTrsf);
-	TopoDS::Shape^ Shape();
+	Transform(TopoDS::TShape^ theShape, Trsf^ theTrsf);
+	TopoDS::TShape^ Shape();
 private:
 	BRepBuilderAPI_Transform* myT;
 };

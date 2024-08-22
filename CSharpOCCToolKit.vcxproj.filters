@@ -155,6 +155,9 @@
     <ClCompile Include="ICO_Transform.cpp">
       <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_MakeDir.cpp">
+      <Filter>源文件\OCCTools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -228,6 +231,9 @@
     </ClInclude>
     <ClInclude Include="ICO_SelectionMode.h">
       <Filter>头文件\Visualization</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeDir.h">
+      <Filter>头文件\OCCTools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

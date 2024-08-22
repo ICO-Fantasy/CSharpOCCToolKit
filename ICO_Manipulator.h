@@ -54,8 +54,8 @@ public:
 
 #pragma region 附加
 
-	void Attach(Shape^ theAIS);
-	void Attach(Shape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes);
+	void Attach(AShape^ theAIS);
+	void Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes);
 	void Detach();
 
 #pragma endregion

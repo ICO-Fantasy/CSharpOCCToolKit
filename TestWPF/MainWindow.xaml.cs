@@ -24,12 +24,12 @@ using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.TopoAbs;
 using OCCTK.OCC.TopoDS;
+using OCCTK.Tool;
 using OCCViewForm;
+using static OCCTK.OCC.TopoAbs.ShapeEnum;
 //设置别名
-using AShape = OCCTK.OCC.AIS.Shape;
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
-using TShape = OCCTK.OCC.TopoDS.Shape;
 
 namespace TestWPF;
 
@@ -431,7 +431,8 @@ public partial class MainWindow : Window, IAISSelectionHandler
     private InputWorkpiece InputWorkpiece;
     private bool ShowInputWorkpiece = true;
 
-    #region 创建底板参数
+    #region 底板参数
+
     /// <summary>
     /// 底板
     /// </summary>
@@ -448,8 +449,10 @@ public partial class MainWindow : Window, IAISSelectionHandler
 
     #region 创建竖板参数
 
-    private static readonly Dir DirectionX = new(1.0, 0.0, 0.0);
-    private static readonly Dir DirectionY = new(0.0, 1.0, 0.0);
+    //private static readonly Dir DirectionX = new(1.0, 0.0, 0.0);
+    //private static readonly Dir DirectionY = new(0.0, 1.0, 0.0);
+    private static readonly Dir DirectionX = DirMaker.AngleWithZ(0);
+    private static readonly Dir DirectionY = DirMaker.AngleWithZ(90);
 
     /// <summary>
     /// 创建竖板所用模式
@@ -539,8 +542,8 @@ public partial class MainWindow : Window, IAISSelectionHandler
                 CurrentPlateLocationX_TextBox.Text = $"{value.Pose.Location.X():F1}";
                 CurrentPlateLocationY_TextBox.Text = $"{value.Pose.Location.Y():F1}";
                 CurrentPlateLocationZ_TextBox.Text = $"{value.Pose.Location.Z():F1}";
-                CurrentPlateDirectionX_TextBox.Text = $"{value.Pose.Direction.X():F1}";
-                CurrentPlateDirectionY_TextBox.Text = $"{value.Pose.Direction.Y():F1}";
+                CurrentPlateDirection_TextBox.Text =
+                    $"{DirMaker.GetDirAngleWithZ(value.Pose.Direction):F1}";
                 CurrentPlateConnectionThickness_TextBox.Text = $"{value.ConnectionThickness}";
                 CurrentPlateNumberString_TextBox.Text = $"{value.NumberString}";
                 CurrentPlateFilletRadius_TextBox.Text = $"{value.FilletRadius}";
@@ -584,50 +587,53 @@ public partial class MainWindow : Window, IAISSelectionHandler
         Viewer.OnAISSelected += OnSelectionMade;
         #region 全局属性绑定
 
-        BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString();
+        BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString("F1");
         BasePlateOffsetX_TextBox.TextChanged += BasePlateOffsetX_TextChanged;
 
-        BasePlateOffsetY_TextBox.Text = BasePlateOffsetY.ToString();
+        BasePlateOffsetY_TextBox.Text = BasePlateOffsetY.ToString("F1");
         BasePlateOffsetY_TextBox.TextChanged += BasePlateOffsetY_TextChanged;
 
-        BasePlateHight_TextBox.Text = BasePlateOffsetZ.ToString();
+        BasePlateHight_TextBox.Text = BasePlateOffsetZ.ToString("F1");
         BasePlateOffsetY_TextBox.TextChanged += BasePlateOffsetZ_TextChanged;
 
-        InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString();
+        BasePlateXWidth_TextBox.TextChanged += BasePlateXWidth_TextChanged;
+        BasePlateYWidth_TextBox.TextChanged += BasePlateYWidth_TextChanged;
+
+        InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString("F1");
         InitialOffsetX_TextBox.TextChanged += InitialOffsetX_TextChanged;
 
         // 设置OffsetXLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        OffsetX_TextBox.Text = OffsetXParameter.ToString();
+        OffsetX_TextBox.Text = OffsetXParameter.ToString("F1");
         OffsetX_TextBox.TextChanged += OffsetX_TextChanged;
 
         // 设置InitialOffsetYLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString();
+        InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString("F1");
         InitialOffsetY_TextBox.TextChanged += InitialOffsetY_TextChanged;
 
         // 设置OffsetYLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        OffsetY_TextBox.Text = OffsetYParameter.ToString();
+        OffsetY_TextBox.Text = OffsetYParameter.ToString("F1");
         OffsetY_TextBox.TextChanged += OffsetY_TextChanged;
 
         // 设置ConnectionHeightLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        ConnectionHeight_TextBox.Text = AvoidanceHeightParameter.ToString();
+        ConnectionHeight_TextBox.Text = AvoidanceHeightParameter.ToString("F1");
         ConnectionHeight_TextBox.TextChanged += ConnectionHeight_TextChanged;
 
         // 设置MinSupportingLenLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        MinSupportingLen_TextBox.Text = MinSupportingLenParameter.ToString();
+        MinSupportingLen_TextBox.Text = MinSupportingLenParameter.ToString("F1");
         MinSupportingLen_TextBox.TextChanged += MinSupportingLen_TextChanged;
 
         // 设置ClearancesLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        Clearances_TextBox.Text = ClearancesParameter.ToString();
+        Clearances_TextBox.Text = ClearancesParameter.ToString("F1");
         Clearances_TextBox.TextChanged += Clearances_TextChanged;
 
         // 设置CuttingDistanceLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        CuttingDistance_TextBox.Text = CuttingDistanceParameter.ToString();
+        CuttingDistance_TextBox.Text = CuttingDistanceParameter.ToString("F1");
         CuttingDistance_TextBox.TextChanged += CuttingDistance_TextChanged;
 
-        ConnectionThickness_TextBox.Text = ConnectionThicknessParameter.ToString();
+        ConnectionThickness_TextBox.Text = ConnectionThicknessParameter.ToString("F1");
         ConnectionThickness_TextBox.TextChanged += ConnectionThickness_TextChanged;
 
-        FilletRadius_TextBox.Text = FilletRadiusParameter.ToString();
+        FilletRadius_TextBox.Text = FilletRadiusParameter.ToString("F1");
         FilletRadius_TextBox.TextChanged += FilletRadius_TextChanged;
         #endregion
 
@@ -825,6 +831,44 @@ public partial class MainWindow : Window, IAISSelectionHandler
         {
             // 更新 BasePlateOffsetZ 的值
             BasePlateOffsetZ = newValue;
+        }
+    }
+
+    private void BasePlateXWidth_TextChanged(object sender, EventArgs e)
+    {
+        // 获取TextBox的新值
+        TextBox textBox = (TextBox)sender;
+        double newValue;
+        if (double.TryParse(textBox.Text, out newValue))
+        {
+            // 更新 BasePlate本身
+            if (BasePlate == null)
+            {
+                return;
+            }
+            BasePlate.OffsetX = (newValue - BasePlate.DX) / 2;
+            BasePlate.UpdateAIS();
+            DisplayEraseBasePlates(true);
+            Viewer.Update();
+        }
+    }
+
+    private void BasePlateYWidth_TextChanged(object sender, EventArgs e)
+    {
+        // 获取TextBox的新值
+        TextBox textBox = (TextBox)sender;
+        double newValue;
+        if (double.TryParse(textBox.Text, out newValue))
+        {
+            // 更新 BasePlate本身
+            if (BasePlate == null)
+            {
+                return;
+            }
+            BasePlate.OffsetY = (newValue - BasePlate.DY) / 2;
+            BasePlate.UpdateAIS();
+            DisplayEraseBasePlates(true);
+            Viewer.Update();
         }
     }
 
@@ -1093,17 +1137,15 @@ public partial class MainWindow : Window, IAISSelectionHandler
         //! 方向虽然用X、Y做区分，实际上还包括XY以外的方向，但只分为两种。
         if (AddPlateDirection == "X")
         {
-            AddPlateDirectionX_TextBox.Text = DirectionX.X().ToString();
-            AddPlateDirectionY_TextBox.Text = DirectionX.Y().ToString();
-            AddPlateLocationY_TextBox.Text = BasePlate.Y.ToString();
+            AddPlateDirection_TextBox.Text = DirMaker.GetDirAngleWithZ(DirectionX).ToString("F1");
+            AddPlateLocationY_TextBox.Text = (BasePlate.Y + BasePlate.DY / 2).ToString("F1");
             AddPlateLocationY_TextBox.IsReadOnly = true;
             AddPlateLocationX_TextBox.IsReadOnly = false;
         }
         else if (AddPlateDirection == "Y")
         {
-            AddPlateDirectionX_TextBox.Text = DirectionY.X().ToString();
-            AddPlateDirectionY_TextBox.Text = DirectionY.Y().ToString();
-            AddPlateLocationX_TextBox.Text = BasePlate.X.ToString();
+            AddPlateDirection_TextBox.Text = DirMaker.GetDirAngleWithZ(DirectionY).ToString("F1");
+            AddPlateLocationX_TextBox.Text = (BasePlate.X + BasePlate.DX / 2).ToString("F1");
             AddPlateLocationX_TextBox.IsReadOnly = true;
             AddPlateLocationY_TextBox.IsReadOnly = false;
         }
@@ -1168,8 +1210,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
         double theX,
             theY,
             theZ,
-            theW,
-            theP,
+            theAngle,
             theClearances,
             theMinSupportLen,
             theCuttingDistance;
@@ -1180,32 +1221,22 @@ public partial class MainWindow : Window, IAISSelectionHandler
             MessageBox.Show("X 位置输入的值不是有效的数字。");
             return;
         }
-
         // 转换 Y 位置
         if (!double.TryParse(CurrentPlateLocationY_TextBox.Text, out theY))
         {
             MessageBox.Show("Y 位置输入的值不是有效的数字。");
             return;
         }
-
         // 转换 Z 位置
         if (!double.TryParse(CurrentPlateLocationZ_TextBox.Text, out theZ))
         {
             MessageBox.Show("Z 位置输入的值不是有效的数字。");
             return;
         }
-
-        // 转换 X 方向
-        if (!double.TryParse(CurrentPlateDirectionX_TextBox.Text, out theW))
+        // 转换方向
+        if (!double.TryParse(CurrentPlateDirection_TextBox.Text, out theAngle))
         {
             MessageBox.Show("X 方向输入的值不是有效的数字。");
-            return;
-        }
-
-        // 转换 Y 方向
-        if (!double.TryParse(CurrentPlateDirectionY_TextBox.Text, out theP))
-        {
-            MessageBox.Show("Y 方向输入的值不是有效的数字。");
             return;
         }
         // 转换 板两侧偏置
@@ -1230,7 +1261,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
         var newPlate = SimpleClampMaker.MakeVerticalPlate(
             InputWorkpiece.Shape,
             BasePlate,
-            new PlatePose(new Pnt(theX, theY, theZ), new Dir(theW, theP, 0.0)),
+            new PlatePose(new Pnt(theX, theY, theZ), DirMaker.AngleWithZ(theAngle)),
             theClearances,
             theMinSupportLen,
             theCuttingDistance
@@ -1292,8 +1323,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
 
         double theX,
             theY,
-            theW,
-            theP;
+            theAngle;
         // 转换 X 位置
         if (!double.TryParse(AddPlateLocationX_TextBox.Text, out theX))
         {
@@ -1308,18 +1338,12 @@ public partial class MainWindow : Window, IAISSelectionHandler
             return;
         }
         // 转换 X 方向
-        if (!double.TryParse(AddPlateDirectionX_TextBox.Text, out theW))
+        if (!double.TryParse(AddPlateDirection_TextBox.Text, out theAngle))
         {
             MessageBox.Show("X 方向输入的值不是有效的数字。");
             return;
         }
 
-        // 转换 Y 方向
-        if (!double.TryParse(AddPlateDirectionY_TextBox.Text, out theP))
-        {
-            MessageBox.Show("Y 方向输入的值不是有效的数字。");
-            return;
-        }
         #endregion
 
         //按照选择的方向添加
@@ -1329,7 +1353,10 @@ public partial class MainWindow : Window, IAISSelectionHandler
             newPlate = SimpleClampMaker.MakeVerticalPlate(
                 InputWorkpiece.Shape,
                 BasePlate,
-                new PlatePose(new Pnt(theX, BasePlate.Y, BasePlate.Z), new Dir(theW, theP, 0.0)),
+                new PlatePose(
+                    new Pnt(theX, BasePlate.Y + BasePlate.DY / 2, BasePlate.Z),
+                    DirMaker.AngleWithZ(theAngle)
+                ),
                 ClearancesParameter,
                 MinSupportingLenParameter,
                 CuttingDistanceParameter
@@ -1341,7 +1368,10 @@ public partial class MainWindow : Window, IAISSelectionHandler
             newPlate = SimpleClampMaker.MakeVerticalPlate(
                 InputWorkpiece.Shape,
                 BasePlate,
-                new PlatePose(new Pnt(BasePlate.X, theY, BasePlate.Z), new Dir(theW, theP, 0.0)),
+                new PlatePose(
+                    new Pnt(BasePlate.X + BasePlate.DX / 2, theY, BasePlate.Z),
+                    DirMaker.AngleWithZ(theAngle)
+                ),
                 ClearancesParameter,
                 MinSupportingLenParameter,
                 CuttingDistanceParameter
@@ -1378,6 +1408,26 @@ public partial class MainWindow : Window, IAISSelectionHandler
     }
 
     /// <summary>
+    /// 重置底板按钮
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void ResetBasePlate_Button_Clcik(object sender, RoutedEventArgs e)
+    {
+        if (BasePlate == null)
+        {
+            return;
+        }
+        BasePlate.OffsetX = 0.0;
+        BasePlate.OffsetY = 0.0;
+        BasePlate.UpdateAIS();
+        BasePlateXWidth_TextBox.Text = (BasePlate.DX + BasePlate.OffsetX * 2).ToString("F1");
+        BasePlateYWidth_TextBox.Text = (BasePlate.DY + BasePlate.OffsetY * 2).ToString("F1");
+        DisplayEraseBasePlates(false);
+        Viewer.Update();
+    }
+
+    /// <summary>
     /// 创建竖板按钮
     /// </summary>
     /// <param name="sender"></param>
@@ -1408,6 +1458,18 @@ public partial class MainWindow : Window, IAISSelectionHandler
             MakeVerticalPlates();
             UpdateComboBox();
             DisplayVerticalPlatesPieces(false);
+
+            //! debug
+            //foreach (var item in MiddleToDownPlates)
+            //{
+            //    Display(item.AIS, false);
+            //    Viewer.InteractiveContext.SetTransparency(item.AIS, 0.9, false);
+            //}
+            //foreach (var item in MiddleToUpPlates)
+            //{
+            //    Display(item.AIS, false);
+            //    Viewer.InteractiveContext.SetTransparency(item.AIS, 0.9, false);
+            //}
         }
         Viewer.Update();
         Viewer.FitAll();
@@ -1593,6 +1655,8 @@ public partial class MainWindow : Window, IAISSelectionHandler
             BasePlateOffsetX,
             BasePlateOffsetY
         );
+        BasePlateXWidth_TextBox.Text = (BasePlate.DX + BasePlate.OffsetX * 2).ToString("F1");
+        BasePlateYWidth_TextBox.Text = (BasePlate.DY + BasePlate.OffsetY * 2).ToString("F1");
     }
 
     /// <summary>

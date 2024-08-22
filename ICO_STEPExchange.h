@@ -2,7 +2,7 @@
 #include <TopoDS_Shape.hxx>
 #include "ICO_TopoDS_Shape.h"
 using namespace System;
-typedef OCCTK::OCC::TopoDS::Shape TShape;
+using namespace OCCTK::OCC::TopoDS;
 
 #pragma once
 namespace OCCTK {

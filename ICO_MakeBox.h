@@ -13,7 +13,7 @@ namespace BRepPrimAPI {
 public ref class MakeBox {
 public:
 	MakeBox(double X, double Y, double Z);
-	TopoDS::Shape^ Shape();
+	TopoDS::TShape^ Shape();
 private:
 	BRepPrimAPI_MakeBox* myMaker;
 };
