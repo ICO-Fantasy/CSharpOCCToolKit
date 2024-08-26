@@ -786,6 +786,32 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         }
     }
 
+    private void SaveBrep_Button_Click(object sender, RoutedEventArgs e)
+    {
+        // 创建保存文件对话框
+        Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+
+        // 设置默认的文件类型过滤器
+        saveFileDialog.Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*";
+
+        // 设置初始目录为指定的路径
+        saveFileDialog.InitialDirectory = System.IO.Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "mods"
+        );
+
+        // 显示保存文件对话框并检查用户是否选择了保存路径
+        if (saveFileDialog.ShowDialog() == true)
+        {
+            // 获取用户选择的文件路径
+            string filePath = saveFileDialog.FileName;
+
+            // 创建 BrepExchange 对象并保存文件
+            BrepExchange BE = new BrepExchange(InputWorkpiece.Shape);
+            BE.SaveFile(filePath);
+        }
+    }
+
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
         Viewer.EraseAll(false);
