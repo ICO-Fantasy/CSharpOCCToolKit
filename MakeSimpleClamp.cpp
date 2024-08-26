@@ -314,20 +314,23 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 		}
 	}
 
-	//! debug
-	std::vector<gp_Vec2d> debug_vec;
-	std::vector<double> debug_vec_mag;
-	std::vector <std::pair< double, double >> debug_vec_start;
-	std::vector <std::pair< gp_Pnt2d, gp_Pnt2d >> debug_vec_start2;
+	////! debug
+	//std::vector<gp_Vec2d> debug_vec;
+	//std::vector<double> debug_vec_mag;
+	//std::vector <std::pair< double, double >> debug_vec_start;
+	//std::vector <std::pair< gp_Pnt2d, gp_Pnt2d >> debug_vec_start2;
 
 	wireMaker.Add(edgeList);
+	if (!wireMaker.IsDone()) {
+		return theRing;
+	}
 	BRepTools_WireExplorer wireExplorer(wireMaker);
 	while (wireExplorer.More()) {
 		myEdge anEdge(wireExplorer.Current());
 		// 对Edge两端点重新排序
 		gp_Pnt theStart = BRep_Tool::Pnt(wireExplorer.CurrentVertex());
 		if (anEdge.start.Distance(theStart) > anEdge.end.Distance(theStart)) { std::swap(anEdge.start, anEdge.end); }
-		debug_vec_start2.push_back({ anEdge.start2D() , anEdge.end2D() });
+		//debug_vec_start2.push_back({ anEdge.start2D() , anEdge.end2D() });
 		// 获取线的相对方向
 		gp_Vec2d edgeVec2d = gp_Vec2d(anEdge.start2D(), anEdge.end2D());
 		if (edgeVec2d.Magnitude() != 0.0) {
@@ -336,18 +339,18 @@ static std::vector<myEdge> SplitRing(Ring theRing) {
 		}
 		orderedEdges.push_back(anEdge);
 		wireExplorer.Next();
-		debug_vec.push_back(edgeVec2d);
-		debug_vec_mag.push_back(edgeVec2d.Magnitude());
+		//debug_vec.push_back(edgeVec2d);
+		//debug_vec_mag.push_back(edgeVec2d.Magnitude());
 	}
-	int trueCount = 0;
-	int falseCount = 0;
+	int debug_trueCount = 0;
+	int debug_falseCount = 0;
 
 	for (auto d : orderedEdges) {
 		if (d.dir) {
-			trueCount += 1;
+			debug_trueCount += 1;
 		}
 		else {
-			falseCount += 1;
+			debug_falseCount += 1;
 		}
 	}
 
@@ -548,36 +551,46 @@ VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape
 	}
 	Rings = GetRings(TempEdges);
 	//! 每个环中取最下边的线段作为原始构造线
-	std::vector<VerticalPiece>thePieces;
+	std::vector<myEdge>allEdges;
 	std::vector<VerticalPiece>finalPieces;
 	for (Ring aRing : Rings) {
 		std::vector<myEdge> bottomEdges = SplitRing(aRing);
-		//for (myEdge anEdge : bottomEdges) {
-		//	VerticalPiece anPiece(thePose, anEdge, theZ);
-		//	thePieces.push_back(anPiece);
-		//}
-		// 检查是否存在分离失败的情况
-		gp_Trsf theT;
-		theT.SetRotation(gp_Ax1(thePose.point, gp_Dir(0, 0, 1)), thePose.dir.AngleWithRef(gp_Vec(0.0, 1.0, 0.0), gp_Vec(0.0, 0.0, 1.0)));
-		for (myEdge Edge_i : bottomEdges) {
-			bool collision = false;
-			gp_Pnt Start_i = Edge_i.start.Transformed(theT);
-			gp_Pnt Middle_i = Edge_i.middle.Transformed(theT);
-			gp_Pnt End_i = Edge_i.end.Transformed(theT);
-			for (myEdge Edge_j : bottomEdges) {
-				gp_Pnt Start_j = Edge_j.start.Transformed(theT);
-				gp_Pnt Middle_j = Edge_j.middle.Transformed(theT);
-				gp_Pnt End_j = Edge_j.end.Transformed(theT);
-				if (Start_j.X() <= Middle_i.X() && Middle_i.X() <= End_j.X()) {
-					if (Middle_i.Z() < Middle_j.Z()) {
-						bool collision = true;
-					}
+		for (myEdge anEdge : bottomEdges) {
+			//VerticalPiece anPiece(thePose, anEdge, theZ);
+			allEdges.push_back(anEdge);
+		}
+	}
+	// 检查是否存在分离失败的情况
+	gp_Trsf theT;
+	theT.SetRotation(gp_Ax1(thePose.point, gp_Dir(0, 0, 1)), thePose.dir.AngleWithRef(gp_Vec(0.0, 1.0, 0.0), gp_Vec(0.0, 0.0, 1.0)));
+
+	for (size_t i = 0; i < allEdges.size(); i++) {
+		myEdge Edge_i = allEdges[i];
+		bool collision = false;
+		gp_Pnt Start_i = Edge_i.start.Transformed(theT);
+		gp_Pnt Middle_i = Edge_i.middle.Transformed(theT);
+		gp_Pnt End_i = Edge_i.end.Transformed(theT);
+		for (size_t j = 0; j < allEdges.size(); j++) {
+			if (i == j) { continue; }
+			myEdge Edge_j = allEdges[j];
+			gp_Pnt Start_j = Edge_j.start.Transformed(theT);
+			gp_Pnt Middle_j = Edge_j.middle.Transformed(theT);
+			gp_Pnt End_j = Edge_j.end.Transformed(theT);
+			double localTol = 3.0;
+			if (Start_i.X() - localTol <= Middle_j.X() && Middle_j.X() <= End_i.X() + localTol) {
+				if (Middle_i.Z() > Middle_j.Z()) {
+					collision = true;
 				}
 			}
-			if (!collision) {
-				VerticalPiece anPiece(thePose, Edge_i, theZ);
-				finalPieces.push_back(anPiece);
+			if (Start_j.X() - localTol <= Middle_i.X() && Middle_i.X() <= End_j.X() + localTol) {
+				if (Middle_i.Z() > Middle_j.Z()) {
+					collision = true;
+				}
 			}
+		}
+		if (!collision) {
+			VerticalPiece aPiece(thePose, Edge_i, theZ);
+			finalPieces.push_back(aPiece);
 		}
 	}
 	thePalte.pieces = finalPieces;
@@ -810,15 +823,20 @@ VerticalPlate SuturePiece(VerticalPlate& thePlate, const BasePlate theBase, doub
 			wire.Add(BRepBuilderAPI_MakeEdge(lastP, p1));
 		}
 		else {
-			wire.Add(BRepBuilderAPI_MakeEdge(lastP, p0));
-			wire.Add(BRepBuilderAPI_MakeEdge(p0, p1));
+			if (tempEdges[i].start.Distance(tempEdges[i - 1].end) > 0.5) {
+				wire.Add(BRepBuilderAPI_MakeEdge(lastP, p0));
+				wire.Add(BRepBuilderAPI_MakeEdge(p0, p1));
+			}
 		}
 		wire.Add(tempEdges[i].edge);
+		//末段线
 		if (i == tempEdges.size() - 1) {
 			wire.Add(BRepBuilderAPI_MakeEdge(p2, end_p0));
 		}
 		else {
-			wire.Add(BRepBuilderAPI_MakeEdge(p2, p3));
+			if (tempEdges[i].end.Distance(tempEdges[i + 1].start) > 0.5) {
+				wire.Add(BRepBuilderAPI_MakeEdge(p2, p3));
+			}
 		}
 		lastP = p3;
 	}
@@ -873,8 +891,8 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 		});
 	//用于后续烙印数字
 	thePlate.cutPoints = cutPoints;
-	thePlate.cutPoints.insert(thePlate.cutPoints.begin(), thePlate.end);
-	thePlate.cutPoints.push_back(thePlate.start);
+	//thePlate.cutPoints.insert(thePlate.cutPoints.begin(), thePlate.end);
+	//thePlate.cutPoints.push_back(thePlate.start);
 	std::sort(thePlate.cutPoints.begin(), thePlate.cutPoints.end(), [&](const gp_Pnt& p1, const gp_Pnt& p2) {
 		return p1.Distance(thePlate.start) < p2.Distance(thePlate.start);
 		});
@@ -884,10 +902,9 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 	double ct = thePlate.connectionThickness / 2;
 	gp_Pnt lastP = thePlate.end;
 	// 在每个位置切槽
+	gp_Vec plateDir(thePlate.start, thePlate.end);
+	plateDir.Normalize();
 	for (gp_Pnt aPnt : cutPoints) {
-		gp_Vec plateDir(thePlate.start, thePlate.end);
-		plateDir.Normalize();
-
 		gp_Pnt r1 = aPnt;
 		gp_Trsf Tr1;
 		Tr1.SetTranslation(plateDir.Multiplied(slotL));
@@ -939,6 +956,32 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 			thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(r2, l1));
 			thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(l1, l2));
 		}
+		lastP = l2;
+	}
+	// 如果没有其它竖板相交
+	if (cutPoints.empty()) {
+		gp_Pnt middle = gp_Pnt((thePlate.start.XYZ() + thePlate.end.XYZ()) / 2);
+		gp_Pnt r1 = middle;
+		gp_Trsf Tr1;
+		Tr1.SetTranslation(plateDir.Multiplied(slotL));
+		r1.Transform(Tr1);
+		gp_Pnt r2 = middle;
+		gp_Trsf Tr2;
+		Tr2.SetTranslation(plateDir.Multiplied(slotL).Added(gp_Vec(0, 0, -ct * 2)));
+		r2.Transform(Tr2);
+		gp_Pnt l1 = middle;
+		gp_Trsf Tl1;
+		Tl1.SetTranslation(plateDir.Multiplied(-slotL).Added(gp_Vec(0, 0, -ct * 2)));
+		l1.Transform(Tl1);
+		gp_Pnt l2 = middle;
+		gp_Trsf Tl2;
+		Tl2.SetTranslation(plateDir.Multiplied(-slotL));
+		l2.Transform(Tl2);
+
+		thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(lastP, r1));
+		thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(r1, r2));
+		thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(r2, l1));
+		thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(l1, l2));
 		lastP = l2;
 	}
 	thePlate._unclosedWire.Add(BRepBuilderAPI_MakeEdge(lastP, thePlate.start));
@@ -1019,12 +1062,13 @@ BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> midd
 		return theBasePlate;
 	}
 	double TOL = 1e-2;
-	std::vector<gp_Pnt> cutPoints;
+	//std::vector<gp_Pnt> cutPoints;
 
 	////! test
 	//TopoDS_Compound test;
 	//BRep_Builder builder;
 	//builder.MakeCompound(test);
+
 	for (size_t i = 0; i < middleDownPlates.size(); ++i) {
 		auto downPlate = middleDownPlates[i];
 		for (size_t j = 0; j < middleUpPlates.size(); ++j) {
@@ -1042,7 +1086,7 @@ BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> midd
 			double cx, cy;
 			if (Get2DLineIntersection(x1, y1, x2, y2, x3, y3, x4, y4, cx, cy)) {
 				if (x1 - TOL <= cx && cx <= x2 + TOL && y1 - TOL <= cy && cy <= y2 + TOL) {
-					double slotLen = downPlate.slotLength / 2 + 1;
+					double slotLen = downPlate.slotLength / 2 + 0.5;
 					gp_Pnt currentPnt = gp_Pnt(cx, cy, theBasePlate.Z - 1);
 
 					gp_Vec v1 = gp_Vec(downPlate.pose.dir).Normalized();
@@ -1110,6 +1154,72 @@ BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> midd
 					theBasePlate.mySlotBuilder.Add(theBasePlate.mySlotShape, prismer.Shape());
 				}
 			}
+			//如果没有和其它竖板相交
+			if (upPlate.cutPoints.empty()) {
+				double slotLen = upPlate.slotLength / 2 + 0.5;
+				gp_Vec v2 = gp_Vec(upPlate.pose.dir).Normalized();
+				gp_Vec v1 = v2.Crossed(gp_Vec(0, 0, 1)).Normalized();
+				gp_Pnt middle = gp_Pnt((upPlate.start.XYZ() + upPlate.end.XYZ()) / 2);
+				middle.SetZ(middle.Z() - 1);
+				double l = upPlate.connectionThickness / 2;
+				gp_Pnt p1 = middle;
+				gp_Trsf T1;
+				T1.SetTranslationPart(v1.Multiplied(slotLen).Added(v2.Multiplied(l)));
+				p1.Transform(T1);
+				gp_Pnt p2 = middle;
+				gp_Trsf T2;
+				T2.SetTranslationPart(v1.Multiplied(-slotLen).Added(v2.Multiplied(l)));
+				p2.Transform(T2);
+				gp_Pnt p3 = middle;
+				gp_Trsf T3;
+				T3.SetTranslationPart(v1.Multiplied(-slotLen).Added(v2.Multiplied(-l)));
+				p3.Transform(T3);
+				gp_Pnt p4 = middle;
+				gp_Trsf T4;
+				T4.SetTranslationPart(v1.Multiplied(slotLen).Added(v2.Multiplied(-l)));
+				p4.Transform(T4);
+				BRepBuilderAPI_MakeWire wireMaker = BRepBuilderAPI_MakeWire();
+				wireMaker.Add(BRepBuilderAPI_MakeEdge(p1, p2));
+				wireMaker.Add(BRepBuilderAPI_MakeEdge(p2, p3));
+				wireMaker.Add(BRepBuilderAPI_MakeEdge(p3, p4));
+				wireMaker.Add(BRepBuilderAPI_MakeEdge(p4, p1));
+				BRepBuilderAPI_MakeFace faceMaker(wireMaker);
+				BRepPrimAPI_MakePrism prismer(faceMaker, gp_Vec(0, 0, 2));
+				theBasePlate.mySlotBuilder.Add(theBasePlate.mySlotShape, prismer.Shape());
+			}
+		}
+		//如果没有和其它竖板相交
+		if (downPlate.cutPoints.empty()) {
+			double slotLen = downPlate.slotLength / 2 + 0.5;
+			gp_Vec v2 = gp_Vec(downPlate.pose.dir).Normalized();
+			gp_Vec v1 = v2.Crossed(gp_Vec(0, 0, 1)).Normalized();
+			gp_Pnt middle = gp_Pnt((downPlate.start.XYZ() + downPlate.end.XYZ()) / 2);
+			middle.SetZ(middle.Z() - 1);
+			double l = downPlate.connectionThickness / 2;
+			gp_Pnt p1 = middle;
+			gp_Trsf T1;
+			T1.SetTranslationPart(v1.Multiplied(slotLen).Added(v2.Multiplied(l)));
+			p1.Transform(T1);
+			gp_Pnt p2 = middle;
+			gp_Trsf T2;
+			T2.SetTranslationPart(v1.Multiplied(-slotLen).Added(v2.Multiplied(l)));
+			p2.Transform(T2);
+			gp_Pnt p3 = middle;
+			gp_Trsf T3;
+			T3.SetTranslationPart(v1.Multiplied(-slotLen).Added(v2.Multiplied(-l)));
+			p3.Transform(T3);
+			gp_Pnt p4 = middle;
+			gp_Trsf T4;
+			T4.SetTranslationPart(v1.Multiplied(slotLen).Added(v2.Multiplied(-l)));
+			p4.Transform(T4);
+			BRepBuilderAPI_MakeWire wireMaker = BRepBuilderAPI_MakeWire();
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(p1, p2));
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(p2, p3));
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(p3, p4));
+			wireMaker.Add(BRepBuilderAPI_MakeEdge(p4, p1));
+			BRepBuilderAPI_MakeFace faceMaker(wireMaker);
+			BRepPrimAPI_MakePrism prismer(faceMaker, gp_Vec(0, 0, 2));
+			theBasePlate.mySlotBuilder.Add(theBasePlate.mySlotShape, prismer.Shape());
 		}
 	}
 	return theBasePlate;
@@ -1441,7 +1551,7 @@ VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, gp_Pnt aimPoint, 
 VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight = 60.0) {
 	double width = 30.0;//默认宽度为30.0
 	double neededLen = ((double)GetNumberString(thePlate.numberString).size() * (width + 10.0) + thePlate.connectionThickness) * (hight / 60.0) + 10.0;
-	if (thePlate.cutPoints.size() > 0) {
+	if (!thePlate.cutPoints.empty()) {
 		gp_Pnt lastP = thePlate.cutPoints[0];
 		for (size_t i = 1; i < thePlate.cutPoints.size(); i++) {
 			double dis = lastP.Distance(thePlate.cutPoints[i]);
@@ -1491,16 +1601,6 @@ BasePlate BrandNumberBasePlate(BasePlate thePlate, double hight) {
 	BRepBuilderAPI_Transform transformedFace = BRepBuilderAPI_Transform(prismer.Shape(), transT.Multiplied(scaleT));
 
 	thePlate.mySlotBuilder.Add(thePlate.mySlotShape, transformedFace.Shape());
-
-	////! test
-	//thePlate.shape = transformedFace.Shape();
-
-	//TopoDS_Compound testShape;
-	//BRep_Builder b;
-	//b.MakeCompound(testShape);
-	//b.Add(testShape, thePlate.shape);
-	//b.Add(testShape, transformedFace);
-	//thePlate.shape = testShape;
 
 	return thePlate;
 }
@@ -1588,6 +1688,7 @@ TopoDS_Shape DeployPlates(BasePlate theBasePlate, std::vector<VerticalPlate> mid
 		builder.Add(result, FinalShape);
 		rightY += xMax - xMin + gap;
 	}
+
 #pragma endregion
 
 	return result;

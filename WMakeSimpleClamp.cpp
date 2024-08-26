@@ -2,6 +2,7 @@
 #include "WMakeSimpleClamp.h"
 #include "MakeSimpleClamp.h"
 #include "ICO_StringExchange.h"
+#include <TopoDS_FrozenShape.hxx>
 using namespace System::Collections::Generic;
 
 namespace OCCTK {
@@ -56,6 +57,7 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 
 	for each (auto oneVP in toDownPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
+		if (theoccVP.pieces.empty()) { continue; }
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccDownVP.push_back(theoccVP);
 		////! debug
@@ -67,6 +69,7 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 	}
 	for each (auto oneVP in toUpPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
+		if (theoccVP.pieces.empty()) { continue; }
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccUpVP.push_back(theoccVP);
 		////! debug
@@ -145,8 +148,20 @@ BasePlate^ SimpleClampMaker::SlotBasePLates(BasePlate^ theBasePlate, List<Vertic
 	std::vector<SimpleClamp::VerticalPlate> tempOccUpVP;
 	for each (auto oneVP in toDownPlates) { tempOccDownVP.push_back(oneVP->GetOCC()); }
 	for each (auto oneVP in toUpPlates) { tempOccUpVP.push_back(oneVP->GetOCC()); }
-
-	SimpleClamp::BasePlate newOccBP = SimpleClamp::SlotBasePlate(theoccBP, tempOccDownVP, tempOccUpVP);
+	// 无法判断mySlotShape是否已被冻结，直接清空在函数中重新构建
+	theoccBP.mySlotShape.Nullify();
+	SimpleClamp::BasePlate newOccBP;
+	try {
+		newOccBP = SimpleClamp::SlotBasePlate(theoccBP, tempOccDownVP, tempOccUpVP);
+	}
+	catch (const TopoDS_FrozenShape& ex) {
+		// 将特定的 C++ 异常转换为托管异常
+		throw gcnew System::InvalidOperationException("TopoDS_FrozenShape: Attempted to modify a frozen shape.");
+	}
+	catch (const std::exception& e) {
+		System::String^ errorMsg = gcnew System::String(e.what());
+		throw gcnew System::Exception(errorMsg);
+	}
 	return gcnew BasePlate(newOccBP);
 }
 
@@ -162,7 +177,18 @@ VerticalPlate^ SimpleClampMaker::BrandNumberVerticalPlate(VerticalPlate^ theVert
 }
 BasePlate^ SimpleClampMaker::BrandNumberBasePlate(BasePlate^ theBasePlate, double hight) {
 	SimpleClamp::BasePlate theoccBasePlate = theBasePlate->GetOCC();
-	SimpleClamp::BasePlate newoccBasePlate = SimpleClamp::BrandNumberBasePlate(theoccBasePlate, hight);
+	//可能需要判断 mySlotShape 是否已冻结
+	//theoccBasePlate.mySlotShape;
+	SimpleClamp::BasePlate newoccBasePlate;
+	try {
+		newoccBasePlate = SimpleClamp::BrandNumberBasePlate(theoccBasePlate, hight);
+	}
+	catch (const std::exception& e) {
+		// 将 std::exception 的消息转换为 System::String^
+		System::String^ errorMsg = gcnew System::String(e.what());
+		// 使用转换后的消息构造新的 System::Exception
+		throw gcnew System::Exception(errorMsg);
+	}
 	BasePlate^ newbasePlate = gcnew BasePlate(newoccBasePlate);
 	return newbasePlate;
 }
@@ -190,6 +216,21 @@ TShape^ SimpleClampMaker::DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^
 	}
 	TopoDS_Shape result = SimpleClamp::DeployPlates(BasePlate->GetOCC(), cppDownPlates, cppUpPlates);
 	return gcnew TShape(result);
+}
+
+auto SimpleClampMaker::TestError(int value) {
+	switch (value) {
+	case 0:
+		throw gcnew System::Exception("Test Error 0");
+	case 1:
+		throw gcnew System::Exception("Test Error 1");
+	case 2:
+		throw gcnew System::Exception("Test Error 2");
+	case 4:
+		throw gcnew System::Exception("Test Error 4");
+	default:
+		throw gcnew System::Exception(System::String::Format("Test Unknown Error {0}", value));
+	}
 }
 
 

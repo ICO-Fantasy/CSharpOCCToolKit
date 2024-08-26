@@ -14,6 +14,7 @@ using System.Windows.Forms.Integration;
 using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using Microsoft.VisualBasic;
+using Microsoft.Win32;
 using Microsoft.Windows.Themes;
 using OCCTK.Extension;
 using OCCTK.IO;
@@ -387,9 +388,19 @@ public enum VPCMode
 /// <summary>
 /// 交互逻辑 MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window, IAISSelectionHandler
+public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandler
 {
     const double LINEAR_TOL = 1e-1;
+
+    // 定义颜色数组
+    private System.Windows.Media.SolidColorBrush[] colorSequence =
+    {
+        Brushes.LightPink,
+        Brushes.LightCoral,
+        Brushes.LightYellow,
+        Brushes.LightGreen,
+        Brushes.LightCyan
+    };
     private OCCCanvas Viewer;
     private InteractiveContext AISContext;
 
@@ -459,26 +470,26 @@ public partial class MainWindow : Window, IAISSelectionHandler
     /// </summary>
     public VPCMode VPCMode { get; set; } = 0;
 
-    public int XNum { get; set; } = 3;
+    public int XNum { get; set; } = 4;
 
-    public int YNum { get; set; } = 3;
+    public int YNum { get; set; } = 5;
 
     //X方向
     /// <summary>
     /// 竖板横向初始偏移
     /// </summary>
-    public double InitialOffsetXParameter { get; set; } = 20.0;
+    public double InitialOffsetXParameter { get; set; } = 30.0;
 
     /// <summary>
     /// 竖板横向偏移
     /// </summary>
-    public double OffsetXParameter { get; set; } = 20;
+    public double OffsetXParameter { get; set; } = 20.0;
 
     //Y方向
     /// <summary>
     /// 竖板纵向初始偏移
     /// </summary>
-    public double InitialOffsetYParameter { get; set; } = 20.0;
+    public double InitialOffsetYParameter { get; set; } = 40.0;
 
     /// <summary>
     /// 竖板纵向偏移
@@ -495,27 +506,21 @@ public partial class MainWindow : Window, IAISSelectionHandler
     /// </summary>
     public double AvoidanceHeightParameter { get; set; } = 20.0;
 
-    //! 移除竖板连接高，用避让高度代替
-    ///// <summary>
-    ///// 竖板连接高
-    ///// </summary>
-    //public double ConnectionHeightParameter { get; set; } = 20;
-
     /// <summary>
     /// 竖板最小支撑长度
     /// </summary>
-    public double MinSupportingLenParameter { get; set; } = 5;
+    public double MinSupportingLenParameter { get; set; } = 0;
 
     //XY方向
     /// <summary>
     /// 竖板避让间隙
     /// </summary>
-    public double ClearancesParameter { get; set; } = 4;
+    public double ClearancesParameter { get; set; } = 0;
 
     /// <summary>
     /// 竖板切断距离
     /// </summary>
-    public double CuttingDistanceParameter { get; set; } = 500;
+    public double CuttingDistanceParameter { get; set; } = 999;
 
     /// <summary>
     /// 连接卡槽宽度
@@ -585,6 +590,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
         //ViewModel = new MainViewModel();
         //this.DataContext = ViewModel;
         Viewer.OnAISSelected += OnSelectionMade;
+        Viewer.OnMouseMoved += OnMouseMoved;
         #region 全局属性绑定
 
         BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString("F1");
@@ -696,24 +702,88 @@ public partial class MainWindow : Window, IAISSelectionHandler
         Viewer.FitAll();
     }
 
-    private void Test_Button_Click(object sender, RoutedEventArgs e)
-    {
-        InputWorkpiece = new(new MakeBox(20, 20, 20).Shape());
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
-    }
     #endregion
 
     #region 导入
+    private void Test_Button_Click(object sender, RoutedEventArgs e)
+    {
+        // 创建文件选择对话框
+        OpenFileDialog openFileDialog = new OpenFileDialog();
+        openFileDialog.Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*"; // 设置文件过滤器
+
+        // 设置初始目录为指定的路径
+        openFileDialog.InitialDirectory = System.IO.Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "mods"
+        );
+
+        // 如果用户选择了文件并点击了“打开”按钮
+        if (openFileDialog.ShowDialog() == true)
+        {
+            string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
+
+            Viewer.EraseAll(false);
+            InputWorkpiece = new(new BrepExchange(selectedFilePath).Shape()); // 使用选择的文件路径
+            BasePlate = null;
+            MiddleToDownPlates.Clear();
+            MiddleToUpPlates.Clear();
+            UpdateComboBox();
+            DisplayEraseInputWorkpiece(false);
+            Viewer.FitAll();
+        }
+    }
+
     private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
-        //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\mytest.STEP");
-        //InputWorkpiece = SimpleClampMaker.TestInputWorkpiece("mods\\test1Small.STEP");
-        InputWorkpiece = new(new STEPExchange("mods\\test4small03.STEP").Shape());
-        BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        // 创建文件选择对话框
+        OpenFileDialog openFileDialog = new OpenFileDialog();
+        // 设置文件过滤器
+        openFileDialog.Filter =
+            "STEP Files (*.STEP;*.step;*.stp)|*.STEP;*.step;*.stp|All Files (*.*)|*.*";
+
+        // 设置初始目录为指定的路径
+        openFileDialog.InitialDirectory = System.IO.Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "mods"
+        );
+
+        // 如果用户选择了文件并点击了“打开”按钮
+        if (openFileDialog.ShowDialog() == true)
+        {
+            string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
+
+            Viewer.EraseAll(false);
+            InputWorkpiece = new(new STEPExchange(selectedFilePath).Shape()); // 使用选择的文件路径
+            BasePlate = null;
+            Viewer.Display(InputWorkpiece.AIS, true);
+            Viewer.FitAll();
+        }
+    }
+
+    private void SaveBrep_Button_Click(object sender, RoutedEventArgs e)
+    {
+        // 创建保存文件对话框
+        Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+
+        // 设置默认的文件类型过滤器
+        saveFileDialog.Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*";
+
+        // 设置初始目录为指定的路径
+        saveFileDialog.InitialDirectory = System.IO.Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "mods"
+        );
+
+        // 显示保存文件对话框并检查用户是否选择了保存路径
+        if (saveFileDialog.ShowDialog() == true)
+        {
+            // 获取用户选择的文件路径
+            string filePath = saveFileDialog.FileName;
+
+            // 创建 BrepExchange 对象并保存文件
+            BrepExchange BE = new BrepExchange(InputWorkpiece.Shape);
+            BE.SaveFile(filePath);
+        }
     }
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
@@ -1069,7 +1139,14 @@ public partial class MainWindow : Window, IAISSelectionHandler
             EraseAll(false);
             DisplayEraseInputWorkpiece(false);
             DisplayEraseBasePlates(false);
-            DisplaySinglePlate(CurrentPlate, false);
+            if (CurrentPlate.Sutured)
+            {
+                DisplayCurrentPlate(false);
+            }
+            else
+            {
+                DisplayCurrentPieces(false);
+            }
             Viewer.Update();
             CurrentPlate
                 .Pieces.OrderBy(item =>
@@ -1105,7 +1182,14 @@ public partial class MainWindow : Window, IAISSelectionHandler
             EraseAll(false);
             DisplayEraseInputWorkpiece(false);
             DisplayEraseBasePlates(false);
-            DisplaySinglePlate(CurrentPlate, false);
+            if (CurrentPlate.Sutured)
+            {
+                DisplayCurrentPlate(false);
+            }
+            else
+            {
+                DisplayCurrentPieces(false);
+            }
             Viewer.Update();
             for (global::System.Int32 i = 0; i < CurrentPlate.Pieces.Count; ++i)
             {
@@ -1141,6 +1225,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
             AddPlateLocationY_TextBox.Text = (BasePlate.Y + BasePlate.DY / 2).ToString("F1");
             AddPlateLocationY_TextBox.IsReadOnly = true;
             AddPlateLocationX_TextBox.IsReadOnly = false;
+            AddPlateNumberString_TextBox.Text = "X";
         }
         else if (AddPlateDirection == "Y")
         {
@@ -1148,44 +1233,67 @@ public partial class MainWindow : Window, IAISSelectionHandler
             AddPlateLocationX_TextBox.Text = (BasePlate.X + BasePlate.DX / 2).ToString("F1");
             AddPlateLocationX_TextBox.IsReadOnly = true;
             AddPlateLocationY_TextBox.IsReadOnly = false;
+            AddPlateNumberString_TextBox.Text = "Y";
         }
     }
 
-    //单板
+    //单片
     private Grid MakeStackItem(VerticalPiece thePiece, int theNum)
     {
-        if (CurrentPlate == null)
+        if (thePiece == null)
         {
             return null; // 直接返回，不执行后续代码
         }
-        // 创建一个新的 StackPanel
+
+        // 创建一个新的 Grid
         Grid outerStackPanel = new Grid();
 
-        // 创建列定义
-        ColumnDefinition column1 = new ColumnDefinition();
-        ColumnDefinition column2 = new ColumnDefinition();
-        ColumnDefinition column3 = new ColumnDefinition();
+        // 定义显示内容和列索引
+        var labelDefinitions = new (string Content, int ColumnIndex)[]
+        {
+            ($"{thePiece.Order:F1}", 0),
+            ($"L: {thePiece.Length:F1}", 1),
+            ($"S: {thePiece.Start[0]:F1}, {thePiece.Start[1]:F1}, {thePiece.Start[0]:F1}", 2),
+            ($"M: {thePiece.Middle[0]:F1}, {thePiece.Middle[1]:F1}, {thePiece.Middle[0]:F1}", 3),
+            ($"E: {thePiece.End[0]:F1}, {thePiece.End[1]:F1}, {thePiece.End[0]:F1}", 4)
+        };
 
-        // 设置列宽度为相对值
-        column1.Width = new GridLength(1, GridUnitType.Star);
-        column2.Width = new GridLength(1, GridUnitType.Auto);
-        column3.Width = new GridLength(1, GridUnitType.Auto);
-        // 将列添加到 Grid 中
-        outerStackPanel.ColumnDefinitions.Add(column1);
-        outerStackPanel.ColumnDefinitions.Add(column2);
-        outerStackPanel.ColumnDefinitions.Add(column3);
+        // 创建并添加列定义
+        for (int i = 0; i < labelDefinitions.Length; i++)
+        {
+            ColumnDefinition column = new ColumnDefinition
+            {
+                Width =
+                    i == 0
+                        ? new GridLength(1, GridUnitType.Star)
+                        : new GridLength(1, GridUnitType.Auto)
+            };
+            outerStackPanel.ColumnDefinitions.Add(column);
+        }
 
-        // 创建要添加到 StackPanel 中的子元素
-        Label PieceLabel = new Label();
-        PieceLabel.Content = thePiece;
-        PieceLabel.HorizontalContentAlignment = HorizontalAlignment.Left; // 设置 Label 的水平内容对齐方式为 Left
-        // 添加点击事件
-        PieceLabel.MouseLeftButtonDown += PieceLabel_MouseLeftButtonDown;
-        // 将子元素添加到 Grid 中，并指定列索引
-        Grid.SetColumn(PieceLabel, 0);
+        // 创建并添加子元素
+        foreach (var (content, columnIndex) in labelDefinitions)
+        {
+            Label label = new Label
+            {
+                Content = content,
+                HorizontalContentAlignment = HorizontalAlignment.Left
+            };
 
-        // 将子元素添加到 StackPanel 的 Children 集合中
-        outerStackPanel.Children.Add(PieceLabel);
+            // 设置标签的列索引
+            Grid.SetColumn(label, columnIndex);
+
+            // 将标签添加到 Grid 中
+            outerStackPanel.Children.Add(label);
+        }
+
+        // 绑定 thePiece 对象到第一个 Label 的 Tag 属性
+        if (outerStackPanel.Children[0] is Label firstLabel)
+        {
+            firstLabel.Tag = thePiece;
+            // 添加鼠标左键点击事件处理程序
+            firstLabel.MouseLeftButtonDown += PieceLabel_MouseLeftButtonDown;
+        }
 
         return outerStackPanel;
     }
@@ -1299,7 +1407,14 @@ public partial class MainWindow : Window, IAISSelectionHandler
         {
             CurrentPlate_StackPanel.Children.Add(MakeStackItem(CurrentPlate.Pieces[i], i));
         }
-        DisplaySinglePlate(CurrentPlate, false);
+        if (CurrentPlate.Sutured)
+        {
+            DisplayCurrentPlate(false);
+        }
+        else
+        {
+            DisplayCurrentPieces(false);
+        }
         Viewer.Update();
     }
 
@@ -1343,6 +1458,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
             MessageBox.Show("X 方向输入的值不是有效的数字。");
             return;
         }
+        string theNumberString = AddPlateNumberString_TextBox.Text;
 
         #endregion
 
@@ -1361,6 +1477,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
                 MinSupportingLenParameter,
                 CuttingDistanceParameter
             );
+            newPlate.NumberString = theNumberString;
             MiddleToDownPlates.Add(newPlate);
         }
         if (AddPlateDirection == "Y")
@@ -1376,6 +1493,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
                 MinSupportingLenParameter,
                 CuttingDistanceParameter
             );
+            newPlate.NumberString = theNumberString;
             MiddleToUpPlates.Add(newPlate);
         }
         if (newPlate != null)
@@ -1588,8 +1706,8 @@ public partial class MainWindow : Window, IAISSelectionHandler
         if (CurrentPlate != null)
         {
             EraseAll(false);
-            //DisplayEraseInputWorkpiece(false);
-            //DisplayEraseBasePlates(false);
+            DisplayEraseInputWorkpiece(false);
+            DisplayEraseBasePlates(false);
             DisplayCurrentPieces(false);
 
             Viewer.Update();
@@ -1606,9 +1724,14 @@ public partial class MainWindow : Window, IAISSelectionHandler
     {
         if (CurrentPlate != null)
         {
+            if (!CurrentPlate.Sutured)
+            {
+                MessageBox.Show("板未连接");
+                return;
+            }
             EraseAll(false);
-            //DisplayEraseInputWorkpiece(false);
-            //DisplayEraseBasePlates(false);
+            DisplayEraseInputWorkpiece(false);
+            DisplayEraseBasePlates(false);
             DisplayCurrentPlate(false);
 
             Viewer.Update();
@@ -1768,7 +1891,10 @@ public partial class MainWindow : Window, IAISSelectionHandler
                             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
                                 InputWorkpiece.Shape,
                                 BasePlate,
-                                new PlatePose(new Pnt(currentX, BasePlate.Y, 0.0), DirectionX),
+                                new PlatePose(
+                                    new Pnt(currentX, (BasePlate.Y + BasePlate.DY / 2), 0.0),
+                                    DirectionX
+                                ),
                                 ClearancesParameter,
                                 MinSupportingLenParameter,
                                 CuttingDistanceParameter
@@ -1810,7 +1936,10 @@ public partial class MainWindow : Window, IAISSelectionHandler
                             var tempPlate = SimpleClampMaker.MakeVerticalPlate(
                                 InputWorkpiece.Shape,
                                 BasePlate,
-                                new PlatePose(new Pnt(BasePlate.X, currentY, 0.0), DirectionY),
+                                new PlatePose(
+                                    new Pnt((BasePlate.X + BasePlate.DX / 2), currentY, 0.0),
+                                    DirectionY
+                                ),
                                 ClearancesParameter,
                                 MinSupportingLenParameter,
                                 CuttingDistanceParameter
@@ -1878,11 +2007,18 @@ public partial class MainWindow : Window, IAISSelectionHandler
         MiddleToUpPlates = tempUp;
 
         // 给底板开槽
-        BasePlate = SimpleClampMaker.SlotBasePLates(
-            BasePlate,
-            MiddleToDownPlates,
-            MiddleToUpPlates
-        );
+        try
+        {
+            BasePlate = SimpleClampMaker.SlotBasePLates(
+                BasePlate,
+                MiddleToDownPlates,
+                MiddleToUpPlates
+            );
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+        }
         //给底板烙印标记
         BasePlate = SimpleClampMaker.BrandNumberBasePlate(BasePlate, 10.0);
     }
@@ -2046,7 +2182,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
     /// </summary>
     /// <param name="thePlate"></param>
     /// <param name="update"></param>
-    private void DisplaySinglePlate(VerticalPlate thePlate, bool update)
+    private void DisplaySinglePlate(VerticalPlate thePlate, bool update, double transparency = 0.0)
     {
         Color theColor = new(125, 125, 125);
         if (MiddleToDownPlates.Contains(thePlate))
@@ -2061,7 +2197,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
         if (thePlate.Sutured)
         {
             Display(thePlate.AIS, false);
-            //AISContext.SetTransparency(thePlate.AIS, 0.3, false);
+            AISContext.SetTransparency(thePlate.AIS, transparency, false);
             AISContext.SetColor(thePlate.AIS, theColor, update);
         }
         else
@@ -2069,7 +2205,7 @@ public partial class MainWindow : Window, IAISSelectionHandler
             foreach (var onePiece in thePlate.Pieces)
             {
                 Display(onePiece.AIS, false);
-                //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
+                AISContext.SetTransparency(onePiece.AIS, transparency, false);
                 AISContext.SetColor(onePiece.AIS, theColor, update);
             }
         }
@@ -2083,9 +2219,39 @@ public partial class MainWindow : Window, IAISSelectionHandler
     {
         if (CurrentPlate != null)
         {
+            Color theColor = new(125, 125, 125);
+            if (MiddleToDownPlates.Contains(CurrentPlate))
+            {
+                theColor = new(255, 0, 0);
+                //其它板按半透明显示
+                foreach (
+                    var otherPlate in MiddleToDownPlates
+                        .Where(plate => !plate.Equals(CurrentPlate))
+                        .ToList()
+                )
+                {
+                    DisplaySinglePlate(otherPlate, update, 0.6);
+                }
+            }
+            else if (MiddleToUpPlates.Contains(CurrentPlate))
+            {
+                theColor = new(0, 255, 0);
+                //其它板按半透明显示
+                foreach (
+                    var otherPlate in MiddleToUpPlates
+                        .Where(plate => !plate.Equals(CurrentPlate))
+                        .ToList()
+                )
+                {
+                    DisplaySinglePlate(otherPlate, update, 0.6);
+                    AISContext.SetTransparency(otherPlate.AIS, 0.6, update);
+                }
+            }
             foreach (var Piece in CurrentPlate.Pieces)
             {
                 Display(Piece.AIS, update);
+                AISContext.SetTransparency(Piece.AIS, 0.0, update);
+                AISContext.SetColor(Piece.AIS, theColor, update);
             }
         }
     }
@@ -2098,9 +2264,38 @@ public partial class MainWindow : Window, IAISSelectionHandler
     {
         if (CurrentPlate != null)
         {
+            Color theColor = new(125, 125, 125);
+            if (MiddleToDownPlates.Contains(CurrentPlate))
+            {
+                theColor = new(255, 0, 0);
+                //其它板按半透明显示
+                foreach (
+                    var otherPlate in MiddleToDownPlates
+                        .Where(plate => !plate.Equals(CurrentPlate))
+                        .ToList()
+                )
+                {
+                    DisplaySinglePlate(otherPlate, update, 0.6);
+                }
+            }
+            else if (MiddleToUpPlates.Contains(CurrentPlate))
+            {
+                theColor = new(0, 255, 0);
+                //其它板按半透明显示
+                foreach (
+                    var otherPlate in MiddleToUpPlates
+                        .Where(plate => !plate.Equals(CurrentPlate))
+                        .ToList()
+                )
+                {
+                    DisplaySinglePlate(otherPlate, update, 0.6);
+                }
+            }
             if (CurrentPlate.AIS != null)
             {
                 Display(CurrentPlate.AIS, update);
+                AISContext.SetColor(CurrentPlate.AIS, theColor, update);
+                AISContext.SetTransparency(CurrentPlate.AIS, 0.0, update);
             }
         }
     }
@@ -2108,31 +2303,66 @@ public partial class MainWindow : Window, IAISSelectionHandler
     // 选中单个片的交互
     private void PieceLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        // 获取Label
+        // 获取点击的 Label
         Label clickedLabel = sender as Label;
 
-        // 确保Label不为空且Content不为空
-        if (clickedLabel != null && clickedLabel.Content != null)
+        // 确保 Label 不为空且 Tag 不为空
+        if (clickedLabel != null && clickedLabel.Tag != null)
         {
-            // 如果 Label 已经被高亮显示，则恢复原始颜色
-            if (clickedLabel.Background == Brushes.Yellow)
+            // 获取 Grid（假设 Label 是直接添加到 Grid 中的）
+            Grid parentGrid = clickedLabel.Parent as Grid;
+            StackPanel parentStack = parentGrid.Parent as StackPanel;
+
+            if (parentGrid != null && parentStack != null)
             {
-                clickedLabel.Background = Brushes.Transparent; // 恢复默认背景色
-            }
-            else
-            {
-                // 否则，将其设置为高亮颜色
-                clickedLabel.Background = Brushes.Yellow;
+                // 获取被点击 Label 所在的行
+                int clickedRow = parentStack.Children.IndexOf(parentGrid);
+
+                // 遍历 StackPanel 的所有子元素
+                foreach (UIElement theGrid in parentStack.Children)
+                {
+                    if (theGrid is Grid grid)
+                    {
+                        int row = parentStack.Children.IndexOf(grid);
+
+                        // 遍历每个 Grid 中的子元素
+                        foreach (UIElement element in grid.Children)
+                        {
+                            if (element is Label label)
+                            {
+                                int column = Grid.GetColumn(label);
+
+                                // 如果是点击的行，按照颜色数组设置背景颜色
+                                if (row == clickedRow)
+                                {
+                                    if (column >= 0 && column < colorSequence.Length)
+                                    {
+                                        label.Background = colorSequence[column];
+                                    }
+                                }
+                                else
+                                {
+                                    // 其他行设置为透明
+                                    label.Background = Brushes.Transparent;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            //选中AIS
-            var piece = clickedLabel.Content as VerticalPiece;
+            // 选中 AIS
+            var piece = clickedLabel.Tag as VerticalPiece;
             if (piece != null && piece.AIS != null)
             {
-                Viewer.InteractiveContext.SelectAIS(piece.AIS, true);
+                AISContext.SelectAIS(piece.AIS, true);
             }
         }
     }
+
+    #endregion
+
+    #region 实现接口
 
     public void OnSelectionMade(AShape theAIS)
     {
@@ -2140,40 +2370,50 @@ public partial class MainWindow : Window, IAISSelectionHandler
         {
             return;
         }
-        foreach (var child in CurrentPlate_StackPanel.Children)
+        int clickedRow = 999;
+        foreach (Grid theGrid in CurrentPlate_StackPanel.Children)
         {
-            // 确认子元素是否是 Grid 类型
-            if (child is Grid theGrid)
+            StackPanel parentStack = theGrid.Parent as StackPanel;
+            // 遍历每个 Grid 中的子元素
+            var tl = theGrid.Children[0];
+            if (tl is Label thelabel)
             {
-                // 遍历 Grid 的 Children 集合，寻找 Label
-                foreach (var gridChild in theGrid.Children)
+                if (thelabel.Tag is AShape)
                 {
-                    if (gridChild is Label pieceLabel)
+                    if (thelabel.Tag.Equals(theAIS))
                     {
-                        // 获取 Label 的 Content，即 thePiece
-                        var thePiece = pieceLabel.Content as VerticalPiece;
-                        if (thePiece != null)
-                        {
-                            // 在这里处理 thePiece 的逻辑
-                            if (thePiece.AIS.Equals(theAIS))
-                            {
-                                // 如果 Label 已经被高亮显示，则恢复原始颜色
-                                if (pieceLabel.Background == Brushes.Yellow)
-                                {
-                                    pieceLabel.Background = Brushes.Transparent; // 恢复默认背景色
-                                }
-                                else
-                                {
-                                    // 否则，将其设置为高亮颜色
-                                    pieceLabel.Background = Brushes.Yellow;
-                                }
-                                return;
-                            }
-                        }
+                        clickedRow = parentStack.Children.IndexOf(theGrid);
                     }
                 }
             }
         }
+        foreach (Grid theGrid in CurrentPlate_StackPanel.Children)
+        {
+            StackPanel parentStack = theGrid.Parent as StackPanel;
+            int row = parentStack.Children.IndexOf(theGrid);
+            foreach (Label label in theGrid.Children)
+            {
+                int column = Grid.GetColumn(label);
+                // 如果是点击的行，按照颜色数组设置背景颜色
+                if (row == clickedRow)
+                {
+                    if (column >= 0 && column < colorSequence.Length)
+                    {
+                        label.Background = colorSequence[column];
+                    }
+                }
+                else
+                {
+                    // 其他行设置为透明
+                    label.Background = Brushes.Transparent;
+                }
+            }
+        }
+    }
+
+    public void OnMouseMoved(int X, int Y)
+    {
+        currentMouse_Label.Content = $"鼠标坐标: {X}, {Y}";
     }
 
     #endregion
