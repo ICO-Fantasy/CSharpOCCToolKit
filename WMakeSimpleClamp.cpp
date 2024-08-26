@@ -56,6 +56,7 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 
 	for each (auto oneVP in toDownPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
+		if (theoccVP.pieces.empty()) { continue; }
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccDownVP.push_back(theoccVP);
 		////! debug
@@ -67,6 +68,7 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 	}
 	for each (auto oneVP in toUpPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
+		if (theoccVP.pieces.empty()) { continue; }
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccUpVP.push_back(theoccVP);
 		////! debug
@@ -162,6 +164,7 @@ VerticalPlate^ SimpleClampMaker::BrandNumberVerticalPlate(VerticalPlate^ theVert
 }
 BasePlate^ SimpleClampMaker::BrandNumberBasePlate(BasePlate^ theBasePlate, double hight) {
 	SimpleClamp::BasePlate theoccBasePlate = theBasePlate->GetOCC();
+	theoccBasePlate.mySlotShape.Nullify();
 	SimpleClamp::BasePlate newoccBasePlate = SimpleClamp::BrandNumberBasePlate(theoccBasePlate, hight);
 	BasePlate^ newbasePlate = gcnew BasePlate(newoccBasePlate);
 	return newbasePlate;
@@ -190,6 +193,21 @@ TShape^ SimpleClampMaker::DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^
 	}
 	TopoDS_Shape result = SimpleClamp::DeployPlates(BasePlate->GetOCC(), cppDownPlates, cppUpPlates);
 	return gcnew TShape(result);
+}
+
+auto SimpleClampMaker::TestError(int value) {
+	switch (value) {
+	case 0:
+		throw gcnew System::Exception("Test Error 0");
+	case 1:
+		throw gcnew System::Exception("Test Error 1");
+	case 2:
+		throw gcnew System::Exception("Test Error 2");
+	case 4:
+		throw gcnew System::Exception("Test Error 4");
+	default:
+		throw gcnew System::Exception(System::String::Format("Test Unknown Error {0}", value));
+	}
 }
 
 

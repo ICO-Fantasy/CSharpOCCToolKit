@@ -63,9 +63,13 @@ public:
 	property AShape^ AIS { AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }}
 	property PlatePose^ Pose {PlatePose^ get() { return gcnew PlatePose(myPiece().pose); }}
 	property double Order {double get() { return myPiece().order; }}
+	property double Length {double get() { return myPiece().Length(); }}
+	property cli::array<double>^ Start {cli::array<double>^ get() { return gcnew cli::array<double>(3) { myPiece().myEdge.start.X(), myPiece().myEdge.start.Y(), myPiece().myEdge.start.Z() }; }}
+	property cli::array<double>^ Middle {cli::array<double>^ get() { return gcnew cli::array<double>(3) { myPiece().myEdge.middle.X(), myPiece().myEdge.middle.Y(), myPiece().myEdge.middle.Z() }; }}
+	property cli::array<double>^ End {cli::array<double>^ get() { return gcnew cli::array<double>(3) { myPiece().myEdge.end.X(), myPiece().myEdge.end.Y(), myPiece().myEdge.end.Z() }; }}
 	OCCTK::SimpleClamp::VerticalPiece GetOCC() { return myPiece(); };
 
-	virtual System::String^ ToString() override { return Order.ToString(); }
+	virtual System::String^ ToString() override { return Order.ToString("F1"); }
 private:
 	NCollection_Haft<OCCTK::SimpleClamp::VerticalPiece> myPiece;
 	AShape^ myAIS;
@@ -143,6 +147,8 @@ public:
 	//static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint);
 
 	static TShape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);
+
+	static auto TestError(int value);
 };
 
 }

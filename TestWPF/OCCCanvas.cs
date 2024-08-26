@@ -56,12 +56,23 @@ public enum ViewOrientation
 
 #endregion
 
+#region 接口
+
 public interface IAISSelectionHandler
 {
     void OnSelectionMade(AShape theAIS);
 }
 
 public delegate void AISSelectionMadeHandler(AShape theAIS);
+
+public interface IMouseMoveHandler
+{
+    void OnMouseMoved(int X, int Y);
+}
+
+public delegate void MouseMovedHandler(int X, int Y);
+
+#endregion
 
 public class SingleManipulator
 {
@@ -94,6 +105,7 @@ public class OCCCanvas : Form
 {
     // 定义事件
     public event AISSelectionMadeHandler OnAISSelected;
+    public event MouseMovedHandler OnMouseMoved;
 
     #region 私有字段
 
@@ -626,6 +638,7 @@ public class OCCCanvas : Form
         mouseCurrentY = e.Y;
         int endX = e.X;
         int endY = e.Y;
+        OnMouseMoved?.Invoke(e.X, e.Y);
         double zoomFactor = 1.0;
         // 根据需要执行相应操作
 

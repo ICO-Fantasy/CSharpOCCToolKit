@@ -150,12 +150,17 @@
             <!--  显示模式的两个按钮  -->
             <Button
                 Click="Test_Button_Click"
-                Content="Box"
+                Content="brep"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Button
                 Click="Test_Input_Button_Click"
-                Content="导入简化工件"
+                Content="step"
+                Style="{StaticResource dgButton}"
+                Template="{StaticResource buttonTemplate}" />
+            <Button
+                Click="SaveBrep_Button_Click"
+                Content="save brep"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Separator />
@@ -531,7 +536,7 @@
                             <Label
                                 x:Name="Clearances_Label"
                                 VerticalAlignment="Stretch"
-                                Content="板两侧偏置量" />
+                                Content="R角避让" />
                             <TextBox
                                 x:Name="Clearances_TextBox"
                                 Margin="0,4,0,4"
@@ -667,50 +672,6 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
-                    <Grid x:Name="CurrentPlateDirection_Grid" Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Label
-                            x:Name="CurrentPlateDirection_Label"
-                            HorizontalAlignment="Stretch"
-                            Content="当前方向" />
-                        <ComboBox
-                            x:Name="CurrentPlateDirection_ComboBox"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            SelectionChanged="CurrentPlateDirection_ComboBox_SelectionChanged">
-                            <ComboBoxItem Content="X" />
-                            <ComboBoxItem Content="Y" />
-                        </ComboBox>
-                    </Grid>
-                    <Grid
-                        x:Name="CurrentPlateLocation_Grid"
-                        Grid.Row="1"
-                        Grid.Column="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Label
-                            x:Name="CurrentPlateLocation_Label"
-                            HorizontalAlignment="Stretch"
-                            Content="位置" />
-                        <ComboBox
-                            x:Name="CurrentPlateLocationX_ComboBox"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            SelectionChanged="CurrentPlateLocationX_ComboBox_SelectionChanged"
-                            Visibility="Collapsed" />
-                        <ComboBox
-                            x:Name="CurrentPlateLocationY_ComboBox"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            SelectionChanged="CurrentPlateLocationY_ComboBox_SelectionChanged"
-                            Visibility="Collapsed" />
-                    </Grid>
                     <Label
                         Grid.Row="2"
                         Grid.ColumnSpan="2"
@@ -741,6 +702,12 @@
                             Grid.Row="1"
                             Grid.Column="0"
                             VerticalAlignment="Stretch" />
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Content="方向" />
                         <TextBox
                             x:Name="AddPlateLocationY_TextBox"
                             Grid.RowSpan="2"
@@ -748,6 +715,17 @@
                             Height="17"
                             Margin="0,25,0,0"
                             VerticalAlignment="Top" />
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Content="编号" />
+                        <TextBox
+                            x:Name="AddPlateNumberString_TextBox"
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            VerticalAlignment="Stretch" />
                         <TextBox
                             x:Name="AddPlateDirection_TextBox"
                             Grid.Row="2"
@@ -778,10 +756,55 @@
                         Grid.ColumnSpan="2"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
+                        Background="LightGoldenrodYellow"
                         Content="当前选择" />
+                    <Grid x:Name="CurrentPlateDirection_Grid" Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            x:Name="CurrentPlateDirection_Label"
+                            HorizontalAlignment="Stretch"
+                            Content="当前方向" />
+                        <ComboBox
+                            x:Name="CurrentPlateDirection_ComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="CurrentPlateDirection_ComboBox_SelectionChanged">
+                            <ComboBoxItem Content="X" />
+                            <ComboBoxItem Content="Y" />
+                        </ComboBox>
+                    </Grid>
+                    <Grid
+                        x:Name="CurrentPlateLocation_Grid"
+                        Grid.Row="5"
+                        Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            x:Name="CurrentPlateLocation_Label"
+                            HorizontalAlignment="Stretch"
+                            Content="位置" />
+                        <ComboBox
+                            x:Name="CurrentPlateLocationX_ComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="CurrentPlateLocationX_ComboBox_SelectionChanged"
+                            Visibility="Collapsed" />
+                        <ComboBox
+                            x:Name="CurrentPlateLocationY_ComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="CurrentPlateLocationY_ComboBox_SelectionChanged"
+                            Visibility="Collapsed" />
+                    </Grid>
                     <Grid
                         x:Name="CurrentPlate_Grid"
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Grid.ColumnSpan="2"
                         Margin="5,0,5,0">
                         <Grid.Background>
@@ -799,7 +822,7 @@
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="160" />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="3" Grid.ColumnSpan="2">
@@ -836,7 +859,9 @@
                                 <Label
                                     x:Name="CurrentPlateSelectedLocation_Label"
                                     Grid.Row="0"
+                                    Grid.ColumnSpan="2"
                                     VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
                                     Content="位置" />
                                 <TextBox
                                     x:Name="CurrentPlateLocationX_TextBox"
@@ -872,6 +897,7 @@
                                     x:Name="CurrentPlateSelectedDirection_Label"
                                     Grid.Row="0"
                                     VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
                                     Content="方向" />
                                 <TextBox
                                     x:Name="CurrentPlateDirection_TextBox"
@@ -883,49 +909,70 @@
                                 Grid.Row="1"
                                 Grid.Column="4"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="最小支撑长度" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="最小支撑长度" />
                                 <TextBox x:Name="CurrentPlateMinSupportLen_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
                                 Grid.Column="5"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="两侧偏置量" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="R角避让" />
                                 <TextBox x:Name="CurrentPlateClearances_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
                                 Grid.Column="3"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="切断距离" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="切断距离" />
                                 <TextBox x:Name="CurrentPlateCuttingDistance_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
                                 Grid.Column="0"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="板厚" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="板厚" />
                                 <TextBox x:Name="CurrentPlateConnectionThickness_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
                                 Grid.Column="1"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="槽圆角半径" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="槽圆角半径" />
                                 <TextBox x:Name="CurrentPlateFilletRadius_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
                                 Grid.Column="2"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="避让高度" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="避让高度" />
                                 <TextBox x:Name="CurrentPlateAvoidanceHeight_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="0"
                                 Grid.Column="4"
                                 Orientation="Vertical">
-                                <Label VerticalAlignment="Stretch" Content="编号" />
+                                <Label
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="编号" />
                                 <TextBox x:Name="CurrentPlateNumberString_TextBox" VerticalAlignment="Stretch" />
                             </StackPanel>
                             <Label
