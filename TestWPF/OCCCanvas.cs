@@ -60,7 +60,7 @@ public enum ViewOrientation
 
 public interface IAISSelectionHandler
 {
-    void OnSelectionMade(AShape theAIS);
+    void OnAISSelectionMade(AShape theAIS);
 }
 
 public delegate void AISSelectionMadeHandler(AShape theAIS);
@@ -418,9 +418,12 @@ public class OCCCanvas : Form
         if (InteractiveContext.MoreDetected())
         {
             _Detected = true;
+            CurrentAction3d = Action3d.SingleSelect;
         }
-        // 默认设置为点击，如果鼠标移动了会替换掉默认模式
-        CurrentAction3d = Action3d.SingleSelect;
+        else
+        {
+            CurrentAction3d = Action3d.Nothing;
+        }
         //! 记录旋转开始点
         Viewer.StartRotation(e.X, e.Y);
         //! 记录变换开始点

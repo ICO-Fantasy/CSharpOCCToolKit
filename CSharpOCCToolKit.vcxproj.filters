@@ -161,6 +161,9 @@
     <ClCompile Include="ICO_ViewCube.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_BndBox.cpp">
+      <Filter>源文件\Extension</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -242,6 +245,9 @@
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="ICO_ViewCube.h">
+      <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BndBox.h">
       <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>

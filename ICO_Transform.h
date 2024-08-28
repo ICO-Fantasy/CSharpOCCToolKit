@@ -4,6 +4,7 @@
 #include <NCollection_Haft.h> 
 //Local
 #include "ICO_TopoDS_Shape.h"
+#include "ICO_Pnt.h"
 
 namespace OCCTK {
 namespace OCC {

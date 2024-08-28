@@ -19,6 +19,14 @@ Trsf::Trsf(Ax2^ fromAx2, Ax2^ toAx2) {
 	//T.SetTransformation(gp_Ax3(fromAx2->GetOCC()), gp_Ax3(toAx2->GetOCC()));
 }
 
+Trsf::Trsf(Pnt^ fromPoint, Pnt^ toPoint) {
+	_nativeHandle = new gp_Trsf();
+	_nativeHandle->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
+}
+void Trsf::SetTranslation(Pnt^ fromPoint, Pnt^ toPoint) {
+	_nativeHandle->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
+}
+
 gp_Trsf Trsf::GetOCC() {
 	return *_nativeHandle;
 }

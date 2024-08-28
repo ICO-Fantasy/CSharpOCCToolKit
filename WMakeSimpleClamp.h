@@ -41,6 +41,7 @@ public ref struct BasePlate {
 	property double OffsetY {double get() { return myBP().offsetY; }void set(double value) { myBP().offsetY = value; }};
 	property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }};
 public:
+	Trsf^ Translation;
 	void UpdateAIS() {
 		if (myAIS != nullptr) {
 			myAIS->RemoveSelf();
@@ -103,16 +104,28 @@ public ref struct VerticalPlate {
 	// 最终的竖板形状
 	//property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(myPlate().shape); }return myAIS; }};
 	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
-	property TShape^ Shape {TShape^ get() { if (sutured) { return gcnew TShape(myPlate().shape); } return nullptr; }};
-	// 用于判断是否已连接
+	property TShape^ Shape {TShape^ get() { if (sutured) { if (numbered) { return myNumberedShape; } else { return myShape; } } return nullptr; }};
+	// 是否已连接
 	property bool Sutured {bool get() { return sutured; } };
+	// 是否已烙印编号
+	property bool Numbered {bool get() { return numbered; } };
 	// debug
 	property Pnt^ Start {Pnt^ get() { return gcnew Pnt(myPlate().start); }};
 	property Pnt^ End {Pnt^ get() { return gcnew Pnt(myPlate().end); }};
 
 public:
 	List<VerticalPiece^>^ Pieces = gcnew List<VerticalPiece^>();
-	OCCTK::SimpleClamp::VerticalPlate GetOCC() { return myPlate(); };
+	void RemovePiece(VerticalPiece^ thePiece) {
+		std::vector<SimpleClamp::VerticalPiece>T;
+		for each (auto p in  myPlate().pieces) {
+			if (p == thePiece->GetOCC()) {
+				continue;
+			}
+			T.push_back(p);
+		}
+		myPlate().pieces = T;
+	}
+	SimpleClamp::VerticalPlate GetOCC() { return myPlate(); };
 	// 添加 ToString 方法
 	virtual System::String^ ToString() override {
 		return NumberString;
@@ -121,6 +134,7 @@ private:
 	NCollection_Haft<SimpleClamp::VerticalPlate> myPlate;
 internal:
 	bool sutured = false;
+	bool numbered = false;
 	TShape^ myShape;
 	TShape^ myNumberedShape;
 	AShape^ myAIS;

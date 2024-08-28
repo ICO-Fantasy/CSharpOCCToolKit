@@ -589,7 +589,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
         //ViewModel = new MainViewModel();
         //this.DataContext = ViewModel;
-        Viewer.OnAISSelected += OnSelectionMade;
+        Viewer.OnAISSelected += OnAISSelectionMade;
         Viewer.OnMouseMoved += OnMouseMoved;
         #region 全局属性绑定
 
@@ -705,24 +705,21 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #endregion
 
     #region 导入
-    private void Test_Button_Click(object sender, RoutedEventArgs e)
+    private void InputBrep_Button_Click(object sender, RoutedEventArgs e)
     {
         // 创建文件选择对话框
-        OpenFileDialog openFileDialog = new OpenFileDialog();
-        openFileDialog.Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*"; // 设置文件过滤器
-
-        // 设置初始目录为指定的路径
-        openFileDialog.InitialDirectory = System.IO.Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "mods"
-        );
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*", // 设置文件过滤器
+            InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
+        };
 
         // 如果用户选择了文件并点击了“打开”按钮
         if (openFileDialog.ShowDialog() == true)
         {
             string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
 
-            Viewer.EraseAll(false);
+            EraseAll(false);
             InputWorkpiece = new(new BrepExchange(selectedFilePath).Shape()); // 使用选择的文件路径
             BasePlate = null;
             MiddleToDownPlates.Clear();
@@ -733,29 +730,27 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         }
     }
 
-    private void Test_Input_Button_Click(object sender, RoutedEventArgs e)
+    private void InputSTEP_Button_Click(object sender, RoutedEventArgs e)
     {
         // 创建文件选择对话框
-        OpenFileDialog openFileDialog = new OpenFileDialog();
-        // 设置文件过滤器
-        openFileDialog.Filter =
-            "STEP Files (*.STEP;*.step;*.stp)|*.STEP;*.step;*.stp|All Files (*.*)|*.*";
-
-        // 设置初始目录为指定的路径
-        openFileDialog.InitialDirectory = System.IO.Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "mods"
-        );
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Filter = "STEP Files (*.STEP;*.step;*.stp)|*.STEP;*.step;*.stp|All Files (*.*)|*.*", // 设置文件过滤器
+            InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
+        };
 
         // 如果用户选择了文件并点击了“打开”按钮
         if (openFileDialog.ShowDialog() == true)
         {
             string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
 
-            Viewer.EraseAll(false);
+            EraseAll(false);
             InputWorkpiece = new(new STEPExchange(selectedFilePath).Shape()); // 使用选择的文件路径
             BasePlate = null;
-            Viewer.Display(InputWorkpiece.AIS, true);
+            MiddleToDownPlates.Clear();
+            MiddleToUpPlates.Clear();
+            UpdateComboBox();
+            DisplayEraseInputWorkpiece(false);
             Viewer.FitAll();
         }
     }
@@ -763,42 +758,11 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     private void SaveBrep_Button_Click(object sender, RoutedEventArgs e)
     {
         // 创建保存文件对话框
-        Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-
-        // 设置默认的文件类型过滤器
-        saveFileDialog.Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*";
-
-        // 设置初始目录为指定的路径
-        saveFileDialog.InitialDirectory = System.IO.Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "mods"
-        );
-
-        // 显示保存文件对话框并检查用户是否选择了保存路径
-        if (saveFileDialog.ShowDialog() == true)
+        SaveFileDialog saveFileDialog = new SaveFileDialog
         {
-            // 获取用户选择的文件路径
-            string filePath = saveFileDialog.FileName;
-
-            // 创建 BrepExchange 对象并保存文件
-            BrepExchange BE = new BrepExchange(InputWorkpiece.Shape);
-            BE.SaveFile(filePath);
-        }
-    }
-
-    private void SaveBrep_Button_Click(object sender, RoutedEventArgs e)
-    {
-        // 创建保存文件对话框
-        Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-
-        // 设置默认的文件类型过滤器
-        saveFileDialog.Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*";
-
-        // 设置初始目录为指定的路径
-        saveFileDialog.InitialDirectory = System.IO.Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "mods"
-        );
+            Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*", // 设置默认的文件类型过滤器
+            InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
+        };
 
         // 显示保存文件对话框并检查用户是否选择了保存路径
         if (saveFileDialog.ShowDialog() == true)
@@ -1285,7 +1249,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         };
 
         // 创建并添加列定义
-        for (int i = 0; i < labelDefinitions.Length; i++)
+        for (int i = 0; i < labelDefinitions.Length + 1; i++)
         {
             ColumnDefinition column = new ColumnDefinition
             {
@@ -1312,7 +1276,24 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             // 将标签添加到 Grid 中
             outerStackPanel.Children.Add(label);
         }
-
+        //增加删除按钮
+        Button deleteButton = new Button { Content = "删除" };
+        Grid.SetColumn(deleteButton, labelDefinitions.Length);
+        outerStackPanel.Children.Add(deleteButton);
+        deleteButton.Click += (sender, e) =>
+        {
+            // 删除对应的 Piece
+            CurrentPlate.Pieces.Remove(thePiece);
+            CurrentPlate.RemovePiece(thePiece);
+            // 删除显示对象
+            AISContext.Remove(thePiece.AIS, false);
+            //删除对应的grid
+            if (outerStackPanel.Parent is StackPanel theS)
+            {
+                theS.Children.Remove(outerStackPanel);
+            }
+            Viewer.Update();
+        };
         // 绑定 thePiece 对象到第一个 Label 的 Tag 属性
         if (outerStackPanel.Children[0] is Label firstLabel)
         {
@@ -1545,8 +1526,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         #endregion
 
         EraseAll(false);
-        DisplayEraseInputWorkpiece(true);
         MakeBasePlate();
+        DisplayEraseInputWorkpiece(true);
         DisplayEraseBasePlates(true);
         Viewer.Update();
     }
@@ -1792,6 +1773,17 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #endregion
 
     #region 算法逻辑
+    private void RelocationInputWorkPiece()
+    {
+        if (InputWorkpiece == null)
+        {
+            return;
+        }
+        Trsf T = new();
+        T.SetTranslation(new Pnt(), new Pnt());
+        TShape newShape = new OCCTK.OCC.BRepBuilderAPI.Transform(InputWorkpiece.Shape, T).Shape();
+        InputWorkpiece = new(newShape);
+    }
 
     /// <summary>
     /// 创建底板逻辑
@@ -1804,6 +1796,15 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             BasePlateOffsetX,
             BasePlateOffsetY
         );
+        //将工件平移到左下角点为0的位置
+        AISContext.Remove(InputWorkpiece.AIS, false);
+        InputWorkpiece = new(
+            new OCCTK.OCC.BRepBuilderAPI.Transform(
+                InputWorkpiece.Shape,
+                BasePlate.Translation
+            ).Shape()
+        );
+
         BasePlateXWidth_TextBox.Text = (BasePlate.DX + BasePlate.OffsetX * 2).ToString("F1");
         BasePlateYWidth_TextBox.Text = (BasePlate.DY + BasePlate.OffsetY * 2).ToString("F1");
     }
@@ -2018,6 +2019,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         //    }
         //    Debug.WriteLine("");
         //}
+
+
         // 给板打标签
         List<VerticalPlate> tempDown = new List<VerticalPlate>();
         foreach (var plate in MiddleToDownPlates)
@@ -2270,7 +2273,6 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
                 )
                 {
                     DisplaySinglePlate(otherPlate, update, 0.6);
-                    AISContext.SetTransparency(otherPlate.AIS, 0.6, update);
                 }
             }
             foreach (var Piece in CurrentPlate.Pieces)
@@ -2390,12 +2392,13 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     #region 实现接口
 
-    public void OnSelectionMade(AShape theAIS)
+    public void OnAISSelectionMade(AShape theAIS)
     {
         if (CurrentPlate_StackPanel.Children.Count == 0)
         {
             return;
         }
+
         int clickedRow = 999;
         foreach (Grid theGrid in CurrentPlate_StackPanel.Children)
         {
@@ -2404,9 +2407,9 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             var tl = theGrid.Children[0];
             if (tl is Label thelabel)
             {
-                if (thelabel.Tag is AShape)
+                if (thelabel.Tag is VerticalPiece onePiece)
                 {
-                    if (thelabel.Tag.Equals(theAIS))
+                    if (onePiece.AIS.Equals(theAIS))
                     {
                         clickedRow = parentStack.Children.IndexOf(theGrid);
                     }

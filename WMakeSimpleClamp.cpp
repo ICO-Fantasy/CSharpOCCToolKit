@@ -23,7 +23,14 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) { return gcn
 // 根据包围盒创建底板
 BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
 	SimpleClamp::BasePlate theCPPBasePlate = SimpleClamp::MakeBasePlate(InputWorkpiece->GetOCC(), OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
-	return gcnew BasePlate(theCPPBasePlate);
+	//设置移动
+	Trsf^ T = gcnew Trsf(gcnew Pnt(theCPPBasePlate.X, theCPPBasePlate.Y, theCPPBasePlate.Z), gcnew Pnt());
+	theCPPBasePlate.X = 0.0;
+	theCPPBasePlate.Y = 0.0;
+	theCPPBasePlate.Z = 0.0;
+	BasePlate^ base = gcnew BasePlate(theCPPBasePlate);
+	base->Translation = T;
+	return base;
 }
 
 // 在指定位置创建一块竖板
@@ -104,6 +111,16 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 
 		// 开槽
 		SimpleClamp::SlotVerticalPlate(oneVP, otherVPs, theFilletRadius, true);
+		//如果没有相交竖板，添加一块辅助板
+		if (oneVP.singlePlate == true) {
+			oneVP.singlePlate = false;
+			auto auxPlate = SimpleClamp::AddSupportPlate(oneVP, true);
+			auto newVP = gcnew VerticalPlate(auxPlate);
+			newVP->sutured = true;
+			newVP->myShape = gcnew TShape(auxPlate.shape);
+			newVP->myAIS = gcnew AShape(auxPlate.shape);
+			tempToUpPlates->Add(newVP);
+		}
 		// 保存结果，将Shape和AIS保存在对象中
 		auto newVP = gcnew VerticalPlate(oneVP);
 		newVP->sutured = true;
@@ -126,6 +143,16 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 
 		// 开槽
 		SimpleClamp::SlotVerticalPlate(oneVP, otherVPs, theFilletRadius, false);
+		//如果没有相交竖板，添加一块辅助板
+		if (oneVP.singlePlate == true) {
+			oneVP.singlePlate = false;
+			auto auxPlate = SimpleClamp::AddSupportPlate(oneVP, false);
+			auto newVP = gcnew VerticalPlate(auxPlate);
+			newVP->sutured = true;
+			newVP->myShape = gcnew TShape(auxPlate.shape);
+			newVP->myAIS = gcnew AShape(auxPlate.shape);
+			tempToDownPlates->Add(newVP);
+		}
 		// 保存结果，将Shape和AIS保存在对象中
 		auto newVP = gcnew VerticalPlate(oneVP);
 		newVP->sutured = true;
@@ -171,6 +198,7 @@ VerticalPlate^ SimpleClampMaker::BrandNumberVerticalPlate(VerticalPlate^ theVert
 	VerticalPlate^ newPlate = gcnew VerticalPlate(newoccplate);
 	// 更新NumberedShape和AIS
 	newPlate->sutured = true;
+	newPlate->numbered = true;
 	newPlate->myNumberedShape = gcnew TShape(newoccplate.numberedShape);
 	newPlate->myAIS = gcnew AShape(newoccplate.numberedShape);
 	return newPlate;
@@ -206,12 +234,14 @@ TShape^ SimpleClampMaker::DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^
 	std::vector<SimpleClamp::VerticalPlate> cppDownPlates;
 	for each (auto onePlate in MiddleToDownPlates) {
 		if (!onePlate->Sutured) { continue; }
+		if (!onePlate->Numbered) { continue; }
 		cppDownPlates.push_back(onePlate->GetOCC());
 	}
 
 	std::vector<SimpleClamp::VerticalPlate> cppUpPlates;
 	for each (auto onePlate in MiddleToUpPlatesates) {
 		if (!onePlate->Sutured) { continue; }
+		if (!onePlate->Numbered) { continue; }
 		cppUpPlates.push_back(onePlate->GetOCC());
 	}
 	TopoDS_Shape result = SimpleClamp::DeployPlates(BasePlate->GetOCC(), cppDownPlates, cppUpPlates);

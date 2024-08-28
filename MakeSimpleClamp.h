@@ -44,6 +44,7 @@ public struct BasePlate {
 		wire.Add(l4);
 		// 创建面
 		BRepBuilderAPI_MakeFace face(wire.Wire(), true);
+
 		if (mySlotShape.IsNull()) {
 			TopoDS_Compound test;
 			mySlotBuilder.MakeCompound(test);
@@ -62,7 +63,7 @@ public struct BasePlate {
 	double offsetX;
 	double offsetY;
 	double offsetZ;
-	double lowestZ;// 零件最低点
+	//double lowestZ;// 零件最低点
 	double hight;// 零件高度
 	TopoDS_Shape mySlotShape = TopoDS_Shape();
 	BRep_Builder mySlotBuilder = BRep_Builder();
@@ -214,6 +215,9 @@ public struct VerticalPiece {
 		myLength = a.Distance(b);
 		return myLength;
 	}
+	bool operator==(const VerticalPiece& other) const {
+		return this->myEdge == other.myEdge;
+	}
 private:
 	TopoDS_Shape* myShape = nullptr;
 	mutable double myLength = -1.0;// 使用一个无效的默认值来表示长度尚未计算
@@ -236,8 +240,11 @@ public:
 	double slotLength = 6.0;//todo 暂不开放 连接槽长度
 	double slotHight = 10.0;//todo 暂不开放 连接槽高度
 	double filletRadius;
+	double auxiliaryHight = 100.0;
+	double auxiliaryWidth = 30.0;
 	std::vector<gp_Pnt> cutPoints;
 	TCollection_AsciiString numberString = "unset";
+	bool singlePlate = false;
 
 	BRepBuilderAPI_MakeWire _unclosedWire;
 };
@@ -286,6 +293,8 @@ VerticalPlate SuturePiece(VerticalPlate& thePlate, const BasePlate theBase, doub
 VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPlate> otherPlates, double theFilletRadius, bool middleToDown);
 
 BasePlate SlotBasePlate(BasePlate& theBasePlate, std::vector<VerticalPlate> middleDownPlates, std::vector<VerticalPlate> middleUpPlates);
+
+VerticalPlate AddSupportPlate(VerticalPlate thePlate, bool middleToDown);
 
 VerticalPlate BrandNumberVerticalPlate(VerticalPlate thePlate, double hight);
 

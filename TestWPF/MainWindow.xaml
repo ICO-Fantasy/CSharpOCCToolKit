@@ -149,12 +149,12 @@
             <System:String xml:space="preserve"> Test </System:String>
             <!--  显示模式的两个按钮  -->
             <Button
-                Click="Test_Button_Click"
+                Click="InputBrep_Button_Click"
                 Content="brep"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Button
-                Click="Test_Input_Button_Click"
+                Click="InputSTEP_Button_Click"
                 Content="step"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
@@ -756,7 +756,7 @@
                         Grid.ColumnSpan="2"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Background="LightGoldenrodYellow"
+                        Background="LightGreen"
                         Content="当前选择" />
                     <Grid x:Name="CurrentPlateDirection_Grid" Grid.Row="5">
                         <Grid.ColumnDefinitions>
@@ -1016,14 +1016,7 @@
                             x:Name="CurrentPlate_ScrollViewer"
                             Grid.Row="4"
                             Grid.ColumnSpan="4">
-                            <StackPanel x:Name="CurrentPlate_StackPanel">
-                                <Label Content="test" />
-                                <Label Content="test" />
-                                <Label Content="test" />
-                                <Label Content="test" />
-                                <Label Content="test" />
-                                <Label Content="test" />
-                            </StackPanel>
+                            <StackPanel x:Name="CurrentPlate_StackPanel" />
                         </ScrollViewer>
                     </Grid>
                 </Grid>
