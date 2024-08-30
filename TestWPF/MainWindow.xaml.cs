@@ -1,36 +1,26 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
-using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
-using Microsoft.VisualBasic;
 using Microsoft.Win32;
-using Microsoft.Windows.Themes;
-using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.Laser;
-using OCCTK.OCC;
 using OCCTK.OCC.AIS;
-using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
-using OCCTK.OCC.TopoAbs;
 using OCCTK.OCC.TopoDS;
 using OCCTK.Tool;
 using OCCViewForm;
-using static OCCTK.OCC.TopoAbs.ShapeEnum;
 //设置别名
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
+using SelectionMode = OCCTK.OCC.AIS.SelectionMode;
+using ViewOrientation = OCCTK.OCC.V3d.ViewOrientation;
 
 namespace TestWPF;
 
@@ -390,6 +380,12 @@ public enum VPCMode
 /// </summary>
 public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandler
 {
+    #region TEST
+
+    private List<TShape> inputShapes = new();
+
+    #endregion
+
     const double LINEAR_TOL = 1e-1;
 
     // 定义颜色数组
@@ -581,7 +577,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
         Viewer = new OCCCanvas();
-        AISContext = Viewer.InteractiveContext;
+        AISContext = Viewer.AISContext;
         Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
         Viewer.Show();
         aHost.Child = Viewer;
@@ -687,12 +683,12 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private void Wireframe_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetDisplayMode(DisplayMode.Wireframe);
+        //Canvas.SetDisplayMode(DisplayMode.Wireframe);
     }
 
     private void Shading_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetDisplayMode(DisplayMode.Shading);
+        //Canvas.SetDisplayMode(DisplayMode.Shading);
     }
     #endregion
 
@@ -769,10 +765,23 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         {
             // 获取用户选择的文件路径
             string filePath = saveFileDialog.FileName;
+            string tempFilePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "temp.brep");
 
             // 创建 BrepExchange 对象并保存文件
             BrepExchange BE = new BrepExchange(InputWorkpiece.Shape);
-            BE.SaveFile(filePath);
+            BE.SaveFile(tempFilePath);
+            try
+            {
+                // 剪切文件
+                System.IO.File.Move(tempFilePath, filePath);
+
+                Debug.WriteLine($"文件已从 {tempFilePath} 剪切并重命名为 {filePath}");
+            }
+            catch (Exception ex)
+            {
+                System.IO.File.Delete(tempFilePath);
+                Debug.WriteLine($"文件剪切失败: {ex.Message}");
+            }
         }
     }
 
@@ -787,20 +796,59 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test2.stp").Shape());
-        BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        // 创建文件选择对话框
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*", // 设置文件过滤器
+            InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
+        };
+
+        // 如果用户选择了文件并点击了“打开”按钮
+        if (openFileDialog.ShowDialog() == true)
+        {
+            string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
+            inputShapes.Add(new BrepExchange(selectedFilePath).Shape()); // 使用选择的文件路径
+            CompoundNum_Label.Content = $"CompoundNum: {inputShapes.Count}";
+        }
     }
 
     private void Test_input_test_3_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test3.STEP").Shape());
-        BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        // 创建保存文件对话框
+        SaveFileDialog saveFileDialog = new SaveFileDialog
+        {
+            Filter = "Brep Files (*.brep)|*.brep|All Files (*.*)|*.*", // 设置默认的文件类型过滤器
+            InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
+        };
+
+        // 显示保存文件对话框并检查用户是否选择了保存路径
+        if (saveFileDialog.ShowDialog() == true)
+        {
+            // 获取用户选择的文件路径
+            string filePath = saveFileDialog.FileName;
+            string tempFilePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "temp.brep");
+            CompoundMaker maker = new();
+            foreach (TShape s in inputShapes)
+            {
+                maker.Add(s);
+            }
+
+            // 创建 BrepExchange 对象并保存文件
+            BrepExchange BE = new BrepExchange(maker.Shape());
+            BE.SaveFile(tempFilePath);
+            try
+            {
+                // 剪切文件
+                System.IO.File.Move(tempFilePath, filePath);
+
+                Debug.WriteLine($"文件已从 {tempFilePath} 剪切并重命名为 {filePath}");
+            }
+            catch (Exception ex)
+            {
+                System.IO.File.Delete(tempFilePath);
+                Debug.WriteLine($"文件剪切失败: {ex.Message}");
+            }
+        }
     }
 
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
@@ -827,32 +875,32 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shape);
-        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Shape.ToString());
+        Viewer.SetSelectionMode(SelectionMode.Shape);
+        Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Face);
-        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Face.ToString());
+        Viewer.SetSelectionMode(SelectionMode.Face);
+        Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Edge);
-        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Edge.ToString());
+        Viewer.SetSelectionMode(SelectionMode.Edge);
+        Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Vertex);
-        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Vertex.ToString());
+        Viewer.SetSelectionMode(SelectionMode.Vertex);
+        Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void Select_Shell_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(OCCTK.Visualization.SelectionMode.Shell);
-        Debug.WriteLine(OCCTK.Visualization.SelectionMode.Shell.ToString());
+        Viewer.SetSelectionMode(SelectionMode.Shell);
+        Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 
     #endregion
@@ -1243,9 +1291,9 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         {
             ($"{thePiece.Order:F1}", 0),
             ($"L: {thePiece.Length:F1}", 1),
-            ($"S: {thePiece.Start[0]:F1}, {thePiece.Start[1]:F1}, {thePiece.Start[0]:F1}", 2),
-            ($"M: {thePiece.Middle[0]:F1}, {thePiece.Middle[1]:F1}, {thePiece.Middle[0]:F1}", 3),
-            ($"E: {thePiece.End[0]:F1}, {thePiece.End[1]:F1}, {thePiece.End[0]:F1}", 4)
+            //($"S: {thePiece.Start[0]:F1}, {thePiece.Start[1]:F1}, {thePiece.Start[0]:F1}", 2),
+            //($"M: {thePiece.Middle[0]:F1}, {thePiece.Middle[1]:F1}, {thePiece.Middle[0]:F1}", 3),
+            //($"E: {thePiece.End[0]:F1}, {thePiece.End[1]:F1}, {thePiece.End[0]:F1}", 4)
         };
 
         // 创建并添加列定义
@@ -1588,12 +1636,12 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             //foreach (var item in MiddleToDownPlates)
             //{
             //    Display(item.AIS, false);
-            //    Viewer.InteractiveContext.SetTransparency(item.AIS, 0.9, false);
+            //    Canvas.AISContext.SetTransparency(item.AIS, 0.9, false);
             //}
             //foreach (var item in MiddleToUpPlates)
             //{
             //    Display(item.AIS, false);
-            //    Viewer.InteractiveContext.SetTransparency(item.AIS, 0.9, false);
+            //    Canvas.AISContext.SetTransparency(item.AIS, 0.9, false);
             //}
         }
         Viewer.Update();
@@ -1700,7 +1748,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <param name="e"></param>
     private void Erase_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseSelect();
+        Viewer.EraseSelected();
     }
 
     /// <summary>
@@ -2124,7 +2172,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             if (ShowInputWorkpiece)
             {
                 Display(InputWorkpiece.AIS, false);
-                AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
+                //AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
                 AISContext.SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), false);
             }
             else
@@ -2391,14 +2439,16 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #endregion
 
     #region 实现接口
-
     public void OnAISSelectionMade(AShape theAIS)
     {
         if (CurrentPlate_StackPanel.Children.Count == 0)
         {
             return;
         }
-
+        if (theAIS == null)
+        {
+            return;
+        }
         int clickedRow = 999;
         foreach (Grid theGrid in CurrentPlate_StackPanel.Children)
         {
@@ -2420,21 +2470,24 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         {
             StackPanel parentStack = theGrid.Parent as StackPanel;
             int row = parentStack.Children.IndexOf(theGrid);
-            foreach (Label label in theGrid.Children)
+            foreach (var child in theGrid.Children)
             {
-                int column = Grid.GetColumn(label);
-                // 如果是点击的行，按照颜色数组设置背景颜色
-                if (row == clickedRow)
+                if (child is Label label)
                 {
-                    if (column >= 0 && column < colorSequence.Length)
+                    int column = Grid.GetColumn(label);
+                    // 如果是点击的行，按照颜色数组设置背景颜色
+                    if (row == clickedRow)
                     {
-                        label.Background = colorSequence[column];
+                        if (column >= 0 && column < colorSequence.Length)
+                        {
+                            label.Background = colorSequence[column];
+                        }
                     }
-                }
-                else
-                {
-                    // 其他行设置为透明
-                    label.Background = Brushes.Transparent;
+                    else
+                    {
+                        // 其他行设置为透明
+                        label.Background = Brushes.Transparent;
+                    }
                 }
             }
         }

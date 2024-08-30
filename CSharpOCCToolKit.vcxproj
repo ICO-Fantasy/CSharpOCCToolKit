@@ -161,7 +161,9 @@
     <ClCompile Include="ICO_BrepExchange.cpp" />
     <ClCompile Include="ICO_MakeCompound.cpp" />
     <ClCompile Include="ICO_MakeDir.cpp" />
+    <ClCompile Include="ICO_RubberBand.cpp" />
     <ClCompile Include="ICO_Transform.cpp" />
+    <ClCompile Include="ICO_Viewer.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
     <ClCompile Include="ICO_STEPExchange.cpp" />
     <ClCompile Include="ICO_StringExchange.cpp" />
@@ -170,7 +172,6 @@
     <ClCompile Include="ICO_MakeBox.cpp" />
     <ClCompile Include="ICO_Color.cpp" />
     <ClCompile Include="ICO_Dir.cpp" />
-    <ClCompile Include="ICO_ShapeEnum.cpp" />
     <ClCompile Include="ICO_InteractiveContext.cpp" />
     <ClCompile Include="ICO_InteractiveObject.cpp" />
     <ClCompile Include="ICO_Manipulator.cpp" />
@@ -185,12 +186,17 @@
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
+    <ClInclude Include="ICO_Aspect_Line.h" />
     <ClInclude Include="ICO_Ax2.h" />
     <ClInclude Include="ICO_BndBox.h" />
     <ClInclude Include="ICO_BrepExchange.h" />
+    <ClInclude Include="ICO_DisplayMode.h" />
     <ClInclude Include="ICO_MakeCompound.h" />
     <ClInclude Include="ICO_MakeDir.h" />
+    <ClInclude Include="ICO_RubberBand.h" />
     <ClInclude Include="ICO_Transform.h" />
+    <ClInclude Include="ICO_Viewer.h" />
+    <ClInclude Include="ICO_ViewOrientation.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="ICO_STEPExchange.h" />
     <ClInclude Include="ICO_Trihedron.h" />

@@ -88,11 +88,11 @@ Ax2^ Manipulator::Position() {
 }
 
 void Manipulator::StartTransform(double theX, double theY, View^ theView) {
-	_pManipulator()->StartTransform(theX, theY, theView->getOCC());
+	_pManipulator()->StartTransform(theX, theY, theView->GetOCC());
 }
 
 void Manipulator::Transform(double theX, double theY, View^ theView) {
-	_pManipulator()->Transform(theX, theY, theView->getOCC());
+	_pManipulator()->Transform(theX, theY, theView->GetOCC());
 }
 
 void Manipulator::StopTransform(bool thetoApply) {

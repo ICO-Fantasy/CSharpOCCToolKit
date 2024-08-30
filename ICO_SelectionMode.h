@@ -1,6 +1,7 @@
 ﻿#pragma once
 namespace OCCTK {
-namespace Visualization {
+namespace OCC {
+namespace AIS {
 
 public enum class SelectionMode {
 	Shape = 0,
@@ -11,5 +12,6 @@ public enum class SelectionMode {
 	Shell = 5,
 };
 
+}
 }
 }

@@ -18,12 +18,6 @@
     <Filter Include="头文件\Visualization">
       <UniqueIdentifier>{0fcf6117-8bb6-4d83-b5e1-9fd5d5f7ad53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\OCCTools">
-      <UniqueIdentifier>{030bbd23-96d1-4853-bb5a-46d79aa5f176}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\OCCTools">
-      <UniqueIdentifier>{f5ab1354-4ff0-4012-863d-daa30833acb6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\DataExchange">
       <UniqueIdentifier>{59584460-156d-479d-877b-f92d18032130}</UniqueIdentifier>
     </Filter>
@@ -81,6 +75,18 @@
     <Filter Include="源文件\OCCProxy\BRepBuilderAPI">
       <UniqueIdentifier>{971f9255-d1fe-4499-80ea-eb69545ceb43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Tools">
+      <UniqueIdentifier>{030bbd23-96d1-4853-bb5a-46d79aa5f176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Tools">
+      <UniqueIdentifier>{f5ab1354-4ff0-4012-863d-daa30833acb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\Aspect">
+      <UniqueIdentifier>{8e9b5818-a1c6-4852-a2be-508402ef0ac8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\Aspect">
+      <UniqueIdentifier>{4d9baac6-228c-4f96-83ee-42f2bdf4a739}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -90,7 +96,7 @@
       <Filter>源文件\Visualization</Filter>
     </ClCompile>
     <ClCompile Include="convertChinese.cpp">
-      <Filter>源文件\OCCTools</Filter>
+      <Filter>源文件\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ICO_InteractiveObject.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
@@ -125,9 +131,6 @@
     <ClCompile Include="ICO_InteractiveContext.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
-    <ClCompile Include="ICO_ShapeEnum.cpp">
-      <Filter>源文件\OCCProxy\TopAbs</Filter>
-    </ClCompile>
     <ClCompile Include="ICO_Color.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
@@ -150,10 +153,7 @@
       <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClCompile>
     <ClCompile Include="ICO_MakeDir.cpp">
-      <Filter>源文件\OCCTools</Filter>
-    </ClCompile>
-    <ClCompile Include="ICO_MakeCompound.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ICO_BrepExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
@@ -164,13 +164,22 @@
     <ClCompile Include="ICO_BndBox.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_Viewer.cpp">
+      <Filter>源文件\OCCProxy\V3d</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_RubberBand.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakeCompound.cpp">
+      <Filter>源文件\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
       <Filter>头文件\Visualization</Filter>
     </ClInclude>
     <ClInclude Include="ConvertChinese.h">
-      <Filter>头文件\OCCTools</Filter>
+      <Filter>头文件\Tools</Filter>
     </ClInclude>
     <ClInclude Include="ICO_StringExchange.h">
       <Filter>头文件\DataExchange</Filter>
@@ -232,14 +241,8 @@
     <ClInclude Include="ICO_Transform.h">
       <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClInclude>
-    <ClInclude Include="ICO_SelectionMode.h">
-      <Filter>头文件\Visualization</Filter>
-    </ClInclude>
     <ClInclude Include="ICO_MakeDir.h">
-      <Filter>头文件\OCCTools</Filter>
-    </ClInclude>
-    <ClInclude Include="ICO_MakeCompound.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Tools</Filter>
     </ClInclude>
     <ClInclude Include="ICO_BrepExchange.h">
       <Filter>头文件\DataExchange</Filter>
@@ -249,6 +252,27 @@
     </ClInclude>
     <ClInclude Include="ICO_BndBox.h">
       <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Viewer.h">
+      <Filter>头文件\OCCProxy\V3d</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ViewOrientation.h">
+      <Filter>头文件\OCCProxy\V3d</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_DisplayMode.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_SelectionMode.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_RubberBand.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeCompound.h">
+      <Filter>头文件\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Aspect_Line.h">
+      <Filter>头文件\OCCProxy\Aspect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

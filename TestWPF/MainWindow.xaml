@@ -203,7 +203,7 @@
                 Width="50"
                 VerticalAlignment="Stretch"
                 Click="Test_input_test_2_Click"
-                Content="导入2"
+                Content="导入测试"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Separator Background="Transparent" />
@@ -211,7 +211,7 @@
                 Width="50"
                 VerticalAlignment="Stretch"
                 Click="Test_input_test_3_Click"
-                Content="平板"
+                Content="导出测试"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Separator Background="Transparent" />
@@ -230,6 +230,8 @@
                 Content="MMA"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
+            <Separator />
+            <Label x:Name="CompoundNum_Label" Content="Compound: " />
         </ToolBar>
 
         <!--  canvas  -->

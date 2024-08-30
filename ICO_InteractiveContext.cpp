@@ -1,4 +1,5 @@
 ﻿#include <AIS_Manipulator.hxx>
+#include <StdSelect_BRepOwner.hxx>
 #include "ICO_InteractiveContext.h"
 #include "ICO_ShapeEnum.h"
 
@@ -10,20 +11,69 @@ InteractiveContext::InteractiveContext(Handle(AIS_InteractiveContext) theAISCont
 	myAISContext() = theAISContext;
 }
 
-// 删除选中的物体（首先需要选中物体）
-void InteractiveContext::EraseObjects(void) {
-	if (myAISContext().IsNull()) return;
+InteractiveContext::InteractiveContext(V3d::Viewer^ theViewer) {
+	myAISContext() = new AIS_InteractiveContext(theViewer->GetOCC());
+}
 
-	myAISContext()->EraseSelected(Standard_False);
-	myAISContext()->ClearSelected(Standard_True);
+void InteractiveContext::SetDefault() {
+	// 设置自动高亮
+	myAISContext()->SetAutomaticHilight(true);
+	// 不显示面中间ISO线
+	myAISContext()->SetIsoNumber(0);
+	// 设置自动选择
+	myAISContext()->SetAutoActivateSelection(true);
+	// 绘制黑色轮廓边缘
+	myAISContext()->DefaultDrawer()->SetFaceBoundaryDraw(true);
+	//设置显示实体
+	this->SetDisplayMode(DisplayMode::Shaded);
+	//设置默认选中后的高亮模式
+	this->SetDefaultHighlightStyle();
+}
+
+void InteractiveContext::SetDefaultHighlightStyle() {
+	//整个对象被选中
+	Handle(Prs3d_Drawer) all_selected = myAISContext()->HighlightStyle(Prs3d_TypeOfHighlight_Selected);
+	all_selected->SetMethod(Aspect_TOHM_COLOR);
+	all_selected->SetColor(Quantity_NOC_LIGHTSEAGREEN);
+	all_selected->SetDisplayMode(1);
+	all_selected->SetTransparency(0.2f);
+	//对象的一部分被选择
+	Handle(Prs3d_Drawer) part_selected = myAISContext()->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected);
+	part_selected->SetMethod(Aspect_TOHM_COLOR);
+	part_selected->SetColor(Quantity_NOC_LIGHTSEAGREEN);
+	part_selected->SetDisplayMode(1);
+	part_selected->SetTransparency(0.2f);
+}
+
+void InteractiveContext::UpdateCurrentViewer() {
+	if (myAISContext().IsNull()) return;
 	myAISContext()->UpdateCurrentViewer();
 }
 
-void InteractiveContext::SetSelectionMode(TopoAbs::ShapeEnum theMode) {
+void InteractiveContext::MoveTo(int theX, int theY, V3d::View^ theView) {
 	if (myAISContext().IsNull()) return;
+	myAISContext()->MoveTo(theX, theY, theView->GetOCC(), true);
+}
 
+//设置显示模式
+void InteractiveContext::SetDisplayMode(DisplayMode theMode) {
+	if (myAISContext().IsNull()) return;
+	AIS_DisplayMode aCurrentMode;
+	if (myAISContext()->NbSelected() == 0) {
+		myAISContext()->SetDisplayMode((int)theMode, false);
+	}
+	else {
+		for (myAISContext()->InitSelected(); myAISContext()->MoreSelected(); myAISContext()->NextSelected()) {
+			myAISContext()->SetDisplayMode(myAISContext()->SelectedInteractive(), (int)theMode, false);
+		}
+	}
+}
+
+//设置选择模式
+void InteractiveContext::SetSelectionMode(SelectionMode theMode) {
+	if (myAISContext().IsNull()) return;
 	myAISContext()->Deactivate();
-	myAISContext()->Activate(theMode.GetOCC(), true);
+	myAISContext()->Activate((int)theMode, true);
 	myAISContext()->UpdateSelected(true);
 }
 
@@ -55,10 +105,37 @@ void InteractiveContext::XORSelect(void) {
 	myAISContext()->UpdateCurrentViewer();
 }
 
+void InteractiveContext::AreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView) {
+	if (myAISContext().IsNull()) return;
+	if (theView->GetOCC().IsNull()) return;
+	myAISContext()->SelectRectangle(Graphic3d_Vec2i(theX1, theY1),
+		Graphic3d_Vec2i(theX2, theY2),
+		theView->GetOCC());
+}
+
+void InteractiveContext::MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView) {
+	if (myAISContext().IsNull()) return;
+	if (theView->GetOCC().IsNull()) return;
+	myAISContext()->SelectRectangle(Graphic3d_Vec2i(theX1, theY1),
+		Graphic3d_Vec2i(theX2, theY2),
+		theView->GetOCC(),
+		AIS_SelectionScheme_Add);
+	myAISContext()->UpdateCurrentViewer();
+}
+
+void InteractiveContext::XORAreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView) {
+	if (myAISContext().IsNull()) return;
+	if (theView->GetOCC().IsNull()) return;
+	myAISContext()->SelectRectangle(Graphic3d_Vec2i(theX1, theY1),
+		Graphic3d_Vec2i(theX2, theY2),
+		theView->GetOCC(),
+		AIS_SelectionScheme_XOR);
+	myAISContext()->UpdateCurrentViewer();
+}
+
 void InteractiveContext::InitSelected() {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->InitSelected();
-
 }
 
 bool InteractiveContext::MoreSelected() {
@@ -74,6 +151,7 @@ bool InteractiveContext::NextSelected() {
 
 InteractiveObject^ InteractiveContext::SelectedInteractive() {
 	if (myAISContext().IsNull()) return nullptr;
+	myAISContext()->InitSelected();
 	if (!myAISContext()->SelectedInteractive().IsNull()) {
 		return gcnew InteractiveObject(myAISContext()->SelectedInteractive());
 	}
@@ -82,12 +160,16 @@ InteractiveObject^ InteractiveContext::SelectedInteractive() {
 
 AShape^ InteractiveContext::SelectedAIS() {
 	if (myAISContext().IsNull()) return nullptr;
-	Handle(AIS_Shape) anAISShape;
-	auto selectedObj = myAISContext()->SelectedInteractive();
-	if (!selectedObj.IsNull() && selectedObj->IsKind(STANDARD_TYPE(AIS_Shape))) {
-		anAISShape = Handle(AIS_Shape)::DownCast(selectedObj);
-		AIS::AShape^ result = gcnew AIS::AShape(*anAISShape);
-		return result;
+	myAISContext()->InitSelected();
+	auto owner = myAISContext()->SelectedOwner();
+	if (!owner.IsNull()) {
+		const Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(owner);
+		if (aBRepOwner->HasShape()) {
+			auto anShape = aBRepOwner->Shape();
+			Handle(AIS_Shape) refAIS = new AIS_Shape(anShape);
+			AIS::AShape^ result = gcnew AIS::AShape(refAIS);
+			return result;
+		}
 	}
 	return nullptr;
 }
@@ -125,6 +207,11 @@ void InteractiveContext::Display(AShape^ theAIS, bool theToUpdateViewer) {
 	myAISContext()->Display(theAIS->GetOCC(), theToUpdateViewer);
 }
 
+void InteractiveContext::Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
+	if (myAISContext().IsNull()) return;
+	myAISContext()->Redisplay(theAISObject->GetOCC(), theToUpdateViewer);
+}
+
 // 擦除全部(保留缓存)
 void InteractiveContext::EraseAll(bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
@@ -145,6 +232,15 @@ void InteractiveContext::Erase(Handle(AIS_InteractiveObject) theAISObject, bool 
 void InteractiveContext::Erase(AShape^ theAIS, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->Erase(theAIS->GetOCC(), theToUpdateViewer);
+}
+
+// 删除选中的物体（首先需要选中物体）
+void InteractiveContext::EraseSelected(void) {
+	if (myAISContext().IsNull()) return;
+
+	myAISContext()->EraseSelected(Standard_False);
+	myAISContext()->ClearSelected(Standard_True);
+	myAISContext()->UpdateCurrentViewer();
 }
 
 // 移除全部(包括缓存)
@@ -205,6 +301,12 @@ bool InteractiveContext::IsSelected(void) {
 	if (myAISContext().IsNull()) return false;
 	myAISContext()->InitSelected();
 	return myAISContext()->MoreSelected();
+}
+
+//是否正在显示
+bool InteractiveContext::IsDisplayed(InteractiveObject^ theAISObject) {
+	if (myAISContext().IsNull()) return false;
+	return myAISContext()->IsDisplayed(theAISObject->GetOCC());
 }
 
 Handle(AIS_InteractiveContext) InteractiveContext::GetOCC() {
