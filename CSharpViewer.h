@@ -14,8 +14,8 @@
 #include "ICO_Viewer.h"
 
 using namespace OCCTK::OCC;
-using namespace OCCTK::OCC::AIS;
-using namespace OCCTK::Extension;
+//using namespace OCCTK::OCC::AIS;
+//using namespace OCCTK::Extension;
 
 namespace OCCTK {
 namespace Visualization {
@@ -35,23 +35,12 @@ public:
 
 #pragma region 持久变换对象
 
-	void SetViewCube(float axesRadius);
-	void SetOriginTrihedron(float axisSize);
-	void SetViewTrihedron(float axisSize);
 	void DisplayGrid(bool theFlag);
-	void DisplayViewCube(bool theFlag);
-	void DisplayOriginTrihedron(bool theFlag);
-	void DisplayViewTrihedron(bool theFlag);
-
-private:
-	NCollection_Haft<Handle(AIS_ViewCube)> myViewCube;
-	NCollection_Haft<Handle(AIS_Trihedron)> myOriginTri;
-	NCollection_Haft<Handle(AIS_Trihedron)> myViewTri;
 
 #pragma endregion	
 
 public:
-	InteractiveContext^ GetContext();
+	AIS::InteractiveContext^ GetContext();
 	V3d::View^ GetMainView();
 	V3d::Viewer^ GetViewer();
 private:

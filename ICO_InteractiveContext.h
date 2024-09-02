@@ -23,8 +23,8 @@ public:
 	InteractiveContext(Handle(AIS_InteractiveContext) theAISContext);
 	InteractiveContext(V3d::Viewer^ theViewer);
 
-	void SetDefault();
-	void SetDefaultHighlightStyle();
+	bool SetDefault();
+	bool SetDefaultHighlightStyle();
 
 #pragma region 渲染
 	void UpdateCurrentViewer();
@@ -60,6 +60,7 @@ public:
 	void Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 	void Display(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 	void Display(AShape^ theAIS, bool theToUpdateViewer);
+	inline void myDisplay(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 	void Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 
 	void EraseAll(bool theToUpdateViewer);

@@ -15,7 +15,10 @@ InteractiveContext::InteractiveContext(V3d::Viewer^ theViewer) {
 	myAISContext() = new AIS_InteractiveContext(theViewer->GetOCC());
 }
 
-void InteractiveContext::SetDefault() {
+bool InteractiveContext::SetDefault() {
+	if (myAISContext().IsNull()) {
+		return false;
+	}
 	// 设置自动高亮
 	myAISContext()->SetAutomaticHilight(true);
 	// 不显示面中间ISO线
@@ -25,24 +28,31 @@ void InteractiveContext::SetDefault() {
 	// 绘制黑色轮廓边缘
 	myAISContext()->DefaultDrawer()->SetFaceBoundaryDraw(true);
 	//设置显示实体
-	this->SetDisplayMode(DisplayMode::Shaded);
+	myAISContext()->SetDisplayMode(AIS_Shaded, true);
 	//设置默认选中后的高亮模式
 	this->SetDefaultHighlightStyle();
+	return true;
 }
 
-void InteractiveContext::SetDefaultHighlightStyle() {
+bool InteractiveContext::SetDefaultHighlightStyle() {
+	if (myAISContext().IsNull()) {
+		return false;
+	}
 	//整个对象被选中
 	Handle(Prs3d_Drawer) all_selected = myAISContext()->HighlightStyle(Prs3d_TypeOfHighlight_Selected);
 	all_selected->SetMethod(Aspect_TOHM_COLOR);
 	all_selected->SetColor(Quantity_NOC_LIGHTSEAGREEN);
 	all_selected->SetDisplayMode(1);
-	all_selected->SetTransparency(0.2f);
+	//all_selected->SetDisplayMode(AIS_DisplayMode::AIS_Shaded);
+	all_selected->SetTransparency(0.2);
 	//对象的一部分被选择
 	Handle(Prs3d_Drawer) part_selected = myAISContext()->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected);
 	part_selected->SetMethod(Aspect_TOHM_COLOR);
 	part_selected->SetColor(Quantity_NOC_LIGHTSEAGREEN);
 	part_selected->SetDisplayMode(1);
-	part_selected->SetTransparency(0.2f);
+	//part_selected->SetDisplayMode(AIS_DisplayMode::AIS_Shaded);
+	part_selected->SetTransparency(0.2);
+	return true;
 }
 
 void InteractiveContext::UpdateCurrentViewer() {
@@ -58,15 +68,12 @@ void InteractiveContext::MoveTo(int theX, int theY, V3d::View^ theView) {
 //设置显示模式
 void InteractiveContext::SetDisplayMode(DisplayMode theMode) {
 	if (myAISContext().IsNull()) return;
-	AIS_DisplayMode aCurrentMode;
-	if (myAISContext()->NbSelected() == 0) {
-		myAISContext()->SetDisplayMode((int)theMode, false);
-	}
-	else {
-		for (myAISContext()->InitSelected(); myAISContext()->MoreSelected(); myAISContext()->NextSelected()) {
-			myAISContext()->SetDisplayMode(myAISContext()->SelectedInteractive(), (int)theMode, false);
-		}
-	}
+	System::Diagnostics::Debug::WriteLine("Before");
+	System::Diagnostics::Debug::WriteLine(myAISContext()->DisplayMode());
+	myAISContext()->SetDisplayMode((int)theMode, true);
+	System::Diagnostics::Debug::WriteLine("After");
+	System::Diagnostics::Debug::WriteLine(myAISContext()->DisplayMode());
+	myAISContext()->UpdateCurrentViewer();
 }
 
 //设置选择模式
@@ -193,18 +200,20 @@ void InteractiveContext::NextDetected() {
 // AIS_InteractiveContext 内部的对象是在无序映射中定义的，因此它们的绘制顺序默认是未定义的（Z 深度缓冲区用于正确渲染），
 // 但可以通过显示优先级和分配图层来改变（参见Graphic3d_ZLayerId / PrsMgr_PresentableObject::ZLayer()）。
 void InteractiveContext::Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer) {
-	if (myAISContext().IsNull()) return;
-	myAISContext()->Display(theAISObject, theToUpdateViewer);
+	this->myDisplay(theAISObject, theToUpdateViewer);
 }
 
 void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
-	if (myAISContext().IsNull()) return;
-	myAISContext()->Display(theAISObject->GetOCC(), theToUpdateViewer);
+	this->myDisplay(theAISObject->GetOCC(), theToUpdateViewer);
 }
 
 void InteractiveContext::Display(AShape^ theAIS, bool theToUpdateViewer) {
+	this->myDisplay(theAIS->GetOCC(), theToUpdateViewer);
+}
+
+inline void InteractiveContext::myDisplay(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->Display(theAIS->GetOCC(), theToUpdateViewer);
+	myAISContext()->Display(theAISObject, theToUpdateViewer);
 }
 
 void InteractiveContext::Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer) {

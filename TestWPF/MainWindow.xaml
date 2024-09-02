@@ -195,7 +195,7 @@
                 Width="50"
                 VerticalAlignment="Stretch"
                 Click="Test_input_test_1_Click"
-                Content="B柱"
+                Content="Test"
                 Style="{StaticResource dgButton}"
                 Template="{StaticResource buttonTemplate}" />
             <Separator Background="Transparent" />

@@ -9,7 +9,7 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-ViewCube::ViewCube(float axesRadius) {
+ViewCube::ViewCube(double axesRadius) {
 	int R, G, B;
 	myViewCube() = new AIS_ViewCube();
 	nativeHandle() = myViewCube();
@@ -46,7 +46,7 @@ ViewCube::ViewCube(float axesRadius) {
 	myViewCube()->SetBoxSideLabel(V3d_Zpos, Tool::ConvertChineseToUnicode("上"));
 	myViewCube()->SetBoxSideLabel(V3d_Zneg, Tool::ConvertChineseToUnicode("下"));
 	myViewCube()->SetFont("MSYHL");
-	myViewCube()->SetFontHeight(50);
+	myViewCube()->SetFontHeight(50.0);
 	R = 241;
 	G = 217;
 	B = 37;

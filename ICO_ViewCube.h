@@ -12,7 +12,7 @@ namespace AIS {
 
 public ref class ViewCube :public InteractiveObject {
 public:
-	ViewCube(float axisSize);
+	ViewCube(double axisSize);
 	Handle(AIS_ViewCube) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 

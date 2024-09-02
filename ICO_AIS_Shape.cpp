@@ -14,17 +14,13 @@ namespace AIS {
 AShape::AShape(Handle(AIS_InteractiveObject) aInteractive) {
 	if (aInteractive->IsKind(STANDARD_TYPE(AIS_Shape))) {
 		Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(aInteractive);
-		_pAISShape() = new AIS_Shape(*anAISShape);
-		;
-		// 保存原始句柄
-		nativeHandle() = aInteractive;
+		myAShape(new AIS_Shape(*anAISShape));
 	}
+	throw std::exception("Type error");
 }
 
 AShape::AShape(TopoDS_Shape aShape) {
-	_pAISShape() = new AIS_Shape(aShape);
-	// 保存原始句柄
-	nativeHandle() = _pAISShape();
+	myAShape(new AIS_Shape(aShape));
 }
 
 // 传入TopoDS_Shape的指针（不要轻易使用指针构造方法）
@@ -32,28 +28,27 @@ AShape::AShape(System::IntPtr aShapePtr) {
 	// 将 IntPtr 转换为原生指针
 	TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(aShapePtr.ToPointer());
 	// 创建新的 AIS_Shape 对象
-	_pAISShape() = new AIS_Shape(*pShape);
-
-	// 保存原始句柄
-	nativeHandle() = _pAISShape();
+	myAShape(new AIS_Shape(*pShape));
 }
 
 AShape::AShape(TopoDS::TShape^ aShape) {
-	_pAISShape() = new AIS_Shape(aShape->GetOCC());
-	// 保存原始句柄
-	nativeHandle() = _pAISShape();
+	myAShape(new AIS_Shape(aShape->GetOCC()));
 }
 
 AShape::AShape(Handle(AIS_Shape)aAISShape) {
-	_pAISShape() = aAISShape;
-	// 保存原始句柄
-	nativeHandle() = _pAISShape();
+	myAShape(aAISShape);
 }
 
 AShape::AShape(AIS_Shape aAISShape) {
-	_pAISShape() = new AIS_Shape(aAISShape);
+	myAShape(new AIS_Shape(aAISShape));
+}
+
+inline void AShape::myAShape(Handle(AIS_Shape)aAISShape) {
+	_pAISShape() = aAISShape;
 	// 保存原始句柄
 	nativeHandle() = _pAISShape();
+	//todo debug 
+	_pAISShape()->SetDisplayMode(1);
 }
 
 TopoDS::TShape^ AShape::TopoShape() {

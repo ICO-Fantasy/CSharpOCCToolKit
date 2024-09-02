@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq.Expressions;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using OCCTK.OCC;
 using OCCTK.OCC.AIS;
@@ -9,16 +11,19 @@ using OCCTK.OCC.gp;
 using OCCTK.OCC.TopoDS;
 using OCCTK.OCC.V3d;
 using OCCTK.Visualization;
+using TestWPF.Resources;
+
+//! 注意OCC的窗口零点为左下角，Form的窗口零点为右上角，既OCC的Y方向与From的Y方向不一致。
 
 namespace OCCViewForm;
 
 #region Enum
 
-public enum ActionMode
-{
-    Normal,
-    Manipulator
-}
+//public enum ActionMode
+//{
+//    Normal,
+//    Manipulator
+//}
 
 public enum Action3d
 {
@@ -37,12 +42,6 @@ public enum Action3d
 
     // Manipulator
     Manipulator_Translation
-}
-
-public enum DisplayMode
-{
-    Wireframe,
-    Shading
 }
 
 #endregion
@@ -65,10 +64,13 @@ public delegate void MouseMovedHandler(int X, int Y);
 
 #endregion
 
+/// <summary>
+/// 操作器单例
+/// </summary>
 public class SingleManipulator
 {
     // 私有静态变量用于保存单例实例
-    private static Manipulator _instance;
+    private static Manipulator? _instance;
     private static readonly object _lock = new object();
 
     // 私有构造函数，防止外部实例化
@@ -94,201 +96,6 @@ public class SingleManipulator
 
 public class OCCCanvas : Form
 {
-    // 定义事件
-    public event AISSelectionMadeHandler OnAISSelected;
-    public event MouseMovedHandler OnMouseMoved;
-
-    #region 私有字段
-
-    float devicePixelRatioX;
-    float devicePixelRatioY;
-
-    private List<AShape> _CurrentAIS = new List<AShape>();
-
-    public List<AShape> SelectedAISList = new List<AShape>();
-
-    public bool ShowViewCube = true;
-
-    public bool ShowViewTrihedron = false;
-
-    public bool ShowOriginTrihedron = false;
-
-    private bool _Detected = false;
-
-    public bool ScrollMode = true; //true表示根据鼠标点缩放，false表示根据中心点缩放
-    #endregion
-
-    #region 属性
-
-    /// <summary>
-    /// 框选零宽度的最小值
-    /// </summary>
-    private const int ZEROWIDTHMIN = 1;
-
-    /// <summary>
-    /// 交互动作对应的鼠标指针
-    /// </summary>
-    public Dictionary<Action3d, Cursor> CURSORS = new Dictionary<Action3d, Cursor>
-    {
-        // Manipulator
-        { Action3d.Nothing, Cursors.Default },
-        { Action3d.SingleSelect, Cursors.Hand },
-        { Action3d.MultipleSelect, Cursors.Hand },
-        { Action3d.XORSelect, Cursors.Default },
-        { Action3d.AreaSelect, Cursors.Cross },
-        { Action3d.MultipleAreaSelect, Cursors.Cross },
-        { Action3d.XORAreaSelect, Cursors.Default },
-        { Action3d.AreaZooming, Cursors.Default },
-        { Action3d.DynamicRotation, new Cursor("rotation.cur") },
-        { Action3d.DynamicPanning, Cursors.SizeAll },
-        { Action3d.Prohibition, Cursors.No },
-        // Manipulator
-        { Action3d.Manipulator_Translation, Cursors.SizeAll },
-    };
-
-    /// <summary>
-    /// C++委托的视图对象
-    /// </summary>
-    public CSharpViewer Canvas { get; set; }
-
-    /// <summary>
-    /// 画布对象
-    /// </summary>
-    public Viewer Viewer { get; set; }
-
-    /// <summary>
-    /// 主视图
-    /// </summary>
-    public OCCTK.OCC.V3d.View MainView { get; set; }
-
-    /// <summary>
-    /// C++委托的交互对象管理器
-    /// </summary>
-    public InteractiveContext AISContext { get; set; }
-
-    /// <summary>
-    /// 选择框
-    /// </summary>
-    private RubberBand myBubberBand;
-
-    /// <summary>
-    /// AIS操作器
-    /// </summary>
-    private readonly Manipulator myManipulator = SingleManipulator.Instance;
-
-    private ManipulatorMode _manipulatorMode = ManipulatorMode.None;
-    private ManipulatorAxisIndex _ManipulatorAxis = ManipulatorAxisIndex.None;
-
-    /// <summary>
-    /// 重设滚轮光标计时器
-    /// </summary>
-    private System.Windows.Forms.Timer CursorResetTimer { get; set; }
-
-    #region 状态flag
-    // 缩放结束
-    public event EventHandler ZoomingFinished;
-
-    protected void RaiseZoomingFinished()
-    {
-        if (ZoomingFinished != null)
-        {
-            ZoomingFinished(this, EventArgs.Empty);
-        }
-    }
-
-    //未知
-    public event EventHandler AvaliabiltyOfOperationsChanged;
-
-    protected void RaiseAvaliabiltyOfOperationsChanged()
-    {
-        if (AvaliabiltyOfOperationsChanged != null)
-        {
-            AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
-        }
-    }
-
-    private bool _isActivateGrid;
-
-    /// <summary>
-    /// 是否显示网格
-    /// </summary>
-    public bool IsActivateGrid
-    {
-        get { return _isActivateGrid; }
-        set
-        {
-            _isActivateGrid = value;
-            Canvas.DisplayGrid(_isActivateGrid);
-        }
-    }
-
-    private Action3d _currentAction3d;
-
-    /// <summary>
-    /// 当前交互动作
-    /// </summary>
-    public Action3d CurrentAction3d
-    {
-        get => _currentAction3d;
-        set
-        {
-            _currentAction3d = value;
-            if (CURSORS.TryGetValue(value, out Cursor cursor))
-            {
-                Cursor = cursor;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 当前显示模式
-    /// </summary>
-    public DisplayMode CurrentDisplayMode { get; private set; }
-
-    /// <summary>
-    /// 当前视图方向
-    /// </summary>
-    public OCCTK.OCC.V3d.ViewOrientation CurrentViewOrientation { get; private set; }
-
-    /// <summary>
-    /// 是否正在绘制选择框
-    /// </summary>
-    private bool IsDrawRect { get; set; }
-    private bool IsRectVisible { get; set; }
-    #endregion
-
-    #region 显示模式
-    /// <summary>
-    /// 隐藏线显示模式
-    /// </summary>
-    public bool DegenerateMode { get; private set; }
-
-    /// <summary>
-    /// 框线模式
-    /// </summary>
-    public bool IsWireframeEnabled { get; private set; }
-
-    /// <summary>
-    /// 阴影模式
-    /// </summary>
-    public bool IsShadingEnabled { get; private set; }
-
-    //无效定义
-    //public bool IsTransparencyEnabled { get; private set; }
-    //public bool IsColorEnabled { get; private set; }
-    //public bool IsMaterialEnabled { get; private set; }
-    //public bool IsDeleteEnabled { get; private set; }
-
-    private int mouseDownX;
-    private int mouseDownY;
-    private int mouseCurrentX;
-    private int mouseCurrentY;
-    private int myButtonDownX;
-    private int myButtonDownY;
-    #endregion
-
-    #endregion
-
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -309,55 +116,27 @@ public class OCCCanvas : Form
         {
             MessageBox.Show("图形初始化失败", "Error!");
         }
-        //获取视图对象
+
+        //视图对象
         Viewer = Canvas.GetViewer();
-        //获取上下文管理器对象
+        //上下文管理器对象
         AISContext = Canvas.GetContext();
-        //获取相机对象
+        //相机对象
         MainView = Canvas.GetMainView();
 
-        //设置默认灯光
-        Viewer.SetDefaultLight();
-        //设置交互默认值
-        AISContext.SetDefault();
-        //设置选择模式
-        AISContext.SetSelectionMode(OCCTK.OCC.AIS.SelectionMode.Shape);
-        //设置相机默认值
-        MainView.SetDefault();
-
-        float dpiX = CreateGraphics().DpiX;
-        float dpiY = CreateGraphics().DpiY;
+        //选择框
+        myBubberBand = new();
+        //用于恢复鼠标光标
+        CursorResetTimer = new System.Windows.Forms.Timer();
 
         // 计算设备像素比
-        devicePixelRatioX = dpiX / 96.0f;
-        devicePixelRatioY = dpiY / 96.0f;
+        devicePixelRatioX = CreateGraphics().DpiX / 96.0f;
+        devicePixelRatioY = CreateGraphics().DpiY / 96.0f;
 
-        //设置选择框样式
-        myBubberBand = new();
-        myBubberBand.SetLineType(OCCTK.OCC.Aspect.Line.Solid);
-        myBubberBand.SetLineColor(new OCCTK.Extension.Color(125, 0, 0));
-        myBubberBand.SetFilling(true);
-        myBubberBand.SetFillTransparency(0.9);
-        myBubberBand.SetFillColor(new OCCTK.Extension.Color(0, 0, 125));
-
-        #region 设置鼠标样式
-
-        CursorResetTimer = new System.Windows.Forms.Timer();
-        CursorResetTimer.Interval = 500; // 设置计时器间隔为100毫秒
-        CursorResetTimer.Tick += CursorResetTimer_Tick; // 绑定计时器的Tick事件处理方法
-        #endregion
-
-        CurrentAction3d = Action3d.Nothing;
-        IsActivateGrid = false;
-
-        IsDrawRect = false;
-        DegenerateMode = true;
-        Canvas.DisplayViewCube(ShowViewCube);
-        Canvas.DisplayOriginTrihedron(ShowOriginTrihedron);
-        Canvas.DisplayViewTrihedron(ShowViewTrihedron);
-
-        MainView.Redraw();
-        MainView.MustBeResized();
+        //使用默认设置
+        SetDefault();
+        //更新视图
+        Update();
     }
 
     private void InitializeComponent()
@@ -366,7 +145,7 @@ public class OCCCanvas : Form
         ControlBox = false;
         // 设置不为顶层窗口
         TopLevel = false;
-        this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+        ImeMode = System.Windows.Forms.ImeMode.NoControl;
 
         SizeChanged += new System.EventHandler(OnSizeChanged);
         Paint += new System.Windows.Forms.PaintEventHandler(OnPaint);
@@ -376,43 +155,351 @@ public class OCCCanvas : Form
         MouseMove += new System.Windows.Forms.MouseEventHandler(OnMouseMove);
         MouseWheel += new System.Windows.Forms.MouseEventHandler(OnMouseWheel);
 
-        //todo 键盘事件未生效
+        //! 键盘事件的响应必须要求窗体处于焦点，需要在OnMouseMove事件中添加Focus()
+        //启用 KeyPreview 使得 Form 能够接收到所有键盘事件
         KeyPreview = true;
+        // 添加键盘事件处理程序
         KeyDown += new System.Windows.Forms.KeyEventHandler(OnKeyDown);
     }
 
-    /// <summary>
-    /// 计时器触发后将光标恢复为默认光标
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CursorResetTimer_Tick(object sender, EventArgs e)
+    private void SetDefault()
     {
-        Cursor = System.Windows.Forms.Cursors.Default;
-        // 停止计时器
-        CursorResetTimer.Stop();
+        //设置默认灯光
+        Viewer.SetDefaultLight();
+        //设置交互默认值
+        AISContext.SetDefault();
+        //设置选择模式
+        AISContext.SetSelectionMode(OCCTK.OCC.AIS.SelectionMode.Shape);
+        //设置相机默认值
+        MainView.SetDefault();
+
+        //设置选择框样式
+        myBubberBand.SetLineType(OCCTK.OCC.Aspect.Line.Solid);
+        myBubberBand.SetLineColor(new OCCTK.Extension.Color(125, 0, 0));
+        myBubberBand.SetFilling(true);
+        myBubberBand.SetFillTransparency(0.9);
+        myBubberBand.SetFillColor(new OCCTK.Extension.Color(0, 0, 125));
+
+        //设置鼠标样式
+        CursorResetTimer.Interval = 500; // 设置计时器间隔
+        CursorResetTimer.Tick += CursorResetTimer_Tick; // 绑定计时器的Tick事件处理方法
+
+        //设置视图旋转方式
+        ScrollMode = true;
+
+        //设置初始交互状态
+        CurrentAction3d = Action3d.Nothing;
+
+        //设置显示模式为实体
+        //DisplayMode = DisplayMode.Shaded;
+
+        //设置隐藏线显示模式
+        DegenerateMode = true;
+
+        //设置显示视图立方体
+        ShowViewCube = true;
+
+        //设置显示视图坐标轴
+        ShowViewTrihedron = false;
+
+        //设置显示原点坐标轴
+        ShowOriginTrihedron = false;
+
+        AISDetected = false;
     }
 
+    // 定义事件
+    public event AISSelectionMadeHandler? OnAISSelected;
+    public event MouseMovedHandler? OnMouseMoved;
+
+    #region 字段
+
     /// <summary>
-    /// 循环选择下一个枚举值
+    /// 是否检测到可选对象
     /// </summary>
-    /// <param name="currentEnum"></param>
-    /// <returns></returns>
-    private T CycleEnum<T>(T currentEnum)
-        where T : Enum
+    private bool AISDetected;
+
+    private float devicePixelRatioX;
+    private float devicePixelRatioY;
+
+    /// <summary>
+    /// 框选零宽度的最小值
+    /// </summary>
+    private const int ZEROWIDTHMIN = 1;
+
+    /// <summary>
+    /// 交互动作对应的鼠标指针
+    /// </summary>
+    private Dictionary<Action3d, Cursor> InteractionCursorDict = new Dictionary<Action3d, Cursor>
     {
-        // 获取枚举类型的所有值
-        T[] enumValues = (T[])Enum.GetValues(typeof(T));
+        // Manipulator
+        { Action3d.Nothing, Cursors.Default },
+        { Action3d.SingleSelect, Cursors.Hand },
+        { Action3d.MultipleSelect, Cursors.Hand },
+        { Action3d.XORSelect, Cursors.Default },
+        { Action3d.AreaSelect, Cursors.Cross },
+        { Action3d.MultipleAreaSelect, Cursors.Cross },
+        { Action3d.XORAreaSelect, Cursors.Default },
+        { Action3d.AreaZooming, Cursors.Default },
+        { Action3d.DynamicRotation, new Cursor(new MemoryStream(MyCursors.rotation)) },
+        { Action3d.DynamicPanning, Cursors.SizeAll },
+        { Action3d.Prohibition, Cursors.No },
+        // Manipulator
+        { Action3d.Manipulator_Translation, Cursors.SizeAll },
+    };
 
-        // 获取当前枚举值的索引
-        int currentIndex = Array.IndexOf(enumValues, currentEnum);
+    /// <summary>
+    /// 重设滚轮光标计时器
+    /// </summary>
+    private System.Windows.Forms.Timer CursorResetTimer;
 
-        // 获取下一个枚举值的索引，如果当前值是最后一个，则循环到第一个
-        int nextIndex = (currentIndex + 1) % enumValues.Length;
+    /// <summary>
+    /// 选择框
+    /// </summary>
+    private RubberBand myBubberBand;
 
-        // 返回下一个枚举值
-        return enumValues[nextIndex];
+    /// <summary>
+    /// AIS操作器
+    /// </summary>
+    private readonly Manipulator myManipulator = SingleManipulator.Instance;
+
+    private ManipulatorMode _manipulatorMode = ManipulatorMode.None;
+    private ManipulatorAxisIndex _ManipulatorAxis = ManipulatorAxisIndex.None;
+
+    //按下鼠标的坐标
+    private int mouseDownX;
+    private int mouseDownY;
+
+    //鼠标当前坐标
+    private int mouseCurrentX;
+    private int mouseCurrentY;
+
+    #endregion
+
+    #region 属性
+
+    /// <summary>
+    /// true表示根据鼠标点缩放，false表示根据中心点缩放
+    /// </summary>
+    public bool ScrollMode { get; set; }
+
+    /// <summary>
+    /// C++委托的视图对象
+    /// </summary>
+    public CSharpViewer Canvas { get; set; }
+
+    /// <summary>
+    /// 画布对象
+    /// </summary>
+    private Viewer Viewer { get; set; }
+
+    /// <summary>
+    /// 主视图
+    /// </summary>
+    public OCCTK.OCC.V3d.View MainView { get; set; }
+
+    /// <summary>
+    /// C++委托的交互对象管理器
+    /// </summary>
+    public InteractiveContext AISContext { get; set; }
+
+    #region 状态flag
+
+    // MVVM
+    //public event EventHandler ZoomingFinished;
+    //
+    //protected void RaiseZoomingFinished()
+    //{
+    //    if (ZoomingFinished != null)
+    //    {
+    //        ZoomingFinished(this, EventArgs.Empty);
+    //    }
+    //}
+
+    // MVVM
+    //public event EventHandler AvaliabiltyOfOperationsChanged;
+    //
+    //protected void RaiseAvaliabiltyOfOperationsChanged()
+    //{
+    //    if (AvaliabiltyOfOperationsChanged != null)
+    //    {
+    //        AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
+    //    }
+    //}
+
+    #region 是否显示网格
+
+    private bool _isShowGrid;
+
+    /// <summary>
+    /// 是否显示网格
+    /// </summary>
+    public bool IsShowGrid
+    {
+        get { return _isShowGrid; }
+        set
+        {
+            _isShowGrid = value;
+            //todo
+        }
     }
+
+    #endregion
+
+    #region 是否显示视图方块
+
+    private bool _isShowViewCube;
+    private ViewCube _ViewCube = new(5.0);
+
+    /// <summary>
+    /// 是否显示视图方块
+    /// </summary>
+    public bool ShowViewCube
+    {
+        get { return _isShowViewCube; }
+        set
+        {
+            _isShowViewCube = value;
+            DisplayViewCube(true);
+        }
+    }
+
+    private void DisplayViewCube(bool update)
+    {
+        if (_isShowViewCube)
+        {
+            AISContext.Display(_ViewCube, update);
+        }
+        else
+        {
+            if (AISContext.IsDisplayed(_ViewCube))
+            {
+                AISContext.Erase(_ViewCube, update);
+            }
+        }
+    }
+
+    #endregion
+
+    #region 是否显示视图坐标轴
+
+    private bool _isShowViewTrihedron;
+
+    /// <summary>
+    /// 是否显示视图坐标轴
+    /// </summary>
+    public bool ShowViewTrihedron
+    {
+        get { return _isShowViewTrihedron; }
+        set
+        {
+            _isShowViewTrihedron = value;
+            //todo
+        }
+    }
+
+    #endregion
+
+    #region 是否显示原点坐标轴
+
+    private bool _isShowOriginTrihedron;
+
+    /// <summary>
+    /// 是否显示原点坐标轴
+    /// </summary>
+    public bool ShowOriginTrihedron
+    {
+        get { return _isShowOriginTrihedron; }
+        set
+        {
+            _isShowOriginTrihedron = value;
+            //todo
+        }
+    }
+
+    #endregion
+
+    #region 当前交互动作
+
+    private Action3d _currentAction3d;
+
+    /// <summary>
+    /// 当前交互动作
+    /// </summary>
+    public Action3d CurrentAction3d
+    {
+        get => _currentAction3d;
+        set
+        {
+            _currentAction3d = value;
+            //设置事件的同时设置鼠标光标
+            if (InteractionCursorDict.TryGetValue(value, out Cursor? cursor))
+            {
+                Cursor = cursor;
+            }
+        }
+    }
+
+    #endregion
+
+    #region 当前视图方向
+
+    private OCCTK.OCC.V3d.ViewOrientation _CurrentViewOrientation;
+
+    /// <summary>
+    /// 当前视图方向
+    /// </summary>
+    public OCCTK.OCC.V3d.ViewOrientation CurrentViewOrientation
+    {
+        get { return _CurrentViewOrientation; }
+        private set
+        {
+            _CurrentViewOrientation = value;
+            MainView.SetViewOrientation(value, true);
+        }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region 显示模式
+
+    private bool _DegenerateMode;
+
+    /// <summary>
+    /// 隐藏线显示模式
+    /// </summary>
+    public bool DegenerateMode
+    {
+        get { return _DegenerateMode; }
+        set
+        {
+            _DegenerateMode = value;
+            MainView.SetDegenerateMode(value);
+            Update();
+        }
+    }
+
+    private DisplayMode _DisplayMode;
+
+    /// <summary>
+    /// 实体显示模式
+    /// </summary>
+    public DisplayMode DisplayMode
+    {
+        get { return _DisplayMode; }
+        set
+        {
+            _DisplayMode = value;
+            //AISContext.SetDisplayMode(value);
+            Update();
+        }
+    }
+
+    #endregion
+
+    #endregion
 
     #region 重写虚方法
 
@@ -423,7 +510,7 @@ public class OCCCanvas : Form
         // 不调用基类方法，避免系统背景绘制
     }
 
-    private void OnPaint(object sender, PaintEventArgs e)
+    private void OnPaint(object? sender, PaintEventArgs e)
     {
         if (AISContext == null)
         {
@@ -437,7 +524,7 @@ public class OCCCanvas : Form
         AISContext.UpdateCurrentViewer();
     }
 
-    private void OnSizeChanged(object sender, EventArgs e)
+    private void OnSizeChanged(object? sender, EventArgs e)
     {
         if (MainView == null)
         {
@@ -448,9 +535,9 @@ public class OCCCanvas : Form
 
     #endregion
 
-    #region 鼠标
+    #region 鼠标事件
 
-    private void OnMouseDown(object sender, MouseEventArgs e)
+    private void OnMouseDown(object? sender, MouseEventArgs e)
     {
         // 获取鼠标按下的按钮和修改键
         //MouseButtons mouseButton = e.Button;
@@ -461,7 +548,7 @@ public class OCCCanvas : Form
         AISContext.InitDetected();
         if (AISContext.MoreDetected())
         {
-            _Detected = true;
+            AISDetected = true;
             CurrentAction3d = Action3d.SingleSelect;
         }
         else
@@ -477,8 +564,10 @@ public class OCCCanvas : Form
         }
     }
 
-    private void OnMouseMove(object sender, MouseEventArgs e)
+    private void OnMouseMove(object? sender, MouseEventArgs e)
     {
+        //使窗体获得焦点
+        Focus();
         //! 使用if而不是switch判断，让点击事件具有更高优先级
         // 获取鼠标当前位置
         //Point pt = e.Location;
@@ -500,7 +589,7 @@ public class OCCCanvas : Form
         //! 左键
         else if (mouseButton == MouseButtons.Left)
         {
-            if (_Detected)
+            if (AISDetected)
             {
                 // 操作器执行移动
                 if (myManipulator.HasActiveMode())
@@ -557,7 +646,6 @@ public class OCCCanvas : Form
             if (modifiers == Keys.None)
             {
                 MainView.Rotation(e.X, e.Y);
-                MainView.Redraw();
                 CurrentAction3d = Action3d.DynamicRotation;
             }
             // Dynamic Panning 表示交互式的平移画面与非交互的平移 Global Panning 相区别
@@ -577,12 +665,12 @@ public class OCCCanvas : Form
             AISContext.MoveTo(mouseCurrentX, mouseCurrentY, MainView);
         }
         // 工厂类构建
-        var interaction = CanvasInteractionFactory.CreateInteraction(this, CurrentAction3d);
+        var interaction = MouseMoveInteractionFactory.Create(this, CurrentAction3d);
         // 执行操作
-        interaction.Interaction(mouseCurrentX, mouseCurrentY);
+        interaction.Interaction();
     }
 
-    private void OnMouseUp(object sender, MouseEventArgs e)
+    private void OnMouseUp(object? sender, MouseEventArgs e)
     {
         // 获取鼠标按下的按钮和修改键
         MouseButtons mouseButton = e.Button;
@@ -612,7 +700,7 @@ public class OCCCanvas : Form
                 {
                     // 移动了,结束单次框选
                     AISContext.Erase(myBubberBand, true);
-                    DragEvent(mouseCurrentX, mouseCurrentY, 1);
+                    DragEvent();
                 }
                 else
                 {
@@ -645,7 +733,6 @@ public class OCCCanvas : Form
                 {
                     MainView.WindowFitAll(mouseDownX, mouseDownY, mouseCurrentX, mouseCurrentY);
                 }
-                RaiseZoomingFinished();
                 break;
             case Action3d.DynamicRotation:
                 //结束旋转
@@ -660,26 +747,16 @@ public class OCCCanvas : Form
             default:
                 break;
         }
-
-        //todo 会引发程序崩溃
-        //保存选中的AIS对象
-        //while (AISContext.MoreSelected())
-        //{
-        //    SelectedAISList.Add(AISContext.SelectedAIS());
-        //    AISContext.NextSelected();
-        //}
+        Update();
 
         // 结束操作
         CurrentAction3d = Action3d.Nothing;
         _manipulatorMode = ManipulatorMode.None;
         _ManipulatorAxis = ManipulatorAxisIndex.None;
-        _Detected = false;
-
-        // 恢复光标
-        Cursor = Cursors.Default;
+        AISDetected = false;
     }
 
-    private void OnMouseWheel(object sender, MouseEventArgs e)
+    private void OnMouseWheel(object? sender, MouseEventArgs e)
     {
         Keys modifiers = ModifierKeys;
         // 处理鼠标滚轮事件
@@ -740,7 +817,13 @@ public class OCCCanvas : Form
     }
 
     #endregion
-    private void OnKeyDown(object sender, KeyEventArgs e)
+
+    /// <summary>
+    /// 键盘事件
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.F)
         {
@@ -748,9 +831,16 @@ public class OCCCanvas : Form
         }
     }
 
+    #endregion
+
+    #region 工厂类实现交互逻辑
+
+    /// <summary>
+    /// 交互接口
+    /// </summary>
     public interface ICanvasInteraction
     {
-        void Interaction(int currentX, int currentY);
+        void Interaction();
     }
 
     public class Nothing : ICanvasInteraction
@@ -759,7 +849,31 @@ public class OCCCanvas : Form
 
         public Nothing(OCCCanvas canvas) => _C = canvas;
 
-        public void Interaction(int currentX, int currentY) { }
+        public void Interaction() { }
+    }
+
+    public class DrawRectangleAction : ICanvasInteraction
+    {
+        public readonly OCCCanvas _C;
+
+        public DrawRectangleAction(OCCCanvas canvas) => _C = canvas;
+
+        public void Interaction()
+        {
+            _C.DrawRectangle();
+        }
+    }
+
+    public class SingleSelect : ICanvasInteraction
+    {
+        public readonly OCCCanvas _C;
+
+        public SingleSelect(OCCCanvas canvas) => _C = canvas;
+
+        public void Interaction()
+        {
+            _C.AISContext.Select();
+        }
     }
 
     public class AreaSelect : ICanvasInteraction
@@ -768,11 +882,7 @@ public class OCCCanvas : Form
 
         public AreaSelect(OCCCanvas canvas) => _C = canvas;
 
-        public void Interaction(int currentX, int currentY)
-        {
-            _C.DrawRectangle();
-            _C.Cursor = Cursors.Cross;
-        }
+        public void Interaction() { }
     }
 
     public class MultipleAreaSelect : ICanvasInteraction
@@ -781,10 +891,9 @@ public class OCCCanvas : Form
 
         public MultipleAreaSelect(OCCCanvas canvas) => _C = canvas;
 
-        public void Interaction(int currentX, int currentY)
+        public void Interaction()
         {
             _C.DrawRectangle();
-            _C.Cursor = Cursors.Cross;
         }
     }
 
@@ -794,52 +903,48 @@ public class OCCCanvas : Form
 
         public AreaZooming(OCCCanvas canvas) => _C = canvas;
 
-        public void Interaction(int currentX, int currentY)
+        public void Interaction()
         {
             _C.DrawRectangle();
             _C.Cursor = Cursors.Cross;
         }
     }
 
-    public static class CanvasInteractionFactory
+    /// <summary>
+    /// 鼠标移动时的交互逻辑
+    /// </summary>
+    public static class MouseMoveInteractionFactory
     {
-        public static ICanvasInteraction CreateInteraction(OCCCanvas canvas, Action3d mode)
+        public static ICanvasInteraction Create(OCCCanvas canvas, Action3d mode)
         {
             return mode switch
             {
-                //Action3d.SingleSelect => new SingleSelect(canvas),
-                Action3d.Nothing
-                    => new Nothing(canvas),
+                Action3d.AreaSelect => new DrawRectangleAction(canvas),
+                Action3d.MultipleAreaSelect => new DrawRectangleAction(canvas),
+                Action3d.AreaZooming => new DrawRectangleAction(canvas),
+                _ => new Nothing(canvas),
+            };
+        }
+    }
+
+    /// <summary>
+    /// 鼠标抬起时的交互逻辑
+    /// </summary>
+    public static class MouseUpInteractionFactory
+    {
+        public static ICanvasInteraction Create(OCCCanvas canvas, Action3d mode)
+        {
+            return mode switch
+            {
+                Action3d.SingleSelect => new SingleSelect(canvas),
                 Action3d.AreaSelect => new AreaSelect(canvas),
                 Action3d.MultipleAreaSelect => new MultipleAreaSelect(canvas),
                 Action3d.AreaZooming => new AreaZooming(canvas),
                 _ => new Nothing(canvas),
             };
         }
-
-        //public static ICanvasInteraction CreateInteraction(OCCCanvas canvas, string mode)
-        //{
-        //    return mode switch
-        //    {
-        //        "SingleSelect" => new SingleSelect(canvas),
-        //        "AreaSelect" => new AreaSelect(canvas),
-        //        "MultipleAreaSelect" => new MultipleAreaSelect(canvas),
-        //        _ => throw new ArgumentException("Invalid interaction mode", nameof(mode)),
-        //    };
-        //}
     }
 
-    #endregion
-
-    #region 设置按键
-    //设置未成功
-    //private void OCCViewer_KeyDown(object sender, KeyEventArgs e)
-    //{
-    //    if (e.KeyCode == Keys.F) // 如果按下 F 键
-    //    {
-    //        this.FitAll();
-    //    }
-    //}
     #endregion
 
     #region 视图控制
@@ -863,7 +968,7 @@ public class OCCCanvas : Form
     /// </summary>
     public void SetViewOrientation()
     {
-        MainView.SetViewOrientation(CycleEnum(CurrentViewOrientation), true);
+        CurrentViewOrientation = CycleEnum(CurrentViewOrientation);
     }
 
     /// <summary>
@@ -873,7 +978,6 @@ public class OCCCanvas : Form
     public void SetViewOrientation(ViewOrientation theMode)
     {
         CurrentViewOrientation = theMode;
-        MainView.SetViewOrientation(theMode, true);
     }
 
     /// <summary>
@@ -890,7 +994,6 @@ public class OCCCanvas : Form
     /// <param name="theMode"></param>
     public void SetHidden(bool toOpen)
     {
-        MainView.SetDegenerateMode(toOpen);
         DegenerateMode = toOpen;
     }
 
@@ -900,13 +1003,11 @@ public class OCCCanvas : Form
 
     public void Display(AShape theAIS, bool Toupdate)
     {
-        _CurrentAIS.Add(theAIS);
         AISContext.Display(theAIS, Toupdate);
     }
 
     public void EraseSelected()
     {
-        _CurrentAIS.Remove(AISContext.SelectedAIS());
         AISContext.EraseSelected();
     }
 
@@ -918,14 +1019,16 @@ public class OCCCanvas : Form
     public void EraseAll(bool Toupdate)
     {
         AISContext.EraseAll(Toupdate);
-        Canvas.DisplayViewCube(ShowViewCube);
-        Canvas.DisplayOriginTrihedron(ShowOriginTrihedron);
-        Canvas.DisplayViewTrihedron(ShowViewTrihedron);
+        //持久显示对象
+        DisplayViewCube(false);
+        if (Toupdate)
+        {
+            Update();
+        }
     }
 
     public void Remove(AShape theAIS, bool Toupdate)
     {
-        _CurrentAIS.Remove(theAIS);
         AISContext.Remove(theAIS, Toupdate);
     }
 
@@ -943,21 +1046,16 @@ public class OCCCanvas : Form
     /// <param name="theState"></param>
     protected void MultiDragEvent(int x, int y, int theState)
     {
-        if (theState == -1) //mouse is down
-        {
-            myButtonDownX = x;
-            myButtonDownY = y;
-        }
-        else if (theState == 1) //mouse is up
-        {
-            AISContext.MultipleAreaSelect(
-                Math.Min(myButtonDownX, x),
-                Math.Min(myButtonDownY, y),
-                Math.Max(myButtonDownX, x),
-                Math.Max(myButtonDownY, y),
-                MainView
-            ); //连续选择，只添加
-        }
+        int windowWidth = this.Width; // 获取当前窗口的宽度
+        int windowHeight = this.Height; // 获取当前窗口的高度
+
+        AISContext.MultipleAreaSelect(
+            Math.Min(mouseDownX, mouseCurrentX),
+            Math.Min(windowHeight - mouseDownY, windowHeight - mouseCurrentY),
+            Math.Max(mouseDownX, mouseCurrentX),
+            Math.Max(windowHeight - mouseDownY, windowHeight - mouseCurrentY),
+            MainView
+        ); //连续选择，只添加
     }
 
     /// <summary>
@@ -966,23 +1064,18 @@ public class OCCCanvas : Form
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="theState"></param>
-    protected void DragEvent(int x, int y, int theState)
+    protected void DragEvent()
     {
-        if (theState == -1) // mouse is down
-        {
-            myButtonDownX = x;
-            myButtonDownY = y;
-        }
-        else if (theState == 1) // mouse is up
-        {
-            AISContext.AreaSelect(
-                Math.Min(myButtonDownX, x),
-                Math.Min(myButtonDownY, y),
-                Math.Max(myButtonDownX, x),
-                Math.Max(myButtonDownY, y),
-                MainView
-            );
-        }
+        int windowWidth = this.Width; // 获取当前窗口的宽度
+        int windowHeight = this.Height; // 获取当前窗口的高度
+
+        AISContext.AreaSelect(
+            Math.Min(mouseDownX, mouseCurrentX),
+            Math.Min(windowHeight - mouseDownY, windowHeight - mouseCurrentY),
+            Math.Max(mouseDownX, mouseCurrentX),
+            Math.Max(windowHeight - mouseDownY, windowHeight - mouseCurrentY),
+            MainView
+        );
     }
 
     /// <summary>
@@ -993,12 +1086,14 @@ public class OCCCanvas : Form
     {
         int windowWidth = this.Width; // 获取当前窗口的宽度
         int windowHeight = this.Height; // 获取当前窗口的高度
+
         myBubberBand.SetRectangle(
             Math.Min(mouseDownX, mouseCurrentX),
             Math.Min(windowHeight - mouseDownY, windowHeight - mouseCurrentY),
             Math.Max(mouseDownX, mouseCurrentX),
             Math.Max(windowHeight - mouseDownY, windowHeight - mouseCurrentY)
         );
+
         if (AISContext.IsDisplayed(myBubberBand))
         {
             AISContext.Redisplay(myBubberBand, true);
@@ -1080,7 +1175,40 @@ public class OCCCanvas : Form
 
     #endregion
 
-    #region 其它设置
+    #region 其它
+
+    /// <summary>
+    /// 计时器触发后将光标恢复为默认光标
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void CursorResetTimer_Tick(object? sender, EventArgs e)
+    {
+        Cursor = System.Windows.Forms.Cursors.Default;
+        // 停止计时器
+        CursorResetTimer.Stop();
+    }
+
+    /// <summary>
+    /// 循环选择下一个枚举值
+    /// </summary>
+    /// <param name="currentEnum"></param>
+    /// <returns></returns>
+    private T CycleEnum<T>(T currentEnum)
+        where T : Enum
+    {
+        // 获取枚举类型的所有值
+        T[] enumValues = (T[])Enum.GetValues(typeof(T));
+
+        // 获取当前枚举值的索引
+        int currentIndex = Array.IndexOf(enumValues, currentEnum);
+
+        // 获取下一个枚举值的索引，如果当前值是最后一个，则循环到第一个
+        int nextIndex = (currentIndex + 1) % enumValues.Length;
+
+        // 返回下一个枚举值
+        return enumValues[nextIndex];
+    }
 
     #endregion
 }

@@ -385,6 +385,85 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     private List<TShape> inputShapes = new();
 
     #endregion
+    public MainWindow()
+    {
+        InitializeComponent();
+        // 创建 Windows Forms 控件和 WindowsFormsHost
+        WindowsFormsHost aHost = new WindowsFormsHost();
+        Viewer = new OCCCanvas();
+        AISContext = Viewer.AISContext;
+        Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+        Viewer.Show();
+        aHost.Child = Viewer;
+        canvas_grid.Children.Add(aHost);
+        //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
+        //ViewModel = new MainViewModel();
+        //this.DataContext = ViewModel;
+        Viewer.OnAISSelected += OnAISSelectionMade;
+        Viewer.OnMouseMoved += OnMouseMoved;
+
+        #region 全局属性绑定
+
+        BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString("F1");
+        BasePlateOffsetX_TextBox.TextChanged += BasePlateOffsetX_TextChanged;
+
+        BasePlateOffsetY_TextBox.Text = BasePlateOffsetY.ToString("F1");
+        BasePlateOffsetY_TextBox.TextChanged += BasePlateOffsetY_TextChanged;
+
+        BasePlateHight_TextBox.Text = BasePlateOffsetZ.ToString("F1");
+        BasePlateOffsetY_TextBox.TextChanged += BasePlateOffsetZ_TextChanged;
+
+        BasePlateXWidth_TextBox.TextChanged += BasePlateXWidth_TextChanged;
+        BasePlateYWidth_TextBox.TextChanged += BasePlateYWidth_TextChanged;
+
+        InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString("F1");
+        InitialOffsetX_TextBox.TextChanged += InitialOffsetX_TextChanged;
+
+        // 设置OffsetXLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        OffsetX_TextBox.Text = OffsetXParameter.ToString("F1");
+        OffsetX_TextBox.TextChanged += OffsetX_TextChanged;
+
+        // 设置InitialOffsetYLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString("F1");
+        InitialOffsetY_TextBox.TextChanged += InitialOffsetY_TextChanged;
+
+        // 设置OffsetYLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        OffsetY_TextBox.Text = OffsetYParameter.ToString("F1");
+        OffsetY_TextBox.TextChanged += OffsetY_TextChanged;
+
+        // 设置ConnectionHeightLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        ConnectionHeight_TextBox.Text = AvoidanceHeightParameter.ToString("F1");
+        ConnectionHeight_TextBox.TextChanged += ConnectionHeight_TextChanged;
+
+        // 设置MinSupportingLenLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        MinSupportingLen_TextBox.Text = MinSupportingLenParameter.ToString("F1");
+        MinSupportingLen_TextBox.TextChanged += MinSupportingLen_TextChanged;
+
+        // 设置ClearancesLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        Clearances_TextBox.Text = ClearancesParameter.ToString("F1");
+        Clearances_TextBox.TextChanged += Clearances_TextChanged;
+
+        // 设置CuttingDistanceLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
+        CuttingDistance_TextBox.Text = CuttingDistanceParameter.ToString("F1");
+        CuttingDistance_TextBox.TextChanged += CuttingDistance_TextChanged;
+
+        ConnectionThickness_TextBox.Text = ConnectionThicknessParameter.ToString("F1");
+        ConnectionThickness_TextBox.TextChanged += ConnectionThickness_TextChanged;
+
+        FilletRadius_TextBox.Text = FilletRadiusParameter.ToString("F1");
+        FilletRadius_TextBox.TextChanged += FilletRadius_TextChanged;
+
+        #endregion
+
+        #region 创建竖板
+
+        XNum_TextBox.Text = XNum.ToString();
+        XNum_TextBox.TextChanged += XNum_TextChanged;
+        YNum_TextBox.Text = YNum.ToString();
+        YNum_TextBox.TextChanged += YNum_TextChanged;
+
+        #endregion
+    }
 
     const double LINEAR_TOL = 1e-1;
 
@@ -402,8 +481,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private AShape? manipulatedObject = null;
 
-    private Ax2 StartPosition;
-    private Ax2 EndPosition;
+    private Ax2? StartPosition;
+    private Ax2? EndPosition;
 
     /// <summary>
     /// 创建的竖板列表，分为两部分储存
@@ -430,12 +509,12 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <summary>
     /// 展平后的结果
     /// </summary>
-    public CombinedFixtureBoard CombinedFixtureBoard;
+    public CombinedFixtureBoard? CombinedFixtureBoard;
 
     /// <summary>
     /// 输入的工件
     /// </summary>
-    private InputWorkpiece InputWorkpiece;
+    private InputWorkpiece? InputWorkpiece;
     private bool ShowInputWorkpiece = true;
 
     #region 底板参数
@@ -571,84 +650,6 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     //public MainViewModel ViewModel { get; set; }
 
-    public MainWindow()
-    {
-        InitializeComponent();
-        // 创建 Windows Forms 控件和 WindowsFormsHost
-        WindowsFormsHost aHost = new WindowsFormsHost();
-        Viewer = new OCCCanvas();
-        AISContext = Viewer.AISContext;
-        Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-        Viewer.Show();
-        aHost.Child = Viewer;
-        canvas_grid.Children.Add(aHost);
-        //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
-        //ViewModel = new MainViewModel();
-        //this.DataContext = ViewModel;
-        Viewer.OnAISSelected += OnAISSelectionMade;
-        Viewer.OnMouseMoved += OnMouseMoved;
-        #region 全局属性绑定
-
-        BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString("F1");
-        BasePlateOffsetX_TextBox.TextChanged += BasePlateOffsetX_TextChanged;
-
-        BasePlateOffsetY_TextBox.Text = BasePlateOffsetY.ToString("F1");
-        BasePlateOffsetY_TextBox.TextChanged += BasePlateOffsetY_TextChanged;
-
-        BasePlateHight_TextBox.Text = BasePlateOffsetZ.ToString("F1");
-        BasePlateOffsetY_TextBox.TextChanged += BasePlateOffsetZ_TextChanged;
-
-        BasePlateXWidth_TextBox.TextChanged += BasePlateXWidth_TextChanged;
-        BasePlateYWidth_TextBox.TextChanged += BasePlateYWidth_TextChanged;
-
-        InitialOffsetX_TextBox.Text = InitialOffsetXParameter.ToString("F1");
-        InitialOffsetX_TextBox.TextChanged += InitialOffsetX_TextChanged;
-
-        // 设置OffsetXLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        OffsetX_TextBox.Text = OffsetXParameter.ToString("F1");
-        OffsetX_TextBox.TextChanged += OffsetX_TextChanged;
-
-        // 设置InitialOffsetYLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        InitialOffsetY_TextBox.Text = InitialOffsetYParameter.ToString("F1");
-        InitialOffsetY_TextBox.TextChanged += InitialOffsetY_TextChanged;
-
-        // 设置OffsetYLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        OffsetY_TextBox.Text = OffsetYParameter.ToString("F1");
-        OffsetY_TextBox.TextChanged += OffsetY_TextChanged;
-
-        // 设置ConnectionHeightLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        ConnectionHeight_TextBox.Text = AvoidanceHeightParameter.ToString("F1");
-        ConnectionHeight_TextBox.TextChanged += ConnectionHeight_TextChanged;
-
-        // 设置MinSupportingLenLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        MinSupportingLen_TextBox.Text = MinSupportingLenParameter.ToString("F1");
-        MinSupportingLen_TextBox.TextChanged += MinSupportingLen_TextChanged;
-
-        // 设置ClearancesLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        Clearances_TextBox.Text = ClearancesParameter.ToString("F1");
-        Clearances_TextBox.TextChanged += Clearances_TextChanged;
-
-        // 设置CuttingDistanceLabel的内容和TextBox的初始值，并添加TextChanged事件处理程序
-        CuttingDistance_TextBox.Text = CuttingDistanceParameter.ToString("F1");
-        CuttingDistance_TextBox.TextChanged += CuttingDistance_TextChanged;
-
-        ConnectionThickness_TextBox.Text = ConnectionThicknessParameter.ToString("F1");
-        ConnectionThickness_TextBox.TextChanged += ConnectionThickness_TextChanged;
-
-        FilletRadius_TextBox.Text = FilletRadiusParameter.ToString("F1");
-        FilletRadius_TextBox.TextChanged += FilletRadius_TextChanged;
-        #endregion
-
-        #region 创建竖板
-        XNum_TextBox.Text = XNum.ToString();
-        XNum_TextBox.TextChanged += XNum_TextChanged;
-        YNum_TextBox.Text = YNum.ToString();
-        YNum_TextBox.TextChanged += YNum_TextChanged;
-        #endregion
-
-        #region 单块板的属性
-        #endregion
-    }
 
     #region 视角
     private void ForntView_Button_Click(object sender, RoutedEventArgs e)
@@ -763,35 +764,44 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         // 显示保存文件对话框并检查用户是否选择了保存路径
         if (saveFileDialog.ShowDialog() == true)
         {
-            // 获取用户选择的文件路径
-            string filePath = saveFileDialog.FileName;
-            string tempFilePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "temp.brep");
-
-            // 创建 BrepExchange 对象并保存文件
-            BrepExchange BE = new BrepExchange(InputWorkpiece.Shape);
-            BE.SaveFile(tempFilePath);
-            try
+            if (InputWorkpiece != null)
             {
-                // 剪切文件
-                System.IO.File.Move(tempFilePath, filePath);
+                // 获取用户选择的文件路径
+                string filePath = saveFileDialog.FileName;
+                string tempFilePath = System.IO.Path.Combine(
+                    System.IO.Path.GetTempPath(),
+                    "temp.brep"
+                );
 
-                Debug.WriteLine($"文件已从 {tempFilePath} 剪切并重命名为 {filePath}");
-            }
-            catch (Exception ex)
-            {
-                System.IO.File.Delete(tempFilePath);
-                Debug.WriteLine($"文件剪切失败: {ex.Message}");
+                // 创建 BrepExchange 对象并保存文件
+                BrepExchange BE = new BrepExchange(InputWorkpiece.Shape);
+                BE.SaveFile(tempFilePath);
+                try
+                {
+                    // 剪切文件
+                    System.IO.File.Move(tempFilePath, filePath);
+
+                    Debug.WriteLine($"文件已从 {tempFilePath} 剪切并重命名为 {filePath}");
+                }
+                catch (Exception ex)
+                {
+                    System.IO.File.Delete(tempFilePath);
+                    Debug.WriteLine($"文件剪切失败: {ex.Message}");
+                }
             }
         }
     }
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test1.stp").Shape());
-        BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        if (Viewer.DisplayMode == DisplayMode.Shaded)
+        {
+            Viewer.DisplayMode = DisplayMode.WireFrame;
+        }
+        else
+        {
+            Viewer.DisplayMode = DisplayMode.Shaded;
+        }
     }
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
@@ -1143,7 +1153,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         string selectedDirection = "";
         if (seletedItem != null)
         {
-            selectedDirection = seletedItem.Content.ToString();
+            selectedDirection = seletedItem.Content?.ToString() ?? string.Empty;
         }
 
         if (selectedDirection == "X")
@@ -1253,7 +1263,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         ComboBoxItem seletedItem = (ComboBoxItem)AddPlateDirection_ComboBox.SelectedItem;
         if (seletedItem != null)
         {
-            AddPlateDirection = seletedItem.Content.ToString();
+            AddPlateDirection = seletedItem.Content?.ToString() ?? string.Empty;
         }
 
         //! 方向虽然用X、Y做区分，实际上还包括XY以外的方向，但只分为两种。
@@ -1276,7 +1286,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     }
 
     //单片
-    private Grid MakeStackItem(VerticalPiece thePiece, int theNum)
+    private Grid? MakeStackItem(VerticalPiece thePiece, int theNum)
     {
         if (thePiece == null)
         {
@@ -1821,17 +1831,6 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #endregion
 
     #region 算法逻辑
-    private void RelocationInputWorkPiece()
-    {
-        if (InputWorkpiece == null)
-        {
-            return;
-        }
-        Trsf T = new();
-        T.SetTranslation(new Pnt(), new Pnt());
-        TShape newShape = new OCCTK.OCC.BRepBuilderAPI.Transform(InputWorkpiece.Shape, T).Shape();
-        InputWorkpiece = new(newShape);
-    }
 
     /// <summary>
     /// 创建底板逻辑

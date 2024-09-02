@@ -20,6 +20,7 @@ public:
 	Trihedron(gp::Trsf^ theTrsf, float axisSize);
 	void SetArrowLength(double value);
 	void SetArrowWidth(double value);
+	void SetRightLower();
 	Handle(AIS_Trihedron) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 

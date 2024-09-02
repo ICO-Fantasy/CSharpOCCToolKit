@@ -38,6 +38,11 @@ void Trihedron::SetArrowWidth(double value) {
 	ArrowWidth = value;
 }
 
+void Trihedron::SetRightLower() {
+	if (myTrihedron().IsNull()) return;
+	myTrihedron()->SetTransformPersistence(new Graphic3d_TransformPers((Graphic3d_TMF_TriedronPers), Aspect_TOTP_RIGHT_LOWER, Graphic3d_Vec2i(80, 50)));
+}
+
 
 Handle(AIS_Trihedron) Trihedron::GetOCC() {
 	return myTrihedron();

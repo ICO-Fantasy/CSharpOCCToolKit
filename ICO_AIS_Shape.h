@@ -24,6 +24,7 @@ public:
 	AShape(TopoDS::TShape^ aShape);
 	AShape(Handle(AIS_Shape) aAISShape);
 	AShape(AIS_Shape aAISShape);
+	inline void myAShape(Handle(AIS_Shape)aAISShape);
 	TopoDS::TShape^ TopoShape();
 	void SetColor(int R, int G, int B);
 	void SetTransparency(double theFactor);
