@@ -68,8 +68,8 @@ public delegate void MouseMovedHandler(int X, int Y);
 public class SingleManipulator
 {
     // 私有静态变量用于保存单例实例
-    private static Manipulator _instance;
-    private static readonly object _lock = new object();
+    private static Manipulator? _instance;
+    private static readonly object _lock = new();
 
     // 私有构造函数，防止外部实例化
     private SingleManipulator() { }
@@ -82,10 +82,7 @@ public class SingleManipulator
             // 确保线程安全
             lock (_lock)
             {
-                if (_instance == null)
-                {
-                    _instance = new Manipulator();
-                }
+                _instance ??= new Manipulator();
                 return _instance;
             }
         }
