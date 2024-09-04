@@ -17,7 +17,6 @@ public:
 	InteractiveObject(Handle(Standard_Transient)nativeHandle);
 	bool IsNull();
 	Handle(AIS_InteractiveObject) GetOCC();
-	// 实现虚函数
 	Handle(Standard_Transient) GetStd() override;
 protected:
 	NCollection_Haft<Handle(AIS_InteractiveObject)> myAISObject;

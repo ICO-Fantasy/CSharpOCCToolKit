@@ -15,11 +15,12 @@ namespace AIS {
 
 public ref class Trihedron :public InteractiveObject {
 public:
-	Trihedron(float axisSize);
-	Trihedron(AShape^ theAIS, float axisSize);
-	Trihedron(gp::Trsf^ theTrsf, float axisSize);
+	Trihedron(double axisSize);
+	Trihedron(AShape^ theAIS, double axisSize);
+	Trihedron(gp::Trsf^ theTrsf, double axisSize);
 	void SetArrowLength(double value);
 	void SetArrowWidth(double value);
+	void SetAspect(int theX, int theY);
 	Handle(AIS_Trihedron) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 

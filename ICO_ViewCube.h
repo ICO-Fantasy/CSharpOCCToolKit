@@ -12,11 +12,13 @@ namespace AIS {
 
 public ref class ViewCube :public InteractiveObject {
 public:
-	ViewCube(float axisSize);
+	ViewCube(double axisSize);
 	Handle(AIS_ViewCube) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 
 private:
+	void SetDefault();
+	double myAxisSize = 5.0;
 	NCollection_Haft<Handle(AIS_ViewCube)> myViewCube;
 };
 

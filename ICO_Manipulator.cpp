@@ -12,45 +12,57 @@ namespace OCC {
 namespace AIS {
 
 Manipulator::Manipulator() {
-	_pManipulator() = new AIS_Manipulator();
+	myManipulator() = new AIS_Manipulator();
+
 	// 保存原始句柄
-	nativeHandle() = _pManipulator();
+	myAISObject() = myManipulator();
+	nativeHandle() = myManipulator();
 }
 
 Manipulator::Manipulator(Manipulator^ theManipulator) {
-	_pManipulator() = theManipulator->_pManipulator();
+	myManipulator() = theManipulator->GetOCC();
+
 	// 保存原始句柄
-	nativeHandle() = _pManipulator();
+	myAISObject() = myManipulator();
+	nativeHandle() = myManipulator();
 }
 
 Manipulator::Manipulator(Handle(AIS_Manipulator)theManipulator) {
-	_pManipulator() = theManipulator;
+	myManipulator() = theManipulator;
+
 	// 保存原始句柄
-	nativeHandle() = _pManipulator();
+	myAISObject() = myManipulator();
+	nativeHandle() = myManipulator();
 }
 
 Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) {
-	AIS_Manipulator* aManipulator = new AIS_Manipulator();
+	Handle(AIS_Manipulator) aManipulator = new AIS_Manipulator();
 	AIS_ManipulatorObjectSequence* aSeq = new AIS_ManipulatorObjectSequence();
 	for each (AShape ^ var in theAISList) {
 		aSeq->Append((var->GetOCC()));
 	}
 	aManipulator->Attach(aSeq);
-	_pManipulator() = aManipulator;
+
+	myManipulator() = aManipulator;
 	// 保存原始句柄
-	nativeHandle() = _pManipulator();
+	myAISObject() = myManipulator();
+	nativeHandle() = myManipulator();
 }
 
 Handle(AIS_Manipulator) Manipulator::GetOCC() {
-	return _pManipulator();
+	return myManipulator();
+}
+
+Handle(Standard_Transient) Manipulator::GetStd() {
+	return nativeHandle();
 }
 
 bool Manipulator::HasActiveMode() {
-	return _pManipulator()->HasActiveMode();
+	return myManipulator()->HasActiveMode();
 }
 
 ManipulatorMode Manipulator::ActiveMode() {
-	auto theMode = _pManipulator()->ActiveMode();
+	auto theMode = myManipulator()->ActiveMode();
 	ManipulatorMode output;
 	switch (theMode) {
 	case AIS_MM_None:
@@ -76,37 +88,41 @@ ManipulatorMode Manipulator::ActiveMode() {
 }
 
 ManipulatorAxisIndex Manipulator::ActiveAxisIndex() {
-	return ManipulatorAxisIndex(_pManipulator()->ActiveAxisIndex());
+	return ManipulatorAxisIndex(myManipulator()->ActiveAxisIndex());
 }
 
 bool Manipulator::IsAttached() {
-	return _pManipulator()->IsAttached();
+	return myManipulator()->IsAttached();
 }
 
 Ax2^ Manipulator::Position() {
-	return gcnew Ax2(_pManipulator()->Position());
+	return gcnew Ax2(myManipulator()->Position());
 }
 
 void Manipulator::StartTransform(double theX, double theY, View^ theView) {
-	_pManipulator()->StartTransform(theX, theY, theView->GetOCC());
+	myManipulator()->StartTransform(theX, theY, theView->GetOCC());
 }
+//
+//void Manipulator::Transform(double theX, double theY, View^ theView) {
+//	myManipulator()->Transform(theX, theY, theView->GetOCC());
+//}
 
-void Manipulator::Transform(double theX, double theY, View^ theView) {
-	_pManipulator()->Transform(theX, theY, theView->GetOCC());
+Trsf^ Manipulator::Transform(double theX, double theY, View^ theView) {
+	return gcnew Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
 }
 
 void Manipulator::StopTransform(bool thetoApply) {
-	_pManipulator()->StopTransform(thetoApply);
+	myManipulator()->StopTransform(thetoApply);
 }
 
 void Manipulator::StopTransform() {
-	_pManipulator()->StopTransform();
+	myManipulator()->StopTransform();
 }
 
 void Manipulator::Attach(AShape^ theAIS) {
-	_pManipulator()->Attach(theAIS->GetOCC());
+	myManipulator()->Attach(theAIS->GetOCC());
 	// 让操作器自动激活
-	_pManipulator()->SetModeActivationOnDetection(true);
+	myManipulator()->SetModeActivationOnDetection(true);
 }
 
 void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes) {
@@ -114,15 +130,15 @@ void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, b
 	anOptions.SetAdjustPosition(adjustPosition);
 	anOptions.SetAdjustSize(!adjustSize);
 	anOptions.SetEnableModes(enableModes);
-	_pManipulator()->Attach(theAIS->GetOCC(), anOptions);
+	myManipulator()->Attach(theAIS->GetOCC(), anOptions);
 	// 让操作器自动激活
-	_pManipulator()->SetModeActivationOnDetection(true);
+	myManipulator()->SetModeActivationOnDetection(true);
 }
 
 void Manipulator::Attach(InteractiveObject^ theAISObject) {
-	_pManipulator()->Attach(theAISObject->GetOCC());
+	myManipulator()->Attach(theAISObject->GetOCC());
 	// 让操作器自动激活
-	_pManipulator()->SetModeActivationOnDetection(true);
+	myManipulator()->SetModeActivationOnDetection(true);
 }
 
 void Manipulator::Attach(InteractiveObject^ theAISObject, bool adjustPosition, bool adjustSize, bool enableModes) {
@@ -130,39 +146,35 @@ void Manipulator::Attach(InteractiveObject^ theAISObject, bool adjustPosition, b
 	anOptions.SetAdjustPosition(adjustPosition);
 	anOptions.SetAdjustSize(!adjustSize);
 	anOptions.SetEnableModes(enableModes);
-	_pManipulator()->Attach(theAISObject->GetOCC(), anOptions);
+	myManipulator()->Attach(theAISObject->GetOCC(), anOptions);
 	// 让操作器自动激活
-	_pManipulator()->SetModeActivationOnDetection(true);
+	myManipulator()->SetModeActivationOnDetection(true);
 }
 
 void Manipulator::Detach() {
-	_pManipulator()->Detach();
+	myManipulator()->Detach();
 }
 
 void Manipulator::DeactivateCurrentMode() {
-	_pManipulator()->DeactivateCurrentMode();
+	myManipulator()->DeactivateCurrentMode();
 }
 
 // 设置显示哪个部分,默认全部显示
 void Manipulator::SetPart(ManipulatorMode^ theMode, bool isEnable) {
 	if (*theMode == ManipulatorMode::None) { return; }
-	_pManipulator()->SetPart(AIS_ManipulatorMode((int)*theMode), isEnable);
+	myManipulator()->SetPart(AIS_ManipulatorMode((int)*theMode), isEnable);
 }
 
 //设置显示哪个轴的哪个部分，0=x、1=y、2=z
 void Manipulator::SetPart(ManipulatorAxisIndex^ theAxisIndex, ManipulatorMode^ theMode, bool isEnable) {
 	if (*theAxisIndex == ManipulatorAxisIndex::None) { return; }
 	if (*theMode == ManipulatorMode::None) { return; }
-	_pManipulator()->SetPart((int)*theAxisIndex, AIS_ManipulatorMode((int)*theMode), isEnable);
+	myManipulator()->SetPart((int)*theAxisIndex, AIS_ManipulatorMode((int)*theMode), isEnable);
 }
 
 // 开启操作器模式
 void Manipulator::EnableMode(ManipulatorMode^ theMode) {
-	_pManipulator()->EnableMode(AIS_ManipulatorMode((int)*theMode));
-}
-
-Handle(Standard_Transient) Manipulator::GetStd() {
-	return nativeHandle();
+	myManipulator()->EnableMode(AIS_ManipulatorMode((int)*theMode));
 }
 
 }

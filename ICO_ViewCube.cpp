@@ -9,14 +9,32 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-ViewCube::ViewCube(float axesRadius) {
-	int R, G, B;
+ViewCube::ViewCube(double axesRadius) {
 	myViewCube() = new AIS_ViewCube();
+
+	//保存原始句柄
+	myAISObject() = myViewCube();
 	nativeHandle() = myViewCube();
+
+	SetDefault();
+}
+
+Handle(AIS_ViewCube) ViewCube::GetOCC() {
+	return myViewCube();
+
+}
+
+Handle(Standard_Transient) ViewCube::GetStd() {
+	return myViewCube();
+}
+
+void ViewCube::SetDefault() {
+	int R, G, B;
+
 	// 设置坐标轴半径
-	myViewCube()->SetAxesRadius(axesRadius);
-	myViewCube()->SetAxesConeRadius(axesRadius * 1.5);
-	myViewCube()->SetAxesSphereRadius(axesRadius * 1.5);
+	myViewCube()->SetAxesRadius(myAxisSize);
+	myViewCube()->SetAxesConeRadius(myAxisSize * 1.5);
+	myViewCube()->SetAxesSphereRadius(myAxisSize * 1.5);
 	//修改坐标轴文字颜色
 	Handle(Prs3d_Drawer) aDrawer = myViewCube()->Attributes();
 	aDrawer->SetDatumAspect(new Prs3d_DatumAspect());  // 动态设置
@@ -24,9 +42,9 @@ ViewCube::ViewCube(float axesRadius) {
 	aDatumAsp->TextAspect(Prs3d_DP_XAxis)->SetColor(Quantity_NOC_RED2);
 	aDatumAsp->TextAspect(Prs3d_DP_YAxis)->SetColor(Quantity_NOC_GREEN2);
 	aDatumAsp->TextAspect(Prs3d_DP_ZAxis)->SetColor(Quantity_NOC_BLUE2);
-	aDatumAsp->TextAspect(Prs3d_DP_XAxis)->SetHeight(axesRadius * 5);
-	aDatumAsp->TextAspect(Prs3d_DP_YAxis)->SetHeight(axesRadius * 5);
-	aDatumAsp->TextAspect(Prs3d_DP_ZAxis)->SetHeight(axesRadius * 5);
+	aDatumAsp->TextAspect(Prs3d_DP_XAxis)->SetHeight(myAxisSize * 5);
+	aDatumAsp->TextAspect(Prs3d_DP_YAxis)->SetHeight(myAxisSize * 5);
+	aDatumAsp->TextAspect(Prs3d_DP_ZAxis)->SetHeight(myAxisSize * 5);
 	// 修改坐标轴颜色
 	aDatumAsp->ShadingAspect(Prs3d_DP_XAxis)->SetColor(Quantity_NOC_RED2);
 	aDatumAsp->ShadingAspect(Prs3d_DP_YAxis)->SetColor(Quantity_NOC_GREEN2);
@@ -66,15 +84,6 @@ ViewCube::ViewCube(float axesRadius) {
 	// myViewCube()->SetRoundRadius(0.1)
 	// 设置立方体面到边间空隙的可选择范围
 	// myViewCube()->SetBoxEdgeGap(0)
-}
-
-Handle(AIS_ViewCube) ViewCube::GetOCC() {
-	return myViewCube();
-
-}
-
-Handle(Standard_Transient) ViewCube::GetStd() {
-	return myViewCube();
 }
 
 }

@@ -87,6 +87,12 @@
     <Filter Include="源文件\OCCProxy\Aspect">
       <UniqueIdentifier>{4d9baac6-228c-4f96-83ee-42f2bdf4a739}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Laset">
+      <UniqueIdentifier>{63c61224-7f17-4df0-b9bb-1cb45688da93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Laser">
+      <UniqueIdentifier>{8eadf91c-c88e-49bb-8cfa-6f400d6fd7c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -103,12 +109,6 @@
     </ClCompile>
     <ClCompile Include="ICO_Trsf.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
-    </ClCompile>
-    <ClCompile Include="MakeSimpleClamp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WMakeSimpleClamp.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ICO_AIS_Shape.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
@@ -182,6 +182,12 @@
     <ClCompile Include="ICO_Ax3.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
+    <ClCompile Include="MakeSimpleClamp.cpp">
+      <Filter>源文件\Laser</Filter>
+    </ClCompile>
+    <ClCompile Include="WMakeSimpleClamp.cpp">
+      <Filter>源文件\Laser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -199,14 +205,8 @@
     <ClInclude Include="ICO_Trsf.h">
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
-    <ClInclude Include="WMakeSimpleClamp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ICO_AIS_Shape.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
-    </ClInclude>
-    <ClInclude Include="MakeSimpleClamp.h">
-      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ICO_Pnt.h">
       <Filter>头文件\OCCProxy\gp</Filter>
@@ -291,6 +291,12 @@
     </ClInclude>
     <ClInclude Include="ICO_Ax3.h">
       <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="MakeSimpleClamp.h">
+      <Filter>头文件\Laset</Filter>
+    </ClInclude>
+    <ClInclude Include="WMakeSimpleClamp.h">
+      <Filter>头文件\Laset</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

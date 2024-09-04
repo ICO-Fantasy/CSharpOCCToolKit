@@ -380,13 +380,35 @@ public enum VPCMode
 /// <summary>
 /// 交互逻辑 MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandler
+public partial class MainWindow : Window
 {
     #region TEST
 
     private List<TShape> inputShapes = new();
 
     #endregion
+    public MainWindow()
+    {
+        InitializeComponent();
+        // 创建 Windows Forms 控件和 WindowsFormsHost
+        WindowsFormsHost aHost = new WindowsFormsHost();
+        Canvas = new OCCCanvas();
+        aHost.Child = Canvas;
+        canvas_grid.Children.Add(aHost);
+        AISContext = Canvas.AISContext;
+        Canvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+        Canvas.Show();
+        //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
+        //ViewModel = new MainViewModel();
+        //this.DataContext = ViewModel;
+        Canvas.OnAISSelected += OnSelectPiece;
+        Canvas.OnMouseMoved += MousePosition;
+
+        TextChangeSetting();
+        //! test
+        TestInput();
+        DisplayEraseInputWorkpiece(true);
+    }
 
     const double LINEAR_TOL = 1e-1;
 
@@ -494,6 +516,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #endregion
 
     #region 竖板全局参数
+
     /// <summary>
     /// 避让高度
     /// </summary>
@@ -569,25 +592,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     //public MainViewModel ViewModel { get; set; }
 
-    public MainWindow()
-    {
-        InitializeComponent();
-        // 创建 Windows Forms 控件和 WindowsFormsHost
-        WindowsFormsHost aHost = new WindowsFormsHost();
-        Canvas = new OCCCanvas();
-        AISContext = Canvas.AISContext;
-        Canvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-        Canvas.Show();
-        aHost.Child = Canvas;
-        canvas_grid.Children.Add(aHost);
-        //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
-        //ViewModel = new MainViewModel();
-        //this.DataContext = ViewModel;
-        Canvas.OnAISSelected += OnAISSelectionMade;
-        Canvas.OnMouseMoved += OnMouseMoved;
 
-        TextChangeSetting();
-    }
 
     /// <summary>
     /// 全局属性绑定
@@ -1737,9 +1742,6 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private InteractiveObject? manipulatedObject = null;
 
-    private Ax2? StartPosition;
-    private Ax2? EndPosition;
-
     /// <summary>
     /// 操作器
     /// </summary>
@@ -1755,26 +1757,14 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
                 Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
                 manipulatedObject = InputWorkpiece.AIS;
                 Canvas.Attach(manipulatedObject);
-                StartPosition = Canvas.GetManipulatorPosition();
             }
             else
             {
-                EndPosition = Canvas.GetManipulatorPosition();
-
-                Debug.WriteLine($"Start: {StartPosition}");
-                Debug.WriteLine($"End: {EndPosition}");
-                Trsf theT = new Trsf(StartPosition, EndPosition);
-                Debug.WriteLine($"Trsf: {theT}");
-                var ashape = (AShape)(InputWorkpiece.AIS);
-                Ax2 ax2 = new();
-                ax2.Transform(ashape.LocalTransformation());
-                var p = new OCCTK.OCC.BRepPrimAPI.MakeSphere(ax2, 1);
-                var origin = new AShape(p.Shape());
-                Display(origin, true);
-
-                Canvas.Remove(InputWorkpiece.AIS, false);
-                InputWorkpiece.Transform(theT);
+                var t = Canvas.GetManipulatorTransformation() ?? new Trsf();
+                //! 必须先detach操作器，否则会因为AIS对象消失而出错
                 Canvas.ResetManipulatorPart();
+                Canvas.Remove(InputWorkpiece.AIS, false);
+                InputWorkpiece.Transform(t);
                 manipulatedObject = null;
                 DisplayEraseInputWorkpiece(false);
             }
@@ -2451,7 +2441,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #endregion
 
     #region 实现接口
-    public void OnAISSelectionMade(AShape theAIS)
+    public void OnSelectPiece(AShape theAIS)
     {
         if (CurrentPlate_StackPanel.Children.Count == 0)
         {
@@ -2505,7 +2495,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         }
     }
 
-    public void OnMouseMoved(int X, int Y)
+    public void MousePosition(int X, int Y)
     {
         currentMouse_Label.Content = $"鼠标坐标: {X}, {Y}";
     }

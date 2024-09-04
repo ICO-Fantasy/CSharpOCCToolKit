@@ -7,6 +7,7 @@ namespace AIS {
 RubberBand::RubberBand() {
 	myRubber() = new AIS_RubberBand();
 	// 保存原始句柄
+	myAISObject() = myRubber();
 	nativeHandle() = myRubber();
 }
 

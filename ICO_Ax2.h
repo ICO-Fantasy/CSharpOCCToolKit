@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <gp_Ax2.hxx>
+
+//前向声明
 namespace OCCTK {
 namespace OCC {
 namespace gp {
@@ -7,6 +9,7 @@ ref class Trsf;
 }
 }
 }
+
 namespace OCCTK {
 namespace OCC {
 namespace gp {

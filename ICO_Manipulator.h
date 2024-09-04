@@ -37,6 +37,7 @@ public:
 	Manipulator(Handle(AIS_Manipulator) theManipulator);
 	Manipulator(List<InteractiveObject^>^ theAISList);
 	Handle(AIS_Manipulator) GetOCC();
+	virtual Handle(Standard_Transient) GetStd() override;
 
 	bool HasActiveMode();
 	ManipulatorMode ActiveMode();
@@ -46,7 +47,8 @@ public:
 #pragma region 变换
 
 	void StartTransform(double theX, double theY, View^ theView);
-	void Transform(double theX, double theY, View^ theView);
+	//void Transform(double theX, double theY, View^ theView);
+	Trsf^ Transform(double theX, double theY, View^ theView);
 	void StopTransform();
 	void StopTransform(bool thetoApply);
 
@@ -66,9 +68,8 @@ public:
 	void SetPart(ManipulatorMode^ theMode, bool isEnable);
 	void SetPart(ManipulatorAxisIndex^ theAxisIndex, ManipulatorMode^ theMode, bool isEnable);
 	void EnableMode(ManipulatorMode^ theMode);
-	virtual Handle(Standard_Transient) GetStd() override;
 private:
-	NCollection_Haft<Handle(AIS_Manipulator)> _pManipulator;
+	NCollection_Haft<Handle(AIS_Manipulator)> myManipulator;
 };
 
 }

@@ -105,29 +105,29 @@ void InteractiveContext::XORSelect(void) {
 	myAISContext()->UpdateCurrentViewer();
 }
 
-void InteractiveContext::AreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView) {
+void InteractiveContext::AreaSelect(int minX, int minY, int maxX, int maxY, V3d::View^ theView) {
 	if (myAISContext().IsNull()) return;
 	if (theView->GetOCC().IsNull()) return;
-	myAISContext()->SelectRectangle(Graphic3d_Vec2i(theX1, theY1),
-		Graphic3d_Vec2i(theX2, theY2),
+	myAISContext()->SelectRectangle(Graphic3d_Vec2i(minX, minY),
+		Graphic3d_Vec2i(maxX, maxY),
 		theView->GetOCC());
 }
 
-void InteractiveContext::MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView) {
+void InteractiveContext::MultipleAreaSelect(int minX, int minY, int maxX, int maxY, V3d::View^ theView) {
 	if (myAISContext().IsNull()) return;
 	if (theView->GetOCC().IsNull()) return;
-	myAISContext()->SelectRectangle(Graphic3d_Vec2i(theX1, theY1),
-		Graphic3d_Vec2i(theX2, theY2),
+	myAISContext()->SelectRectangle(Graphic3d_Vec2i(minX, minY),
+		Graphic3d_Vec2i(maxX, maxY),
 		theView->GetOCC(),
 		AIS_SelectionScheme_Add);
 	myAISContext()->UpdateCurrentViewer();
 }
 
-void InteractiveContext::XORAreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView) {
+void InteractiveContext::XORAreaSelect(int minX, int minY, int maxX, int maxY, V3d::View^ theView) {
 	if (myAISContext().IsNull()) return;
 	if (theView->GetOCC().IsNull()) return;
-	myAISContext()->SelectRectangle(Graphic3d_Vec2i(theX1, theY1),
-		Graphic3d_Vec2i(theX2, theY2),
+	myAISContext()->SelectRectangle(Graphic3d_Vec2i(minX, minY),
+		Graphic3d_Vec2i(maxX, maxY),
 		theView->GetOCC(),
 		AIS_SelectionScheme_XOR);
 	myAISContext()->UpdateCurrentViewer();
@@ -189,12 +189,17 @@ void InteractiveContext::NextDetected() {
 	myAISContext()->NextDetected();
 }
 
-// 显示
+//! 显示
 // AIS_InteractiveContext 内部的对象是在无序映射中定义的，因此它们的绘制顺序默认是未定义的（Z 深度缓冲区用于正确渲染），
 // 但可以通过显示优先级和分配图层来改变（参见Graphic3d_ZLayerId / PrsMgr_PresentableObject::ZLayer()）。
 void InteractiveContext::Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->Display(theAISObject, theToUpdateViewer);
+	try {
+		myAISContext()->Display(theAISObject, theToUpdateViewer);
+	}
+	catch (Standard_Failure e) {
+		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
+	}
 }
 
 void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpdateViewer) {

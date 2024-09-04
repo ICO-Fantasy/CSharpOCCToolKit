@@ -2,6 +2,8 @@
 #include <gp_Trsf.hxx>
 //Local
 #include "ICO_Pnt.h"
+
+//前向声明
 namespace OCCTK {
 namespace OCC {
 namespace gp {
@@ -9,6 +11,7 @@ ref class Ax2;
 }
 }
 }
+
 namespace OCCTK {
 namespace OCC {
 namespace gp {

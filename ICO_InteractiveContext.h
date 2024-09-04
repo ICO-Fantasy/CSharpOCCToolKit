@@ -39,9 +39,9 @@ public:
 	void SelectAIS(InteractiveObject^ theAISObject, bool update);
 	void MultipleSelect(void);
 	void XORSelect(void);
-	void AreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView);
-	void MultipleAreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView);
-	void XORAreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView);
+	void AreaSelect(int minX, int minY, int maxX, int maxY, V3d::View^ theView);
+	void MultipleAreaSelect(int minX, int minY, int maxX, int maxY, V3d::View^ theView);
+	void XORAreaSelect(int minX, int minY, int maxX, int maxY, V3d::View^ theView);
 
 	void InitSelected();
 	bool MoreSelected();
