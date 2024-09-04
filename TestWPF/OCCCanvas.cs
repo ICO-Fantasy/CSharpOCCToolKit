@@ -139,7 +139,7 @@ public class OCCCanvas : Form
         { Action3d.MultipleAreaSelect, Cursors.Cross },
         { Action3d.XORAreaSelect, Cursors.Default },
         { Action3d.AreaZooming, Cursors.Default },
-        { Action3d.DynamicRotation, new Cursor("rotation.cur") },
+        { Action3d.DynamicRotation, Cursors.NoMove2D },
         { Action3d.DynamicPanning, Cursors.SizeAll },
         { Action3d.Prohibition, Cursors.No },
         // Manipulator
@@ -316,6 +316,48 @@ public class OCCCanvas : Form
         //获取相机对象
         MainView = Canvas.GetMainView();
 
+        SetDefault();
+
+        MainView.Redraw();
+        MainView.MustBeResized();
+    }
+
+    private void InitializeComponent()
+    {
+        // 标题栏中不显示控制框的值
+        ControlBox = false;
+        // 设置不为顶层窗口
+        TopLevel = false;
+        this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+
+        SizeChanged += new System.EventHandler(OnSizeChanged);
+        Paint += new System.Windows.Forms.PaintEventHandler(OnPaint);
+
+        MouseDown += new System.Windows.Forms.MouseEventHandler(OnMouseDown);
+        MouseUp += new System.Windows.Forms.MouseEventHandler(OnMouseUp);
+        MouseMove += new System.Windows.Forms.MouseEventHandler(OnMouseMove);
+        MouseWheel += new System.Windows.Forms.MouseEventHandler(OnMouseWheel);
+
+        //todo 键盘事件未生效
+        KeyPreview = true;
+        KeyDown += new System.Windows.Forms.KeyEventHandler(OnKeyDown);
+    }
+
+    private void SetDefault()
+    {
+        if (Viewer == null)
+        {
+            throw new Exception("Canvas is null");
+        }
+        if (AISContext == null)
+        {
+            throw new Exception("AISContext is null");
+        }
+        if (MainView == null)
+        {
+            throw new Exception("MainView is null");
+        }
+
         //设置默认灯光
         Viewer.SetDefaultLight();
         //设置交互默认值
@@ -352,33 +394,11 @@ public class OCCCanvas : Form
 
         IsDrawRect = false;
         DegenerateMode = true;
+
         Canvas.DisplayViewCube(ShowViewCube);
         Canvas.DisplayOriginTrihedron(ShowOriginTrihedron);
         Canvas.DisplayViewTrihedron(ShowViewTrihedron);
-
-        MainView.Redraw();
-        MainView.MustBeResized();
-    }
-
-    private void InitializeComponent()
-    {
-        // 标题栏中不显示控制框的值
-        ControlBox = false;
-        // 设置不为顶层窗口
-        TopLevel = false;
-        this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-
-        SizeChanged += new System.EventHandler(OnSizeChanged);
-        Paint += new System.Windows.Forms.PaintEventHandler(OnPaint);
-
-        MouseDown += new System.Windows.Forms.MouseEventHandler(OnMouseDown);
-        MouseUp += new System.Windows.Forms.MouseEventHandler(OnMouseUp);
-        MouseMove += new System.Windows.Forms.MouseEventHandler(OnMouseMove);
-        MouseWheel += new System.Windows.Forms.MouseEventHandler(OnMouseWheel);
-
-        //todo 键盘事件未生效
-        KeyPreview = true;
-        KeyDown += new System.Windows.Forms.KeyEventHandler(OnKeyDown);
+        MainView.DisplayDefault_GraduatedTrihedron();
     }
 
     /// <summary>
@@ -386,7 +406,7 @@ public class OCCCanvas : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void CursorResetTimer_Tick(object sender, EventArgs e)
+    private void CursorResetTimer_Tick(object? sender, EventArgs e)
     {
         Cursor = System.Windows.Forms.Cursors.Default;
         // 停止计时器
@@ -450,7 +470,7 @@ public class OCCCanvas : Form
 
     #region 鼠标
 
-    private void OnMouseDown(object sender, MouseEventArgs e)
+    private void OnMouseDown(object? sender, MouseEventArgs e)
     {
         // 获取鼠标按下的按钮和修改键
         //MouseButtons mouseButton = e.Button;
@@ -477,8 +497,10 @@ public class OCCCanvas : Form
         }
     }
 
-    private void OnMouseMove(object sender, MouseEventArgs e)
+    private void OnMouseMove(object? sender, MouseEventArgs e)
     {
+        //! 键盘响应一定要获得焦点
+        this.Focus();
         //! 使用if而不是switch判断，让点击事件具有更高优先级
         // 获取鼠标当前位置
         //Point pt = e.Location;
@@ -518,8 +540,8 @@ public class OCCCanvas : Form
                         && myManipulator.ActiveAxisIndex() == _ManipulatorAxis
                     )
                     {
-                        Debug.WriteLine($"{myManipulator.ActiveMode()}");
-                        myManipulator.Transform(mouseCurrentX, mouseCurrentY, Canvas.GetMainView());
+                        //Debug.WriteLine($"{myManipulator.ActiveMode()}");
+                        myManipulator.Transform(mouseCurrentX, mouseCurrentY, MainView);
                         MainView.Redraw();
                         CurrentAction3d = Action3d.Manipulator_Translation;
                     }
@@ -740,7 +762,12 @@ public class OCCCanvas : Form
     }
 
     #endregion
-    private void OnKeyDown(object sender, KeyEventArgs e)
+    /// <summary>
+    /// 键盘事件
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.F)
         {
@@ -898,19 +925,17 @@ public class OCCCanvas : Form
 
     #region 显示
 
-    public void Display(AShape theAIS, bool Toupdate)
+    public void Display(InteractiveObject theAIS, bool Toupdate)
     {
-        _CurrentAIS.Add(theAIS);
         AISContext.Display(theAIS, Toupdate);
     }
 
     public void EraseSelected()
     {
-        _CurrentAIS.Remove(AISContext.SelectedAIS());
         AISContext.EraseSelected();
     }
 
-    public void Erase(AShape theAIS, bool Toupdate)
+    public void Erase(InteractiveObject theAIS, bool Toupdate)
     {
         AISContext.Erase(theAIS, Toupdate);
     }
@@ -923,9 +948,8 @@ public class OCCCanvas : Form
         Canvas.DisplayViewTrihedron(ShowViewTrihedron);
     }
 
-    public void Remove(AShape theAIS, bool Toupdate)
+    public void Remove(InteractiveObject theAIS, bool Toupdate)
     {
-        _CurrentAIS.Remove(theAIS);
         AISContext.Remove(theAIS, Toupdate);
     }
 
@@ -1031,7 +1055,7 @@ public class OCCCanvas : Form
 
     #region 操作器
 
-    public void Attach(AShape theAIS)
+    public void Attach(InteractiveObject theAIS)
     {
         myManipulator.Attach(theAIS, true, true, true);
     }

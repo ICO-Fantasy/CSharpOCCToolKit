@@ -101,6 +101,11 @@ public ref struct VerticalPlate {
 	property String^ NumberString { String^ get() { return gcnew String(myPlate().numberString.ToCString()); }void set(String^ value) {
 		myPlate().numberString = DataExchange::ToAsciiString(value);
 	}};
+	//是否有辅助板
+	property bool Auxiliary {bool get() { return myPlate().auxiliary; }}
+	//辅助板的高和宽设置
+	property double AuxiliaryHight {double get() { return myPlate().auxiliaryHight; }void set(double value) { myPlate().auxiliaryHight = value; }}
+	property double AuxiliaryWidth {double get() { return myPlate().auxiliaryWidth; }void set(double value) { myPlate().auxiliaryWidth = value; }}
 	// 最终的竖板形状
 	//property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(myPlate().shape); }return myAIS; }};
 	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};

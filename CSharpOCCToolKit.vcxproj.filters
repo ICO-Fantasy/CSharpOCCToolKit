@@ -173,6 +173,15 @@
     <ClCompile Include="ICO_MakeCompound.cpp">
       <Filter>源文件\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_AIS_Shape_Tri.cpp">
+      <Filter>源文件\Extension</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakeSphere.cpp">
+      <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Ax3.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -273,6 +282,15 @@
     </ClInclude>
     <ClInclude Include="ICO_Aspect_Line.h">
       <Filter>头文件\OCCProxy\Aspect</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_AIS_Shape_Tri.h">
+      <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeSphere.h">
+      <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Ax3.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

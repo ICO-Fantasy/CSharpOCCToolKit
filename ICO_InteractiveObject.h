@@ -20,7 +20,7 @@ public:
 	// 实现虚函数
 	Handle(Standard_Transient) GetStd() override;
 protected:
-	NCollection_Haft<Handle(AIS_InteractiveObject)>myAISObject;
+	NCollection_Haft<Handle(AIS_InteractiveObject)> myAISObject;
 };
 
 }

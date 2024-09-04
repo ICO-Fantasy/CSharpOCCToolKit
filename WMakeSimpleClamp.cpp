@@ -64,6 +64,9 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 
 	for each (auto oneVP in toDownPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
+		if (theoccVP.auxiliary) {
+			continue;
+		}
 		if (theoccVP.pieces.empty()) { continue; }
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccDownVP.push_back(theoccVP);
@@ -77,6 +80,9 @@ cli::array<List<VerticalPlate^>^>^ SimpleClampMaker::ConnectVerticalPLates(List<
 	for each (auto oneVP in toUpPlates) {
 		SimpleClamp::VerticalPlate theoccVP = oneVP->GetOCC();
 		if (theoccVP.pieces.empty()) { continue; }
+		if (theoccVP.auxiliary) {
+			continue;
+		}
 		SimpleClamp::SuturePiece(theoccVP, theoccBP, theAvoidanceHeight, theConnectThickness);
 		tempOccUpVP.push_back(theoccVP);
 		////! debug

@@ -240,6 +240,7 @@ public:
 	double slotLength = 6.0;//todo 暂不开放 连接槽长度
 	double slotHight = 10.0;//todo 暂不开放 连接槽高度
 	double filletRadius;
+	bool auxiliary = false;
 	double auxiliaryHight = 100.0;
 	double auxiliaryWidth = 30.0;
 	std::vector<gp_Pnt> cutPoints;

@@ -1197,6 +1197,7 @@ VerticalPlate AddSupportPlate(VerticalPlate thePlate, bool middleToDown) {
 			wireMaker.Add(BRepBuilderAPI_MakeEdge(l1, lh));
 		}
 	}
+	auxiliaryPlate.auxiliary = true;
 	auxiliaryPlate.shape = BRepBuilderAPI_MakeFace(wireMaker).Shape();
 	return auxiliaryPlate;
 }

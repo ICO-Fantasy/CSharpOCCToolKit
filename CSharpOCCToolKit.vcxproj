@@ -156,11 +156,14 @@
   <ItemGroup>
     <ClCompile Include="convertChinese.cpp" />
     <ClCompile Include="CSharpViewer.cpp" />
+    <ClCompile Include="ICO_AIS_Shape_Tri.cpp" />
     <ClCompile Include="ICO_Ax2.cpp" />
+    <ClCompile Include="ICO_Ax3.cpp" />
     <ClCompile Include="ICO_BndBox.cpp" />
     <ClCompile Include="ICO_BrepExchange.cpp" />
     <ClCompile Include="ICO_MakeCompound.cpp" />
     <ClCompile Include="ICO_MakeDir.cpp" />
+    <ClCompile Include="ICO_MakeSphere.cpp" />
     <ClCompile Include="ICO_RubberBand.cpp" />
     <ClCompile Include="ICO_Transform.cpp" />
     <ClCompile Include="ICO_Viewer.cpp" />
@@ -186,13 +189,16 @@
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
+    <ClInclude Include="ICO_AIS_Shape_Tri.h" />
     <ClInclude Include="ICO_Aspect_Line.h" />
     <ClInclude Include="ICO_Ax2.h" />
+    <ClInclude Include="ICO_Ax3.h" />
     <ClInclude Include="ICO_BndBox.h" />
     <ClInclude Include="ICO_BrepExchange.h" />
     <ClInclude Include="ICO_DisplayMode.h" />
     <ClInclude Include="ICO_MakeCompound.h" />
     <ClInclude Include="ICO_MakeDir.h" />
+    <ClInclude Include="ICO_MakeSphere.h" />
     <ClInclude Include="ICO_RubberBand.h" />
     <ClInclude Include="ICO_Transform.h" />
     <ClInclude Include="ICO_Viewer.h" />

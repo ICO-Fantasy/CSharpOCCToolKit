@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
 using Microsoft.Win32;
+using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.Laser;
 using OCCTK.OCC.AIS;
@@ -29,6 +30,7 @@ public class InputWorkpiece
     public InputWorkpiece(TShape theShape)
     {
         _InputWorkpiece = theShape;
+
         _AISInputWorkpiece = new AShape(theShape);
     }
 
@@ -38,7 +40,7 @@ public class InputWorkpiece
     {
         get { return _InputWorkpiece; }
     }
-    public AShape AIS
+    public InteractiveObject AIS
     {
         get { return _AISInputWorkpiece; }
     }
@@ -389,7 +391,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     const double LINEAR_TOL = 1e-1;
 
     // 定义颜色数组
-    private System.Windows.Media.SolidColorBrush[] colorSequence =
+    private readonly System.Windows.Media.SolidColorBrush[] colorSequence =
     {
         Brushes.LightPink,
         Brushes.LightCoral,
@@ -397,13 +399,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         Brushes.LightGreen,
         Brushes.LightCyan
     };
-    private OCCCanvas Viewer;
-    private InteractiveContext AISContext;
-
-    private AShape? manipulatedObject = null;
-
-    private Ax2 StartPosition;
-    private Ax2 EndPosition;
+    private readonly OCCCanvas Canvas;
+    private readonly InteractiveContext AISContext;
 
     /// <summary>
     /// 创建的竖板列表，分为两部分储存
@@ -430,12 +427,12 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <summary>
     /// 展平后的结果
     /// </summary>
-    public CombinedFixtureBoard CombinedFixtureBoard;
+    public CombinedFixtureBoard? CombinedFixtureBoard;
 
     /// <summary>
     /// 输入的工件
     /// </summary>
-    private InputWorkpiece InputWorkpiece;
+    private InputWorkpiece? InputWorkpiece;
     private bool ShowInputWorkpiece = true;
 
     #region 底板参数
@@ -542,9 +539,10 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
                 _CurrentPlate = value;
                 CurrentPlateLocationX_TextBox.Text = $"{value.Pose.Location.X():F1}";
                 CurrentPlateLocationY_TextBox.Text = $"{value.Pose.Location.Y():F1}";
-                CurrentPlateLocationZ_TextBox.Text = $"{value.Pose.Location.Z():F1}";
                 CurrentPlateDirection_TextBox.Text =
                     $"{DirMaker.GetDirAngleWithZ(value.Pose.Direction):F1}";
+                CurrentPlateAuxiliaryHight_TextBox.Text = $"{value.AuxiliaryHight}";
+                CurrentPlateAuxiliaryWidth_TextBox.Text = $"{value.AuxiliaryWidth}";
                 CurrentPlateConnectionThickness_TextBox.Text = $"{value.ConnectionThickness}";
                 CurrentPlateNumberString_TextBox.Text = $"{value.NumberString}";
                 CurrentPlateFilletRadius_TextBox.Text = $"{value.FilletRadius}";
@@ -576,19 +574,26 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
-        Viewer = new OCCCanvas();
-        AISContext = Viewer.AISContext;
-        Viewer.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-        Viewer.Show();
-        aHost.Child = Viewer;
+        Canvas = new OCCCanvas();
+        AISContext = Canvas.AISContext;
+        Canvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+        Canvas.Show();
+        aHost.Child = Canvas;
         canvas_grid.Children.Add(aHost);
         //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
         //ViewModel = new MainViewModel();
         //this.DataContext = ViewModel;
-        Viewer.OnAISSelected += OnAISSelectionMade;
-        Viewer.OnMouseMoved += OnMouseMoved;
-        #region 全局属性绑定
+        Canvas.OnAISSelected += OnAISSelectionMade;
+        Canvas.OnMouseMoved += OnMouseMoved;
 
+        TextChangeSetting();
+    }
+
+    /// <summary>
+    /// 全局属性绑定
+    /// </summary>
+    private void TextChangeSetting()
+    {
         BasePlateOffsetX_TextBox.Text = BasePlateOffsetX.ToString("F1");
         BasePlateOffsetX_TextBox.TextChanged += BasePlateOffsetX_TextChanged;
 
@@ -637,7 +642,6 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
         FilletRadius_TextBox.Text = FilletRadiusParameter.ToString("F1");
         FilletRadius_TextBox.TextChanged += FilletRadius_TextChanged;
-        #endregion
 
         #region 创建竖板
         XNum_TextBox.Text = XNum.ToString();
@@ -645,40 +649,37 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         YNum_TextBox.Text = YNum.ToString();
         YNum_TextBox.TextChanged += YNum_TextChanged;
         #endregion
-
-        #region 单块板的属性
-        #endregion
     }
 
     #region 视角
     private void ForntView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetViewOrientation(ViewOrientation.Front);
+        Canvas.SetViewOrientation(ViewOrientation.Front);
     }
 
     private void BackView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetViewOrientation(ViewOrientation.Back);
+        Canvas.SetViewOrientation(ViewOrientation.Back);
     }
 
     private void TopView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetViewOrientation(ViewOrientation.Top);
+        Canvas.SetViewOrientation(ViewOrientation.Top);
     }
 
     private void BottomView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetViewOrientation(ViewOrientation.Bottom);
+        Canvas.SetViewOrientation(ViewOrientation.Bottom);
     }
 
     private void LeftView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetViewOrientation(ViewOrientation.Left);
+        Canvas.SetViewOrientation(ViewOrientation.Left);
     }
 
     private void RightView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetViewOrientation(ViewOrientation.Right);
+        Canvas.SetViewOrientation(ViewOrientation.Right);
     }
 
     private void Wireframe_Button_Click(object sender, RoutedEventArgs e)
@@ -695,7 +696,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     #region 测试
     private void FitAll_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.FitAll();
+        Canvas.FitAll();
     }
 
     #endregion
@@ -721,8 +722,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             MiddleToDownPlates.Clear();
             MiddleToUpPlates.Clear();
             UpdateComboBox();
-            DisplayEraseInputWorkpiece(false);
-            Viewer.FitAll();
+            DisplayEraseInputWorkpiece(true);
+            Canvas.FitAll();
         }
     }
 
@@ -746,8 +747,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             MiddleToDownPlates.Clear();
             MiddleToUpPlates.Clear();
             UpdateComboBox();
-            DisplayEraseInputWorkpiece(false);
-            Viewer.FitAll();
+            DisplayEraseInputWorkpiece(true);
+            Canvas.FitAll();
         }
     }
 
@@ -787,11 +788,11 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
+        Canvas.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test1.stp").Shape());
         BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        Canvas.Display(InputWorkpiece.AIS, true);
+        Canvas.FitAll();
     }
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
@@ -853,20 +854,20 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
+        Canvas.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test4.stp").Shape());
         BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        Canvas.Display(InputWorkpiece.AIS, true);
+        Canvas.FitAll();
     }
 
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseAll(false);
+        Canvas.EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test5.stp").Shape());
         BasePlate = null;
-        Viewer.Display(InputWorkpiece.AIS, true);
-        Viewer.FitAll();
+        Canvas.Display(InputWorkpiece.AIS, true);
+        Canvas.FitAll();
     }
 
     #endregion
@@ -875,31 +876,31 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(SelectionMode.Shape);
+        Canvas.SetSelectionMode(SelectionMode.Shape);
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(SelectionMode.Face);
+        Canvas.SetSelectionMode(SelectionMode.Face);
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(SelectionMode.Edge);
+        Canvas.SetSelectionMode(SelectionMode.Edge);
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(SelectionMode.Vertex);
+        Canvas.SetSelectionMode(SelectionMode.Vertex);
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void Select_Shell_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.SetSelectionMode(SelectionMode.Shell);
+        Canvas.SetSelectionMode(SelectionMode.Shell);
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 
@@ -957,7 +958,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             BasePlate.OffsetX = (newValue - BasePlate.DX) / 2;
             BasePlate.UpdateAIS();
             DisplayEraseBasePlates(true);
-            Viewer.Update();
+            Canvas.Update();
         }
     }
 
@@ -976,7 +977,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             BasePlate.OffsetY = (newValue - BasePlate.DY) / 2;
             BasePlate.UpdateAIS();
             DisplayEraseBasePlates(true);
-            Viewer.Update();
+            Canvas.Update();
         }
     }
 
@@ -1143,7 +1144,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         string selectedDirection = "";
         if (seletedItem != null)
         {
-            selectedDirection = seletedItem.Content.ToString();
+            selectedDirection = seletedItem.Content.ToString() ?? string.Empty;
         }
 
         if (selectedDirection == "X")
@@ -1164,7 +1165,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void CurrentPlateLocationX_ComboBox_SelectionChanged(
-        object sender,
+        object? sender,
         SelectionChangedEventArgs e
     )
     {
@@ -1185,7 +1186,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             {
                 DisplayCurrentPieces(false);
             }
-            Viewer.Update();
+            Canvas.Update();
             CurrentPlate
                 .Pieces.OrderBy(item =>
                 {
@@ -1206,7 +1207,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void CurrentPlateLocationY_ComboBox_SelectionChanged(
-        object sender,
+        object? sender,
         SelectionChangedEventArgs e
     )
     {
@@ -1228,7 +1229,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             {
                 DisplayCurrentPieces(false);
             }
-            Viewer.Update();
+            Canvas.Update();
             for (global::System.Int32 i = 0; i < CurrentPlate.Pieces.Count; ++i)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(CurrentPlate.Pieces[i], i));
@@ -1242,7 +1243,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void AddPlateDirection_ComboBox_SelectionChanged(
-        object sender,
+        object? sender,
         SelectionChangedEventArgs e
     )
     {
@@ -1253,7 +1254,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         ComboBoxItem seletedItem = (ComboBoxItem)AddPlateDirection_ComboBox.SelectedItem;
         if (seletedItem != null)
         {
-            AddPlateDirection = seletedItem.Content.ToString();
+            AddPlateDirection = seletedItem.Content.ToString() ?? string.Empty;
         }
 
         //! 方向虽然用X、Y做区分，实际上还包括XY以外的方向，但只分为两种。
@@ -1276,7 +1277,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     }
 
     //单片
-    private Grid MakeStackItem(VerticalPiece thePiece, int theNum)
+    private Grid? MakeStackItem(VerticalPiece thePiece, int theNum)
     {
         if (thePiece == null)
         {
@@ -1331,8 +1332,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         deleteButton.Click += (sender, e) =>
         {
             // 删除对应的 Piece
-            CurrentPlate.Pieces.Remove(thePiece);
-            CurrentPlate.RemovePiece(thePiece);
+            CurrentPlate?.Pieces?.Remove(thePiece);
+            CurrentPlate?.RemovePiece(thePiece);
             // 删除显示对象
             AISContext.Remove(thePiece.AIS, false);
             //删除对应的grid
@@ -1340,7 +1341,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             {
                 theS.Children.Remove(outerStackPanel);
             }
-            Viewer.Update();
+            Canvas.Update();
         };
         // 绑定 thePiece 对象到第一个 Label 的 Tag 属性
         if (outerStackPanel.Children[0] is Label firstLabel)
@@ -1372,7 +1373,6 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         // 更新CurrentPlateValueLable的值
         double theX,
             theY,
-            theZ,
             theAngle,
             theClearances,
             theMinSupportLen,
@@ -1390,12 +1390,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             MessageBox.Show("Y 位置输入的值不是有效的数字。");
             return;
         }
-        // 转换 Z 位置
-        if (!double.TryParse(CurrentPlateLocationZ_TextBox.Text, out theZ))
-        {
-            MessageBox.Show("Z 位置输入的值不是有效的数字。");
-            return;
-        }
+
         // 转换方向
         if (!double.TryParse(CurrentPlateDirection_TextBox.Text, out theAngle))
         {
@@ -1424,12 +1419,16 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         var newPlate = SimpleClampMaker.MakeVerticalPlate(
             InputWorkpiece.Shape,
             BasePlate,
-            new PlatePose(new Pnt(theX, theY, theZ), DirMaker.AngleWithZ(theAngle)),
+            new PlatePose(
+                new Pnt(theX, theY, CurrentPlate.Pose.Location.Z()),
+                DirMaker.AngleWithZ(theAngle)
+            ),
             theClearances,
             theMinSupportLen,
             theCuttingDistance
         );
-        newPlate.NumberString = oldNumberString;
+        //更新编号值
+        newPlate.NumberString = CurrentPlateNumberString_TextBox.Text;
         MiddleToDownPlates.RemoveAll(item => item.NumberString == oldNumberString);
         if (oldNumberString[0] == 'X')
         {
@@ -1443,13 +1442,13 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         //删除旧的板的显示
         if (CurrentPlate.AIS != null)
         {
-            Viewer.Remove(CurrentPlate.AIS, false);
+            Canvas.Remove(CurrentPlate.AIS, false);
         }
         if (CurrentPlate.Pieces.Count() != 0)
         {
             foreach (var onePiece in CurrentPlate.Pieces)
             {
-                Viewer.Remove(onePiece.AIS, false);
+                Canvas.Remove(onePiece.AIS, false);
             }
         }
         //替换为新的
@@ -1470,7 +1469,35 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         {
             DisplayCurrentPieces(false);
         }
-        Viewer.Update();
+        Canvas.Update();
+    }
+
+    /// <summary>
+    /// 更新板中储存的数值，但是不生成新板
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void UpdateCurrentPlatePara_Button_Click(object sender, RoutedEventArgs e)
+    {
+        if (CurrentPlate == null)
+        {
+            return;
+        }
+        double AH,
+            AW;
+        if (!double.TryParse(CurrentPlateAuxiliaryHight_TextBox.Text, out AH))
+        {
+            MessageBox.Show("辅助高 输入的值不是有效的数字。");
+            return;
+        }
+        if (!double.TryParse(CurrentPlateAuxiliaryWidth_TextBox.Text, out AW))
+        {
+            MessageBox.Show("辅助宽 输入的值不是有效的数字。");
+            return;
+        }
+        CurrentPlate.NumberString = CurrentPlateNumberString_TextBox.Text;
+        CurrentPlate.AuxiliaryHight = AH;
+        CurrentPlate.AuxiliaryWidth = AW;
     }
 
     /// <summary>
@@ -1556,7 +1583,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             UpdateComboBox();
             DisplaySinglePlate(newPlate, false);
         }
-        Viewer.Update();
+        Canvas.Update();
     }
 
     /// <summary>
@@ -1577,7 +1604,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         MakeBasePlate();
         DisplayEraseInputWorkpiece(true);
         DisplayEraseBasePlates(true);
-        Viewer.Update();
+        Canvas.Update();
     }
 
     /// <summary>
@@ -1597,7 +1624,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         BasePlateXWidth_TextBox.Text = (BasePlate.DX + BasePlate.OffsetX * 2).ToString("F1");
         BasePlateYWidth_TextBox.Text = (BasePlate.DY + BasePlate.OffsetY * 2).ToString("F1");
         DisplayEraseBasePlates(false);
-        Viewer.Update();
+        Canvas.Update();
     }
 
     /// <summary>
@@ -1644,8 +1671,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             //    Canvas.AISContext.SetTransparency(item.AIS, 0.9, false);
             //}
         }
-        Viewer.Update();
-        Viewer.FitAll();
+        Canvas.Update();
+        Canvas.FitAll();
     }
 
     /// <summary>
@@ -1679,8 +1706,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         DisplayEraseBasePlates(false);
         DisplayVerticalPlates(false);
 
-        Viewer.Update();
-        Viewer.FitAll();
+        Canvas.Update();
+        Canvas.FitAll();
     }
 
     /// <summary>
@@ -1692,8 +1719,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     {
         EraseAll(false);
         CombinedDisplayBoard();
-        Viewer.Update();
-        Viewer.FitAll();
+        Canvas.Update();
+        Canvas.FitAll();
     }
 
     /// <summary>
@@ -1706,6 +1733,13 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         OutputSTEP();
     }
 
+    #region 操作器
+
+    private InteractiveObject? manipulatedObject = null;
+
+    private Ax2? StartPosition;
+    private Ax2? EndPosition;
+
     /// <summary>
     /// 操作器
     /// </summary>
@@ -1717,29 +1751,38 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
         {
             if (manipulatedObject == null)
             {
-                Viewer.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Scaling, false);
-                Viewer.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
+                Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Scaling, false);
+                Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
                 manipulatedObject = InputWorkpiece.AIS;
-                Viewer.Attach(manipulatedObject);
-                StartPosition = Viewer.GetManipulatorPosition();
+                Canvas.Attach(manipulatedObject);
+                StartPosition = Canvas.GetManipulatorPosition();
             }
             else
             {
-                if (BasePlate != null)
-                {
-                    Viewer.Remove(BasePlate.AIS, false);
-                    BasePlate = null;
-                }
-                EndPosition = Viewer.GetManipulatorPosition();
-                InputWorkpiece.Transform(new Trsf(StartPosition, EndPosition));
-                Viewer.ResetManipulatorPart();
-                Viewer.Remove(InputWorkpiece.AIS, false);
+                EndPosition = Canvas.GetManipulatorPosition();
+
+                Debug.WriteLine($"Start: {StartPosition}");
+                Debug.WriteLine($"End: {EndPosition}");
+                Trsf theT = new Trsf(StartPosition, EndPosition);
+                Debug.WriteLine($"Trsf: {theT}");
+                var ashape = (AShape)(InputWorkpiece.AIS);
+                Ax2 ax2 = new();
+                ax2.Transform(ashape.LocalTransformation());
+                var p = new OCCTK.OCC.BRepPrimAPI.MakeSphere(ax2, 1);
+                var origin = new AShape(p.Shape());
+                Display(origin, true);
+
+                Canvas.Remove(InputWorkpiece.AIS, false);
+                InputWorkpiece.Transform(theT);
+                Canvas.ResetManipulatorPart();
                 manipulatedObject = null;
                 DisplayEraseInputWorkpiece(false);
             }
-            Viewer.Update();
+            Canvas.Update();
         }
     }
+
+    #endregion
 
     /// <summary>
     /// 擦除选中的视图对象
@@ -1748,7 +1791,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     /// <param name="e"></param>
     private void Erase_Button_Click(object sender, RoutedEventArgs e)
     {
-        Viewer.EraseSelected();
+        Canvas.EraseSelected();
     }
 
     /// <summary>
@@ -1765,8 +1808,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             DisplayEraseBasePlates(false);
             DisplayCurrentPieces(false);
 
-            Viewer.Update();
-            Viewer.FitAll();
+            Canvas.Update();
+            Canvas.FitAll();
         }
     }
 
@@ -1789,8 +1832,8 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             DisplayEraseBasePlates(false);
             DisplayCurrentPlate(false);
 
-            Viewer.Update();
-            Viewer.FitAll();
+            Canvas.Update();
+            Canvas.FitAll();
         }
     }
 
@@ -1803,7 +1846,7 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     {
         ShowInputWorkpiece = !ShowInputWorkpiece;
         DisplayEraseInputWorkpiece(ShowInputWorkpiece);
-        Viewer.Update();
+        Canvas.Update();
     }
 
     /// <summary>
@@ -1815,23 +1858,12 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
     {
         ShowBasePlate = !ShowBasePlate;
         DisplayEraseBasePlates(ShowBasePlate);
-        Viewer.Update();
+        Canvas.Update();
     }
 
     #endregion
 
     #region 算法逻辑
-    private void RelocationInputWorkPiece()
-    {
-        if (InputWorkpiece == null)
-        {
-            return;
-        }
-        Trsf T = new();
-        T.SetTranslation(new Pnt(), new Pnt());
-        TShape newShape = new OCCTK.OCC.BRepBuilderAPI.Transform(InputWorkpiece.Shape, T).Shape();
-        InputWorkpiece = new(newShape);
-    }
 
     /// <summary>
     /// 创建底板逻辑
@@ -2137,29 +2169,9 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
 
     #region 视图显示
 
-    /// <summary>
-    /// 显示AIS，并加入当前AIS列表
-    /// </summary>
-    /// <param name="theAIS"></param>
-    /// <param name="update"></param>
-    private void Display(AShape theAIS, bool update)
-    {
-        Viewer.Display(theAIS, update);
-    }
-
-    private void Erase(AShape theAIS, bool update)
-    {
-        Viewer.Erase(theAIS, update);
-    }
-
-    /// <summary>
-    /// 移除AIS列表中的所有AIS对象
-    /// </summary>
-    /// <param name="update"></param>
-    private void EraseAll(bool update)
-    {
-        Viewer.EraseAll(update);
-    }
+    private Action<InteractiveObject, bool> Display => Canvas.Display;
+    private Action<InteractiveObject, bool> Erase => Canvas.Erase;
+    private Action<bool> EraseAll => Canvas.EraseAll;
 
     /// <summary>
     /// 显示或隐藏工件
@@ -2173,11 +2185,11 @@ public partial class MainWindow : Window, IAISSelectionHandler, IMouseMoveHandle
             {
                 Display(InputWorkpiece.AIS, false);
                 //AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
-                AISContext.SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), false);
+                AISContext.SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), update);
             }
             else
             {
-                Erase(InputWorkpiece.AIS, false);
+                Erase(InputWorkpiece.AIS, update);
             }
         }
     }

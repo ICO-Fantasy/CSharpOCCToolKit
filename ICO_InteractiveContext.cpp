@@ -85,10 +85,10 @@ void InteractiveContext::Select(void) {
 }
 
 // 选中输入的对象
-void InteractiveContext::SelectAIS(AShape^ theAIS, bool update) {
+void InteractiveContext::SelectAIS(InteractiveObject^ theAISObject, bool update) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->ClearSelected(Standard_True); // 清除当前选中的对象
-	myAISContext()->AddOrRemoveSelected(theAIS->GetOCC(), update);// 选中AIS
+	myAISContext()->AddOrRemoveSelected(theAISObject->GetOCC(), update);// 选中AIS
 }
 
 // 多选
@@ -199,12 +199,12 @@ void InteractiveContext::Display(Handle(AIS_InteractiveObject) theAISObject, boo
 
 void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->Display(theAISObject->GetOCC(), theToUpdateViewer);
-}
-
-void InteractiveContext::Display(AShape^ theAIS, bool theToUpdateViewer) {
-	if (myAISContext().IsNull()) return;
-	myAISContext()->Display(theAIS->GetOCC(), theToUpdateViewer);
+	try {
+		myAISContext()->Display(theAISObject->GetOCC(), theToUpdateViewer);
+	}
+	catch (Standard_Failure e) {
+		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
+	}
 }
 
 void InteractiveContext::Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
@@ -227,11 +227,6 @@ void InteractiveContext::Erase(InteractiveObject^ theAISObject, bool theToUpdate
 void InteractiveContext::Erase(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->Erase(theAISObject, theToUpdateViewer);
-}
-
-void InteractiveContext::Erase(AShape^ theAIS, bool theToUpdateViewer) {
-	if (myAISContext().IsNull()) return;
-	myAISContext()->Erase(theAIS->GetOCC(), theToUpdateViewer);
 }
 
 // 删除选中的物体（首先需要选中物体）
@@ -260,35 +255,30 @@ void InteractiveContext::Remove(InteractiveObject^ theAISObject, bool theToUpdat
 	myAISContext()->Remove(theAISObject->GetOCC(), theToUpdateViewer);
 }
 
-void InteractiveContext::Remove(AShape^ theAIS, bool theToUpdateViewer) {
-	if (myAISContext().IsNull()) return;
-	myAISContext()->Remove(theAIS->GetOCC(), theToUpdateViewer);
-}
-
 #pragma region 设置AIS
 
 // 颜色
-void InteractiveContext::SetColor(AShape^ theAIS, Extension::Color^ theColor, bool theToUpdateViewer) {
+void InteractiveContext::SetColor(InteractiveObject^ theAIS, Extension::Color^ theColor, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->SetColor(theAIS->GetOCC(), theColor->GetOCC(), theToUpdateViewer);
 }
 
-void InteractiveContext::UnsetColor(AShape^ theAIS, bool theToUpdateViewer) {
+void InteractiveContext::UnsetColor(InteractiveObject^ theAIS, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->UnsetColor(theAIS->GetOCC(), theToUpdateViewer);
 }
 // 透明度
-void InteractiveContext::SetTransparency(AShape^ theAIS, double theTransparency, bool theToUpdateViewer) {
+void InteractiveContext::SetTransparency(InteractiveObject^ theAIS, double theTransparency, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->SetTransparency(theAIS->GetOCC(), theTransparency, theToUpdateViewer);
 }
 
-void InteractiveContext::UnsetTransparency(AShape^ theAIS, bool theToUpdateViewer) {
+void InteractiveContext::UnsetTransparency(InteractiveObject^ theAIS, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->UnsetTransparency(theAIS->GetOCC(), theToUpdateViewer);
 }
 
-void InteractiveContext::SetZLayer(AShape^ theAIS, int theZLayerID) {
+void InteractiveContext::SetZLayer(InteractiveObject^ theAIS, int theZLayerID) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->SetZLayer(theAIS->GetOCC(), theZLayerID);
 }

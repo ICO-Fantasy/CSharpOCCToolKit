@@ -8,6 +8,7 @@
 //Local
 #include "ICO_TopoDS_Shape.h"
 #include "ICO_InteractiveObject.h"
+#include "ICO_Trsf.h"
 
 using namespace OCCTK::OCC::TopoDS;
 using namespace System;
@@ -24,17 +25,21 @@ public:
 	AShape(TopoDS::TShape^ aShape);
 	AShape(Handle(AIS_Shape) aAISShape);
 	AShape(AIS_Shape aAISShape);
-	TopoDS::TShape^ TopoShape();
-	void SetColor(int R, int G, int B);
-	void SetTransparency(double theFactor);
-	bool HasInteractiveContext();
-	virtual bool Equals(System::Object^ obj) override;
-	void RemoveSelf();
+public:
 	Handle(AIS_Shape) GetOCC();
 	Handle(Standard_Transient) GetStd() override;
 	System::IntPtr GetIntPtr();
+public:
+	TopoDS::TShape^ Shape();
+	void SetColor(int R, int G, int B);
+	void SetTransparency(double theFactor);
+	bool HasInteractiveContext();
+	Trsf^ LocalTransformation();
+	void RemoveSelf();
+	virtual bool Equals(System::Object^ obj) override;
+
 private:
-	NCollection_Haft<Handle(AIS_Shape)> _pAISShape;
+	NCollection_Haft<Handle(AIS_Shape)> myAIS;
 };
 
 }

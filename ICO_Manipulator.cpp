@@ -119,6 +119,22 @@ void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, b
 	_pManipulator()->SetModeActivationOnDetection(true);
 }
 
+void Manipulator::Attach(InteractiveObject^ theAISObject) {
+	_pManipulator()->Attach(theAISObject->GetOCC());
+	// 让操作器自动激活
+	_pManipulator()->SetModeActivationOnDetection(true);
+}
+
+void Manipulator::Attach(InteractiveObject^ theAISObject, bool adjustPosition, bool adjustSize, bool enableModes) {
+	AIS_Manipulator::OptionsForAttach anOptions;
+	anOptions.SetAdjustPosition(adjustPosition);
+	anOptions.SetAdjustSize(!adjustSize);
+	anOptions.SetEnableModes(enableModes);
+	_pManipulator()->Attach(theAISObject->GetOCC(), anOptions);
+	// 让操作器自动激活
+	_pManipulator()->SetModeActivationOnDetection(true);
+}
+
 void Manipulator::Detach() {
 	_pManipulator()->Detach();
 }

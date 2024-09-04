@@ -56,6 +56,8 @@ public:
 
 	void Attach(AShape^ theAIS);
 	void Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, bool enableModes);
+	void Attach(InteractiveObject^ theAISObject);
+	void Attach(InteractiveObject^ theAISObject, bool adjustPosition, bool adjustSize, bool enableModes);
 	void Detach();
 
 #pragma endregion

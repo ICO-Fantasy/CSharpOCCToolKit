@@ -36,7 +36,7 @@ public:
 	void SetDisplayMode(DisplayMode theMode);
 	void SetSelectionMode(SelectionMode theMode);
 	void Select(void);
-	void SelectAIS(AShape^ theAIS, bool update);
+	void SelectAIS(InteractiveObject^ theAISObject, bool update);
 	void MultipleSelect(void);
 	void XORSelect(void);
 	void AreaSelect(int theX1, int theY1, int theX2, int theY2, V3d::View^ theView);
@@ -59,29 +59,26 @@ public:
 
 	void Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 	void Display(InteractiveObject^ theAISObject, bool theToUpdateViewer);
-	void Display(AShape^ theAIS, bool theToUpdateViewer);
 	void Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 
 	void EraseAll(bool theToUpdateViewer);
-	void Erase(InteractiveObject^ theAIS, bool theToUpdateViewer);
+	void Erase(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 	void Erase(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
-	void Erase(AShape^ theAIS, bool theToUpdateViewer);
 	void EraseSelected(void);
 
 	void RemoveAll(bool theToUpdateViewer);
 	void Remove(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 	void Remove(InteractiveObject^ theAISObject, bool theToUpdateViewer);
-	void Remove(AShape^ theAIS, bool theToUpdateViewer);
 
 #pragma endregion
 
 #pragma region 设置AIS
 
-	void SetColor(AShape^ theAIS, Extension::Color^ theColor, bool theToUpdateViewer);
-	void UnsetColor(AShape^ theAIS, bool theToUpdateViewer);
-	void SetTransparency(AShape^ theAIS, double theTransparency, bool theToUpdateViewer);
-	void UnsetTransparency(AShape^ theAIS, bool theToUpdateViewer);
-	void SetZLayer(AShape^ theAIS, int theZLayerID);
+	void SetColor(InteractiveObject^ theAISObject, Extension::Color^ theColor, bool theToUpdateViewer);
+	void UnsetColor(InteractiveObject^ theAISObject, bool theToUpdateViewer);
+	void SetTransparency(InteractiveObject^ theAISObject, double theTransparency, bool theToUpdateViewer);
+	void UnsetTransparency(InteractiveObject^ theAISObject, bool theToUpdateViewer);
+	void SetZLayer(InteractiveObject^ theAISObject, int theZLayerID);
 
 #pragma endregion
 

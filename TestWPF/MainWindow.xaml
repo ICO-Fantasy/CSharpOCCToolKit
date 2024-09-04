@@ -869,17 +869,16 @@
                                     x:Name="CurrentPlateLocationX_TextBox"
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    VerticalAlignment="Stretch" />
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                                 <TextBox
                                     x:Name="CurrentPlateLocationY_TextBox"
                                     Grid.Row="1"
                                     Grid.Column="1"
-                                    VerticalAlignment="Stretch" />
-                                <TextBox
-                                    x:Name="CurrentPlateLocationZ_TextBox"
-                                    Grid.Row="1"
-                                    Grid.Column="2"
-                                    VerticalAlignment="Stretch" />
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                             </Grid>
                             <Grid
                                 x:Name="CurrentPlateSelectedDirection_StackPanel"
@@ -896,7 +895,6 @@
                                     <ColumnDefinition Width="1*" />
                                 </Grid.ColumnDefinitions>
                                 <Label
-                                    x:Name="CurrentPlateSelectedDirection_Label"
                                     Grid.Row="0"
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
@@ -905,7 +903,35 @@
                                     x:Name="CurrentPlateDirection_TextBox"
                                     Grid.Row="1"
                                     Grid.Column="0"
-                                    VerticalAlignment="Stretch" />
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="辅助高" />
+                                <TextBox
+                                    x:Name="CurrentPlateAuxiliaryHight_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="辅助宽" />
+                                <TextBox
+                                    x:Name="CurrentPlateAuxiliaryWidth_TextBox"
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                             </Grid>
                             <StackPanel
                                 Grid.Row="1"
@@ -915,7 +941,11 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="最小支撑长度" />
-                                <TextBox x:Name="CurrentPlateMinSupportLen_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateMinSupportLen_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
@@ -925,7 +955,11 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="R角避让" />
-                                <TextBox x:Name="CurrentPlateClearances_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateClearances_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
@@ -935,7 +969,11 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="切断距离" />
-                                <TextBox x:Name="CurrentPlateCuttingDistance_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateCuttingDistance_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
@@ -945,7 +983,12 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="板厚" />
-                                <TextBox x:Name="CurrentPlateConnectionThickness_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateConnectionThickness_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    IsEnabled="False"
+                                    Text="--" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
@@ -955,7 +998,12 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="槽圆角半径" />
-                                <TextBox x:Name="CurrentPlateFilletRadius_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateFilletRadius_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    IsEnabled="False"
+                                    Text="--" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="1"
@@ -965,7 +1013,12 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="避让高度" />
-                                <TextBox x:Name="CurrentPlateAvoidanceHeight_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateAvoidanceHeight_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    IsEnabled="False"
+                                    Text="--" />
                             </StackPanel>
                             <StackPanel
                                 Grid.Row="0"
@@ -975,7 +1028,11 @@
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="Center"
                                     Content="编号" />
-                                <TextBox x:Name="CurrentPlateNumberString_TextBox" VerticalAlignment="Stretch" />
+                                <TextBox
+                                    x:Name="CurrentPlateNumberString_TextBox"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Text="--" />
                             </StackPanel>
                             <Label
                                 x:Name="CurrentPlateSutured_Label"
@@ -988,10 +1045,20 @@
                             <Button
                                 x:Name="UpdateCurrentPlate_Button"
                                 Grid.Row="10"
-                                Grid.ColumnSpan="4"
+                                Grid.ColumnSpan="2"
                                 Height="40"
                                 Click="UpdateCurrentPlate_Button_Click"
                                 Content="更新选中竖板"
+                                Style="{StaticResource dgButton}"
+                                Template="{StaticResource buttonTemplate}" />
+                            <Button
+                                x:Name="UpdateCurrentPlatePara_Button"
+                                Grid.Row="10"
+                                Grid.Column="2"
+                                Grid.ColumnSpan="2"
+                                Height="40"
+                                Click="UpdateCurrentPlatePara_Button_Click"
+                                Content="更新参数"
                                 Style="{StaticResource dgButton}"
                                 Template="{StaticResource buttonTemplate}" />
                             <Button
