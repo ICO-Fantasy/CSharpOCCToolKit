@@ -20,37 +20,13 @@ using namespace OCCTK::Extension;
 namespace OCCTK {
 namespace Visualization {
 
-
+//! 存在 AIS_InteractiveContext 的情况下，交互对象均应该通过 AIS_InteractiveContext 进行管理，而不是直接操作对象本身
 public ref class CSharpViewer {
 public:
 	CSharpViewer();
 	bool InitViewer();
-	bool CreateView(System::IntPtr theWnd);
+	V3d::View^ CreateView(System::IntPtr theWnd);
 
-#pragma region 视图控制
-
-	void Update();
-
-#pragma endregion
-
-#pragma region 持久变换对象
-
-	void SetViewCube(float axesRadius);
-	void SetOriginTrihedron(float axisSize);
-	void SetViewTrihedron(float axisSize);
-	void DisplayGrid(bool theFlag);
-	void DisplayViewCube(bool theFlag);
-	void DisplayOriginTrihedron(bool theFlag);
-	void DisplayViewTrihedron(bool theFlag);
-
-private:
-	NCollection_Haft<Handle(AIS_ViewCube)> myViewCube;
-	NCollection_Haft<Handle(AIS_Trihedron)> myOriginTri;
-	NCollection_Haft<Handle(AIS_Trihedron)> myViewTri;
-
-#pragma endregion	
-
-public:
 	InteractiveContext^ GetContext();
 	V3d::View^ GetMainView();
 	V3d::Viewer^ GetViewer();

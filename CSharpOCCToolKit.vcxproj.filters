@@ -298,6 +298,12 @@
     <ClInclude Include="WMakeSimpleClamp.h">
       <Filter>头文件\Laset</Filter>
     </ClInclude>
+    <ClInclude Include="ICO_Aspect_GridType.h">
+      <Filter>头文件\OCCProxy\Aspect</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Aspect_GridDrawMode.h">
+      <Filter>头文件\OCCProxy\Aspect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

@@ -2,12 +2,12 @@
     x:Class="OCCFramework.OCCCanvasView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:av="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:OCCFramework"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    av:DesignHeight="400"
-    av:DesignWidth="600"
-    mc:Ignorable="av">
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+    <Grid x:Name="canvasGrid" Background="Red">
 
-    <Grid x:Name="canvasGrid" />
+    </Grid>
 </UserControl>

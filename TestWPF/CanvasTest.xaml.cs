@@ -10,19 +10,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace OCCFramework;
+namespace TestWPF;
 
 /// <summary>
-/// OCCCanvasView.xaml 的交互逻辑
+/// CanvasTest.xaml 的交互逻辑
 /// </summary>
-public partial class OCCCanvasView : System.Windows.Controls.UserControl
+public partial class CanvasTest : Window
 {
-    public OCCCanvasView()
+    public CanvasTest()
     {
         InitializeComponent();
-        DataContext = new OCCCanvasViewModel();
     }
 }

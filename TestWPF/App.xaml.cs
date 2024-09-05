@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using OCCViewForm;
 using TestWPF;
 using Application = System.Windows.Application;
 
@@ -31,6 +32,7 @@ namespace OCCViewFoarm
 
             // Start main window
             MainWindow = new MainWindow();
+            //MainWindow = new CanvasTest();
             MainWindow.Show();
 
             ShutdownMode = ShutdownMode.OnMainWindowClose;

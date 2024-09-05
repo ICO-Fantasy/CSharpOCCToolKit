@@ -49,17 +49,17 @@ public enum DisplayMode
 
 #region 接口
 
-public interface IAISSelectionHandler
-{
-    void OnAISSelectionMade(AShape theAIS);
-}
+//public interface IAISSelectionHandler
+//{
+//    void OnAISSelectionMade(AShape theAIS);
+//}
 
 public delegate void AISSelectionMadeHandler(AShape theAIS);
 
-public interface IMouseMoveHandler
-{
-    void OnMouseMoved(int X, int Y);
-}
+//public interface IMouseMoveHandler
+//{
+//    void OnMouseMoved(int X, int Y);
+//}
 
 public delegate void MouseMovedHandler(int X, int Y);
 
@@ -108,16 +108,16 @@ public class OCCCanvas : Form
         //初始化画布，创建上下文
         Canvas.InitViewer();
         //创建相机
-        if (!Canvas.CreateView(this.Handle))
+        MainView = Canvas.CreateView(this.Handle);
+        if (MainView == null)
         {
             MessageBox.Show("图形初始化失败", "Error!");
         }
+
         //获取视图对象
         Viewer = Canvas.GetViewer();
         //获取上下文管理器对象
         AISContext = Canvas.GetContext();
-        //获取相机对象
-        MainView = Canvas.GetMainView();
 
         SetDefault();
 
@@ -322,26 +322,6 @@ public class OCCCanvas : Form
     private System.Windows.Forms.Timer CursorResetTimer { get; set; }
 
     #region 状态flag
-    //// 缩放结束
-    //public event EventHandler ZoomingFinished;
-
-    //protected void RaiseZoomingFinished()
-    //{
-    //    if (ZoomingFinished != null)
-    //    {
-    //        ZoomingFinished(this, EventArgs.Empty);
-    //    }
-    //}
-
-    //public event EventHandler AvaliabiltyOfOperationsChanged;
-
-    //protected void RaiseAvaliabiltyOfOperationsChanged()
-    //{
-    //    if (AvaliabiltyOfOperationsChanged != null)
-    //    {
-    //        AvaliabiltyOfOperationsChanged(this, EventArgs.Empty);
-    //    }
-    //}
 
     private bool _isActivateGrid;
 
@@ -354,7 +334,7 @@ public class OCCCanvas : Form
         set
         {
             _isActivateGrid = value;
-            Canvas.DisplayGrid(_isActivateGrid);
+            //todo
         }
     }
 
@@ -413,11 +393,6 @@ public class OCCCanvas : Form
     #endregion
 
     #endregion
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-
 
     private void InitializeComponent()
     {

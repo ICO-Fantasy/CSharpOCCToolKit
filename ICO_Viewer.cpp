@@ -13,11 +13,12 @@ Viewer::Viewer(Handle(V3d_Viewer) theViewer) {
 	myViewer() = theViewer;
 }
 
-Handle(V3d_Viewer)  Viewer::GetOCC() {
+Handle(V3d_Viewer) Viewer::GetOCC() {
 	return myViewer();
 }
 
 void Viewer::SetDefaultLight() {
+	if (myViewer().IsNull()) return;
 	Handle(V3d_DirectionalLight) aDirLight = new V3d_DirectionalLight(V3d_XposYnegZpos, Quantity_NOC_WHITE);
 	aDirLight->SetName("HeadLight");
 	aDirLight->SetHeadlight(true);
@@ -26,6 +27,16 @@ void Viewer::SetDefaultLight() {
 	//打开光源
 	myViewer()->SetLightOn(aDirLight);
 	myViewer()->SetLightOn(anAmbLight);
+}
+
+void Viewer::ActivateGrid(Aspect::GridType type, Aspect::GridDrawMode drawMode) {
+	if (myViewer().IsNull()) return;
+	myViewer()->ActivateGrid(Aspect_GridType(type), Aspect_GridDrawMode(drawMode));
+}
+
+void Viewer::DeactivateGrid() {
+	if (myViewer().IsNull()) return;
+	myViewer()->DeactivateGrid();
 }
 
 }

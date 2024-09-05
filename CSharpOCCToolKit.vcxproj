@@ -223,6 +223,8 @@
     <ClInclude Include="ICO_TopoDS_Shape.h" />
     <ClInclude Include="ICO_View.h" />
     <ClInclude Include="ICO_SelectionMode.h" />
+    <ClInclude Include="ICO_Aspect_GridType.h" />
+    <ClInclude Include="ICO_Aspect_GridDrawMode.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
