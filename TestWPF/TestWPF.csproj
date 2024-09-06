@@ -16,12 +16,20 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Utils\UserControl\" />
 	  <Folder Include="View\" />
 	  <Folder Include="ViewModel\" />
 	  <Folder Include="Model\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Configs\testrobot.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

@@ -378,16 +378,16 @@ public enum VPCMode
 #endregion
 
 /// <summary>
-/// 交互逻辑 MainWindow.xaml
+/// 交互逻辑 SimpleClamp.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class SimpleClamp : Window
 {
     #region TEST
 
     private List<TShape> inputShapes = new();
 
     #endregion
-    public MainWindow()
+    public SimpleClamp()
     {
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
@@ -2452,6 +2452,7 @@ public partial class MainWindow : Window
             return;
         }
         int clickedRow = 999;
+        //获取选中的对象列
         foreach (Grid theGrid in CurrentPlate_StackPanel.Children)
         {
             StackPanel parentStack = theGrid.Parent as StackPanel;
@@ -2468,6 +2469,7 @@ public partial class MainWindow : Window
                 }
             }
         }
+        //高亮显示获取的列
         foreach (Grid theGrid in CurrentPlate_StackPanel.Children)
         {
             StackPanel parentStack = theGrid.Parent as StackPanel;

@@ -31,8 +31,8 @@ namespace OCCViewFoarm
             CreateInstanceMutexes();
 
             // Start main window
-            MainWindow = new MainWindow();
-            //MainWindow = new CanvasTest();
+            MainWindow = new RobotWindows();
+            //SimpleClamp = new CanvasTest();
             MainWindow.Show();
 
             ShutdownMode = ShutdownMode.OnMainWindowClose;

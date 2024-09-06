@@ -1,0 +1,315 @@
+﻿<UserControl
+    x:Class="TestWPF.RobotPropertiesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:TestWPF"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:utils="clr-namespace:TestWPF.Utils"
+    d:Background="LightGreen"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <UserControl.DataContext>
+        <local:RobotPropertiesViewModel />
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <!--  注册转换器  -->
+        <utils:RadianToDegreeConverter x:Key="RadianToDegreeConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <TextBlock
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Text="{Binding Model.RobotData.Name, StringFormat='Robot: {0}', FallbackValue='Robot: 未加载'}" />
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid Margin="0,2,0,2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="min" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="max" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Theta1, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="{Binding Theta1Min, Converter={StaticResource RadianToDegreeConverter}}" />
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Maximum="{Binding Theta1Max, Converter={StaticResource RadianToDegreeConverter}}"
+                        Minimum="{Binding Theta1Min, Converter={StaticResource RadianToDegreeConverter}}"
+                        Value="{Binding Theta1, Converter={StaticResource RadianToDegreeConverter}, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Text="{Binding Theta1Max, Converter={StaticResource RadianToDegreeConverter}}" />
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid Margin="0,2,0,2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="min" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="max" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Theta2, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="{Binding Theta2Min, Converter={StaticResource RadianToDegreeConverter}}" />
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Maximum="{Binding Theta2Max, Converter={StaticResource RadianToDegreeConverter}}"
+                        Minimum="{Binding Theta2Min, Converter={StaticResource RadianToDegreeConverter}}"
+                        Value="{Binding Theta2, Converter={StaticResource RadianToDegreeConverter}, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Text="{Binding Theta2Max, Converter={StaticResource RadianToDegreeConverter}}" />
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid Margin="0,2,0,2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="min" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="max" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Theta3, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="{Binding Theta3Min, Converter={StaticResource RadianToDegreeConverter}}" />
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Maximum="{Binding Theta3Max, Converter={StaticResource RadianToDegreeConverter}}"
+                        Minimum="{Binding Theta3Min, Converter={StaticResource RadianToDegreeConverter}}"
+                        Value="{Binding Theta3, Converter={StaticResource RadianToDegreeConverter}, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Text="{Binding Theta3Max, Converter={StaticResource RadianToDegreeConverter}}" />
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="3">
+                <Grid Margin="0,2,0,2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="min" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="max" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Theta4, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="{Binding Theta4Min, Converter={StaticResource RadianToDegreeConverter}}" />
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Maximum="{Binding Theta4Max, Converter={StaticResource RadianToDegreeConverter}}"
+                        Minimum="{Binding Theta4Min, Converter={StaticResource RadianToDegreeConverter}}"
+                        Value="{Binding Theta4, Converter={StaticResource RadianToDegreeConverter}, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Text="{Binding Theta4Max, Converter={StaticResource RadianToDegreeConverter}}" />
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="4">
+                <Grid Margin="0,2,0,2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="min" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="max" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Theta5, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="{Binding Theta5Min, Converter={StaticResource RadianToDegreeConverter}}" />
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Maximum="{Binding Theta5Max, Converter={StaticResource RadianToDegreeConverter}}"
+                        Minimum="{Binding Theta5Min, Converter={StaticResource RadianToDegreeConverter}}"
+                        Value="{Binding Theta5, Converter={StaticResource RadianToDegreeConverter}, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Text="{Binding Theta5Max, Converter={StaticResource RadianToDegreeConverter}}" />
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="5">
+                <Grid Margin="0,2,0,2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Text="min" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Text="max" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding Theta6, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Text="{Binding Theta6Min, Converter={StaticResource RadianToDegreeConverter}}" />
+                    <Slider
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Maximum="{Binding Theta6Max, Converter={StaticResource RadianToDegreeConverter}}"
+                        Minimum="{Binding Theta6Min, Converter={StaticResource RadianToDegreeConverter}}"
+                        Value="{Binding Theta6, Converter={StaticResource RadianToDegreeConverter}, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Text="{Binding Theta6Max, Converter={StaticResource RadianToDegreeConverter}}" />
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding XValue, StringFormat='X: {0:F1}, ', FallbackValue='X: -, '}" />
+            <TextBlock Grid.Column="1" Text="{Binding YValue, StringFormat='Y: {0:F1}, ', FallbackValue='Y: -, '}" />
+            <TextBlock Grid.Column="2" Text="{Binding ZValue, StringFormat='Z: {0:F1}, ', FallbackValue='Z: -, '}" />
+            <TextBlock Grid.Column="3" Text="{Binding WValue, StringFormat='W: {0:F1}, ', FallbackValue='W: -, '}" />
+            <TextBlock Grid.Column="4" Text="{Binding PValue, StringFormat='P: {0:F1}, ', FallbackValue='P: -, '}" />
+            <TextBlock Grid.Column="5" Text="{Binding RValue, StringFormat='R: {0:F1}', FallbackValue='R: -'}" />
+        </Grid>
+
+    </Grid>
+</UserControl>
