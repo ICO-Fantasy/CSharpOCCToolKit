@@ -1,41 +1,26 @@
-﻿#pragma once
-#include "ICO_Manipulator.h"
-#include <AIS_InteractiveObject.hxx>
-#include <AIS_Manipulator.hxx>
-#include <AIS_Shape.hxx>
-#include <BRepPrimAPI_MakeBox.hxx>
-//Local
-#include "ICO_AIS_Shape.h"
+﻿#include "ICO_Manipulator.h"
 
 namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-Manipulator::Manipulator() {
+Manipulator::Manipulator() :InteractiveObject(Handle(AIS_Manipulator)()) {
 	myManipulator() = new AIS_Manipulator();
 
-	// 保存原始句柄
-	myAISObject() = myManipulator();
-	nativeHandle() = myManipulator();
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myManipulator();
+	BaseObject::myHandle() = myManipulator();
 }
 
-Manipulator::Manipulator(Manipulator^ theManipulator) {
+Manipulator::Manipulator(Manipulator^ theManipulator) :InteractiveObject(theManipulator->GetOCC()) {
 	myManipulator() = theManipulator->GetOCC();
-
-	// 保存原始句柄
-	myAISObject() = myManipulator();
-	nativeHandle() = myManipulator();
 }
 
-Manipulator::Manipulator(Handle(AIS_Manipulator)theManipulator) {
+Manipulator::Manipulator(Handle(AIS_Manipulator) theManipulator) :InteractiveObject(theManipulator) {
 	myManipulator() = theManipulator;
-
-	// 保存原始句柄
-	myAISObject() = myManipulator();
-	nativeHandle() = myManipulator();
 }
 
-Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) {
+Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) :InteractiveObject(Handle(AIS_Manipulator)()) {
 	Handle(AIS_Manipulator) aManipulator = new AIS_Manipulator();
 	AIS_ManipulatorObjectSequence* aSeq = new AIS_ManipulatorObjectSequence();
 	for each (AShape ^ var in theAISList) {
@@ -44,17 +29,14 @@ Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) {
 	aManipulator->Attach(aSeq);
 
 	myManipulator() = aManipulator;
-	// 保存原始句柄
-	myAISObject() = myManipulator();
-	nativeHandle() = myManipulator();
+
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myManipulator();
+	BaseObject::myHandle() = myManipulator();
 }
 
 Handle(AIS_Manipulator) Manipulator::GetOCC() {
 	return myManipulator();
-}
-
-Handle(Standard_Transient) Manipulator::GetStd() {
-	return nativeHandle();
 }
 
 bool Manipulator::HasActiveMode() {
@@ -62,29 +44,7 @@ bool Manipulator::HasActiveMode() {
 }
 
 ManipulatorMode Manipulator::ActiveMode() {
-	auto theMode = myManipulator()->ActiveMode();
-	ManipulatorMode output;
-	switch (theMode) {
-	case AIS_MM_None:
-		output = ManipulatorMode::None;
-		break;
-	case AIS_MM_Translation:
-		output = ManipulatorMode::Translation;
-		break;
-	case AIS_MM_Rotation:
-		output = ManipulatorMode::Rotation;
-		break;
-	case AIS_MM_Scaling:
-		output = ManipulatorMode::Scaling;
-		break;
-	case AIS_MM_TranslationPlane:
-		output = ManipulatorMode::TranslationPlane;
-		break;
-	default:
-		output = ManipulatorMode::None;
-		break;
-	}
-	return output;
+	return ManipulatorMode(myManipulator()->ActiveMode());
 }
 
 ManipulatorAxisIndex Manipulator::ActiveAxisIndex() {
@@ -99,16 +59,27 @@ Ax2^ Manipulator::Position() {
 	return gcnew Ax2(myManipulator()->Position());
 }
 
+InteractiveObject^ Manipulator::Object() {
+	try {
+		return gcnew InteractiveObject(myManipulator()->Object());
+	}
+	catch (const Standard_Failure e) {
+		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
+	}
+}
+
 void Manipulator::StartTransform(double theX, double theY, View^ theView) {
 	myManipulator()->StartTransform(theX, theY, theView->GetOCC());
 }
-//
+
 //void Manipulator::Transform(double theX, double theY, View^ theView) {
 //	myManipulator()->Transform(theX, theY, theView->GetOCC());
 //}
 
 Trsf^ Manipulator::Transform(double theX, double theY, View^ theView) {
-	return gcnew Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
+	Trsf^ T = gcnew Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
+	theView->Redraw();
+	return T;
 }
 
 void Manipulator::StopTransform(bool thetoApply) {
@@ -165,7 +136,7 @@ void Manipulator::SetPart(ManipulatorMode^ theMode, bool isEnable) {
 	myManipulator()->SetPart(AIS_ManipulatorMode((int)*theMode), isEnable);
 }
 
-//设置显示哪个轴的哪个部分，0=x、1=y、2=z
+//设置显示哪个轴的哪个部分
 void Manipulator::SetPart(ManipulatorAxisIndex^ theAxisIndex, ManipulatorMode^ theMode, bool isEnable) {
 	if (*theAxisIndex == ManipulatorAxisIndex::None) { return; }
 	if (*theMode == ManipulatorMode::None) { return; }

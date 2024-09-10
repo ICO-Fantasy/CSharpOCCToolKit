@@ -8,10 +8,13 @@ namespace OCC {
 
 public ref class BaseObject abstract {
 public:
+	BaseObject(Handle(Standard_Transient)nativeHandle) {
+		myHandle() = nativeHandle;
+	}
 	// 纯虚函数，必须在派生类中实现
 	virtual Handle(Standard_Transient) GetStd() abstract;
 protected:
-	NCollection_Haft<Handle(Standard_Transient)> nativeHandle;
+	NCollection_Haft<Handle(Standard_Transient)> myHandle;
 };
 
 }

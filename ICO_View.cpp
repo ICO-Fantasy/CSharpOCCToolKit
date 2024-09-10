@@ -129,10 +129,25 @@ void View::ZoomAtPoint(double startX, double startY, double endX, double endY) {
 	myView()->ZoomAtPoint(startX, startY, endX, endY);
 }
 
-//平移
-void View::Pan(int theX, int theY) {
+////平移
+//void View::Pan(int theX, int theY) {
+//	if (myView().IsNull())  return;
+//	double theZoomFactor = 1.0;
+//	myView()->Pan(theX, theY, theZoomFactor);
+//}
+
+//记录开始平移点
+void View::StartPan() {
 	if (myView().IsNull())  return;
-	myView()->Pan(theX, theY);
+	double theZoomFactor = 1.0;
+	myView()->Pan(0, 0, theZoomFactor, true);
+}
+
+//平移操作，需要传入计算后的相对X和Y值
+void View::Pan(int theDX, int theDY) {
+	if (myView().IsNull())  return;
+	double theZoomFactor = 1.0;
+	myView()->Pan(theDX, theDY, theZoomFactor, false);
 }
 
 //开始旋转

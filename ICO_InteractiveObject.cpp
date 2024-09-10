@@ -1,27 +1,27 @@
-﻿#include "ICO_InteractiveObject.h"
+﻿#include "ICO_AIS_Shape.h"
+#include "ICO_InteractiveObject.h"
+#include <AIS_Shape.hxx>
 namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-InteractiveObject::InteractiveObject() {
-}
-
-InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject)theAISObject) {
+InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject) :
+	BaseObject(theAISObject) {
 	myAISObject() = theAISObject;
 
-	//保存原始句柄
-	nativeHandle() = myAISObject();
-}
-
-InteractiveObject::InteractiveObject(Handle(Standard_Transient) nativeHandle) {
-	myAISObject() = Handle(AIS_InteractiveObject)::DownCast(nativeHandle);
-
-	//保存原始句柄
-	this->nativeHandle() = myAISObject();
 }
 
 bool InteractiveObject::IsNull() {
-	return nativeHandle().IsNull();
+	return myAISObject().IsNull();
+}
+
+bool InteractiveObject::IsShape() {
+	return myAISObject()->IsKind(STANDARD_TYPE(AIS_Shape));
+}
+
+//转换前应该先做类型检查
+AShape^ InteractiveObject::AsShape() {
+	return gcnew AShape(myAISObject());
 }
 
 Handle(AIS_InteractiveObject) InteractiveObject::GetOCC() {
@@ -29,7 +29,7 @@ Handle(AIS_InteractiveObject) InteractiveObject::GetOCC() {
 }
 
 Handle(Standard_Transient) InteractiveObject::GetStd() {
-	return nativeHandle();
+	return myHandle();
 }
 
 

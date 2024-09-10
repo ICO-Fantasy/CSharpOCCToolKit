@@ -41,14 +41,18 @@ namespace Extension {
 //	//MakeArrow(gp_Dir(0, 0, 1), myLen, (gcnew Color())->ZAxis);
 //}
 
-AShapeTri::AShapeTri(OCC::TopoDS::TShape^ theShape) {
+AShapeTri::AShapeTri(OCC::TopoDS::TShape^ theShape) :InteractiveObject(Handle(AIS_Shape)()) {
 	myAISTri() = new AIS_MultipleConnectedInteractive();
-	myAISObject() = myAISTri();
-	nativeHandle() = myAISTri();
-	myAIS() = new AIS_Shape(theShape->GetOCC());
 
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myAISTri();
+	BaseObject::myHandle() = myAISTri();
+
+	//绑定AIS对象
+	myAIS() = new AIS_Shape(theShape->GetOCC());
 	myAISTri()->Connect(myAIS());
 
+	//绑定坐标轴
 	gp_Ax2 ax2 = gp_Ax2();
 	ax2.Transform(theShape->GetOCC().Location().Transformation());
 	myTri() = new AIS_Trihedron(new Geom_Axis2Placement(ax2));

@@ -45,10 +45,14 @@ public class InputWorkpiece
         get { return _AISInputWorkpiece; }
     }
 
-    public void Transform(Trsf T)
+    public void Transform()
     {
-        var trans = new OCCTK.OCC.BRepBuilderAPI.Transform(_InputWorkpiece, T);
+        var trans = new OCCTK.OCC.BRepBuilderAPI.Transform(
+            _InputWorkpiece,
+            _AISInputWorkpiece.LocalTransformation()
+        );
         _InputWorkpiece = trans.Shape();
+        _AISInputWorkpiece.RemoveSelf();
         _AISInputWorkpiece = new AShape(_InputWorkpiece);
     }
 }
@@ -81,301 +85,6 @@ public enum VPCMode
     Num,
     Offset,
 }
-
-#region ViewModel
-
-//public class BasePlateProperty : INotifyPropertyChanged
-//{
-//    private double _basePlateOffsetX = 5;
-//    private double _basePlateOffsetY = 5;
-//    private double _basePlateOffsetZ = 100.0;
-
-//    public double BasePlateOffsetX
-//    {
-//        get { return _basePlateOffsetX; }
-//        set
-//        {
-//            if (_basePlateOffsetX != value)
-//            {
-//                _basePlateOffsetX = value;
-//                OnPropertyChanged(nameof(BasePlateOffsetX));
-//            }
-//        }
-//    }
-
-//    public double BasePlateOffsetY
-//    {
-//        get { return _basePlateOffsetY; }
-//        set
-//        {
-//            if (_basePlateOffsetY != value)
-//            {
-//                _basePlateOffsetY = value;
-//                OnPropertyChanged(nameof(BasePlateOffsetY));
-//            }
-//        }
-//    }
-
-//    public double BasePlateOffsetZ
-//    {
-//        get { return _basePlateOffsetZ; }
-//        set
-//        {
-//            if (_basePlateOffsetZ != value)
-//            {
-//                _basePlateOffsetZ = value;
-//                OnPropertyChanged(nameof(BasePlateOffsetZ));
-//            }
-//        }
-//    }
-
-//    public event PropertyChangedEventHandler PropertyChanged;
-
-//    protected void OnPropertyChanged(string propertyName)
-//    {
-//        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-//    }
-//}
-
-//public class VerticalPlateProperty : INotifyPropertyChanged
-//{
-//    private VPCMode _vpcMode = 0;
-//    private int _xNum = 3;
-//    private int _yNum = 3;
-//    private double _initialOffsetXParameter = 5;
-//    private double _offsetXParameter = 20;
-//    private double _initialOffsetYParameter = 5;
-//    private double _offsetYParameter = 20;
-//    private double _connectionHeightParameter = 20;
-//    private double _minSupportingLenParameter = 5;
-//    private double _clearancesParameter = 4;
-//    private double _cuttingDistanceParameter = 500;
-//    private double _connectionThicknessParameter = 5.0;
-//    private double _filletRadiusParameter = 2.0;
-
-//    public VPCMode VPCMode
-//    {
-//        get { return _vpcMode; }
-//        set
-//        {
-//            if (_vpcMode != value)
-//            {
-//                _vpcMode = value;
-//                OnPropertyChanged(nameof(VPCMode));
-//            }
-//        }
-//    }
-
-//    public int XNum
-//    {
-//        get { return _xNum; }
-//        set
-//        {
-//            if (_xNum != value)
-//            {
-//                _xNum = value;
-//                OnPropertyChanged(nameof(XNum));
-//            }
-//        }
-//    }
-
-//    public int YNum
-//    {
-//        get { return _yNum; }
-//        set
-//        {
-//            if (_yNum != value)
-//            {
-//                _yNum = value;
-//                OnPropertyChanged(nameof(YNum));
-//            }
-//        }
-//    }
-
-//    public double InitialOffsetXParameter
-//    {
-//        get { return _initialOffsetXParameter; }
-//        set
-//        {
-//            if (_initialOffsetXParameter != value)
-//            {
-//                _initialOffsetXParameter = value;
-//                OnPropertyChanged(nameof(InitialOffsetXParameter));
-//            }
-//        }
-//    }
-
-//    public double OffsetXParameter
-//    {
-//        get { return _offsetXParameter; }
-//        set
-//        {
-//            if (_offsetXParameter != value)
-//            {
-//                _offsetXParameter = value;
-//                OnPropertyChanged(nameof(OffsetXParameter));
-//            }
-//        }
-//    }
-
-//    public double InitialOffsetYParameter
-//    {
-//        get { return _initialOffsetYParameter; }
-//        set
-//        {
-//            if (_initialOffsetYParameter != value)
-//            {
-//                _initialOffsetYParameter = value;
-//                OnPropertyChanged(nameof(InitialOffsetYParameter));
-//            }
-//        }
-//    }
-
-//    public double OffsetYParameter
-//    {
-//        get { return _offsetYParameter; }
-//        set
-//        {
-//            if (_offsetYParameter != value)
-//            {
-//                _offsetYParameter = value;
-//                OnPropertyChanged(nameof(OffsetYParameter));
-//            }
-//        }
-//    }
-
-//    public double ConnectionHeightParameter
-//    {
-//        get { return _connectionHeightParameter; }
-//        set
-//        {
-//            if (_connectionHeightParameter != value)
-//            {
-//                _connectionHeightParameter = value;
-//                OnPropertyChanged(nameof(ConnectionHeightParameter));
-//            }
-//        }
-//    }
-
-//    public double MinSupportingLenParameter
-//    {
-//        get { return _minSupportingLenParameter; }
-//        set
-//        {
-//            if (_minSupportingLenParameter != value)
-//            {
-//                _minSupportingLenParameter = value;
-//                OnPropertyChanged(nameof(MinSupportingLenParameter));
-//            }
-//        }
-//    }
-
-//    public double ClearancesParameter
-//    {
-//        get { return _clearancesParameter; }
-//        set
-//        {
-//            if (_clearancesParameter != value)
-//            {
-//                _clearancesParameter = value;
-//                OnPropertyChanged(nameof(ClearancesParameter));
-//            }
-//        }
-//    }
-
-//    public double CuttingDistanceParameter
-//    {
-//        get { return _cuttingDistanceParameter; }
-//        set
-//        {
-//            if (_cuttingDistanceParameter != value)
-//            {
-//                _cuttingDistanceParameter = value;
-//                OnPropertyChanged(nameof(CuttingDistanceParameter));
-//            }
-//        }
-//    }
-
-//    public double ConnectionThicknessParameter
-//    {
-//        get { return _connectionThicknessParameter; }
-//        set
-//        {
-//            if (_connectionThicknessParameter != value)
-//            {
-//                _connectionThicknessParameter = value;
-//                OnPropertyChanged(nameof(ConnectionThicknessParameter));
-//            }
-//        }
-//    }
-
-//    public double FilletRadiusParameter
-//    {
-//        get { return _filletRadiusParameter; }
-//        set
-//        {
-//            if (_filletRadiusParameter != value)
-//            {
-//                _filletRadiusParameter = value;
-//                OnPropertyChanged(nameof(FilletRadiusParameter));
-//            }
-//        }
-//    }
-
-//    public event PropertyChangedEventHandler PropertyChanged;
-
-//    protected void OnPropertyChanged(string propertyName)
-//    {
-//        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-//    }
-//}
-
-//public class MainViewModel : INotifyPropertyChanged
-//{
-//    private BasePlateProperty _basePlate;
-//    private VerticalPlateProperty _verticalPlate;
-
-//    public MainViewModel()
-//    {
-//        BasePlate = new BasePlateProperty();
-//        VerticalPlate = new VerticalPlateProperty();
-//    }
-
-//    public BasePlateProperty BasePlate
-//    {
-//        get { return _basePlate; }
-//        set
-//        {
-//            if (_basePlate != value)
-//            {
-//                _basePlate = value;
-//                OnPropertyChanged(nameof(BasePlate));
-//            }
-//        }
-//    }
-
-//    public VerticalPlateProperty VerticalPlate
-//    {
-//        get { return _verticalPlate; }
-//        set
-//        {
-//            if (_verticalPlate != value)
-//            {
-//                _verticalPlate = value;
-//                OnPropertyChanged(nameof(VerticalPlate));
-//            }
-//        }
-//    }
-
-//    public event PropertyChangedEventHandler PropertyChanged;
-
-//    protected void OnPropertyChanged(string propertyName)
-//    {
-//        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-//    }
-//}
-
-#endregion
 
 /// <summary>
 /// 交互逻辑 SimpleClamp.xaml
@@ -590,10 +299,6 @@ public partial class SimpleClamp : Window
     //
     #endregion
 
-    //public MainViewModel ViewModel { get; set; }
-
-
-
     /// <summary>
     /// 全局属性绑定
     /// </summary>
@@ -696,14 +401,6 @@ public partial class SimpleClamp : Window
     {
         //Canvas.SetDisplayMode(DisplayMode.Shading);
     }
-    #endregion
-
-    #region 测试
-    private void FitAll_Button_Click(object sender, RoutedEventArgs e)
-    {
-        Canvas.FitAll();
-    }
-
     #endregion
 
     #region 导入
@@ -1753,18 +1450,26 @@ public partial class SimpleClamp : Window
         {
             if (manipulatedObject == null)
             {
+                //关闭缩放、平移
                 Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Scaling, false);
                 Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
+                Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Translation, false);
+                //绑定AIS对象
                 manipulatedObject = InputWorkpiece.AIS;
                 Canvas.Attach(manipulatedObject);
             }
             else
             {
                 var t = Canvas.GetManipulatorTransformation() ?? new Trsf();
+                if (manipulatedObject is AShape ais)
+                {
+                    Debug.WriteLine($"AIS_End: {ais.LocalTransformation()}");
+                }
+                Debug.WriteLine($"Final: {t}");
                 //! 必须先detach操作器，否则会因为AIS对象消失而出错
-                Canvas.ResetManipulatorPart();
-                Canvas.Remove(InputWorkpiece.AIS, false);
-                InputWorkpiece.Transform(t);
+                Canvas.Detach();
+                Canvas.Remove(manipulatedObject, false);
+                InputWorkpiece.Transform();
                 manipulatedObject = null;
                 DisplayEraseInputWorkpiece(false);
             }
@@ -2561,8 +2266,16 @@ public partial class SimpleClamp : Window
         }
     }
 
+    #region 测试
+    private void FitAll_Button_Click(object sender, RoutedEventArgs e)
+    {
+        Canvas.FitAll();
+    }
+
     private void TestInput()
     {
         InputWorkpiece = new(new STEPExchange("mods\\mytest.stp").Shape());
     }
+
+    #endregion
 }

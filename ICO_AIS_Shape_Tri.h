@@ -15,7 +15,6 @@ namespace Extension {
 
 public ref class AShapeTri :public OCC::AIS::InteractiveObject {
 public:
-	//AShapeTri(OCC::AIS::AShape^ theAIS);
 	AShapeTri(OCC::TopoDS::TShape^ theShape);
 	Handle(AIS_InteractiveObject) GetOCC();
 private:

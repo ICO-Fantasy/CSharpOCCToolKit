@@ -22,7 +22,6 @@ public:
 	void SetArrowWidth(double value);
 	void SetAspect(int theX, int theY);
 	Handle(AIS_Trihedron) GetOCC();
-	Handle(Standard_Transient) GetStd() override;
 
 private:
 	void SetAxis();

@@ -8,41 +8,41 @@ namespace AIS {
 
 
 //创建原点坐标轴
-Trihedron::Trihedron(double axisSize) {
+Trihedron::Trihedron(double axisSize) :InteractiveObject(Handle(AIS_Trihedron)()) {
 	myTrihedron() = new AIS_Trihedron(new Geom_Axis2Placement(gp_Ax2()));
 
-	// 保存原始句柄
-	myAISObject() = myTrihedron();
-	nativeHandle() = myTrihedron();
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myTrihedron();
+	BaseObject::myHandle() = myTrihedron();
 
 	ArrowLength = axisSize;
 	SetAxis();
 }
 
 // 根据对象创建坐标轴
-Trihedron::Trihedron(AShape^ theAIS, double axisSize) {
+Trihedron::Trihedron(AShape^ theAIS, double axisSize) :InteractiveObject(Handle(AIS_Trihedron)()) {
 	gp_Trsf t = theAIS->GetOCC()->LocalTransformation();
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(t);
 	myTrihedron() = new AIS_Trihedron(new Geom_Axis2Placement(a));
 
-	// 保存原始句柄
-	myAISObject() = myTrihedron();
-	nativeHandle() = myTrihedron();
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myTrihedron();
+	BaseObject::myHandle() = myTrihedron();
 
 	ArrowLength = axisSize;
 	SetAxis();
 }
 
 // 根据变换创建坐标轴
-Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) {
+Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject(Handle(AIS_Trihedron)()) {
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(theTrsf->GetOCC());
 	myTrihedron() = new AIS_Trihedron(new Geom_Axis2Placement(a));
 
-	// 保存原始句柄
-	myAISObject() = myTrihedron();
-	nativeHandle() = myTrihedron();
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myTrihedron();
+	BaseObject::myHandle() = myTrihedron();
 
 	ArrowLength = axisSize;
 	SetAxis();
@@ -64,10 +64,6 @@ void Trihedron::SetAspect(int theX, int theY) {
 Handle(AIS_Trihedron) Trihedron::GetOCC() {
 	return myTrihedron();
 
-}
-
-Handle(Standard_Transient) Trihedron::GetStd() {
-	return nativeHandle();
 }
 
 void Trihedron::SetAxis() {
@@ -93,6 +89,7 @@ void Trihedron::SetAxis() {
 	myTrihedron()->SetTextColor(Prs3d_DatumParts_YAxis, Extension::Color().YAxis);
 	myTrihedron()->SetTextColor(Prs3d_DatumParts_ZAxis, Extension::Color().ZAxis);
 }
+
 }
 }
 }

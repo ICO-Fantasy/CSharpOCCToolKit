@@ -44,7 +44,9 @@ public:
 	void StartZoomAtPoint(double startX, double startY);
 	void ZoomAtPoint(double startX, double startY, double endX, double endY);
 
-	void Pan(int theX, int theY);
+	//void Pan(int theX, int theY);
+	void StartPan();
+	void Pan(int theDX, int theDY);
 
 	void StartRotation(int theX, int theY);
 	void Rotation(int theX, int theY);

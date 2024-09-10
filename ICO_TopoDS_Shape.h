@@ -12,7 +12,7 @@ namespace TopoDS {
 public ref class TShape {
 public:
 	TShape();
-	TShape(TopoDS_Shape theShape);
+	TShape(const TopoDS_Shape theShape);
 	TShape(System::IntPtr theShapeIntPtr);
 	TShape(TopoDS_Shape* theShape);
 	void Move(Trsf^ theT);

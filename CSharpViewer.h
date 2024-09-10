@@ -33,7 +33,6 @@ public:
 private:
 	NCollection_Haft<Handle(V3d_Viewer)> myViewer;
 	List<V3d::View^>^ myViews;
-	//List<*Handle(V3d_View)>>^ myViews = gcnew List<NCollection_Haft<Handle(V3d_View)>^>();
 	NCollection_Haft<Handle(AIS_InteractiveContext)> myAISContext;
 	NCollection_Haft<Handle(OpenGl_GraphicDriver)> myGraphicDriver;
 

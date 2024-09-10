@@ -4,19 +4,17 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-RubberBand::RubberBand() {
+RubberBand::RubberBand() : InteractiveObject(Handle(AIS_RubberBand)()) {
+	// 初始化 myRubber
 	myRubber() = new AIS_RubberBand();
-	// 保存原始句柄
-	myAISObject() = myRubber();
-	nativeHandle() = myRubber();
+
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myRubber();
+	BaseObject::myHandle() = myRubber();
 }
 
 Handle(AIS_RubberBand) RubberBand::GetOCC() {
 	return myRubber();
-}
-
-Handle(Standard_Transient) RubberBand::GetStd() {
-	return nativeHandle();
 }
 
 void RubberBand::SetRectangle(int minX, int minY, int maxX, int maxY) {

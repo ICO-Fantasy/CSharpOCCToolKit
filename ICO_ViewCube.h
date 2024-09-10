@@ -14,7 +14,6 @@ public ref class ViewCube :public InteractiveObject {
 public:
 	ViewCube(double axisSize);
 	Handle(AIS_ViewCube) GetOCC();
-	Handle(Standard_Transient) GetStd() override;
 
 private:
 	void SetDefault();

@@ -8,7 +8,7 @@ TShape::TShape() {
 	_nativeHandle = new TopoDS_Shape();
 }
 
-TShape::TShape(TopoDS_Shape theShape) {
+TShape::TShape(const TopoDS_Shape theShape) {
 	_nativeHandle = new TopoDS_Shape(theShape);
 }
 

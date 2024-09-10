@@ -48,6 +48,10 @@ void Trsf::SetTranslation(Pnt^ fromPoint, Pnt^ toPoint) {
 	myTrsf->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
 }
 
+Trsf^ Trsf::Multiplied(Trsf^ rightTrsf) {
+	return gcnew Trsf(myTrsf->Multiplied(rightTrsf->GetOCC()));
+}
+
 }
 }
 }

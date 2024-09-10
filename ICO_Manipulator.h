@@ -1,12 +1,15 @@
 ﻿#pragma once
 #include <AIS_Manipulator.hxx>
+#include <AIS_ManipulatorMode.hxx>
 #include <Standard_Transient.hxx>
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
+//local
 #include "ICO_InteractiveObject.h"
 #include "ICO_AIS_Shape.h"
 #include "ICO_View.h"
 #include "ICO_Ax2.h"
+#include "ICO_Trsf.h"
 
 using namespace System::Collections::Generic;
 using namespace OCCTK::OCC::V3d;
@@ -23,6 +26,7 @@ public enum class ManipulatorMode {
 	Scaling = AIS_ManipulatorMode::AIS_MM_Scaling,
 	TranslationPlane = AIS_ManipulatorMode::AIS_MM_TranslationPlane,
 };
+
 public enum class ManipulatorAxisIndex {
 	X = 0,
 	Y = 1,
@@ -37,13 +41,14 @@ public:
 	Manipulator(Handle(AIS_Manipulator) theManipulator);
 	Manipulator(List<InteractiveObject^>^ theAISList);
 	Handle(AIS_Manipulator) GetOCC();
-	virtual Handle(Standard_Transient) GetStd() override;
 
 	bool HasActiveMode();
 	ManipulatorMode ActiveMode();
 	ManipulatorAxisIndex ActiveAxisIndex();
 	bool IsAttached();
 	Ax2^ Position();
+	InteractiveObject^ Object();
+
 #pragma region 变换
 
 	void StartTransform(double theX, double theY, View^ theView);

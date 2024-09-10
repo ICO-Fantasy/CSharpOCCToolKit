@@ -19,15 +19,14 @@ namespace AIS {
 
 public ref class AShape :public InteractiveObject {
 public:
-	AShape(Handle(AIS_InteractiveObject) aInteractive);
-	AShape(TopoDS_Shape aShape);
+	AShape(const Handle(AIS_InteractiveObject) aInteractive);
+	AShape(const Handle(AIS_Shape) aAISShape);
+	AShape(const AIS_Shape& aAISShape);
+	AShape(const TopoDS_Shape& aShape);
 	AShape(System::IntPtr aShapePtr);
 	AShape(TopoDS::TShape^ aShape);
-	AShape(Handle(AIS_Shape) aAISShape);
-	AShape(AIS_Shape aAISShape);
 public:
 	Handle(AIS_Shape) GetOCC();
-	Handle(Standard_Transient) GetStd() override;
 	System::IntPtr GetIntPtr();
 public:
 	TopoDS::TShape^ Shape();
@@ -39,7 +38,20 @@ public:
 	virtual bool Equals(System::Object^ obj) override;
 
 private:
-	NCollection_Haft<Handle(AIS_Shape)> myAIS;
+	NCollection_Haft<Handle(AIS_Shape)> myShape;
+protected:
+	// 析构函数用于清理非托管资源
+	!AShape() {
+		myShape() = 0;
+		myAISObject() = 0;
+		myHandle() = 0;
+	}
+
+	// 终结器（finalizer）用于垃圾回收时的清理
+	~AShape() {
+		// 调用析构函数来清理非托管资源
+		this->!AShape();
+	}
 };
 
 }

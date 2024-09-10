@@ -16,7 +16,6 @@ public ref class RubberBand :public InteractiveObject {
 public:
 	RubberBand();
 	Handle(AIS_RubberBand) GetOCC();
-	Handle(Standard_Transient) GetStd() override;
 
 	void SetRectangle(int minX, int minY, int maxX, int maxY);
 	void SetLineType(Aspect::Line theType);

@@ -9,12 +9,12 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-ViewCube::ViewCube(double axesRadius) {
+ViewCube::ViewCube(double axesRadius) :InteractiveObject(Handle(AIS_ViewCube)()) {
 	myViewCube() = new AIS_ViewCube();
 
-	//保存原始句柄
-	myAISObject() = myViewCube();
-	nativeHandle() = myViewCube();
+	// 确保使用正确的 Handle
+	InteractiveObject::myAISObject() = myViewCube();
+	BaseObject::myHandle() = myViewCube();
 
 	SetDefault();
 }
@@ -22,10 +22,6 @@ ViewCube::ViewCube(double axesRadius) {
 Handle(AIS_ViewCube) ViewCube::GetOCC() {
 	return myViewCube();
 
-}
-
-Handle(Standard_Transient) ViewCube::GetStd() {
-	return myViewCube();
 }
 
 void ViewCube::SetDefault() {
