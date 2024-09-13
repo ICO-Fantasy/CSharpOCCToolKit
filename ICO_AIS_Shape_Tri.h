@@ -1,14 +1,15 @@
 ﻿#pragma once
 #include <AIS_InteractiveObject.hxx>
-#include <Quantity_Color.hxx>
 #include <AIS_MultipleConnectedInteractive.hxx>
 #include <AIS_Shape.hxx>
+#include <Quantity_Color.hxx>
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 //Local
 #include "ICO_AIS_Shape.h"
 #include "ICO_InteractiveObject.h"
 #include "ICO_TopoDS_Shape.h"
+#include <AIS_Trihedron.hxx>
 
 namespace OCCTK {
 namespace Extension {

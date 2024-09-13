@@ -21,13 +21,12 @@ namespace TestWPF;
 /// </summary>
 public partial class RobotWindows : Window
 {
-    private readonly OCCCanvas _model;
-
     public RobotWindows()
     {
         InitializeComponent();
+        DataContext = new WorkSpace();
         // 创建 Windows Forms 控件和 WindowsFormsHost
-        _model = new OCCCanvas();
-        CanvasHost.Child = _model;
+        //CanvasHost.Child = ((App)Application.Current).canva;
+        CanvasHost.Child = App.Current.canva;
     }
 }

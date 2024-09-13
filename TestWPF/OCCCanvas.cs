@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using OCCTK.Extension;
 using OCCTK.OCC;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.TopoDS;
 using OCCTK.OCC.V3d;
 using OCCTK.Visualization;
+using Color = OCCTK.Extension.Color;
 
 namespace OCCViewForm;
 
@@ -678,7 +680,11 @@ public class OCCCanvas : Form
             //将鼠标位置发送给OCC交互上下文管理器，用于获取该位置的所选对象
             //! 单选等操作均需要基于该位置进行
             //! moveto的坐标是基于pix的，不需要做转换
-            AISContext.MoveTo(mouseCurrentX, mouseCurrentY, MainView);
+            try
+            {
+                AISContext.MoveTo(mouseCurrentX, mouseCurrentY, MainView);
+            }
+            catch { }
         }
         // 工厂类构建
         var interaction = MouseMoveFactory.CreateInteraction(this, CurrentAction3d);
@@ -768,22 +774,27 @@ public class OCCCanvas : Form
                 // 结束平移
                 break;
             case Action3d.Manipulator_Translation:
-                Debug.WriteLine($"old: {myManipulatorTransfrom}");
-                if (myManipulator.Object().IsShape())
-                {
-                    var f = myManipulator.Object().AsShape();
-                    Debug.WriteLine($"AIS_old: {f.LocalTransformation()}");
-                }
-                //记录最终结果
-                myManipulatorTransfrom = myManipulatorTransfrom?.Multiplied(
-                    myManipulator.Transform(mouseUpX, mouseUpY, MainView)
-                );
-                Debug.WriteLine($"new: {myManipulatorTransfrom}");
-                if (myManipulator.Object().IsShape())
-                {
-                    var f = myManipulator.Object().AsShape();
-                    Debug.WriteLine($"AIS_new: {f.LocalTransformation()}");
-                }
+                //Debug.WriteLine($"\nold: {myManipulatorTransfrom}");
+                //if (myManipulator.Object().IsShape())
+                //{
+                //    var f = myManipulator.Object().AsShape();
+                //    Debug.WriteLine($"AIS_old: {f.LocalTransformation()}");
+                //}
+
+                //! 记录最终结果
+                var b = debugT.Inverted();
+                myManipulatorTransfrom = myManipulatorTransfrom
+                    ?.Multiplied(b)
+                    .Multiplied(new Trsf(debugAX2, myManipulator.Position()));
+                //Debug.WriteLine($"ax2:{new Trsf(debugAX2, myManipulator.Position())}");
+
+                //Debug.WriteLine($"new: {myManipulatorTransfrom}");
+                //if (myManipulator.Object().IsShape())
+                //{
+                //    var f = myManipulator.Object().AsShape();
+                //    Debug.WriteLine($"AIS_new: {f.LocalTransformation()}");
+                //}
+
                 // 结束拖动
                 myManipulator.StopTransform();
                 break;
@@ -1058,9 +1069,11 @@ public class OCCCanvas : Form
 
     #region 显示
 
-    public void Display(InteractiveObject theAIS, bool Toupdate)
+    public void Display(InteractiveObject theAIS, bool Toupdate = true)
     {
         AISContext.Display(theAIS, Toupdate);
+        //默认颜色为灰色
+        AISContext.SetColor(theAIS, new Color(125, 125, 125), Toupdate);
     }
 
     public void EraseSelected()
@@ -1137,10 +1150,18 @@ public class OCCCanvas : Form
 
     #region 操作器
 
+    Ax2 debugAX2;
+    Trsf debugT;
+
     public void Attach(InteractiveObject theAIS)
     {
         myManipulator.Attach(theAIS, true, true, true);
-        myManipulatorTransfrom = new();
+        AShape a = theAIS.AsShape();
+        debugT = a.Shape().Location();
+        myManipulatorTransfrom = debugT;
+        debugAX2 = myManipulator.Position();
+        Debug.WriteLine($"\n\n\nManipulator_ax2: {debugAX2}");
+        Debug.WriteLine($"debugT: {debugT}");
     }
 
     public void Dettach()

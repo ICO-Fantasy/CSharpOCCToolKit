@@ -1,8 +1,6 @@
 ﻿#pragma once
 //OCC
 #include <AIS_InteractiveContext.hxx>
-#include <AIS_ViewCube.hxx>
-#include <AIS_Trihedron.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <Standard_Handle.hxx>
 #include <V3d_Viewer.hxx>
@@ -20,7 +18,9 @@ using namespace OCCTK::Extension;
 namespace OCCTK {
 namespace Visualization {
 
-//! 存在 AIS_InteractiveContext 的情况下，交互对象均应该通过 AIS_InteractiveContext 进行管理，而不是直接操作对象本身
+/// <summary>
+/// 存在 AIS_InteractiveContext 的情况下，交互对象均应该通过 AIS_InteractiveContext 进行管理，而不是直接操作对象本身（给对象赋予材质和颜色）
+/// </summary>
 public ref class CSharpViewer {
 public:
 	CSharpViewer();

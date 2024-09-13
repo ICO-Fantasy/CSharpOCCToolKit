@@ -303,12 +303,36 @@
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="{Binding XValue, StringFormat='X: {0:F1}, ', FallbackValue='X: -, '}" />
-            <TextBlock Grid.Column="1" Text="{Binding YValue, StringFormat='Y: {0:F1}, ', FallbackValue='Y: -, '}" />
-            <TextBlock Grid.Column="2" Text="{Binding ZValue, StringFormat='Z: {0:F1}, ', FallbackValue='Z: -, '}" />
-            <TextBlock Grid.Column="3" Text="{Binding WValue, StringFormat='W: {0:F1}, ', FallbackValue='W: -, '}" />
-            <TextBlock Grid.Column="4" Text="{Binding PValue, StringFormat='P: {0:F1}, ', FallbackValue='P: -, '}" />
-            <TextBlock Grid.Column="5" Text="{Binding RValue, StringFormat='R: {0:F1}', FallbackValue='R: -'}" />
+            <TextBlock
+                Grid.Column="0"
+                MinWidth="70"
+                Text="{Binding XValue, StringFormat='X: {0:F1}, ', FallbackValue='X: -, '}"
+                TextAlignment="Left" />
+            <TextBlock
+                Grid.Column="1"
+                MinWidth="70"
+                Text="{Binding YValue, StringFormat='Y: {0:F1}, ', FallbackValue='Y: -, '}"
+                TextAlignment="Left" />
+            <TextBlock
+                Grid.Column="2"
+                MinWidth="70"
+                Text="{Binding ZValue, StringFormat='Z: {0:F1}, ', FallbackValue='Z: -, '}"
+                TextAlignment="Left" />
+            <TextBlock
+                Grid.Column="3"
+                MinWidth="70"
+                Text="{Binding WValue, StringFormat='W: {0:F1}, ', FallbackValue='W: -, '}"
+                TextAlignment="Left" />
+            <TextBlock
+                Grid.Column="4"
+                MinWidth="70"
+                Text="{Binding PValue, StringFormat='P: {0:F1}, ', FallbackValue='P: -, '}"
+                TextAlignment="Left" />
+            <TextBlock
+                Grid.Column="5"
+                MinWidth="70"
+                Text="{Binding RValue, StringFormat='R: {0:F1}', FallbackValue='R: -'}"
+                TextAlignment="Left" />
         </Grid>
 
     </Grid>

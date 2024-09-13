@@ -39,19 +39,17 @@ public:
 
 private:
 	NCollection_Haft<Handle(AIS_Shape)> myShape;
-protected:
-	// 析构函数用于清理非托管资源
-	!AShape() {
-		myShape() = 0;
-		myAISObject() = 0;
-		myHandle() = 0;
-	}
-
-	// 终结器（finalizer）用于垃圾回收时的清理
-	~AShape() {
-		// 调用析构函数来清理非托管资源
-		this->!AShape();
-	}
+	//protected:
+	//	// 析构函数用于清理非托管资源
+	//	!AShape() {
+	//		delete myShape;
+	//	}
+	//
+	//	// 终结器（finalizer）用于垃圾回收时的清理
+	//	~AShape() {
+	//		// 调用析构函数来清理非托管资源
+	//		this->!AShape();
+	//	}
 };
 
 }

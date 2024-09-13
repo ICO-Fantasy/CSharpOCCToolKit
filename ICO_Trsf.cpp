@@ -44,12 +44,39 @@ System::String^ Trsf::ToString() {
 	return str;
 }
 
+/// <summary>
+/// 设置平移
+/// </summary>
+/// <param name="fromPoint"></param>
+/// <param name="toPoint"></param>
 void Trsf::SetTranslation(Pnt^ fromPoint, Pnt^ toPoint) {
 	myTrsf->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
 }
 
+/// <summary>
+/// 左乘
+/// </summary>
+/// <param name="leftTrsf"></param>
+void Trsf::PreMultiply(Trsf^ leftTrsf) {
+	myTrsf->PreMultiply(leftTrsf->GetOCC());
+}
+
+/// <summary>
+/// 右乘
+/// </summary>
+/// <param name="rightTrsf"></param>
+/// <returns></returns>
 Trsf^ Trsf::Multiplied(Trsf^ rightTrsf) {
 	return gcnew Trsf(myTrsf->Multiplied(rightTrsf->GetOCC()));
+}
+
+/// <summary>
+/// 取反
+/// </summary>
+/// <returns></returns>
+Trsf^ Trsf::Inverted() {
+	return gcnew Trsf(myTrsf->Inverted());
+
 }
 
 }

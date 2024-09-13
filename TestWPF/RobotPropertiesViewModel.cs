@@ -5,9 +5,16 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using OCCTK.OCC.AIS;
+using OCCTK.OCC.BRepPrimAPI;
+using OCCTK.OCC.gp;
+using OCCTK.OCC.TopoDS;
+using TestWPF.Messages;
 using TestWPF.Utils;
 
 namespace TestWPF;
@@ -15,7 +22,7 @@ namespace TestWPF;
 public partial class RobotPropertiesViewModel : ObservableObject
 {
     [ObservableProperty]
-    private RobotProperties _model;
+    private RobotProperties? _model;
 
     #region 角度值
 
@@ -87,7 +94,27 @@ public partial class RobotPropertiesViewModel : ObservableObject
 
     #endregion
 
-    private Matrix<double> toolCoordinates;
+    #region 机器人模型
+
+    private TShape? BaseShape;
+    private AShape? BaseAIS;
+
+    private TShape? Arm1Shape;
+    private TShape? Arm2Shape;
+    private TShape? Arm3Shape;
+    private TShape? Arm4Shape;
+    private TShape? Arm5Shape;
+    private TShape? Arm6Shape;
+
+    private AShape? Arm1AIS;
+    private AShape? Arm2AIS;
+    private AShape? Arm3AIS;
+    private AShape? Arm4AIS;
+    private AShape? Arm5AIS;
+    private AShape? Arm6AIS;
+
+    #endregion
+    private Matrix<double>? toolCoordinates;
 
     #region 末端坐标系
 
@@ -113,34 +140,52 @@ public partial class RobotPropertiesViewModel : ObservableObject
 
     public RobotPropertiesViewModel()
     {
-        _model = new RobotProperties("D:\\ICO\\CSharpOCCToolKit\\TestWPF\\Configs\\testrobot.json");
+        // 订阅消息，接收 RobotProperties 的更新
+        WeakReferenceMessenger.Default.Register<RobotChangedMessage>(
+            this,
+            (r, message) =>
+            {
+                Model = message.Value;
+                // 处理 RobotProperties 更新后的逻辑
+                SetDefault();
+                UpdateToolCoordinates();
+                DrawRobot();
+            }
+        );
+    }
 
-        Theta1 = _model.RobotData.DHParameters[0].Theta;
-        Theta2 = _model.RobotData.DHParameters[1].Theta;
-        Theta3 = _model.RobotData.DHParameters[2].Theta;
-        Theta4 = _model.RobotData.DHParameters[3].Theta;
-        Theta5 = _model.RobotData.DHParameters[4].Theta;
-        Theta6 = _model.RobotData.DHParameters[5].Theta;
+    private void SetDefault()
+    {
+        if (Model == null)
+            return;
 
-        Theta1Min = _model.RobotData.DHParameters[0].Min;
-        Theta2Min = _model.RobotData.DHParameters[1].Min;
-        Theta3Min = _model.RobotData.DHParameters[2].Min;
-        Theta4Min = _model.RobotData.DHParameters[3].Min;
-        Theta5Min = _model.RobotData.DHParameters[4].Min;
-        Theta6Min = _model.RobotData.DHParameters[5].Min;
+        Theta1 = Model.RobotData.DHParameters[0].Theta;
+        Theta2 = Model.RobotData.DHParameters[1].Theta;
+        Theta3 = Model.RobotData.DHParameters[2].Theta;
+        Theta4 = Model.RobotData.DHParameters[3].Theta;
+        Theta5 = Model.RobotData.DHParameters[4].Theta;
+        Theta6 = Model.RobotData.DHParameters[5].Theta;
 
-        Theta1Max = _model.RobotData.DHParameters[0].Max;
-        Theta2Max = _model.RobotData.DHParameters[1].Max;
-        Theta3Max = _model.RobotData.DHParameters[2].Max;
-        Theta4Max = _model.RobotData.DHParameters[3].Max;
-        Theta5Max = _model.RobotData.DHParameters[4].Max;
-        Theta6Max = _model.RobotData.DHParameters[5].Max;
+        Theta1Min = Model.RobotData.DHParameters[0].Min;
+        Theta2Min = Model.RobotData.DHParameters[1].Min;
+        Theta3Min = Model.RobotData.DHParameters[2].Min;
+        Theta4Min = Model.RobotData.DHParameters[3].Min;
+        Theta5Min = Model.RobotData.DHParameters[4].Min;
+        Theta6Min = Model.RobotData.DHParameters[5].Min;
 
-        UpdateToolCoordinates();
+        Theta1Max = Model.RobotData.DHParameters[0].Max;
+        Theta2Max = Model.RobotData.DHParameters[1].Max;
+        Theta3Max = Model.RobotData.DHParameters[2].Max;
+        Theta4Max = Model.RobotData.DHParameters[3].Max;
+        Theta5Max = Model.RobotData.DHParameters[4].Max;
+        Theta6Max = Model.RobotData.DHParameters[5].Max;
     }
 
     public void UpdateToolCoordinates()
     {
+        if (Model == null)
+            return;
+
         toolCoordinates = RobotDynamics.ForwardKinematics(
             [Theta1, Theta2, Theta3, Theta4, Theta5, Theta6],
             DenseMatrix.OfColumnArrays(Model.RobotData.BaseCoordinate),
@@ -172,4 +217,19 @@ public partial class RobotPropertiesViewModel : ObservableObject
         PValue = pitch * (180.0 / Math.PI);
         RValue = roll * (180.0 / Math.PI);
     }
+
+    #region 3D
+    private void DrawRobot()
+    {
+        if (Model == null)
+            return;
+        Ax2 baseAx2 = new Ax2(Model.RobotData.BaseCoordinate);
+        var m = new MakeBox(baseAx2, 10, 10, 1, 10, 10, 0);
+        BaseShape = m.Shape();
+        BaseAIS = new(BaseShape);
+        App.Current.canva.Display(BaseAIS);
+    }
+
+    private void ReDrawRobot() { }
+    #endregion
 }

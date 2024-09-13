@@ -5,14 +5,22 @@ namespace OCCTK {
 namespace OCC {
 namespace V3d {
 
-//可视化窗口
+/// <summary>
+/// 创建可视化窗口
+/// </summary>
+/// <param name=""></param>
+/// <param name="theWnd">窗体句柄</param>
 View::View(Handle(V3d_View) theView, System::IntPtr theWnd) {
 	myView() = theView;
 	// 创建Windows窗口，并设置为V3d_View的窗口
 	Handle(WNT_Window) aWNTWindow = new WNT_Window(reinterpret_cast<HWND> (theWnd.ToPointer()));
 	myView()->SetWindow(aWNTWindow);
 }
-//无屏窗口
+
+/// <summary>
+/// 创建无屏窗口
+/// </summary>
+/// <param name=""></param>
 View::View(Handle(V3d_View) theView) {
 	myView() = theView;
 }
@@ -21,13 +29,17 @@ Handle(V3d_View) View::GetOCC() {
 	return myView();
 }
 
-//使用默认设置
+/// <summary>
+/// 使用默认设置
+/// </summary>
 void View::SetDefault() {
 	this->SetDefaultBGColor();
 	this->SetDefaultRendering();
 }
 
-// 设置默认渲染参数
+/// <summary>
+/// 设置默认渲染参数
+/// </summary>
 void View::SetDefaultRendering() {
 	if (myView().IsNull()) { return; }
 	myView()->ChangeRenderingParams().Method = Graphic3d_RenderingMode::Graphic3d_RM_RASTERIZATION;
@@ -41,136 +53,214 @@ void View::SetDefaultRendering() {
 	myView()->ChangeRenderingParams().CollectedStats = Graphic3d_RenderingParams::PerfCounters_NONE;
 }
 
-//设置默认背景颜色
+/// <summary>
+/// 设置默认背景颜色
+/// </summary>
 void View::SetDefaultBGColor() {
 	if (myView().IsNull()) { return; }
 	myView()->SetBgGradientColors(Quantity_Color(37. / 255., 55. / 255., 113. / 255., Quantity_TOC_RGB), Quantity_Color(36. / 255., 151. / 255., 132. / 255., Quantity_TOC_RGB), Aspect_GradientFillMethod_Vertical, true);
 }
 
-// 设置视图背景颜色
+/// <summary>
+/// 设置视图背景颜色
+/// </summary>
+/// <param name="C1"></param>
+/// <param name="C2"></param>
+/// <param name="update"></param>
 void View::SetBgGradientColors(Color^ C1, Color^ C2, bool update) {
 	if (myView().IsNull()) { return; }
 	myView()->SetBgGradientColors(C1->GetOCC(), C2->GetOCC(), Aspect_GradientFillMethod_Vertical, update);
 }
 
-//获取当前缩放比例
+/// <summary>
+/// 获取当前缩放比例
+/// </summary>
+/// <returns></returns>
 double View::GetScale() {
-	if (myView().IsNull())  return 0.0;
+	if (myView().IsNull())  return -1.0;
 	return myView()->Scale();
 }
 
-//重绘
+/// <summary>
+/// 重绘
+/// </summary>
 void View::Redraw() {
 	if (myView().IsNull())  return;
 	myView()->Redraw();
 }
 
-//调整画布大小
+/// <summary>
+/// 调整画布大小
+/// </summary>
 void View::MustBeResized() {
 	if (myView().IsNull())  return;
 	myView()->MustBeResized();
 }
 
-//设置隐藏线显示模式
+/// <summary>
+/// 设置隐藏线显示模式
+/// </summary>
+/// <param name="open"></param>
 void View::SetDegenerateMode(bool open) {
 	if (myView().IsNull())  return;
 	myView()->SetComputedMode(open);
 }
 
-//适应尺寸缩放
+/// <summary>
+/// 适应尺寸缩放
+/// </summary>
+/// <param name="theXmin"></param>
+/// <param name="theYmin"></param>
+/// <param name="theXmax"></param>
+/// <param name="theYmax"></param>
 void View::WindowFitAll(int theXmin, int theYmin, int theXmax, int theYmax) {
 	if (myView().IsNull())  return;
 	myView()->WindowFitAll(theXmin, theYmin, theXmax, theYmax);
 }
 
-//根据可视对象缩放View
+/// <summary>
+/// 根据可视对象缩放View
+/// </summary>
+/// <param name="theMargin"></param>
+/// <param name="update"></param>
 void View::FitAll(double theMargin, bool update) {
 	if (myView().IsNull())  return;
 	myView()->FitAll(theMargin, update);
 }
-//根据可视对象缩放View
+
+/// <summary>
+/// 根据可视对象缩放View
+/// </summary>
+/// <param name="theScaleFactor"></param>
 void View::ZFitAll(double theScaleFactor) {
 	if (myView().IsNull())  return;
 	myView()->ZFitAll(theScaleFactor);
 }
-//重置视图的居中和方向
+
+/// <summary>
+/// 重置视图的居中和方向
+/// </summary>
 void View::Reset() {
 	if (myView().IsNull())  return;
 	myView()->Reset();
 }
 
-//将 x,y 像素位置对应的视图点置于窗口中心，并更新视图。
+/// <summary>
+/// 将 x,y 像素位置对应的视图点置于窗口中心，并更新视图。
+/// </summary>
+/// <param name="theX"></param>
+/// <param name="theY"></param>
+/// <param name="theZoomFactor"></param>
 void View::Place(int theX, int theY, float theZoomFactor) {
 	if (myView().IsNull())  return;
 	myView()->Place(theX, theY, theZoomFactor);
 }
 
-//根据两个位置之间的距离计算出的缩放系数，并缩放视图
+/// <summary>
+/// 根据两个位置之间的距离计算出的缩放系数，并缩放视图
+/// </summary>
+/// <param name="theX1"></param>
+/// <param name="theY1"></param>
+/// <param name="theX2"></param>
+/// <param name="theY2"></param>
 void View::Zoom(int theX1, int theY1, int theX2, int theY2) {
 	if (myView().IsNull())  return;
 	myView()->Zoom(theX1, theY1, theX2, theY2);
 }
 
-//设置缩放比例
+/// <summary>
+/// 设置缩放比例
+/// </summary>
+/// <param name="theZoomFactor">缩放比例</param>
+/// <param name="update">更新视图</param>
 void View::SetZoom(double theZoomFactor, bool update) {
 	if (myView().IsNull())  return;
 	myView()->SetZoom(theZoomFactor, update);
 }
 
-//开始点缩放
+/// <summary>
+/// 记录开始缩放点
+/// </summary>
+/// <param name="startX"></param>
+/// <param name="startY"></param>
 void View::StartZoomAtPoint(double startX, double startY) {
 	if (myView().IsNull())  return;
 	myView()->StartZoomAtPoint(startX, startY);
 }
 
-//点缩放(调用前必须调用 StartZoomAtPoint)
+/// <summary>
+/// 点缩放(调用前必须调用 StartZoomAtPoint)
+/// </summary>
+/// <param name="startX"></param>
+/// <param name="startY"></param>
+/// <param name="endX"></param>
+/// <param name="endY"></param>
 void View::ZoomAtPoint(double startX, double startY, double endX, double endY) {
 	if (myView().IsNull())  return;
 	myView()->ZoomAtPoint(startX, startY, endX, endY);
 }
 
-////平移
+// 平移
 //void View::Pan(int theX, int theY) {
 //	if (myView().IsNull())  return;
 //	double theZoomFactor = 1.0;
 //	myView()->Pan(theX, theY, theZoomFactor);
 //}
 
-//记录开始平移点
+/// <summary>
+/// 记录开始平移点
+/// </summary>
 void View::StartPan() {
 	if (myView().IsNull())  return;
 	double theZoomFactor = 1.0;
 	myView()->Pan(0, 0, theZoomFactor, true);
 }
 
-//平移操作，需要传入计算后的相对X和Y值
+/// <summary>
+/// 平移操作，需要传入计算后的相对X和Y值
+/// </summary>
+/// <param name="theDX"></param>
+/// <param name="theDY"></param>
 void View::Pan(int theDX, int theDY) {
 	if (myView().IsNull())  return;
 	double theZoomFactor = 1.0;
 	myView()->Pan(theDX, theDY, theZoomFactor, false);
 }
 
-//开始旋转
+/// <summary>
+/// 记录开始旋转点
+/// </summary>
+/// <param name="theX"></param>
+/// <param name="theY"></param>
 void View::StartRotation(int theX, int theY) {
 	if (myView().IsNull())  return;
 	myView()->StartRotation(theX, theY);
 }
 
 
-//旋转(调用前必须调用 StartRotation)
+/// <summary>
+/// 旋转(调用前必须调用 StartRotation)
+/// </summary>
+/// <param name="theX"></param>
+/// <param name="theY"></param>
 void View::Rotation(int theX, int theY) {
 	if (myView().IsNull())  return;
 	myView()->Rotation(theX, theY);
 }
-
+/// <summary>
+/// 设置视图方向
+/// </summary>
+/// <param name="theOrientation"></param>
+/// <param name="update"></param>
 void View::SetViewOrientation(ViewOrientation theOrientation, bool update) {
 	if (myView().IsNull())  return;
 	myView()->SetProj(V3d_TypeOfOrientation((int)theOrientation), update);
 }
-
+/// <summary>
+/// 显示带刻度的坐标轴
+/// </summary>
 void View::DisplayDefault_GraduatedTrihedron() {
 	if (myView().IsNull()) return;
-	// 显示带刻度的坐标轴
 	myView()->GraduatedTrihedronDisplay(Graphic3d_GraduatedTrihedron());
 }
 

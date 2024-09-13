@@ -1,11 +1,12 @@
-﻿#include <BRepPrimAPI_MakeCone.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <Bnd_Box.hxx>
-#include <Geom_Axis2Placement.hxx>
-#include <BRepBndLib.hxx>
-#include <AIS_Trihedron.hxx>
-#include "ICO_AIS_Shape_Tri.h"
+﻿#include "ICO_AIS_Shape_Tri.h"
 #include "ICO_Color.h"
+#include <AIS_DisplayMode.hxx>
+#include <AIS_Trihedron.hxx>
+#include <Bnd_Box.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepPrimAPI_MakeCone.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <Geom_Axis2Placement.hxx>
 
 static double calculateArrowLength(const TopoDS_Shape theShape) {
 	Bnd_Box b;

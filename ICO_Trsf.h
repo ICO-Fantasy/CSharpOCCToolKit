@@ -26,7 +26,9 @@ public:
 	gp_Trsf GetOCC();
 	virtual System::String^ ToString() override;
 	void SetTranslation(Pnt^ fromPoint, Pnt^ toPoint);
+	void PreMultiply(Trsf^ leftTrsf);
 	Trsf^ Multiplied(Trsf^ rightTrsf);
+	Trsf^ Inverted();
 
 private:
 	gp_Trsf* myTrsf;

@@ -1461,11 +1461,15 @@ public partial class SimpleClamp : Window
             else
             {
                 var t = Canvas.GetManipulatorTransformation() ?? new Trsf();
+                Trsf ais_end = new();
                 if (manipulatedObject is AShape ais)
                 {
-                    Debug.WriteLine($"AIS_End: {ais.LocalTransformation()}");
+                    ais_end = ais.LocalTransformation();
+                    Debug.WriteLine($"\nAIS_End: {ais_end}");
                 }
                 Debug.WriteLine($"Final: {t}");
+                t.PreMultiply(ais_end.Inverted());
+                Debug.WriteLine($"diff: {t}");
                 //! 必须先detach操作器，否则会因为AIS对象消失而出错
                 Canvas.Detach();
                 Canvas.Remove(manipulatedObject, false);

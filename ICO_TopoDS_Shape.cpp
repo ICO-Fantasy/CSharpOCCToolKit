@@ -5,31 +5,24 @@ namespace OCC {
 namespace TopoDS {
 
 TShape::TShape() {
-	_nativeHandle = new TopoDS_Shape();
+	myShape = new TopoDS_Shape();
 }
 
 TShape::TShape(const TopoDS_Shape theShape) {
-	_nativeHandle = new TopoDS_Shape(theShape);
+	myShape = new TopoDS_Shape(theShape);
 }
 
 TShape::TShape(TopoDS_Shape* theShape) {
-	_nativeHandle = theShape;
+	myShape = theShape;
 }
 TShape::TShape(System::IntPtr theShapeIntPtr) {
 	// 将 IntPtr 转换为原生指针
 	TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(theShapeIntPtr.ToPointer());
-	_nativeHandle = pShape;
-}
-
-// 挪动shape的原点
-void TShape::Move(Trsf^ theT) {
-	gp_Trsf occT = theT->GetOCC();
-	occT.SetScaleFactor(1.0);
-	_nativeHandle->Move(TopLoc_Location(occT));
+	myShape = pShape;
 }
 
 bool TShape::IsEqual(TShape^ otherShape) {
-	return _nativeHandle->IsEqual(otherShape->GetOCC());
+	return myShape->IsEqual(otherShape->GetOCC());
 }
 
 bool TShape::Equals(System::Object^ obj) {
@@ -42,12 +35,41 @@ bool TShape::Equals(System::Object^ obj) {
 }
 
 TopoDS_Shape TShape::GetOCC() {
-	return *_nativeHandle;
+	return *myShape;
 }
 
 System::IntPtr TShape::GetPtr() {
-	return System::IntPtr(_nativeHandle);
+	return System::IntPtr(myShape);
 }
+
+/// <summary>
+/// 将 Shape 的 Location 右乘 T
+/// </summary>
+/// <param name="theT"></param>
+void TShape::Move(Trsf^ theT) {
+	gp_Trsf occT = theT->GetOCC();
+	occT.SetScaleFactor(1.0);
+	myShape->Move(TopLoc_Location(occT));
+}
+
+/// <summary>
+/// 返回从世界原点到Shape原点的坐标变换
+/// </summary>
+/// <returns></returns>
+Trsf^ TShape::Location() {
+	return gcnew Trsf(myShape->Location().Transformation());
+}
+
+void TShape::Location(Ax2^ newOrigin) {
+	auto t = gcnew Trsf(newOrigin);
+	myShape->Location(TopLoc_Location(t->GetOCC()));
+}
+
+TShape^ TShape::Located(Ax2^ newOrigin) {
+	auto t = gcnew Trsf(newOrigin);
+	return gcnew TShape(myShape->Located(TopLoc_Location(t->GetOCC())));
+}
+
 
 }
 }

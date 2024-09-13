@@ -61,7 +61,11 @@ Ax2^ Manipulator::Position() {
 
 InteractiveObject^ Manipulator::Object() {
 	try {
-		return gcnew InteractiveObject(myManipulator()->Object());
+		//! 避免对象被GC清理，需要进行拷贝
+		auto f = myManipulator()->Object();
+		Handle(AIS_Shape) a = Handle(AIS_Shape)::DownCast(f);
+		Handle(AIS_Shape) b = new AIS_Shape(a->Shape());
+		return gcnew InteractiveObject(b);
 	}
 	catch (const Standard_Failure e) {
 		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
@@ -101,9 +105,10 @@ void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, b
 	anOptions.SetAdjustPosition(adjustPosition);
 	anOptions.SetAdjustSize(!adjustSize);
 	anOptions.SetEnableModes(enableModes);
-	myManipulator()->Attach(theAIS->GetOCC(), anOptions);
+	Handle(AIS_Shape)newAIS = new AIS_Shape(theAIS->GetOCC()->Shape());
+	myManipulator()->Attach(newAIS, anOptions);
 	// 让操作器自动激活
-	myManipulator()->SetModeActivationOnDetection(true);
+	myManipulator()->SetModeActivationOnDetection(false);
 }
 
 void Manipulator::Attach(InteractiveObject^ theAISObject) {
