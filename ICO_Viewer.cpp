@@ -5,16 +5,8 @@ namespace OCCTK {
 namespace OCC {
 namespace V3d {
 
-Viewer::Viewer(Handle(OpenGl_GraphicDriver) theGraphicDriver) {
-	myViewer() = new V3d_Viewer(theGraphicDriver);
-}
-
-Viewer::Viewer(Handle(V3d_Viewer) theViewer) {
-	myViewer() = theViewer;
-}
-
-Handle(V3d_Viewer) Viewer::GetOCC() {
-	return myViewer();
+Viewer::Viewer(Handle(OpenGl_GraphicDriver) theGraphicDriver) :BaseObject() {
+	NativeHandle = new V3d_Viewer(theGraphicDriver);
 }
 
 void Viewer::SetDefaultLight() {
@@ -27,6 +19,10 @@ void Viewer::SetDefaultLight() {
 	//打开光源
 	myViewer()->SetLightOn(aDirLight);
 	myViewer()->SetLightOn(anAmbLight);
+}
+
+V3d::View^ Viewer::CreateView() {
+	return gcnew V3d::View(myViewer()->CreateView());
 }
 
 void Viewer::ActivateGrid(Aspect::GridType type, Aspect::GridDrawMode drawMode) {

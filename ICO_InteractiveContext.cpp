@@ -7,12 +7,16 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-InteractiveContext::InteractiveContext(Handle(AIS_InteractiveContext) theAISContext) {
-	myAISContext() = theAISContext;
+InteractiveContext::InteractiveContext(V3d::Viewer^ theViewer) :BaseObject() {
+	NativeHandle = new AIS_InteractiveContext(theViewer->GetOCC());
 }
 
-InteractiveContext::InteractiveContext(V3d::Viewer^ theViewer) {
-	myAISContext() = new AIS_InteractiveContext(theViewer->GetOCC());
+Handle(AIS_InteractiveContext) InteractiveContext::GetOCC() {
+	return myAISContext();
+}
+
+System::IntPtr InteractiveContext::GetIntPtr() {
+	return System::IntPtr(&*myAISContext());
 }
 
 void InteractiveContext::SetDefault() {
@@ -165,10 +169,9 @@ AShape^ InteractiveContext::SelectedAIS() {
 	if (!owner.IsNull()) {
 		const Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(owner);
 		if (aBRepOwner->HasShape()) {
-			auto anShape = aBRepOwner->Shape();
-			Handle(AIS_Shape) refAIS = new AIS_Shape(anShape);
-			AIS::AShape^ result = gcnew AIS::AShape(refAIS);
-			return result;
+			//auto anShape = aBRepOwner->Shape();
+			//Handle(AIS_Shape) refAIS = new AIS_Shape(anShape);
+			return gcnew AIS::AShape(aBRepOwner->Shape());
 		}
 	}
 	return nullptr;
@@ -302,14 +305,6 @@ bool InteractiveContext::IsSelected(void) {
 bool InteractiveContext::IsDisplayed(InteractiveObject^ theAISObject) {
 	if (myAISContext().IsNull()) return false;
 	return myAISContext()->IsDisplayed(theAISObject->GetOCC());
-}
-
-Handle(AIS_InteractiveContext) InteractiveContext::GetOCC() {
-	return myAISContext();
-}
-
-System::IntPtr InteractiveContext::GetIntPtr() {
-	return System::IntPtr(&*myAISContext());
 }
 
 }

@@ -93,6 +93,12 @@
     <Filter Include="源文件\Laser">
       <UniqueIdentifier>{8eadf91c-c88e-49bb-8cfa-6f400d6fd7c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\AIS\enum">
+      <UniqueIdentifier>{7dcf551f-a435-4aee-b2c0-f46ac6b1b562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\V3d\enum">
+      <UniqueIdentifier>{a90e70fc-8357-44fe-9fcc-d16e28bf6d57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -158,9 +164,6 @@
     <ClCompile Include="ICO_BrepExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
-    <ClCompile Include="ICO_ViewCube.cpp">
-      <Filter>源文件\Extension</Filter>
-    </ClCompile>
     <ClCompile Include="ICO_BndBox.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
@@ -173,9 +176,6 @@
     <ClCompile Include="ICO_MakeCompound.cpp">
       <Filter>源文件\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="ICO_AIS_Shape_Tri.cpp">
-      <Filter>源文件\Extension</Filter>
-    </ClCompile>
     <ClCompile Include="ICO_MakeSphere.cpp">
       <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
     </ClCompile>
@@ -187,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="WMakeSimpleClamp.cpp">
       <Filter>源文件\Laser</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_ViewCube.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,23 +259,11 @@
     <ClInclude Include="ICO_BrepExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
-    <ClInclude Include="ICO_ViewCube.h">
-      <Filter>头文件\Extension</Filter>
-    </ClInclude>
     <ClInclude Include="ICO_BndBox.h">
       <Filter>头文件\Extension</Filter>
     </ClInclude>
     <ClInclude Include="ICO_Viewer.h">
       <Filter>头文件\OCCProxy\V3d</Filter>
-    </ClInclude>
-    <ClInclude Include="ICO_ViewOrientation.h">
-      <Filter>头文件\OCCProxy\V3d</Filter>
-    </ClInclude>
-    <ClInclude Include="ICO_DisplayMode.h">
-      <Filter>头文件\OCCProxy\AIS</Filter>
-    </ClInclude>
-    <ClInclude Include="ICO_SelectionMode.h">
-      <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
     <ClInclude Include="ICO_RubberBand.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
@@ -282,9 +273,6 @@
     </ClInclude>
     <ClInclude Include="ICO_Aspect_Line.h">
       <Filter>头文件\OCCProxy\Aspect</Filter>
-    </ClInclude>
-    <ClInclude Include="ICO_AIS_Shape_Tri.h">
-      <Filter>头文件\Extension</Filter>
     </ClInclude>
     <ClInclude Include="ICO_MakeSphere.h">
       <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
@@ -303,6 +291,24 @@
     </ClInclude>
     <ClInclude Include="ICO_Aspect_GridDrawMode.h">
       <Filter>头文件\OCCProxy\Aspect</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_DisplayMode.h">
+      <Filter>头文件\OCCProxy\AIS\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ViewOrientation.h">
+      <Filter>头文件\OCCProxy\V3d\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ManipulatorMode.h">
+      <Filter>头文件\OCCProxy\AIS\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ManipulatorAxisIndex.h">
+      <Filter>头文件\OCCProxy\AIS\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_SelectionMode.h">
+      <Filter>头文件\OCCProxy\AIS\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ViewCube.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

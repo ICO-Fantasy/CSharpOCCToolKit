@@ -6,13 +6,18 @@
 namespace OCCTK {
 namespace OCC {
 
-public ref class BaseObject abstract {
+public ref class BaseObject {
 public:
-	BaseObject(Handle(Standard_Transient)nativeHandle) {
+	BaseObject() {
+		myHandle() = new Standard_Transient();
+	}
+	BaseObject(const Handle(Standard_Transient)& nativeHandle) {
 		myHandle() = nativeHandle;
 	}
-	// 纯虚函数，必须在派生类中实现
-	virtual Handle(Standard_Transient) GetStd() abstract;
+	property Handle(Standard_Transient) NativeHandle {
+		Handle(Standard_Transient) get() { return myHandle(); } void set(Handle(Standard_Transient) handle) { myHandle() = handle; }
+	};
+	bool IsNull() { return myHandle().IsNull(); };
 protected:
 	NCollection_Haft<Handle(Standard_Transient)> myHandle;
 };

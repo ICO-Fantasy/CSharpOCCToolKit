@@ -5,6 +5,7 @@
 #include <NCollection_Haft.h> 
 //local
 #include "ICO_Color.h"
+#include "ICO_BaseObject.h"
 #include "ICO_ViewOrientation.h"
 using namespace OCCTK::Extension;
 
@@ -12,11 +13,15 @@ namespace OCCTK {
 namespace OCC {
 namespace V3d {
 
-public ref class View {
+public ref class View :BaseObject {
+private:
+	Handle(V3d_View) myView() { return Handle(V3d_View)::DownCast(NativeHandle); };
 public:
-	View(Handle(V3d_View) theView, System::IntPtr theWnd);
-	View(Handle(V3d_View) theView);
+	View(const Handle(V3d_View)& theView);
+	View(const Handle(V3d_View)& theView, System::IntPtr theWnd);
 	Handle(V3d_View) GetOCC();
+	void SetWindow(System::IntPtr theWnd);
+	void Remove();
 	void SetDefault();
 	void SetDefaultRendering();
 	void SetDefaultBGColor();
@@ -56,8 +61,6 @@ public:
 #pragma endregion
 
 	void DisplayDefault_GraduatedTrihedron();
-private:
-	NCollection_Haft<Handle(V3d_View)> myView;
 };
 
 }

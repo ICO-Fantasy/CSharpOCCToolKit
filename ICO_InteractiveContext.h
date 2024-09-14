@@ -5,6 +5,7 @@
 #include <NCollection_Haft.h> 
 //Local
 #include "ICO_AIS_Shape.h"
+#include "ICO_BaseObject.h"
 #include "ICO_Color.h"
 #include "ICO_View.h"
 #include "ICO_ShapeEnum.h"
@@ -18,10 +19,14 @@ namespace OCC {
 namespace AIS {
 
 
-public ref class InteractiveContext {
+public ref class InteractiveContext :BaseObject {
+private:
+	Handle(AIS_InteractiveContext) myAISContext() { return Handle(AIS_InteractiveContext)::DownCast(NativeHandle); }
 public:
-	InteractiveContext(Handle(AIS_InteractiveContext) theAISContext);
 	InteractiveContext(V3d::Viewer^ theViewer);
+	InteractiveContext(const Handle(AIS_InteractiveContext)& theAISContext) :BaseObject(theAISContext) {}
+	Handle(AIS_InteractiveContext) GetOCC();
+	System::IntPtr GetIntPtr();
 
 	void SetDefault();
 	void SetDefaultHighlightStyle();
@@ -84,11 +89,6 @@ public:
 
 	bool IsSelected(void);
 	bool IsDisplayed(InteractiveObject^ theAISObject);
-
-	Handle(AIS_InteractiveContext) GetOCC();
-	System::IntPtr GetIntPtr();
-protected:
-	NCollection_Haft<Handle(AIS_InteractiveContext)> myAISContext;
 };
 
 }

@@ -18,15 +18,16 @@ namespace OCC {
 namespace AIS {
 
 public ref class AShape :public InteractiveObject {
+private:
+	Handle(AIS_Shape) myShape() { return Handle(AIS_Shape)::DownCast(NativeHandle); }
 public:
 	AShape(const Handle(AIS_InteractiveObject) aInteractive);
-	AShape(const Handle(AIS_Shape) aAISShape);
-	AShape(const AIS_Shape& aAISShape);
+	AShape(const Handle(AIS_Shape) aAISShape) : InteractiveObject(aAISShape) {};
 	AShape(const TopoDS_Shape& aShape);
 	AShape(System::IntPtr aShapePtr);
 	AShape(TopoDS::TShape^ aShape);
 public:
-	Handle(AIS_Shape) GetOCC();
+	Handle(AIS_Shape) GetOCC() { return myShape(); };
 	System::IntPtr GetIntPtr();
 public:
 	TopoDS::TShape^ Shape();
@@ -37,12 +38,10 @@ public:
 	void RemoveSelf();
 	virtual bool Equals(System::Object^ obj) override;
 
-private:
-	NCollection_Haft<Handle(AIS_Shape)> myShape;
 	//protected:
 	//	// 析构函数用于清理非托管资源
 	//	!AShape() {
-	//		delete myShape;
+	//		myHandle;
 	//	}
 	//
 	//	// 终结器（finalizer）用于垃圾回收时的清理

@@ -583,7 +583,8 @@ public class OCCCanvas : Form
         //! 记录变换开始点
         if (myManipulator.HasActiveMode())
         {
-            myManipulator.StartTransform(mouseDownX, mouseDownY, MainView);
+            myManipulator.StartTransform(mouseDownX, mouseDownY, Canvas.GetMainView());
+            //myManipulator.StartTransform(mouseDownX, mouseDownY, MainView);
         }
         MainView.StartPan();
     }
@@ -1156,12 +1157,15 @@ public class OCCCanvas : Form
     public void Attach(InteractiveObject theAIS)
     {
         myManipulator.Attach(theAIS, true, true, true);
-        AShape a = theAIS.AsShape();
-        debugT = a.Shape().Location();
-        myManipulatorTransfrom = debugT;
-        debugAX2 = myManipulator.Position();
-        Debug.WriteLine($"\n\n\nManipulator_ax2: {debugAX2}");
-        Debug.WriteLine($"debugT: {debugT}");
+        if (theAIS is AShape)
+        {
+            AShape a = (AShape)theAIS;
+            debugT = a.Shape().Location();
+            myManipulatorTransfrom = debugT;
+            debugAX2 = myManipulator.Position();
+            Debug.WriteLine($"\n\n\nManipulator_ax2: {debugAX2}");
+            Debug.WriteLine($"debugT: {debugT}");
+        }
     }
 
     public void Dettach()

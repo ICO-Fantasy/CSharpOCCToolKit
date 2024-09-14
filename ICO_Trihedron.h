@@ -14,6 +14,8 @@ namespace OCC {
 namespace AIS {
 
 public ref class Trihedron :public InteractiveObject {
+private:
+	Handle(AIS_Trihedron) myTrihedron() { return Handle(AIS_Trihedron)::DownCast(NativeHandle); }
 public:
 	Trihedron(double axisSize);
 	Trihedron(AShape^ theAIS, double axisSize);
@@ -21,13 +23,12 @@ public:
 	void SetArrowLength(double value);
 	void SetArrowWidth(double value);
 	void SetAspect(int theX, int theY);
-	Handle(AIS_Trihedron) GetOCC();
+	Handle(AIS_Trihedron) GetOCC() { return myTrihedron(); };
 
 private:
 	void SetAxis();
 	double ArrowLength = 100.0;
 	double ArrowWidth = 2.5;
-	NCollection_Haft<Handle(AIS_Trihedron)> myTrihedron;
 };
 
 }

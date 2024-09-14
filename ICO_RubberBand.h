@@ -13,9 +13,11 @@ namespace OCC {
 namespace AIS {
 
 public ref class RubberBand :public InteractiveObject {
+private:
+	Handle(AIS_RubberBand) myRubber() { return Handle(AIS_RubberBand)::DownCast(NativeHandle); }
 public:
 	RubberBand();
-	Handle(AIS_RubberBand) GetOCC();
+	Handle(AIS_RubberBand) GetOCC() { return myRubber(); };
 
 	void SetRectangle(int minX, int minY, int maxX, int maxY);
 	void SetLineType(Aspect::Line theType);
@@ -23,8 +25,6 @@ public:
 	void SetFillTransparency(double transparency);
 	void SetLineColor(Color^ theColor);
 	void SetFilling(bool isFilling);
-private:
-	NCollection_Haft<Handle(AIS_RubberBand)> myRubber;
 };
 
 }

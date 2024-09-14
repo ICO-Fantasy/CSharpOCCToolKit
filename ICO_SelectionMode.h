@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 namespace OCCTK {
 namespace OCC {
 namespace AIS {

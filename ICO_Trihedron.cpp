@@ -8,41 +8,29 @@ namespace AIS {
 
 
 //创建原点坐标轴
-Trihedron::Trihedron(double axisSize) :InteractiveObject(Handle(AIS_Trihedron)()) {
-	myTrihedron() = new AIS_Trihedron(new Geom_Axis2Placement(gp_Ax2()));
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myTrihedron();
-	BaseObject::myHandle() = myTrihedron();
+Trihedron::Trihedron(double axisSize) :InteractiveObject() {
+	NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(gp_Ax2()));
 
 	ArrowLength = axisSize;
 	SetAxis();
 }
 
 // 根据对象创建坐标轴
-Trihedron::Trihedron(AShape^ theAIS, double axisSize) :InteractiveObject(Handle(AIS_Trihedron)()) {
+Trihedron::Trihedron(AShape^ theAIS, double axisSize) :InteractiveObject() {
 	gp_Trsf t = theAIS->GetOCC()->LocalTransformation();
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(t);
-	myTrihedron() = new AIS_Trihedron(new Geom_Axis2Placement(a));
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myTrihedron();
-	BaseObject::myHandle() = myTrihedron();
+	NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(a));
 
 	ArrowLength = axisSize;
 	SetAxis();
 }
 
 // 根据变换创建坐标轴
-Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject(Handle(AIS_Trihedron)()) {
+Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() {
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(theTrsf->GetOCC());
-	myTrihedron() = new AIS_Trihedron(new Geom_Axis2Placement(a));
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myTrihedron();
-	BaseObject::myHandle() = myTrihedron();
+	NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(a));
 
 	ArrowLength = axisSize;
 	SetAxis();
@@ -60,11 +48,6 @@ void Trihedron::SetAspect(int theX, int theY) {
 	myTrihedron()->SetTransformPersistence(new Graphic3d_TransformPers(Graphic3d_TMF_2d, Aspect_TypeOfTriedronPosition::Aspect_TOTP_RIGHT_LOWER, Graphic3d_Vec2i(theY, theY)));
 }
 
-
-Handle(AIS_Trihedron) Trihedron::GetOCC() {
-	return myTrihedron();
-
-}
 
 void Trihedron::SetAxis() {
 	// 显示箭头

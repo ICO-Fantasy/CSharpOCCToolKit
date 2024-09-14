@@ -5,22 +5,27 @@
 #include <NCollection_Haft.h> 
 //local
 #include "ICO_Aspect_GridType.h"
+#include "ICO_BaseObject.h"
+#include "ICO_View.h"
 #include "ICO_Aspect_GridDrawMode.h"
 
 namespace OCCTK {
 namespace OCC {
 namespace V3d {
 
-public ref class Viewer {
+public ref class Viewer :BaseObject {
+private:
+	Handle(V3d_Viewer) myViewer() { return Handle(V3d_Viewer)::DownCast(NativeHandle); }
 public:
 	Viewer(Handle(OpenGl_GraphicDriver) theGraphicDriver);
-	Viewer(Handle(V3d_Viewer) theViewer);
-	Handle(V3d_Viewer) GetOCC();
+	Viewer(const Handle(V3d_Viewer)& theViewer) :BaseObject(theViewer) {};
+	Handle(V3d_Viewer) GetOCC() { return myViewer(); };
 	void SetDefaultLight();
+
+	V3d::View^ CreateView();
+
 	void ActivateGrid(Aspect::GridType type, Aspect::GridDrawMode drawMode);
 	void DeactivateGrid();
-private:
-	NCollection_Haft<Handle(V3d_Viewer)> myViewer;
 };
 
 }

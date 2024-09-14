@@ -12,7 +12,6 @@
 #include "ICO_Viewer.h"
 
 using namespace OCCTK::OCC;
-using namespace OCCTK::OCC::AIS;
 using namespace OCCTK::Extension;
 
 namespace OCCTK {
@@ -27,14 +26,16 @@ public:
 	bool InitViewer();
 	V3d::View^ CreateView(System::IntPtr theWnd);
 
-	InteractiveContext^ GetContext();
+	AIS::InteractiveContext^ GetContext();
 	V3d::View^ GetMainView();
 	V3d::Viewer^ GetViewer();
 private:
-	NCollection_Haft<Handle(V3d_Viewer)> myViewer;
+	//NCollection_Haft<Handle(V3d_Viewer)> myViewer;
+	//NCollection_Haft<Handle(AIS_InteractiveContext)> myAISContext;
+	//NCollection_Haft<Handle(OpenGl_GraphicDriver)> myGraphicDriver;
+	V3d::Viewer^ myViewer;
+	AIS::InteractiveContext^ myAISContext;
 	List<V3d::View^>^ myViews;
-	NCollection_Haft<Handle(AIS_InteractiveContext)> myAISContext;
-	NCollection_Haft<Handle(OpenGl_GraphicDriver)> myGraphicDriver;
 
 };
 }

@@ -37,8 +37,8 @@ public ref struct BasePlate {
 	property double Z {double get() { return myBP().Z; }};
 	property double DX {double get() { return myBP().dX; }};
 	property double DY {double get() { return myBP().dY; }};
-	property double OffsetX {double get() { return myBP().offsetX; }void set(double value) { myBP().offsetX = value; }};
-	property double OffsetY {double get() { return myBP().offsetY; }void set(double value) { myBP().offsetY = value; }};
+	property double OffsetX {double get() { return myBP().offsetX; } void set(double value) { myBP().offsetX = value; }};
+	property double OffsetY {double get() { return myBP().offsetY; } void set(double value) { myBP().offsetY = value; }};
 	property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }};
 public:
 	Trsf^ Translation;

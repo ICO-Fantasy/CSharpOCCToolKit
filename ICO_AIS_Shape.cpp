@@ -9,53 +9,27 @@ namespace AIS {
 
 AShape::AShape(const Handle(AIS_InteractiveObject) aInteractive) : InteractiveObject(aInteractive) {
 	if (aInteractive->IsKind(STANDARD_TYPE(AIS_Shape))) {
-		Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(aInteractive);
-		myShape() = new AIS_Shape(*anAISShape);
-
+		Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(NativeHandle);
 	}
 	else {
 		throw gcnew System::Exception("InteractiveObject not an AIS_Shape");
 	}
 }
 
-AShape::AShape(const TopoDS_Shape& aShape) : InteractiveObject(Handle(AIS_Shape)()) {
-	myShape() = new AIS_Shape(aShape);
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myShape();
-	BaseObject::myHandle() = myShape();
+AShape::AShape(const TopoDS_Shape& aShape) : InteractiveObject() {
+	NativeHandle = new AIS_Shape(aShape);
 }
 
 // 传入TopoDS_Shape的指针（不要轻易使用指针构造方法）
-AShape::AShape(System::IntPtr aShapePtr) : InteractiveObject(Handle(AIS_Shape)()) {
+AShape::AShape(System::IntPtr aShapePtr) : InteractiveObject() {
 	// 将 IntPtr 转换为原生指针
 	TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(aShapePtr.ToPointer());
 	// 创建新的 AIS_Shape 对象
-	myShape() = new AIS_Shape(*pShape);
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myShape();
-	BaseObject::myHandle() = myShape();
+	NativeHandle = new AIS_Shape(*pShape);
 }
 
-AShape::AShape(TopoDS::TShape^ aShape) : InteractiveObject(Handle(AIS_Shape)()) {
-	myShape() = new AIS_Shape(aShape->GetOCC());
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myShape();
-	BaseObject::myHandle() = myShape();
-}
-
-AShape::AShape(const Handle(AIS_Shape) aAISShape) : InteractiveObject(aAISShape) {
-	myShape() = aAISShape;
-}
-
-AShape::AShape(const AIS_Shape& aAISShape) : InteractiveObject(Handle(AIS_Shape)(&aAISShape)) {
-	myShape() = new AIS_Shape(aAISShape);
-}
-
-Handle(AIS_Shape) AShape::GetOCC() {
-	return myShape();
+AShape::AShape(TopoDS::TShape^ aShape) : InteractiveObject() {
+	NativeHandle = new AIS_Shape(aShape->GetOCC());
 }
 
 // 获取指针 (不要轻易使用指针传递)
@@ -98,6 +72,7 @@ void AShape::RemoveSelf() {
 	Handle(AIS_InteractiveContext) theContext = myShape()->GetContext();
 	if (!theContext.IsNull()) {
 		theContext->Remove(myShape(), false);
+		GC::KeepAlive(this);
 	}
 }
 

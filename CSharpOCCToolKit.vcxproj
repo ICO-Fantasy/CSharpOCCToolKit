@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClCompile Include="convertChinese.cpp" />
     <ClCompile Include="CSharpViewer.cpp" />
-    <ClCompile Include="ICO_AIS_Shape_Tri.cpp" />
     <ClCompile Include="ICO_Ax2.cpp" />
     <ClCompile Include="ICO_Ax3.cpp" />
     <ClCompile Include="ICO_BndBox.cpp" />
@@ -190,7 +189,6 @@
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
-    <ClInclude Include="ICO_AIS_Shape_Tri.h" />
     <ClInclude Include="ICO_Aspect_Line.h" />
     <ClInclude Include="ICO_Ax2.h" />
     <ClInclude Include="ICO_Ax3.h" />
@@ -226,6 +224,8 @@
     <ClInclude Include="ICO_SelectionMode.h" />
     <ClInclude Include="ICO_Aspect_GridType.h" />
     <ClInclude Include="ICO_Aspect_GridDrawMode.h" />
+    <ClInclude Include="ICO_ManipulatorMode.h" />
+    <ClInclude Include="ICO_ManipulatorAxisIndex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

@@ -10,6 +10,8 @@
 #include "ICO_View.h"
 #include "ICO_Ax2.h"
 #include "ICO_Trsf.h"
+#include "ICO_ManipulatorAxisIndex.h"
+#include "ICO_ManipulatorMode.h"
 
 using namespace System::Collections::Generic;
 using namespace OCCTK::OCC::V3d;
@@ -19,28 +21,15 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-public enum class ManipulatorMode {
-	None = AIS_ManipulatorMode::AIS_MM_None,
-	Translation = AIS_ManipulatorMode::AIS_MM_Translation,
-	Rotation = AIS_ManipulatorMode::AIS_MM_Rotation,
-	Scaling = AIS_ManipulatorMode::AIS_MM_Scaling,
-	TranslationPlane = AIS_ManipulatorMode::AIS_MM_TranslationPlane,
-};
-
-public enum class ManipulatorAxisIndex {
-	X = 0,
-	Y = 1,
-	Z = 2,
-	None = 99,
-};
 
 public ref class Manipulator : public InteractiveObject {
+private:
+	Handle(AIS_Manipulator) myManipulator() { return Handle(AIS_Manipulator)::DownCast(NativeHandle); }
 public:
 	Manipulator();
-	Manipulator(Manipulator^ theManipulator);
-	Manipulator(Handle(AIS_Manipulator) theManipulator);
+	Manipulator(const Handle(AIS_Manipulator)& theManipulator) :InteractiveObject(theManipulator) {};
 	Manipulator(List<InteractiveObject^>^ theAISList);
-	Handle(AIS_Manipulator) GetOCC();
+	Handle(AIS_Manipulator) GetOCC() { return myManipulator(); };
 
 	bool HasActiveMode();
 	ManipulatorMode ActiveMode();
@@ -73,8 +62,6 @@ public:
 	void SetPart(ManipulatorMode^ theMode, bool isEnable);
 	void SetPart(ManipulatorAxisIndex^ theAxisIndex, ManipulatorMode^ theMode, bool isEnable);
 	void EnableMode(ManipulatorMode^ theMode);
-private:
-	NCollection_Haft<Handle(AIS_Manipulator)> myManipulator;
 };
 
 }

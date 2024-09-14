@@ -21,14 +21,10 @@ namespace AIS {
 
 public ref class InteractiveObject : BaseObject {
 public:
+	InteractiveObject() :BaseObject() {}
 	InteractiveObject(Handle(AIS_InteractiveObject) theAISObject);
-	bool IsNull();
 	bool IsShape();
-	AShape^ AsShape();
-	Handle(AIS_InteractiveObject) GetOCC();
-	Handle(Standard_Transient) GetStd() override;
-protected:
-	NCollection_Haft<Handle(AIS_InteractiveObject)> myAISObject;
+	Handle(AIS_InteractiveObject) GetOCC() { return Handle(AIS_InteractiveObject)::DownCast(NativeHandle); };
 	//protected:
 	//	// 析构函数用于清理非托管资源
 	//	!InteractiveObject() {

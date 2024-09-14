@@ -6,27 +6,38 @@ namespace OCC {
 namespace V3d {
 
 /// <summary>
+/// 创建无屏窗口
+/// </summary>
+/// <param name=""></param>
+View::View(const Handle(V3d_View)& theView) :BaseObject(theView) {
+}
+
+/// <summary>
 /// 创建可视化窗口
 /// </summary>
 /// <param name=""></param>
 /// <param name="theWnd">窗体句柄</param>
-View::View(Handle(V3d_View) theView, System::IntPtr theWnd) {
-	myView() = theView;
-	// 创建Windows窗口，并设置为V3d_View的窗口
-	Handle(WNT_Window) aWNTWindow = new WNT_Window(reinterpret_cast<HWND> (theWnd.ToPointer()));
-	myView()->SetWindow(aWNTWindow);
+View::View(const Handle(V3d_View)& theView, System::IntPtr theWnd) :BaseObject() {
+	NativeHandle = theView;
+	this->SetWindow(theWnd);
 }
 
-/// <summary>
-/// 创建无屏窗口
-/// </summary>
-/// <param name=""></param>
-View::View(Handle(V3d_View) theView) {
-	myView() = theView;
-}
 
 Handle(V3d_View) View::GetOCC() {
 	return myView();
+}
+
+void View::SetWindow(System::IntPtr theWnd) {
+	// 创建Windows窗口，并设置为V3d_View的窗口
+	Handle(WNT_Window) aWNTWindow = new WNT_Window(reinterpret_cast<HWND> (theWnd.ToPointer()));
+	myView()->SetWindow(aWNTWindow);
+	if (!aWNTWindow->IsMapped()) {
+		aWNTWindow->Map();
+	}
+}
+
+void View::Remove() {
+	myView()->Remove();
 }
 
 /// <summary>
@@ -261,7 +272,17 @@ void View::SetViewOrientation(ViewOrientation theOrientation, bool update) {
 /// </summary>
 void View::DisplayDefault_GraduatedTrihedron() {
 	if (myView().IsNull()) return;
-	myView()->GraduatedTrihedronDisplay(Graphic3d_GraduatedTrihedron());
+	Graphic3d_GraduatedTrihedron GT = Graphic3d_GraduatedTrihedron();
+	//GT.ChangeXAxisAspect().SetTickmarksLength(50);
+	//GT.ChangeYAxisAspect().SetTickmarksLength(50);
+	//GT.ChangeZAxisAspect().SetTickmarksLength(50);
+	GT.ChangeXAxisAspect().SetTickmarksNumber(10);
+	GT.ChangeYAxisAspect().SetTickmarksNumber(10);
+	GT.ChangeZAxisAspect().SetTickmarksNumber(2);
+	GT.ChangeXAxisAspect().SetValuesOffset(30);
+	GT.ChangeYAxisAspect().SetValuesOffset(30);
+	GT.ChangeZAxisAspect().SetValuesOffset(30);
+	myView()->GraduatedTrihedronDisplay(GT);
 }
 
 }

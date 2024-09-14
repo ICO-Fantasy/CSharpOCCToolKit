@@ -5,38 +5,17 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
+
 InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject) :
 	BaseObject(theAISObject) {
-	myAISObject() = theAISObject;
 
 }
-
-bool InteractiveObject::IsNull() {
-	return myAISObject().IsNull();
-}
-
 /// <summary>
 /// 检查AIS类型
 /// </summary>
 /// <returns></returns>
 bool InteractiveObject::IsShape() {
-	return myAISObject()->IsKind(STANDARD_TYPE(AIS_Shape));
-}
-
-/// <summary>
-/// 转换前应该先做类型检查（IsShape）
-/// </summary>
-/// <returns></returns>
-AShape^ InteractiveObject::AsShape() {
-	return gcnew AShape(myAISObject());
-}
-
-Handle(AIS_InteractiveObject) InteractiveObject::GetOCC() {
-	return myAISObject();
-}
-
-Handle(Standard_Transient) InteractiveObject::GetStd() {
-	return myHandle();
+	return GetOCC()->IsKind(STANDARD_TYPE(AIS_Shape));
 }
 
 }

@@ -4,20 +4,8 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-Manipulator::Manipulator() :InteractiveObject(Handle(AIS_Manipulator)()) {
-	myManipulator() = new AIS_Manipulator();
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myManipulator();
-	BaseObject::myHandle() = myManipulator();
-}
-
-Manipulator::Manipulator(Manipulator^ theManipulator) :InteractiveObject(theManipulator->GetOCC()) {
-	myManipulator() = theManipulator->GetOCC();
-}
-
-Manipulator::Manipulator(Handle(AIS_Manipulator) theManipulator) :InteractiveObject(theManipulator) {
-	myManipulator() = theManipulator;
+Manipulator::Manipulator() :InteractiveObject() {
+	NativeHandle = new AIS_Manipulator();
 }
 
 Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) :InteractiveObject(Handle(AIS_Manipulator)()) {
@@ -28,15 +16,7 @@ Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) :InteractiveObjec
 	}
 	aManipulator->Attach(aSeq);
 
-	myManipulator() = aManipulator;
-
-	// 确保使用正确的 Handle
-	InteractiveObject::myAISObject() = myManipulator();
-	BaseObject::myHandle() = myManipulator();
-}
-
-Handle(AIS_Manipulator) Manipulator::GetOCC() {
-	return myManipulator();
+	NativeHandle = aManipulator;
 }
 
 bool Manipulator::HasActiveMode() {
@@ -60,16 +40,10 @@ Ax2^ Manipulator::Position() {
 }
 
 InteractiveObject^ Manipulator::Object() {
-	try {
-		//! 避免对象被GC清理，需要进行拷贝
-		auto f = myManipulator()->Object();
-		Handle(AIS_Shape) a = Handle(AIS_Shape)::DownCast(f);
-		Handle(AIS_Shape) b = new AIS_Shape(a->Shape());
-		return gcnew InteractiveObject(b);
-	}
-	catch (const Standard_Failure e) {
-		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
-	}
+	return gcnew InteractiveObject(myManipulator()->Object());
+	//catch (const Standard_Failure e) {
+	//	throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
+	//}
 }
 
 void Manipulator::StartTransform(double theX, double theY, View^ theView) {
@@ -105,8 +79,7 @@ void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, b
 	anOptions.SetAdjustPosition(adjustPosition);
 	anOptions.SetAdjustSize(!adjustSize);
 	anOptions.SetEnableModes(enableModes);
-	Handle(AIS_Shape)newAIS = new AIS_Shape(theAIS->GetOCC()->Shape());
-	myManipulator()->Attach(newAIS, anOptions);
+	myManipulator()->Attach(theAIS->GetOCC(), anOptions);
 	// 让操作器自动激活
 	myManipulator()->SetModeActivationOnDetection(false);
 }
