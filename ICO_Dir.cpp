@@ -1,6 +1,7 @@
 ﻿#include <gp_Dir.hxx>
 //Local
 #include "ICO_Dir.h"
+#include "ICO_Vec.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -12,6 +13,10 @@ Dir::Dir() {
 
 Dir::Dir(double X, double Y, double Z) {
 	myDir = new gp_Dir(X, Y, Z);
+}
+
+Dir::Dir(Vec^ theDir) {
+	myDir = new gp_Dir(theDir->GetOCC());
 }
 
 Dir::Dir(gp_Dir theDir) {
@@ -28,18 +33,6 @@ bool Dir::IsParallel(Dir^ otherDir, double theAngularTolerance) {
 
 gp_Dir Dir::GetOCC() {
 	return *myDir;
-}
-
-double Dir::X() {
-	return myDir->X();
-}
-
-double Dir::Y() {
-	return myDir->Y();
-}
-
-double Dir::Z() {
-	return myDir->Z();
 }
 
 }

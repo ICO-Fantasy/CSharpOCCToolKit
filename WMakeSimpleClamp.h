@@ -2,17 +2,16 @@
 #include "MakeSimpleClamp.h"
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
-#include "ICO_TopoDS_Shape.h"
+#include "ICO_Topo_Shape.h"
 #include "ICO_AIS_Shape.h"
 #include "ICO_StringExchange.h"
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 
-using namespace System::Collections::Generic;
-using namespace OCCTK;
+//业务逻辑不会被其它头文件引用，可以使用using namespace
 using namespace OCCTK::OCC::gp;
+using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::AIS;
-using namespace OCCTK::OCC::TopoDS;
 
 namespace OCCTK {
 namespace Laser {
@@ -31,7 +30,7 @@ private:
 
 public ref struct BasePlate {
 	BasePlate(SimpleClamp::BasePlate theBasePlate) { myBP() = theBasePlate; }
-	property TShape^ Shape {TShape^ get() { return gcnew TShape(myBP().Shape()); }};
+	property OCC::Topo::TShape^ Shape {OCC::Topo::TShape^ get() { return gcnew OCC::Topo::TShape(myBP().Shape()); }};
 	property double X {double get() { return myBP().X; }};
 	property double Y {double get() { return myBP().Y; }};
 	property double Z {double get() { return myBP().Z; }};
@@ -39,19 +38,19 @@ public ref struct BasePlate {
 	property double DY {double get() { return myBP().dY; }};
 	property double OffsetX {double get() { return myBP().offsetX; } void set(double value) { myBP().offsetX = value; }};
 	property double OffsetY {double get() { return myBP().offsetY; } void set(double value) { myBP().offsetY = value; }};
-	property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }};
+	property OCC::AIS::AShape^ AIS {OCC::AIS::AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew OCC::AIS::AShape(Shape); } return myAIS; }};
 public:
 	Trsf^ Translation;
 	void UpdateAIS() {
 		if (myAIS != nullptr) {
 			myAIS->RemoveSelf();
 		}
-		myAIS = gcnew AShape(Shape);
+		myAIS = gcnew OCC::AIS::AShape(Shape);
 	}
 	SimpleClamp::BasePlate GetOCC() { return myBP(); };
 private:
 	NCollection_Haft<SimpleClamp::BasePlate> myBP;
-	AShape^ myAIS;
+	OCC::AIS::AShape^ myAIS;
 };
 
 public ref struct VerticalPiece {
@@ -60,8 +59,8 @@ public ref struct VerticalPiece {
 	}
 public:
 	int NumberString = -1;
-	property TShape^ Shape {TShape^ get() { return gcnew TShape(myPiece().Shape()); }}
-	property AShape^ AIS { AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(Shape); } return myAIS; }}
+	property OCC::Topo::TShape^ Shape {OCC::Topo::TShape^ get() { return gcnew OCC::Topo::TShape(myPiece().Shape()); }}
+	property OCC::AIS::AShape^ AIS { OCC::AIS::AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew OCC::AIS::AShape(Shape); } return myAIS; }}
 	property PlatePose^ Pose {PlatePose^ get() { return gcnew PlatePose(myPiece().pose); }}
 	property double Order {double get() { return myPiece().order; }}
 	property double Length {double get() { return myPiece().Length(); }}
@@ -73,7 +72,7 @@ public:
 	virtual System::String^ ToString() override { return Order.ToString("F1"); }
 private:
 	NCollection_Haft<OCCTK::SimpleClamp::VerticalPiece> myPiece;
-	AShape^ myAIS;
+	OCC::AIS::AShape^ myAIS;
 };
 
 public ref struct VerticalPlate {
@@ -108,8 +107,8 @@ public ref struct VerticalPlate {
 	property double AuxiliaryWidth {double get() { return myPlate().auxiliaryWidth; }void set(double value) { myPlate().auxiliaryWidth = value; }}
 	// 最终的竖板形状
 	//property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(myPlate().shape); }return myAIS; }};
-	property AShape^ AIS {AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
-	property TShape^ Shape {TShape^ get() { if (sutured) { if (numbered) { return myNumberedShape; } else { return myShape; } } return nullptr; }};
+	property OCC::AIS::AShape^ AIS {OCC::AIS::AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};
+	property OCC::Topo::TShape^ Shape {OCC::Topo::TShape^ get() { if (sutured) { if (numbered) { return myNumberedShape; } else { return myShape; } } return nullptr; }};
 	// 是否已连接
 	property bool Sutured {bool get() { return sutured; } };
 	// 是否已烙印编号
@@ -140,18 +139,18 @@ private:
 internal:
 	bool sutured = false;
 	bool numbered = false;
-	TShape^ myShape;
-	TShape^ myNumberedShape;
-	AShape^ myAIS;
+	OCC::Topo::TShape^ myShape;
+	OCC::Topo::TShape^ myNumberedShape;
+	OCC::AIS::AShape^ myAIS;
 };
 
 #pragma endregion
 
 public ref class SimpleClampMaker {
 public:
-	static BasePlate^ MakeBasePlate_NoInteract(TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY);
+	static BasePlate^ MakeBasePlate_NoInteract(OCC::Topo::TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY);
 
-	static VerticalPlate^ MakeVerticalPlate(TShape^ InputWorkpiece, BasePlate^ BasePlate, PlatePose^ theDirection, double theClearances, double theMinSupportLen, double theCuttingDistance);
+	static VerticalPlate^ MakeVerticalPlate(OCC::Topo::TShape^ InputWorkpiece, BasePlate^ BasePlate, PlatePose^ theDirection, double theClearances, double theMinSupportLen, double theCuttingDistance);
 
 	static VerticalPlate^ SuturePLate(VerticalPlate^ theVerticalPlate, BasePlate^ BasePlate, double theConnectHight, double theConnectThickness);
 
@@ -165,7 +164,7 @@ public:
 
 	//static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint);
 
-	static TShape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);
+	static OCC::Topo::TShape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);
 
 	static auto TestError(int value);
 };

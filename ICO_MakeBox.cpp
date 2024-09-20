@@ -1,17 +1,33 @@
 ﻿#include "ICO_MakeBox.h"
-#include "ICO_TopoDS_Shape.h"
-using namespace OCCTK::OCC::TopoDS;
+//local
+#include "ICO_Topo_Shape.h"
+#include "ICO_Ax2.h"
+#include "ICO_Pnt.h"
+
+using namespace OCCTK::OCC::Topo;
+using namespace OCCTK::OCC::gp;
 
 namespace OCCTK {
 namespace OCC {
 namespace BRepPrimAPI {
 
+/// <summary>
+/// 从原点构建矩形
+/// </summary>
+/// <param name="dX">长</param>
+/// <param name="dY">宽</param>
+/// <param name="dZ">高</param>
 MakeBox::MakeBox(double dX, double dY, double dZ) {
 	myMaker = new BRepPrimAPI_MakeBox(dX, dY, dZ);
 }
 
-MakeBox::MakeBox(Pnt^ left, Pnt^ right) {
-	myMaker = new BRepPrimAPI_MakeBox(left->GetOCC(), right->GetOCC());
+/// <summary>
+/// 从两角点构建矩形
+/// </summary>
+/// <param name="leftBottom"></param>
+/// <param name="rightTop"></param>
+MakeBox::MakeBox(Pnt^ leftBottom, Pnt^ rightTop) {
+	myMaker = new BRepPrimAPI_MakeBox(leftBottom->GetOCC(), rightTop->GetOCC());
 }
 
 /// <summary>

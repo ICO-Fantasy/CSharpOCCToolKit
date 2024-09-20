@@ -76,7 +76,6 @@ Trsf^ Trsf::Multiplied(Trsf^ rightTrsf) {
 /// <returns></returns>
 Trsf^ Trsf::Inverted() {
 	return gcnew Trsf(myTrsf->Inverted());
-
 }
 
 }

@@ -13,7 +13,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
-using OCCTK.OCC.TopoDS;
+using OCCTK.OCC.Topo;
 using TestWPF.Messages;
 using TestWPF.Utils;
 

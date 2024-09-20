@@ -278,7 +278,7 @@ void View::DisplayDefault_GraduatedTrihedron() {
 	//GT.ChangeZAxisAspect().SetTickmarksLength(50);
 	GT.ChangeXAxisAspect().SetTickmarksNumber(10);
 	GT.ChangeYAxisAspect().SetTickmarksNumber(10);
-	GT.ChangeZAxisAspect().SetTickmarksNumber(2);
+	GT.ChangeZAxisAspect().SetTickmarksNumber(3);
 	GT.ChangeXAxisAspect().SetValuesOffset(30);
 	GT.ChangeYAxisAspect().SetValuesOffset(30);
 	GT.ChangeZAxisAspect().SetValuesOffset(30);

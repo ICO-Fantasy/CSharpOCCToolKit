@@ -32,6 +32,20 @@ public:
 
 private:
 	gp_Trsf* myTrsf;
+protected:
+	// 析构函数用于清理非托管资源
+	!Trsf() {
+		if (myTrsf != 0) {
+			delete myTrsf;
+			myTrsf = 0;
+		}
+	}
+
+	// 终结器（finalizer）用于垃圾回收时的清理
+	~Trsf() {
+		// 调用析构函数来清理非托管资源
+		this->!Trsf();
+	}
 };
 
 }

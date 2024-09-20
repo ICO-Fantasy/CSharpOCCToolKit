@@ -3,9 +3,15 @@
 #include <BRepTools.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_Shape.hxx>
+//local
 #include "ICO_BrepExchange.h"
+#include "ICO_Topo_Shape.h"
 #include "ICO_StringExchange.h"
 #include "ConvertChinese.h"
+
+using namespace OCCTK::OCC::Topo;
+using namespace OCCTK::OCC::gp;
+using namespace System;
 
 namespace OCCTK {
 namespace IO {

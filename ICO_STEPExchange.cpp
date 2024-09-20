@@ -2,8 +2,13 @@
 #include "ICO_STEPExchange.h"
 #include <IFSelect_ReturnStatus.hxx>
 #include <STEPControl_Reader.hxx>
-#include "ICO_StringExchange.h"
 #include <STEPControl_Writer.hxx>
+//local
+#include "ICO_StringExchange.h"
+#include "ICO_Topo_Shape.h"
+
+using namespace OCCTK::OCC::Topo;
+using namespace System;
 
 namespace OCCTK {
 namespace IO {
@@ -52,7 +57,6 @@ bool STEPExchange::SaveFile(String^ filePath) {
 		return true;
 	}
 	return false;
-
 }
 
 }

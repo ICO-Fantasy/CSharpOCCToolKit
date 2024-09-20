@@ -1,4 +1,13 @@
 ﻿#include "ICO_Manipulator.h"
+//loacl
+#include "ICO_AIS_Shape.h"
+#include "ICO_Trsf.h"
+#include "ICO_Ax2.h"
+#include "ICO_View.h"
+
+using namespace OCCTK::OCC::V3d;
+using namespace OCCTK::OCC::AIS;
+using namespace OCCTK::OCC::gp;
 
 namespace OCCTK {
 namespace OCC {
@@ -8,10 +17,10 @@ Manipulator::Manipulator() :InteractiveObject() {
 	NativeHandle = new AIS_Manipulator();
 }
 
-Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) :InteractiveObject(Handle(AIS_Manipulator)()) {
+Manipulator::Manipulator(List<InteractiveObject^>^ theAISList) :InteractiveObject() {
 	Handle(AIS_Manipulator) aManipulator = new AIS_Manipulator();
 	AIS_ManipulatorObjectSequence* aSeq = new AIS_ManipulatorObjectSequence();
-	for each (AShape ^ var in theAISList) {
+	for each (InteractiveObject ^ var in theAISList) {
 		aSeq->Append((var->GetOCC()));
 	}
 	aManipulator->Attach(aSeq);

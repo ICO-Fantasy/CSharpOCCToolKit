@@ -17,4 +17,8 @@
     <ProjectReference Include="..\CSharpOCCToolKit.vcxproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="GeometryTools\" />
+  </ItemGroup>
+
 </Project>

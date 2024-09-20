@@ -31,6 +31,7 @@ public partial class WorkSpace : ObservableObject
     public WorkSpace()
     {
         Robot = new("D:\\ICO\\CSharpOCCToolKit\\TestWPF\\Configs\\testrobot.json");
+
         //// 发送初始的 Robot 对象
         //SendRobotChangedMessage();
     }

@@ -1,16 +1,18 @@
 ﻿#include "ICO_Transform.h"
-
+//Local
+#include "ICO_Topo_Shape.h"
+#include "ICO_Trsf.h"
 namespace OCCTK {
 namespace OCC {
 namespace BRepBuilderAPI {
 
-Transform::Transform(TopoDS::TShape^ theShape, Trsf^ theTrsf) {
+Transform::Transform(Topo::TShape^ theShape, gp::Trsf^ theTrsf) {
 	gp_Trsf theT = theTrsf->GetOCC();
 	myT = new BRepBuilderAPI_Transform(theShape->GetOCC(), theTrsf->GetOCC());
 }
 
-TopoDS::TShape^ Transform::Shape() {
-	return gcnew TopoDS::TShape(myT->Shape());
+Topo::TShape^ Transform::Shape() {
+	return gcnew Topo::TShape(myT->Shape());
 }
 
 }

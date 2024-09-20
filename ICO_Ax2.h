@@ -33,6 +33,20 @@ public:
 
 protected:
 	gp_Ax2* myAx2;
+protected:
+	// 析构函数用于清理非托管资源
+	!Ax2() {
+		if (myAx2 != 0) {
+			delete myAx2;
+			myAx2 = 0;
+		}
+	}
+
+	// 终结器（finalizer）用于垃圾回收时的清理
+	~Ax2() {
+		// 调用析构函数来清理非托管资源
+		this->!Ax2();
+	}
 };
 
 }

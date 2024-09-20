@@ -11,6 +11,7 @@
 #include "ICO_View.h"
 #include "ICO_Viewer.h"
 
+//业务逻辑不会被其它头文件引用，可以使用using namespace
 using namespace OCCTK::OCC;
 using namespace OCCTK::Extension;
 

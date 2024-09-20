@@ -1,6 +1,6 @@
-﻿#pragma once
-#include "ICO_MakeCompound.h"
+﻿#include "ICO_MakeCompound.h"
 
+using namespace OCCTK::OCC::Topo;
 
 namespace OCCTK {
 namespace Tool {

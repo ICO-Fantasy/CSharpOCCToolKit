@@ -2,8 +2,12 @@
 #include "WMakeSimpleClamp.h"
 #include "MakeSimpleClamp.h"
 #include "ICO_StringExchange.h"
+#include "ICO_Trsf.h"
 #include <TopoDS_FrozenShape.hxx>
 using namespace System::Collections::Generic;
+using namespace OCCTK::OCC::gp;
+using namespace OCCTK::OCC::Topo;
+using namespace OCCTK::OCC::AIS;
 
 namespace OCCTK {
 namespace Laser {
@@ -23,7 +27,7 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) { return gcn
 // 根据包围盒创建底板
 BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
 	SimpleClamp::BasePlate theCPPBasePlate = SimpleClamp::MakeBasePlate(InputWorkpiece->GetOCC(), OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
-	//设置移动
+	// 设置移动
 	Trsf^ T = gcnew Trsf(gcnew Pnt(theCPPBasePlate.X, theCPPBasePlate.Y, theCPPBasePlate.Z), gcnew Pnt());
 	theCPPBasePlate.X = 0.0;
 	theCPPBasePlate.Y = 0.0;
@@ -33,7 +37,16 @@ BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(TShape^ InputWorkpiece, do
 	return base;
 }
 
-// 在指定位置创建一块竖板
+/// <summary>
+/// 在指定位置创建一块竖板
+/// </summary>
+/// <param name="InputWorkpiece"></param>
+/// <param name="BasePlate"></param>
+/// <param name="thePose"></param>
+/// <param name="theClearances"></param>
+/// <param name="theMinSupportLen"></param>
+/// <param name="theCuttingDistance"></param>
+/// <returns></returns>
 VerticalPlate^ SimpleClampMaker::MakeVerticalPlate(TShape^ InputWorkpiece, BasePlate^ BasePlate, PlatePose^ thePose, double theClearances, double theMinSupportLen, double theCuttingDistance) {
 	OCCTK::SimpleClamp::VerticalPlate cppPlate = OCCTK::SimpleClamp::MakeVerticalPlate(InputWorkpiece->GetOCC(), BasePlate->GetOCC(), thePose->GetOCC(), theClearances, theMinSupportLen, theCuttingDistance);
 	return gcnew VerticalPlate(cppPlate);
@@ -266,6 +279,22 @@ auto SimpleClampMaker::TestError(int value) {
 		throw gcnew System::Exception("Test Error 4");
 	default:
 		throw gcnew System::Exception(System::String::Format("Test Unknown Error {0}", value));
+	}
+	try {
+		throw gcnew System::Exception(System::String::Format("Test Unknown Error {0}", value));
+	}
+	catch (const std::exception& e) {
+		// 将 std::exception 的消息转换为 System::String^
+		System::String^ errorMsg = gcnew System::String(e.what());
+		// 使用转换后的消息构造新的 System::Exception
+		throw gcnew System::Exception(errorMsg);
+	}
+	catch (const TopoDS_FrozenShape& ex) {
+		// 将特定的 C++ 异常转换为托管异常
+		throw gcnew System::InvalidOperationException("TopoDS_FrozenShape: Attempted to modify a frozen shape.");
+	}
+	catch (const Standard_Failure& e) {
+		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
 	}
 }
 

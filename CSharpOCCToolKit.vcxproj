@@ -160,12 +160,25 @@
     <ClCompile Include="ICO_Ax2.cpp" />
     <ClCompile Include="ICO_Ax3.cpp" />
     <ClCompile Include="ICO_BndBox.cpp" />
+    <ClCompile Include="ICO_BRepAdaptor_Curve.cpp" />
     <ClCompile Include="ICO_BrepExchange.cpp" />
+    <ClCompile Include="ICO_BRep_Tool.cpp" />
     <ClCompile Include="ICO_MakeCompound.cpp" />
     <ClCompile Include="ICO_MakeDir.cpp" />
+    <ClCompile Include="ICO_MakeEdge.cpp" />
+    <ClCompile Include="ICO_MakeFace.cpp" />
     <ClCompile Include="ICO_MakeSphere.cpp" />
+    <ClCompile Include="ICO_MakeWire.cpp" />
+    <ClCompile Include="ICO_Pln.cpp" />
     <ClCompile Include="ICO_RubberBand.cpp" />
+    <ClCompile Include="ICO_Splitter.cpp" />
+    <ClCompile Include="ICO_TopExp_Explorer.cpp" />
+    <ClCompile Include="ICO_Topo_Edge.cpp" />
+    <ClCompile Include="ICO_Topo_Face.cpp" />
+    <ClCompile Include="ICO_Topo_Vertex.cpp" />
+    <ClCompile Include="ICO_Topo_Wire.cpp" />
     <ClCompile Include="ICO_Transform.cpp" />
+    <ClCompile Include="ICO_Vec.cpp" />
     <ClCompile Include="ICO_Viewer.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
     <ClCompile Include="ICO_STEPExchange.cpp" />
@@ -183,7 +196,7 @@
     <ClCompile Include="ICO_Pnt.cpp" />
     <ClCompile Include="ICO_Trsf.cpp" />
     <ClCompile Include="WMakeSimpleClamp.cpp" />
-    <ClCompile Include="ICO_TopoDS_Shape.cpp" />
+    <ClCompile Include="ICO_Topo_Shape.cpp" />
     <ClCompile Include="ICO_View.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -193,13 +206,26 @@
     <ClInclude Include="ICO_Ax2.h" />
     <ClInclude Include="ICO_Ax3.h" />
     <ClInclude Include="ICO_BndBox.h" />
+    <ClInclude Include="ICO_BRepAdaptor_Curve.h" />
     <ClInclude Include="ICO_BrepExchange.h" />
+    <ClInclude Include="ICO_BRep_Tool.h" />
     <ClInclude Include="ICO_DisplayMode.h" />
     <ClInclude Include="ICO_MakeCompound.h" />
     <ClInclude Include="ICO_MakeDir.h" />
+    <ClInclude Include="ICO_MakeEdge.h" />
+    <ClInclude Include="ICO_MakeFace.h" />
     <ClInclude Include="ICO_MakeSphere.h" />
+    <ClInclude Include="ICO_MakeWire.h" />
+    <ClInclude Include="ICO_Pln.h" />
     <ClInclude Include="ICO_RubberBand.h" />
+    <ClInclude Include="ICO_Splitter.h" />
+    <ClInclude Include="ICO_TopExp_Explorer.h" />
+    <ClInclude Include="ICO_Topo_Edge.h" />
+    <ClInclude Include="ICO_Topo_Face.h" />
+    <ClInclude Include="ICO_Topo_Vertex.h" />
+    <ClInclude Include="ICO_Topo_Wire.h" />
     <ClInclude Include="ICO_Transform.h" />
+    <ClInclude Include="ICO_Vec.h" />
     <ClInclude Include="ICO_Viewer.h" />
     <ClInclude Include="ICO_ViewOrientation.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
@@ -219,13 +245,14 @@
     <ClInclude Include="ICO_Pnt.h" />
     <ClInclude Include="ICO_Trsf.h" />
     <ClInclude Include="WMakeSimpleClamp.h" />
-    <ClInclude Include="ICO_TopoDS_Shape.h" />
+    <ClInclude Include="ICO_Topo_Shape.h" />
     <ClInclude Include="ICO_View.h" />
     <ClInclude Include="ICO_SelectionMode.h" />
     <ClInclude Include="ICO_Aspect_GridType.h" />
     <ClInclude Include="ICO_Aspect_GridDrawMode.h" />
     <ClInclude Include="ICO_ManipulatorMode.h" />
     <ClInclude Include="ICO_ManipulatorAxisIndex.h" />
+    <ClInclude Include="ICO_Arrow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

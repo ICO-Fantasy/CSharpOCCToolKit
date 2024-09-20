@@ -14,7 +14,7 @@ using OCCTK.IO;
 using OCCTK.Laser;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
-using OCCTK.OCC.TopoDS;
+using OCCTK.OCC.Topo;
 using OCCTK.Tool;
 using OCCViewForm;
 //设置别名
@@ -115,7 +115,8 @@ public partial class SimpleClamp : Window
 
         TextChangeSetting();
         //! test
-        TestInput();
+        //TestInput();
+        OCCFunctionTest();
         DisplayEraseInputWorkpiece(true);
     }
 
@@ -269,8 +270,8 @@ public partial class SimpleClamp : Window
             if (_CurrentPlate != value)
             {
                 _CurrentPlate = value;
-                CurrentPlateLocationX_TextBox.Text = $"{value.Pose.Location.X():F1}";
-                CurrentPlateLocationY_TextBox.Text = $"{value.Pose.Location.Y():F1}";
+                CurrentPlateLocationX_TextBox.Text = $"{value.Pose.Location.X:F1}";
+                CurrentPlateLocationY_TextBox.Text = $"{value.Pose.Location.Y:F1}";
                 CurrentPlateDirection_TextBox.Text =
                     $"{DirMaker.GetDirAngleWithZ(value.Pose.Direction):F1}";
                 CurrentPlateAuxiliaryHight_TextBox.Text = $"{value.AuxiliaryHight}";
@@ -1122,7 +1123,7 @@ public partial class SimpleClamp : Window
             InputWorkpiece.Shape,
             BasePlate,
             new PlatePose(
-                new Pnt(theX, theY, CurrentPlate.Pose.Location.Z()),
+                new Pnt(theX, theY, CurrentPlate.Pose.Location.Z),
                 DirMaker.AngleWithZ(theAngle)
             ),
             theClearances,
@@ -1869,6 +1870,8 @@ public partial class SimpleClamp : Window
     #region 视图显示
 
     private Action<InteractiveObject, bool> Display => Canvas.Display;
+    private Action<InteractiveObject, Color, bool> SetColor => AISContext.SetColor;
+    private Action<InteractiveObject, double, bool> SetTransparency => AISContext.SetTransparency;
     private Action<InteractiveObject, bool> Erase => Canvas.Erase;
     private Action<bool> EraseAll => Canvas.EraseAll;
 
@@ -1884,7 +1887,7 @@ public partial class SimpleClamp : Window
             {
                 Display(InputWorkpiece.AIS, false);
                 //AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
-                AISContext.SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), update);
+                SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), update);
             }
             else
             {
@@ -1905,7 +1908,7 @@ public partial class SimpleClamp : Window
             {
                 Display(BasePlate.AIS, false);
                 //AISContext.SetTransparency(BasePlate.AIS, 0.8, false);
-                AISContext.SetColor(BasePlate.AIS, new Color(204, 102, 51), false);
+                SetColor(BasePlate.AIS, new Color(204, 102, 51), false);
             }
             else
             {
@@ -1925,7 +1928,7 @@ public partial class SimpleClamp : Window
             {
                 Display(onePiece.AIS, false);
                 //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
-                AISContext.SetColor(onePiece.AIS, new Color(255, 0, 0), update);
+                SetColor(onePiece.AIS, new Color(255, 0, 0), update);
             }
         }
         foreach (var onePlate in MiddleToUpPlates)
@@ -1934,7 +1937,7 @@ public partial class SimpleClamp : Window
             {
                 Display(onePiece.AIS, false);
                 //AISContext.SetTransparency(onePiece.AIS, 0.3, false);
-                AISContext.SetColor(onePiece.AIS, new(0, 255, 0), update);
+                SetColor(onePiece.AIS, new(0, 255, 0), update);
             }
         }
     }
@@ -1951,7 +1954,7 @@ public partial class SimpleClamp : Window
             {
                 Display(onePlate.AIS, false);
                 //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
-                AISContext.SetColor(onePlate.AIS, new Color(255, 0, 0), update);
+                SetColor(onePlate.AIS, new Color(255, 0, 0), update);
             }
         }
         foreach (var onePlate in MiddleToUpPlates)
@@ -1960,7 +1963,7 @@ public partial class SimpleClamp : Window
             {
                 Display(onePlate.AIS, false);
                 //AISContext.SetTransparency(onePlate.AIS, 0.3, false);
-                AISContext.SetColor(onePlate.AIS, new(0, 255, 0), update);
+                SetColor(onePlate.AIS, new(0, 255, 0), update);
             }
         }
     }
@@ -1986,7 +1989,7 @@ public partial class SimpleClamp : Window
         {
             Display(thePlate.AIS, false);
             AISContext.SetTransparency(thePlate.AIS, transparency, false);
-            AISContext.SetColor(thePlate.AIS, theColor, update);
+            SetColor(thePlate.AIS, theColor, update);
         }
         else
         {
@@ -1994,7 +1997,7 @@ public partial class SimpleClamp : Window
             {
                 Display(onePiece.AIS, false);
                 AISContext.SetTransparency(onePiece.AIS, transparency, false);
-                AISContext.SetColor(onePiece.AIS, theColor, update);
+                SetColor(onePiece.AIS, theColor, update);
             }
         }
     }
@@ -2038,7 +2041,7 @@ public partial class SimpleClamp : Window
             {
                 Display(Piece.AIS, update);
                 AISContext.SetTransparency(Piece.AIS, 0.0, update);
-                AISContext.SetColor(Piece.AIS, theColor, update);
+                SetColor(Piece.AIS, theColor, update);
             }
         }
     }
@@ -2081,7 +2084,7 @@ public partial class SimpleClamp : Window
             if (CurrentPlate.AIS != null)
             {
                 Display(CurrentPlate.AIS, update);
-                AISContext.SetColor(CurrentPlate.AIS, theColor, update);
+                SetColor(CurrentPlate.AIS, theColor, update);
                 AISContext.SetTransparency(CurrentPlate.AIS, 0.0, update);
             }
         }

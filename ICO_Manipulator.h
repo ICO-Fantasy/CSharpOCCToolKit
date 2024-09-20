@@ -6,16 +6,25 @@
 #include <NCollection_Haft.h> 
 //local
 #include "ICO_InteractiveObject.h"
-#include "ICO_AIS_Shape.h"
-#include "ICO_View.h"
-#include "ICO_Ax2.h"
-#include "ICO_Trsf.h"
 #include "ICO_ManipulatorAxisIndex.h"
 #include "ICO_ManipulatorMode.h"
 
-using namespace System::Collections::Generic;
-using namespace OCCTK::OCC::V3d;
-using namespace OCCTK::OCC::gp;
+
+namespace OCCTK {
+namespace OCC {
+namespace gp {
+ref class Pnt;
+ref class Ax2;
+ref class Trsf;
+}
+namespace Topo {
+ref class TShape;
+}
+namespace V3d {
+ref class View;
+}
+}
+}
 
 namespace OCCTK {
 namespace OCC {
@@ -35,14 +44,14 @@ public:
 	ManipulatorMode ActiveMode();
 	ManipulatorAxisIndex ActiveAxisIndex();
 	bool IsAttached();
-	Ax2^ Position();
+	gp::Ax2^ Position();
 	InteractiveObject^ Object();
 
 #pragma region 变换
 
-	void StartTransform(double theX, double theY, View^ theView);
+	void StartTransform(double theX, double theY, V3d::View^ theView);
 	//void Transform(double theX, double theY, View^ theView);
-	Trsf^ Transform(double theX, double theY, View^ theView);
+	gp::Trsf^ Transform(double theX, double theY, V3d::View^ theView);
 	void StopTransform();
 	void StopTransform(bool thetoApply);
 

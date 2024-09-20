@@ -520,15 +520,14 @@ static TopoDS_Shape MakeSection(PlatePose thePose, const TopoDS_Shape& theWorkpi
 	BRep_Builder bb;
 	bb.MakeCompound(test);
 	//bb.Add(test, BRepBuilderAPI_MakeFace(thePose.Plane(), -5, 5, -5, 5));
-	TopoDS_Shape aSplitShape = aSplitter.Shape();
 	TopTools_ListOfShape edges = aSplitter.SectionEdges();
 	TopTools_ListIteratorOfListOfShape it(edges);
 	for (; it.More(); it.Next()) {
 		bb.Add(test, it.Value());
 	}
+	//TopoDS_Shape aSplitShape = aSplitter.Shape();
 	//return aSplitShape;
 	return test;
-
 
 	throw std::runtime_error("截面获取失败");
 }

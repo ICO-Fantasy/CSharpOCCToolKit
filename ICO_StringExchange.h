@@ -4,8 +4,6 @@
 #include <Resource_Unicode.hxx>
 #include <vcclr.h> 
 
-using namespace System;
-
 namespace OCCTK {
 namespace DataExchange {
 

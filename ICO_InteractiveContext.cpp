@@ -169,8 +169,6 @@ AShape^ InteractiveContext::SelectedAIS() {
 	if (!owner.IsNull()) {
 		const Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(owner);
 		if (aBRepOwner->HasShape()) {
-			//auto anShape = aBRepOwner->Shape();
-			//Handle(AIS_Shape) refAIS = new AIS_Shape(anShape);
 			return gcnew AIS::AShape(aBRepOwner->Shape());
 		}
 	}

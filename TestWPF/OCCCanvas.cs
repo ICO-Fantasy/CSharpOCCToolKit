@@ -7,7 +7,7 @@ using OCCTK.Extension;
 using OCCTK.OCC;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
-using OCCTK.OCC.TopoDS;
+using OCCTK.OCC.Topo;
 using OCCTK.OCC.V3d;
 using OCCTK.Visualization;
 using Color = OCCTK.Extension.Color;
@@ -782,11 +782,11 @@ public class OCCCanvas : Form
                 //    Debug.WriteLine($"AIS_old: {f.LocalTransformation()}");
                 //}
 
-                //! 记录最终结果
-                var b = debugT.Inverted();
-                myManipulatorTransfrom = myManipulatorTransfrom
-                    ?.Multiplied(b)
-                    .Multiplied(new Trsf(debugAX2, myManipulator.Position()));
+                ////! 记录最终结果
+                //var b = debugT.Inverted();
+                //myManipulatorTransfrom = myManipulatorTransfrom
+                //    ?.Multiplied(b)
+                //    .Multiplied(new Trsf(debugAX2, myManipulator.Position()));
                 //Debug.WriteLine($"ax2:{new Trsf(debugAX2, myManipulator.Position())}");
 
                 //Debug.WriteLine($"new: {myManipulatorTransfrom}");
@@ -1072,7 +1072,7 @@ public class OCCCanvas : Form
 
     public void Display(InteractiveObject theAIS, bool Toupdate = true)
     {
-        AISContext.Display(theAIS, Toupdate);
+        AISContext.Display(theAIS, false);
         //默认颜色为灰色
         AISContext.SetColor(theAIS, new Color(125, 125, 125), Toupdate);
     }
@@ -1089,9 +1089,9 @@ public class OCCCanvas : Form
 
     public void EraseAll(bool Toupdate)
     {
-        AISContext.EraseAll(Toupdate);
-        DisplayViewCube(Toupdate);
-        DisplayOriginTrihedron(Toupdate);
+        AISContext.EraseAll(false);
+        DisplayViewCube(false);
+        DisplayOriginTrihedron(false);
         DisplayViewTrihedron(Toupdate);
     }
 
@@ -1151,21 +1151,20 @@ public class OCCCanvas : Form
 
     #region 操作器
 
-    Ax2 debugAX2;
-    Trsf debugT;
+    //Ax2 debugAX2;
+    //Trsf debugT;
 
     public void Attach(InteractiveObject theAIS)
     {
         myManipulator.Attach(theAIS, true, true, true);
-        if (theAIS is AShape)
-        {
-            AShape a = (AShape)theAIS;
-            debugT = a.Shape().Location();
-            myManipulatorTransfrom = debugT;
-            debugAX2 = myManipulator.Position();
-            Debug.WriteLine($"\n\n\nManipulator_ax2: {debugAX2}");
-            Debug.WriteLine($"debugT: {debugT}");
-        }
+        //if (theAIS is AShape) {
+        //AShape a = (AShape)theAIS;
+        //debugT = a.Shape().Location();
+        //myManipulatorTransfrom = debugT;
+        //debugAX2 = myManipulator.Position();
+        //Debug.WriteLine($"\n\n\nManipulator_ax2: {debugAX2}");
+        //Debug.WriteLine($"debugT: {debugT}");
+        //}
     }
 
     public void Dettach()

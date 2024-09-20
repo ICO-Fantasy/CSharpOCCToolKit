@@ -99,6 +99,30 @@
     <Filter Include="头文件\OCCProxy\V3d\enum">
       <UniqueIdentifier>{a90e70fc-8357-44fe-9fcc-d16e28bf6d57}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\BRepAdaptor">
+      <UniqueIdentifier>{5628801e-c283-4c2a-8a80-6394f21231a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepAdaptor">
+      <UniqueIdentifier>{d8afe328-b36c-49d9-af2f-9fe213e62cf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRep">
+      <UniqueIdentifier>{236d4590-75a9-43dc-b1c9-631ae2ee8645}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRep">
+      <UniqueIdentifier>{987df178-31e1-487a-a1fb-1695ffa3c13c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\TopExp">
+      <UniqueIdentifier>{8240fe3f-d45d-4447-91b5-cdb6d1e62969}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\TopExp">
+      <UniqueIdentifier>{8c71453b-f78c-42bb-bda3-263cb701a80e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRepAlgoAPI">
+      <UniqueIdentifier>{f891ec7e-f59b-4f30-ae47-a623a1ceb904}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepAlgoAPI">
+      <UniqueIdentifier>{a53eb30d-b289-42dc-adc0-f5601d6b2725}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -122,7 +146,7 @@
     <ClCompile Include="ICO_Pnt.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
-    <ClCompile Include="ICO_TopoDS_Shape.cpp">
+    <ClCompile Include="ICO_Topo_Shape.cpp">
       <Filter>源文件\OCCProxy\TopoDS</Filter>
     </ClCompile>
     <ClCompile Include="ICO_STEPExchange.cpp">
@@ -191,6 +215,45 @@
     <ClCompile Include="ICO_ViewCube.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_Vec.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Pln.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Topo_Edge.cpp">
+      <Filter>源文件\OCCProxy\TopoDS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepAdaptor_Curve.cpp">
+      <Filter>源文件\OCCProxy\BRepAdaptor</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Topo_Face.cpp">
+      <Filter>源文件\OCCProxy\TopoDS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Topo_Vertex.cpp">
+      <Filter>源文件\OCCProxy\TopoDS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRep_Tool.cpp">
+      <Filter>源文件\OCCProxy\BRep</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_TopExp_Explorer.cpp">
+      <Filter>源文件\OCCProxy\TopExp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakeWire.cpp">
+      <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Topo_Wire.cpp">
+      <Filter>源文件\OCCProxy\TopoDS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakeEdge.cpp">
+      <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakeFace.cpp">
+      <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Splitter.cpp">
+      <Filter>源文件\OCCProxy\BRepAlgoAPI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -214,7 +277,7 @@
     <ClInclude Include="ICO_Pnt.h">
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
-    <ClInclude Include="ICO_TopoDS_Shape.h">
+    <ClInclude Include="ICO_Topo_Shape.h">
       <Filter>头文件\OCCProxy\TopoDS</Filter>
     </ClInclude>
     <ClInclude Include="ICO_STEPExchange.h">
@@ -309,6 +372,48 @@
     </ClInclude>
     <ClInclude Include="ICO_ViewCube.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Arrow.h">
+      <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Vec.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Pln.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Topo_Edge.h">
+      <Filter>头文件\OCCProxy\TopoDS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepAdaptor_Curve.h">
+      <Filter>头文件\OCCProxy\BRepAdaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Topo_Face.h">
+      <Filter>头文件\OCCProxy\TopoDS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Topo_Vertex.h">
+      <Filter>头文件\OCCProxy\TopoDS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRep_Tool.h">
+      <Filter>头文件\OCCProxy\BRep</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_TopExp_Explorer.h">
+      <Filter>头文件\OCCProxy\TopExp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeWire.h">
+      <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Topo_Wire.h">
+      <Filter>头文件\OCCProxy\TopoDS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeEdge.h">
+      <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakeFace.h">
+      <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Splitter.h">
+      <Filter>头文件\OCCProxy\BRepAlgoAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
