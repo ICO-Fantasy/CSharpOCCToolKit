@@ -11,6 +11,7 @@ public enum class SelectionMode {
 	Wire = 3,
 	Face = 4,
 	Shell = 5,
+	None = -1
 };
 
 }

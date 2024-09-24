@@ -173,7 +173,7 @@ public class OCCCanvas : Form
 
     private void DisplayViewCube(bool update)
     {
-        _ViewCube ??= new(5.0);
+        _ViewCube ??= new(3.0);
         if (_ShowViewCube)
         {
             Display(_ViewCube, update);
@@ -439,11 +439,12 @@ public class OCCCanvas : Form
         }
 
         //设置默认灯光
-        Viewer.SetDefaultLight();
+        Viewer.SetICOLight();
         //设置交互默认值
         AISContext.SetDefault();
         //设置相机默认值
-        MainView.SetDefault();
+        MainView.SetICORendering();
+        MainView.SetDefaultBGColor();
         //设置选择模式
         CurrentSelectionMode = OCCTK.OCC.AIS.SelectionMode.Shape;
 

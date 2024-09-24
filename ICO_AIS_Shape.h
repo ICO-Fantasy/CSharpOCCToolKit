@@ -41,7 +41,6 @@ public:
 	void SetTransparency(double theFactor);
 	bool HasInteractiveContext();
 	gp::Trsf^ LocalTransformation();
-	void RemoveSelf();
 	virtual bool Equals(System::Object^ obj) override;
 };
 

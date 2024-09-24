@@ -15,7 +15,7 @@ private:
 	Handle(AIS_ViewCube) myViewCube() { return Handle(AIS_ViewCube)::DownCast(NativeHandle); }
 public:
 	ViewCube();
-	ViewCube(double axisSize);
+	ViewCube(double axesRadius);
 	Handle(AIS_ViewCube) GetOCC() { return myViewCube(); };
 
 private:

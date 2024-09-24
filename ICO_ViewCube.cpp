@@ -12,6 +12,11 @@ namespace AIS {
 ViewCube::ViewCube() :InteractiveObject() {
 	NativeHandle = new AIS_ViewCube();
 }
+
+/// <summary>
+/// 创建视图立方
+/// </summary>
+/// <param name="axesRadius">轴半径</param>
 ViewCube::ViewCube(double axesRadius) :ViewCube() {
 	myAxisSize = axesRadius;
 	SetDefault();

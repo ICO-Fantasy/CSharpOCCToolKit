@@ -104,16 +104,6 @@ bool AShape::Equals(System::Object^ obj) {
 	return false;
 }
 
-/// <summary>
-/// 从上下文中删除
-/// </summary>
-void AShape::RemoveSelf() {
-	Handle(AIS_InteractiveContext) theContext = myShape()->GetContext();
-	if (!theContext.IsNull()) {
-		theContext->Remove(myShape(), false);
-	}
-}
-
 }
 }
 }

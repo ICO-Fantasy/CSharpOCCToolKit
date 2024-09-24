@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using log4net;
+using log4net.Config;
+using Microsoft.VisualBasic.Logging;
 using OCCTK.OCC.AIS;
 using OCCViewForm;
 using TestWPF;
@@ -41,6 +46,7 @@ public class Singleton<T>
 /// </summary>
 public partial class App : Application
 {
+    private static readonly ILog log = LogManager.GetLogger(typeof(App));
     public static new App Current => (App)Application.Current;
 
     //public WorkSpace workSpace;
@@ -49,10 +55,13 @@ public partial class App : Application
     [STAThread]
     protected override void OnStartup(StartupEventArgs e)
     {
-        System.AppContext.SetSwitch(
-            "Switch.System.Windows.Input.Stylus.EnablePointerSupport",
-            true
-        );
+        // 加载 log4net 配置文件
+        var logRepository = LogManager.GetRepository(System.Reflection.Assembly.GetEntryAssembly());
+        XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+        log.Info($"程序启动");
+
+        AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.EnablePointerSupport", true);
 
         CultureInfo culture = new CultureInfo("zh-cn");
         Thread.CurrentThread.CurrentCulture = culture;
@@ -69,7 +78,6 @@ public partial class App : Application
         MainWindow.Show();
 
         ShutdownMode = ShutdownMode.OnMainWindowClose;
-
         base.OnStartup(e);
     }
 

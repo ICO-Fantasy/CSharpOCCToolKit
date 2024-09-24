@@ -24,6 +24,7 @@ public:
 	void Remove();
 	void SetDefault();
 	void SetDefaultRendering();
+	void SetICORendering();
 	void SetDefaultBGColor();
 	void SetBgGradientColors(Color^ C1, Color^ C2, bool update);
 	double GetScale();

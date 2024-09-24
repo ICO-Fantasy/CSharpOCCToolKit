@@ -21,6 +21,7 @@ public:
 	Viewer(const Handle(V3d_Viewer)& theViewer) :BaseObject(theViewer) {};
 	Handle(V3d_Viewer) GetOCC() { return myViewer(); };
 	void SetDefaultLight();
+	void SetICOLight();
 
 	V3d::View^ CreateView();
 

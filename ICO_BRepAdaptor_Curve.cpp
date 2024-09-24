@@ -29,14 +29,27 @@ Curve::Curve(TEdge^ edge, TFace^ face) {
 	myCure() = new BRepAdaptor_Curve(edge->GetOCC(), face->GetOCC());
 }
 
+/// <summary>
+/// 获取对应参数处的点
+/// </summary>
+/// <param name="UVValue"></param>
+/// <returns></returns>
 Pnt^ Curve::Value(double UVValue) {
 	return gcnew Pnt(myCure()->Value(UVValue));
 }
 
+/// <summary>
+/// 首端参数
+/// </summary>
+/// <returns></returns>
 double Curve::FirstParameter() {
 	return myCure()->FirstParameter();
 }
 
+/// <summary>
+/// 末端参数
+/// </summary>
+/// <returns></returns>
 double Curve::LastParameter() {
 	return myCure()->LastParameter();
 }

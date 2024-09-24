@@ -22,6 +22,15 @@ gp_Pnt Pnt::GetOCC() {
 	return *myPnt;
 }
 
+System::String^ Pnt::ToString() {
+	System::String^ str = myPnt->X().ToString("F3") + ", " + myPnt->Y().ToString("F3") + ", " + myPnt->Z().ToString("F3");
+	return str;
+}
+
+double Pnt::Distance(Pnt^ otherPnt) {
+	return myPnt->Distance(otherPnt->GetOCC());
+}
+
 }
 }
 }

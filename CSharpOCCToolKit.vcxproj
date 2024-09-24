@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="convertChinese.cpp" />
     <ClCompile Include="CSharpViewer.cpp" />
+    <ClCompile Include="ICO_AABB.cpp" />
     <ClCompile Include="ICO_Ax2.cpp" />
     <ClCompile Include="ICO_Ax3.cpp" />
     <ClCompile Include="ICO_BndBox.cpp" />
@@ -202,6 +203,7 @@
   <ItemGroup>
     <ClInclude Include="ConvertChinese.h" />
     <ClInclude Include="CSharpViewer.h" />
+    <ClInclude Include="ICO_AABB.h" />
     <ClInclude Include="ICO_Aspect_Line.h" />
     <ClInclude Include="ICO_Ax2.h" />
     <ClInclude Include="ICO_Ax3.h" />

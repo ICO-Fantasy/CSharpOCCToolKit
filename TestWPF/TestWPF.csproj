@@ -16,7 +16,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		<PackageReference Include="log4net" Version="3.0.0" />
 		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+		<PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -29,6 +31,9 @@
 	<ItemGroup>
 	  <None Update="Configs\testrobot.json">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+	  <None Update="log4net.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 

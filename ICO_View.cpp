@@ -65,6 +65,27 @@ void View::SetDefaultRendering() {
 }
 
 /// <summary>
+/// 设置自定义的渲染参数
+/// </summary>
+void View::SetICORendering() {
+	if (myView().IsNull()) { return; }
+	//光栅化渲染
+	myView()->ChangeRenderingParams().Method = Graphic3d_RenderingMode::Graphic3d_RM_RASTERIZATION;
+	//阴影
+	myView()->ChangeRenderingParams().IsShadowEnabled = false;
+	//反射
+	myView()->ChangeRenderingParams().IsReflectionEnabled = false;
+	//抗锯齿
+	myView()->ChangeRenderingParams().IsAntialiasingEnabled = true;
+	//透明阴影
+	myView()->ChangeRenderingParams().IsTransparentShadowEnabled = true;
+	//多重采样抗锯齿
+	myView()->ChangeRenderingParams().NbMsaaSamples = 8;
+	//禁用所有的性能计数器
+	myView()->ChangeRenderingParams().CollectedStats = Graphic3d_RenderingParams::PerfCounters_NONE;
+}
+
+/// <summary>
 /// 设置默认背景颜色
 /// </summary>
 void View::SetDefaultBGColor() {

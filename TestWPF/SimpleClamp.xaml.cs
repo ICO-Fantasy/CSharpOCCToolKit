@@ -8,6 +8,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
+using System.Windows.Media.TextFormatting;
+using log4net;
 using Microsoft.Win32;
 using OCCTK.Extension;
 using OCCTK.IO;
@@ -17,6 +19,7 @@ using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.Tool;
 using OCCViewForm;
+using Windows.Media.Core;
 //设置别名
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
@@ -91,6 +94,8 @@ public enum VPCMode
 /// </summary>
 public partial class SimpleClamp : Window
 {
+    private static readonly ILog log = LogManager.GetLogger(typeof(App));
+
     #region TEST
 
     private List<TShape> inputShapes = new();
@@ -889,7 +894,7 @@ public partial class SimpleClamp : Window
             {
                 DisplayCurrentPieces(false);
             }
-            Canvas.Update();
+            Update();
             CurrentPlate
                 .Pieces.OrderBy(item =>
                 {
@@ -995,9 +1000,6 @@ public partial class SimpleClamp : Window
         {
             ($"{thePiece.Order:F1}", 0),
             ($"L: {thePiece.Length:F1}", 1),
-            //($"S: {thePiece.Start[0]:F1}, {thePiece.Start[1]:F1}, {thePiece.Start[0]:F1}", 2),
-            //($"M: {thePiece.Middle[0]:F1}, {thePiece.Middle[1]:F1}, {thePiece.Middle[0]:F1}", 3),
-            //($"E: {thePiece.End[0]:F1}, {thePiece.End[1]:F1}, {thePiece.End[0]:F1}", 4)
         };
 
         // 创建并添加列定义
@@ -1374,8 +1376,8 @@ public partial class SimpleClamp : Window
             //    Canvas.AISContext.SetTransparency(item.AIS, 0.9, false);
             //}
         }
-        Canvas.Update();
-        Canvas.FitAll();
+        Update();
+        FitAll();
     }
 
     /// <summary>
@@ -1874,6 +1876,8 @@ public partial class SimpleClamp : Window
     private Action<InteractiveObject, double, bool> SetTransparency => AISContext.SetTransparency;
     private Action<InteractiveObject, bool> Erase => Canvas.Erase;
     private Action<bool> EraseAll => Canvas.EraseAll;
+    private Action Update => Canvas.Update;
+    private Action FitAll => Canvas.FitAll;
 
     /// <summary>
     /// 显示或隐藏工件

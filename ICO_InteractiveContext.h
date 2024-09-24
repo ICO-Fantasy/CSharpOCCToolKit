@@ -1,23 +1,31 @@
 ﻿#pragma once
 #include <AIS_InteractiveContext.hxx>
-#include <AIS_InteractiveObject.hxx>
-//包装C++类到托管类
-#include <NCollection_Haft.h> 
-//Local
-#include "ICO_AIS_Shape.h"
+#include<Standard_Handle.hxx>
+//local
 #include "ICO_BaseObject.h"
-#include "ICO_Color.h"
-#include "ICO_View.h"
-#include "ICO_ShapeEnum.h"
-#include "ICO_SelectionMode.h"
-#include "ICO_InteractiveObject.h"
-#include "ICO_Viewer.h"
-#include "ICO_DisplayMode.h"
+
+namespace OCCTK {
+namespace Extension {
+ref class Color;
+}
+namespace OCC {
+namespace AIS {
+ref class InteractiveObject;
+ref class AShape;
+enum class DisplayMode;
+enum class SelectionMode;
+}
+namespace V3d {
+ref class Viewer;
+ref class View;
+}
+}
+}
+
 
 namespace OCCTK {
 namespace OCC {
 namespace AIS {
-
 
 public ref class InteractiveContext :BaseObject {
 private:
@@ -40,6 +48,7 @@ public:
 	void MoveTo(int theX, int theY, V3d::View^ theView);
 	void SetDisplayMode(DisplayMode theMode);
 	void SetSelectionMode(SelectionMode theMode);
+	void SetSelectionMode(InteractiveObject^ theAISObject, SelectionMode theMode);
 	void Select(void);
 	void SelectAIS(InteractiveObject^ theAISObject, bool update);
 	void MultipleSelect(void);

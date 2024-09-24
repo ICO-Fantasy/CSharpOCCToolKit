@@ -97,14 +97,14 @@ public ref struct VerticalPlate {
 	// 开槽圆角半径
 	property double FilletRadius { double get() { return myPlate().filletRadius; } };
 	// 标签编号
-	property String^ NumberString { String^ get() { return gcnew String(myPlate().numberString.ToCString()); }void set(String^ value) {
+	property String^ NumberString { String^ get() { return gcnew String(myPlate().numberString.ToCString()); } void set(String^ value) {
 		myPlate().numberString = DataExchange::ToAsciiString(value);
 	}};
 	//是否有辅助板
 	property bool Auxiliary {bool get() { return myPlate().auxiliary; }}
 	//辅助板的高和宽设置
-	property double AuxiliaryHight {double get() { return myPlate().auxiliaryHight; }void set(double value) { myPlate().auxiliaryHight = value; }}
-	property double AuxiliaryWidth {double get() { return myPlate().auxiliaryWidth; }void set(double value) { myPlate().auxiliaryWidth = value; }}
+	property double AuxiliaryHight {double get() { return myPlate().auxiliaryHight; } void set(double value) { myPlate().auxiliaryHight = value; }}
+	property double AuxiliaryWidth {double get() { return myPlate().auxiliaryWidth; } void set(double value) { myPlate().auxiliaryWidth = value; }}
 	// 最终的竖板形状
 	//property AShape^ AIS {AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew AShape(myPlate().shape); }return myAIS; }};
 	property OCC::AIS::AShape^ AIS {OCC::AIS::AShape^ get() { if (sutured) { return myAIS; } return nullptr; }};

@@ -21,9 +21,18 @@ public class BasicGeometryTools
     {
         List<Pnt> endpoints = new();
         Explorer PntExp = new(edge, ShapeEnum.VERTEX);
-        for (TVertex endPoint = PntExp.Current().AsVertex(); PntExp.More(); PntExp.Next())
+        //while (PntExp.More())
+        //{
+        //    TVertex endPoint = PntExp.Current().AsVertex();
+        //    Pnt p = Tool.Pnt(endPoint);
+        //    endpoints.Add(p);
+        //    PntExp.Next();
+        //}
+        for (; PntExp.More(); PntExp.Next())
         {
-            endpoints.Add(Tool.Pnt(endPoint));
+            TVertex endPoint = PntExp.Current().AsVertex();
+            Pnt p = Tool.Pnt(endPoint);
+            endpoints.Add(p);
         }
         if (endpoints.Count != 2)
         {

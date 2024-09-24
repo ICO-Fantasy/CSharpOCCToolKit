@@ -1,48 +1,36 @@
 ﻿#include "ICO_BndBox.h"
+#include <Bnd_Box.hxx>
+#include <TopoDS_Shape.hxx>
+#include <BRepBndLib.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Topo_Shape.h"
+#include "ICO_AABB.h"
 
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::gp;
+using namespace OCCTK::OCC::Bnd;
 
 namespace OCCTK {
 namespace Extension {
 
-BoundingBox::BoundingBox() {
-	myBox = new Bnd_Box();
-}
-
 BoundingBox::BoundingBox(TShape^ TopoShape) {
-	myBox = new Bnd_Box();
-	myShape = new TopoDS_Shape(TopoShape->GetOCC());
-	BRepBndLib::Add(TopoShape->GetOCC(), *myBox);
+	Bnd_Box box = Bnd_Box();
+	myShape = TopoShape;
+	BRepBndLib::Add(myShape->GetOCC(), box);
+	Bnd_Box* temp = new Bnd_Box(box);
+	myBox = gcnew AABB(temp);
 }
 
-void BoundingBox::Add(TShape^ TopoShape) {
-	myShape = new TopoDS_Shape(TopoShape->GetOCC());
-	BRepBndLib::Add(TopoShape->GetOCC(), *myBox);
-}
-
-OCC::gp::Pnt^ BoundingBox::GetLowerLeftCorner() {
-	if (myShape == nullptr) {
-		throw gcnew System::Exception(gcnew System::String("Non Shape Added"));
-	}
-	double xMin, yMin, zMin, xMax, yMax, zMax;
-	myBox->Get(xMin, yMin, zMin, xMax, yMax, zMax);
-	return gcnew Pnt(xMin, yMin, zMin);
-}
 /// <summary>
-/// 获取 xMin, yMin, zMin, xMax, yMax, zMax六个值
+/// 获取AABB包围盒
 /// </summary>
 /// <returns></returns>
-array<double>^ BoundingBox::GetBndBox() {
+AABB^ BoundingBox::GetAABB() {
 	if (myShape == nullptr) {
 		throw gcnew System::Exception(gcnew System::String("Non Shape Added"));
 	}
-	double xMin, yMin, zMin, xMax, yMax, zMax;
-	myBox->Get(xMin, yMin, zMin, xMax, yMax, zMax);
-	return gcnew array<double>(6) { xMin, yMin, zMin, xMax, yMax, zMax };
+	return myBox;
 }
 
 }

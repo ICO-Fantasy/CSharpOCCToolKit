@@ -123,6 +123,12 @@
     <Filter Include="源文件\OCCProxy\BRepAlgoAPI">
       <UniqueIdentifier>{a53eb30d-b289-42dc-adc0-f5601d6b2725}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\Bnd">
+      <UniqueIdentifier>{3e763217-ffbb-4e2e-b040-be533ae3d15b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\Bnd">
+      <UniqueIdentifier>{65aa9c2a-ee76-43f8-b9b5-5c110b7b9894}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -253,6 +259,9 @@
     </ClCompile>
     <ClCompile Include="ICO_Splitter.cpp">
       <Filter>源文件\OCCProxy\BRepAlgoAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_AABB.cpp">
+      <Filter>源文件\OCCProxy\Bnd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -414,6 +423,9 @@
     </ClInclude>
     <ClInclude Include="ICO_Splitter.h">
       <Filter>头文件\OCCProxy\BRepAlgoAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_AABB.h">
+      <Filter>头文件\OCCProxy\Bnd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

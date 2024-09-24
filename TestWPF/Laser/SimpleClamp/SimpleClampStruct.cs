@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 using System.Windows.Xps.Packaging;
+using log4net;
+using OCCTK.Extension;
 using OCCTK.OCC.AIS;
+using OCCTK.OCC.Bnd;
 using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
@@ -16,7 +20,7 @@ using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
 
 namespace TestWPF.Laser.SimpleClamp;
 
-public class Workpiece : IDisposable
+public partial class Workpiece : IDisposable
 {
     /// <summary>
     /// 会默认把输入的Shape的左下角挪动到原点
@@ -24,9 +28,9 @@ public class Workpiece : IDisposable
     /// <param name="shape"></param>
     public Workpiece(TShape shape)
     {
-        _shape = _MoveToOrigin(shape);
+        _shape = MoveToOrigin(shape);
         _AIS = new(_shape);
-        _bndBox = new OCCTK.Extension.BoundingBox(Shape).GetBndBox();
+        BndBox = new BoundingBox(Shape).GetAABB();
     }
 
     private TShape _shape;
@@ -35,11 +39,18 @@ public class Workpiece : IDisposable
         get { return _shape; }
         set
         {
-            _shape = _MoveToOrigin(value);
+            _shape = MoveToOrigin(value);
             AIS = new(_shape);
-            _bndBox = new OCCTK.Extension.BoundingBox(Shape).GetBndBox();
+            BndBox = new BoundingBox(Shape).GetAABB();
         }
     }
+
+    // 定义隐式转换运算符，将 Workpiece 隐式转换为 TShape
+    public static implicit operator TShape(Workpiece workpiece)
+    {
+        return workpiece.Shape;
+    }
+
     private AShape _AIS;
     public AShape AIS
     {
@@ -55,12 +66,6 @@ public class Workpiece : IDisposable
     public static implicit operator AShape(Workpiece workpiece)
     {
         return workpiece.AIS;
-    }
-
-    // 定义隐式转换运算符，将 Workpiece 隐式转换为 TShape
-    public static implicit operator TShape(Workpiece workpiece)
-    {
-        return workpiece.Shape;
     }
 
     #region 析构
@@ -89,24 +94,26 @@ public class Workpiece : IDisposable
     }
     #endregion
 
-    private TShape _MoveToOrigin(TShape shape)
+    public AABB BndBox;
+    public Pnt CornerLeft
     {
-        OCCTK.Extension.BoundingBox Bnd = new(shape);
-        double[] bndarray = Bnd.GetBndBox();
-        return new OCCTK.OCC.BRepBuilderAPI.Transform(
-            shape,
-            new Trsf(new Pnt(bndarray[0], bndarray[1], bndarray[2]), new Pnt())
-        );
+        get { return BndBox.CornerMin(); }
     }
-
-    private double[] _bndBox;
-    public double[] BndBox
+    public double DX
     {
-        get { return _bndBox; }
+        get { return BndBox.XMax - BndBox.XMin; }
+    }
+    public double DY
+    {
+        get { return BndBox.YMax - BndBox.YMin; }
+    }
+    public double DZ
+    {
+        get { return BndBox.ZMax - BndBox.ZMin; }
     }
 }
 
-public class BasePlate
+public partial class BasePlate
 {
     /// <summary>
     /// 使用默认值构建底板
@@ -149,10 +156,10 @@ public class BasePlate
     /// </summary>
     public double DX
     {
-        get { return Math.Abs(Workpiece.BndBox[3] - Workpiece.BndBox[0]) + 2 * offsetX; }
+        get { return Workpiece.DX + offsetX * 2; }
         set
         {
-            offsetX = (value - Math.Abs(Workpiece.BndBox[3] - Workpiece.BndBox[0])) / 2;
+            offsetX = (value - Workpiece.DX) / 2;
             _changed = true;
         }
     }
@@ -162,10 +169,10 @@ public class BasePlate
     /// </summary>
     public double DY
     {
-        get { return Math.Abs(Workpiece.BndBox[4] - Workpiece.BndBox[1]) + 2 * offsetY; }
+        get { return Workpiece.DY + offsetY * 2; }
         set
         {
-            offsetX = (value - Math.Abs(Workpiece.BndBox[4] - Workpiece.BndBox[1])) / 2;
+            offsetX = (value - Workpiece.DY) / 2;
             _changed = true;
         }
     }
@@ -187,7 +194,7 @@ public class BasePlate
 
     public double Z
     {
-        get { return Workpiece.BndBox[2] - offsetZ; }
+        get { return Workpiece.BndBox.ZMin - offsetZ; }
     }
 
     private TShape _shape;
@@ -197,8 +204,8 @@ public class BasePlate
         {
             if (_changed)
             {
-                Pnt leftBottom = new(Workpiece.BndBox[0], Workpiece.BndBox[1], Z);
-                Pnt rightTop = new(Workpiece.BndBox[3], Workpiece.BndBox[4], Z);
+                Pnt leftBottom = new(Workpiece.BndBox.XMin, Workpiece.BndBox.YMin, Z);
+                Pnt rightTop = new(Workpiece.BndBox.XMax, Workpiece.BndBox.YMax, Z);
                 Pnt p1 = new(leftBottom.X, rightTop.Y, Z);
                 Pnt p3 = new(rightTop.X, leftBottom.Y, Z);
                 TEdge edge1 = new MakeEdge(leftBottom, p1);
@@ -215,15 +222,18 @@ public class BasePlate
         }
     }
 
+    // 定义隐式转换运算符，将 BasePlate 隐式转换为 TShape
+    public static implicit operator TShape(BasePlate baseplate)
+    {
+        return baseplate.Shape;
+    }
+
     private AShape? _AIS;
     public AShape AIS
     {
         get
         {
-            if (_AIS == null)
-            {
-                _AIS = new(Shape);
-            }
+            _AIS ??= new(Shape);
             return _AIS;
         }
         private set
@@ -239,33 +249,18 @@ public class BasePlate
         return baseplate.AIS;
     }
 
-    // 定义隐式转换运算符，将 BasePlate 隐式转换为 TShape
-    public static implicit operator TShape(BasePlate baseplate)
-    {
-        return baseplate.Shape;
-    }
-
     //TopoDS_Shape mySlotShape = TopoDS_Shape();
     //BRep_Builder mySlotBuilder = BRep_Builder();
 }
 
-public class PlatePose(Pnt location, Dir direction)
+public partial class PlatePose(Pnt location, Dir direction)
 {
     public Pnt Location { get; set; } = location;
     public Dir Direction { get; set; } = direction;
+
     public TShape Plane
     {
         get { return new MakeFace(new Pln(Location, Direction)); }
-    }
-    private AShape? _AIS;
-    public AShape AIS
-    {
-        get
-        {
-            _AIS?.RemoveSelf();
-            _AIS = new(new MakeFace(new Pln(Location, Direction), -100, 100, -100, 100));
-            return _AIS;
-        }
     }
 
     // 定义隐式转换运算符，将 PlatePose 隐式转换为 TShape
@@ -274,14 +269,16 @@ public class PlatePose(Pnt location, Dir direction)
         return platePose.Plane;
     }
 
-    // 定义隐式转换运算符，将 PlatePose 隐式转换为 TShape
-    public static implicit operator AShape(PlatePose platePose)
-    {
-        return platePose.AIS;
-    }
+    private AShape? _AIS;
+
+    //// 定义隐式转换运算符，将 PlatePose 隐式转换为 AShape
+    //public static implicit operator AShape(PlatePose platePose)
+    //{
+    //    return platePose.AIS;
+    //}
 }
 
-public class MyEdge
+public partial class MyEdge
 {
     public MyEdge(TEdge edge, PlatePose pose)
     {
@@ -292,6 +289,11 @@ public class MyEdge
     }
 
     public PlatePose Pose { get; private set; }
+
+    public Pnt Start { get; private set; }
+    public Pnt End { get; private set; }
+    public Pnt Middle { get; private set; }
+
     public TEdge Edge { get; private set; }
 
     // 定义隐式转换运算符，将 Workpiece 隐式转换为 TShape
@@ -299,38 +301,101 @@ public class MyEdge
     {
         return myEdge.Edge;
     }
-
-    public Pnt Start { get; private set; }
-    public Pnt End { get; private set; }
-    public Pnt Middle { get; private set; }
 }
 
-public class VerticalPiece(MyEdge edge, BasePlate baseplate)
+public partial class VerticalPiece
 {
-    public BasePlate BasePlate { get; private set; } = baseplate;
+    public VerticalPiece(MyEdge edge, BasePlate baseplate)
+    {
+        BasePlate = baseplate;
+        _edge = edge;
+        AISPiece = new(Shape);
+        _AISEdge = new(edge);
+    }
+
+    public BasePlate BasePlate { get; private set; }
     public PlatePose Pose
     {
-        get { return Edge.Pose; }
+        get { return _edge.Pose; }
     }
-    public MyEdge Edge { get; private set; } = edge;
-    public TFace Shape
+    private TFace Shape
     {
         get
         {
-            Pnt p1 = Edge.Start;
-            Pnt p2 = Edge.End;
+            Pnt p1 = _edge.Start;
+            Pnt p2 = _edge.End;
+            StackFrame stackFrame = new(0);
+            log.Debug(
+                $"Edge_Start: {p1} | Edge_End: {p2} | Method: {stackFrame.GetMethod().Name} | Line: {stackFrame.GetFileLineNumber()}"
+            );
             Pnt p0 = new(p1.X, p1.Y, BasePlate.Z);
             Pnt p3 = new(p2.X, p2.Y, BasePlate.Z);
             TEdge edge0 = new MakeEdge(p0, p1);
-            TEdge edge1 = Edge;
+            TEdge edge1 = _edge.Edge;
             TEdge edge2 = new MakeEdge(p2, p3);
             TEdge edge3 = new MakeEdge(p3, p0);
-            TWire wire = new MakeWire(new List<TEdge> { edge0, edge1, edge2, edge3 });
+            TWire wire = new MakeWire([edge0, edge1, edge2, edge3]);
             return new MakeFace(wire);
         }
     }
-    public AShape AIS
+    private readonly MyEdge _edge;
+    public AShape AISPiece { get; private set; }
+    private readonly AShape _AISEdge;
+    public int Order { get; set; }
+    public List<AShape> AISs
     {
-        get { return new AShape(Shape); }
+        get { return [AISPiece, _AISEdge]; }
     }
+}
+
+public partial class VerticalPlate
+{
+    public VerticalPlate(BasePlate basePlate, PlatePose pose)
+    {
+        BasePlate = basePlate;
+        Workpiece = basePlate.Workpiece;
+        this.pose = pose;
+    }
+
+    private PlatePose pose;
+    public PlatePose Pose
+    {
+        get => pose;
+        set => pose = value;
+    }
+
+    /// <summary>
+    /// 避让高度
+    /// </summary>
+    private double clearances;
+    public double Clearances
+    {
+        get => clearances;
+        set => clearances = value;
+    }
+
+    /// <summary>
+    /// 最小支撑长度
+    /// </summary>
+    private double minSupportLen;
+    public double MinSupportLen
+    {
+        get => minSupportLen;
+        set => minSupportLen = value;
+    }
+
+    /// <summary>
+    /// 切断距离
+    /// </summary>
+    private double cutDistance;
+    public double CutDistance
+    {
+        get => cutDistance;
+        set => cutDistance = value;
+    }
+
+    public readonly BasePlate BasePlate;
+    public readonly Workpiece Workpiece;
+
+    public readonly List<VerticalPiece> Pieces = [];
 }

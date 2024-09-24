@@ -23,8 +23,9 @@ public ref class InteractiveObject : BaseObject {
 public:
 	InteractiveObject() :BaseObject() {}
 	InteractiveObject(Handle(AIS_InteractiveObject) theAISObject);
-	bool IsShape();
 	Handle(AIS_InteractiveObject) GetOCC() { return Handle(AIS_InteractiveObject)::DownCast(NativeHandle); };
+	bool IsShape();
+	void RemoveSelf();
 };
 
 }
