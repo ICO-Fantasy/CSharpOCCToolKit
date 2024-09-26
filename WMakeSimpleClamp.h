@@ -12,12 +12,14 @@
 using namespace OCCTK::OCC::gp;
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::AIS;
+using namespace System;
 
 namespace OCCTK {
 namespace Laser {
 #pragma region 结构体
 
-public ref struct PlatePose {
+public ref class PlatePose {
+public:
 	PlatePose(SimpleClamp::PlatePose theOCCPose) { myDir() = theOCCPose; }
 	PlatePose(Pnt^ thePoint, Dir^ theDir) { myDir() = SimpleClamp::PlatePose(thePoint->GetOCC(), theDir->GetOCC()); }
 	property Pnt^ Location {Pnt^ get() { return gcnew Pnt(myDir().point); }};
@@ -28,7 +30,8 @@ private:
 	NCollection_Haft<SimpleClamp::PlatePose> myDir;
 };
 
-public ref struct BasePlate {
+public ref class BasePlate {
+public:
 	BasePlate(SimpleClamp::BasePlate theBasePlate) { myBP() = theBasePlate; }
 	property OCC::Topo::TShape^ Shape {OCC::Topo::TShape^ get() { return gcnew OCC::Topo::TShape(myBP().Shape()); }};
 	property double X {double get() { return myBP().X; }};
@@ -53,10 +56,9 @@ private:
 	OCC::AIS::AShape^ myAIS;
 };
 
-public ref struct VerticalPiece {
-	VerticalPiece(OCCTK::SimpleClamp::VerticalPiece theOCCPiece) {
-		myPiece() = theOCCPiece;
-	}
+public ref class VerticalPiece {
+public:
+	VerticalPiece(SimpleClamp::VerticalPiece theOCCPiece) { myPiece() = theOCCPiece; }
 public:
 	int NumberString = -1;
 	property OCC::Topo::TShape^ Shape {OCC::Topo::TShape^ get() { return gcnew OCC::Topo::TShape(myPiece().Shape()); }}
@@ -75,7 +77,8 @@ private:
 	OCC::AIS::AShape^ myAIS;
 };
 
-public ref struct VerticalPlate {
+public ref class VerticalPlate {
+public:
 	VerticalPlate(OCCTK::SimpleClamp::VerticalPlate theOCCPlate) {
 		myPlate() = theOCCPlate;
 		for (size_t i = 0; i < myPlate().pieces.size(); ++i) {

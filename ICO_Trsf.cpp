@@ -1,7 +1,10 @@
-﻿#include <gp_Quaternion.hxx>
+﻿#include "ICO_Trsf.h"
+#include <gp_Quaternion.hxx>
+//local
 #include <gp_Ax3.hxx>
-#include "ICO_Trsf.h"
 #include "ICO_Ax2.h"
+
+using namespace System;
 
 namespace OCCTK {
 namespace OCC {
@@ -13,6 +16,10 @@ Trsf::Trsf() {
 
 Trsf::Trsf(const gp_Trsf theT) {
 	myTrsf = new gp_Trsf(theT);
+}
+
+Trsf::Trsf(gp_Trsf* theT) {
+	myTrsf = theT;
 }
 
 Trsf::Trsf(Ax2^ theAx2) {
@@ -32,6 +39,10 @@ Trsf::Trsf(Pnt^ fromPoint, Pnt^ toPoint) {
 
 gp_Trsf Trsf::GetOCC() {
 	return *myTrsf;
+}
+
+Object^ Trsf::Clone() {
+	return gcnew Trsf(myTrsf);
 }
 
 System::String^ Trsf::ToString() {

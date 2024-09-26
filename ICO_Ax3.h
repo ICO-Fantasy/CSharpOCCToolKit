@@ -7,12 +7,13 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-public ref class Ax3 {
+public ref class Ax3 :System::ICloneable {
 public:
 	Ax3();
 	Ax3(gp_Ax3 theAx3);
 	Ax3(gp_Ax3* theAx3);
 	gp_Ax3 GetOCC();
+	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
 
 	void Transform(Trsf^ theT);

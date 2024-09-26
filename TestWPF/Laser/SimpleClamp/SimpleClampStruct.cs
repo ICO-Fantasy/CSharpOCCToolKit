@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Shapes;
 using System.Windows.Xps.Packaging;
 using log4net;
+using MathNet.Numerics.Optimization;
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.Bnd;
@@ -15,6 +17,7 @@ using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using Windows.Devices.Bluetooth;
+using Windows.Graphics.Printing.Workflow;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
 
@@ -253,10 +256,21 @@ public partial class BasePlate
     //BRep_Builder mySlotBuilder = BRep_Builder();
 }
 
-public partial class PlatePose(Pnt location, Dir direction)
+public partial class PlatePose
 {
-    public Pnt Location { get; set; } = location;
-    public Dir Direction { get; set; } = direction;
+    public PlatePose(Pnt location, Dir direction)
+    {
+        Location = location;
+        Direction = direction;
+        resetT = new();
+        resetT.SetRotation(
+            new Ax1(location, new(0, 0, 1)),
+            direction.AngleWithRef(new(0, 1, 0), new(0, 0, 1))
+        );
+    }
+
+    public Pnt Location { get; set; }
+    public Dir Direction { get; set; }
 
     public TShape Plane
     {
@@ -270,6 +284,13 @@ public partial class PlatePose(Pnt location, Dir direction)
     }
 
     private AShape? _AIS;
+
+    private readonly Trsf resetT;
+
+    public Trsf Trsf
+    {
+        get => resetT;
+    }
 
     //// 定义隐式转换运算符，将 PlatePose 隐式转换为 AShape
     //public static implicit operator AShape(PlatePose platePose)
@@ -286,6 +307,7 @@ public partial class MyEdge
         Pose = pose;
         (Start, End) = GT.GetEdgeEndPoints(edge);
         Middle = GT.GetEdgeMidlePoint(edge);
+        GetOrder();
     }
 
     public PlatePose Pose { get; private set; }
@@ -295,6 +317,22 @@ public partial class MyEdge
     public Pnt Middle { get; private set; }
 
     public TEdge Edge { get; private set; }
+
+    /// <summary>
+    /// 根据pose旋转后的XMin值；
+    /// </summary>
+    public double Order { get; private set; }
+
+    private void GetOrder()
+    {
+        Pnt resetStart = Start.Transformed(Pose.Trsf);
+        Pnt resetEnd = End.Transformed(Pose.Trsf);
+        if (resetStart.X > resetEnd.X)
+        {
+            (Start, End) = (End, Start);
+        }
+        Order = new[] { resetStart.X, resetEnd.X }.Min();
+    }
 
     // 定义隐式转换运算符，将 Workpiece 隐式转换为 TShape
     public static implicit operator TEdge(MyEdge myEdge)
@@ -365,7 +403,7 @@ public partial class VerticalPlate
     }
 
     /// <summary>
-    /// 避让高度
+    /// 两端避让长度
     /// </summary>
     private double clearances;
     public double Clearances

@@ -1,5 +1,7 @@
 ﻿#include "ICO_MakeFace.h"
+#include <gp_Pln.hxx>
 #include <Standard_Failure.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_FaceError.hxx>
 //Local
 #include "ICO_Topo_Shape.h"
@@ -22,11 +24,11 @@ MakeFace::MakeFace(Topo::TWire^ wire) {
 	myMaker = new BRepBuilderAPI_MakeFace(wire->GetOCC());
 }
 
-MakeFace::MakeFace(gp::Pln^ plane) {
+MakeFace::MakeFace(Pln^ plane) {
 	myMaker = new BRepBuilderAPI_MakeFace(plane->GetOCC());
 }
 
-MakeFace::MakeFace(gp::Pln^ plane, double Umin, double Umax, double Vmin, double Vmax) {
+MakeFace::MakeFace(Pln^ plane, double Umin, double Umax, double Vmin, double Vmax) {
 	myMaker = new BRepBuilderAPI_MakeFace(plane->GetOCC(), Umax, Umin, Vmin, Vmax);
 }
 

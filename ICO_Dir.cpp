@@ -1,38 +1,85 @@
 ﻿#include <gp_Dir.hxx>
+#include <cmath>
 //Local
 #include "ICO_Dir.h"
 #include "ICO_Vec.h"
+
+using namespace System;
 
 namespace OCCTK {
 namespace OCC {
 namespace gp {
 
 Dir::Dir() {
-	myDir = new gp_Dir();
+	X = 1.0;
+	Y = 0.0;
+	Z = 0.0;
+	Normalize();
 }
 
-Dir::Dir(double X, double Y, double Z) {
-	myDir = new gp_Dir(X, Y, Z);
+Dir::Dir(double theX, double theY, double theZ) {
+	X = theX;
+	Y = theY;
+	Z = theZ;
+	Normalize();
 }
 
 Dir::Dir(Vec^ theDir) {
-	myDir = new gp_Dir(theDir->GetOCC());
+	X = theDir->X;
+	Y = theDir->Y;
+	Z = theDir->Z;
+	Normalize();
 }
 
 Dir::Dir(gp_Dir theDir) {
-	myDir = new gp_Dir(theDir);
+	X = theDir.X();
+	Y = theDir.Y();
+	Z = theDir.Z();
+	Normalize();
 }
 
 Dir::Dir(gp_Dir* theDir) {
-	myDir = theDir;
+	X = theDir->X();
+	Y = theDir->Y();
+	Z = theDir->Z();
+	Normalize();
 }
 
 bool Dir::IsParallel(Dir^ otherDir, double theAngularTolerance) {
-	return myDir->IsParallel(otherDir->GetOCC(), theAngularTolerance);
+	return GetOCC().IsParallel(otherDir->GetOCC(), theAngularTolerance);
+}
+
+void Dir::Cross(Dir^ other) {
+	X = (this->Y * other->Z) - (this->Z * other->Y);
+	Y = (this->Z * other->X) - (this->X * other->Z);
+	Z = (this->X * other->Y) - (this->Y * other->X);
+	Normalize();
+}
+
+Dir^ Dir::Crossed(Dir^ other) {
+	double crossX = (this->Y * other->Z) - (this->Z * other->Y);
+	double crossY = (this->Z * other->X) - (this->X * other->Z);
+	double crossZ = (this->X * other->Y) - (this->Y * other->X);
+	return gcnew Dir(crossX, crossY, crossZ);
+}
+
+void Dir::Normalize() {
+	double m = std::sqrt(X * X + Y * Y + Z * Z);
+	X = X / m;
+	Y = Y / m;
+	Z = Z / m;
 }
 
 gp_Dir Dir::GetOCC() {
-	return *myDir;
+	return gp_Dir(X, Y, Z);
+}
+
+Object^ Dir::Clone() {
+	return gcnew Dir(X, Y, Z);
+}
+
+System::String^ Dir::ToString() {
+	return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
 }
 
 }

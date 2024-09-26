@@ -92,6 +92,8 @@ public:
 	void UnsetColor(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 	void SetTransparency(InteractiveObject^ theAISObject, double theTransparency, bool theToUpdateViewer);
 	void UnsetTransparency(InteractiveObject^ theAISObject, bool theToUpdateViewer);
+	void SetWidth(InteractiveObject^ theAISObject, double width, bool theToUpdateViewer);
+	void UnsetWidth(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 	void SetZLayer(InteractiveObject^ theAISObject, int theZLayerID);
 
 #pragma endregion

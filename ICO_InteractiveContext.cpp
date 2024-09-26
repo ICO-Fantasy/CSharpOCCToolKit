@@ -447,9 +447,9 @@ void InteractiveContext::Remove(InteractiveObject^ theAISObject, bool theToUpdat
 /// <param name="theAIS"></param>
 /// <param name="theColor"></param>
 /// <param name="theToUpdateViewer"></param>
-void InteractiveContext::SetColor(InteractiveObject^ theAIS, Extension::Color^ theColor, bool theToUpdateViewer) {
+void InteractiveContext::SetColor(InteractiveObject^ theAISObject, Extension::Color^ theColor, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->SetColor(theAIS->GetOCC(), theColor->GetOCC(), theToUpdateViewer);
+	myAISContext()->SetColor(theAISObject->GetOCC(), theColor->GetOCC(), theToUpdateViewer);
 }
 
 /// <summary>
@@ -457,9 +457,9 @@ void InteractiveContext::SetColor(InteractiveObject^ theAIS, Extension::Color^ t
 /// </summary>
 /// <param name="theAIS"></param>
 /// <param name="theToUpdateViewer"></param>
-void InteractiveContext::UnsetColor(InteractiveObject^ theAIS, bool theToUpdateViewer) {
+void InteractiveContext::UnsetColor(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->UnsetColor(theAIS->GetOCC(), theToUpdateViewer);
+	myAISContext()->UnsetColor(theAISObject->GetOCC(), theToUpdateViewer);
 }
 
 /// <summary>
@@ -468,9 +468,9 @@ void InteractiveContext::UnsetColor(InteractiveObject^ theAIS, bool theToUpdateV
 /// <param name="theAIS"></param>
 /// <param name="theTransparency"></param>
 /// <param name="theToUpdateViewer"></param>
-void InteractiveContext::SetTransparency(InteractiveObject^ theAIS, double theTransparency, bool theToUpdateViewer) {
+void InteractiveContext::SetTransparency(InteractiveObject^ theAISObject, double theTransparency, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->SetTransparency(theAIS->GetOCC(), theTransparency, theToUpdateViewer);
+	myAISContext()->SetTransparency(theAISObject->GetOCC(), theTransparency, theToUpdateViewer);
 }
 
 /// <summary>
@@ -478,9 +478,30 @@ void InteractiveContext::SetTransparency(InteractiveObject^ theAIS, double theTr
 /// </summary>
 /// <param name="theAIS"></param>
 /// <param name="theToUpdateViewer"></param>
-void InteractiveContext::UnsetTransparency(InteractiveObject^ theAIS, bool theToUpdateViewer) {
+void InteractiveContext::UnsetTransparency(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->UnsetTransparency(theAIS->GetOCC(), theToUpdateViewer);
+	myAISContext()->UnsetTransparency(theAISObject->GetOCC(), theToUpdateViewer);
+}
+
+/// <summary>
+/// 设置线宽
+/// </summary>
+/// <param name="theAISObject"></param>
+/// <param name="width"></param>
+/// <param name="theToUpdateViewer"></param>
+void InteractiveContext::SetWidth(InteractiveObject^ theAISObject, double width, bool theToUpdateViewer) {
+	if (myAISContext().IsNull()) return;
+	myAISContext()->SetWidth(theAISObject->GetOCC(), width, theToUpdateViewer);
+}
+
+/// <summary>
+/// 取消线宽设置
+/// </summary>
+/// <param name="theAISObject"></param>
+/// <param name="theToUpdateViewer"></param>
+void InteractiveContext::UnsetWidth(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
+	if (myAISContext().IsNull()) return;
+	myAISContext()->UnsetWidth(theAISObject->GetOCC(), theToUpdateViewer);
 }
 
 /// <summary>

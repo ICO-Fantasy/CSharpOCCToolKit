@@ -16,14 +16,16 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-public ref class Trsf {
+public ref class Trsf :System::ICloneable {
 public:
 	Trsf();
 	Trsf(gp_Trsf theT);
+	Trsf(gp_Trsf* theT);
 	Trsf(Ax2^ theAx2);
 	Trsf(Ax2^ fromAx2, Ax2^ toAx2);
 	Trsf(Pnt^ fromPoint, Pnt^ toPoint);
 	gp_Trsf GetOCC();
+	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
 	void SetTranslation(Pnt^ fromPoint, Pnt^ toPoint);
 	void PreMultiply(Trsf^ leftTrsf);

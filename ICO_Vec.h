@@ -1,38 +1,27 @@
 ﻿#pragma once
-#include <gp_Vec.hxx>
-
+class gp_Vec;
 
 namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-public ref class Vec {
+public ref class Vec :System::ICloneable {
 public:
 	Vec();
-	Vec(double X, double Y, double Z);
+	Vec(double theX, double theY, double theZ);
 	Vec(gp_Vec theVec);
 	Vec(gp_Vec* theVec);
 	gp_Vec GetOCC();
-	property double X {double get() { return myVec->X(); }; void set(double value) { myVec->SetX(value); } };
-	property double Y {double get() { return myVec->Y(); }; void set(double value) { myVec->SetY(value); } };
-	property double Z {double get() { return myVec->Z(); }; void set(double value) { myVec->SetZ(value); } };
+	virtual System::Object^ Clone();
+	virtual System::String^ ToString() override;
+public:
 	bool IsParallel(Vec^ otherVec, double theAngularTolerance);
-protected:
-	gp_Vec* myVec;
-protected:
-	// 析构函数用于清理非托管资源
-	!Vec() {
-		if (myVec != 0) {
-			delete myVec;
-			myVec = 0;
-		}
-	}
-
-	// 终结器（finalizer）用于垃圾回收时的清理
-	~Vec() {
-		// 调用析构函数来清理非托管资源
-		this->!Vec();
-	}
+	void Cross(Vec^ other);
+	Vec^ Crossed(Vec^ other);
+public:
+	property double X;
+	property double Y;
+	property double Z;
 };
 
 }

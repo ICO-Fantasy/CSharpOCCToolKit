@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <BRepBuilderAPI_MakeFace.hxx>
 
+class BRepBuilderAPI_MakeFace;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
@@ -45,11 +45,8 @@ protected:
 
 	// 析构函数用于清理非托管资源
 	~MakeFace() {
-		//if (_isDisposed)
-		//	return;
 		// 调用析构函数来清理非托管资源
 		this->!MakeFace();
-		//_isDisposed = true;
 	}
 };
 

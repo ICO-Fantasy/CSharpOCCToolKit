@@ -1,5 +1,8 @@
 ﻿#include "ICO_Ax3.h"
+//local
 #include "ICO_Trsf.h"
+
+using namespace System;
 
 namespace OCCTK {
 namespace OCC {
@@ -19,6 +22,10 @@ Ax3::Ax3(gp_Ax3* theAx3) {
 
 gp_Ax3 Ax3::GetOCC() {
 	return *myAx3;
+}
+
+Object^ Ax3::Clone() {
+	return gcnew Ax3(myAx3);
 }
 
 System::String^ Ax3::ToString() {

@@ -10,7 +10,6 @@ namespace AIS {
 
 InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject) :
 	BaseObject(theAISObject) {
-
 }
 /// <summary>
 /// 检查AIS类型

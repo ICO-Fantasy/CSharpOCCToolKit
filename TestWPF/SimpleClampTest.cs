@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,6 +18,7 @@ using OCCTK.OCC.TopExp;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.TopoAbs;
 using TestWPF.Laser.SimpleClamp;
+using Windows.UI.WebUI;
 using WinRT;
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
@@ -181,8 +183,10 @@ public partial class SimpleClamp : Window
 
         #region 输入工件
         Workpiece testWorkpiece;
-        testWorkpiece = new Workpiece(new BrepExchange("mods\\new_test01.brep"));
+        testWorkpiece = new Workpiece(new BrepExchange("mods\\test01.brep"));
+        log.Info("工件加载完成");
         Display(testWorkpiece, false);
+        SetTransparency(testWorkpiece, 0.8, false);
         AISContext.SetSelectionMode(testWorkpiece, SelectionMode.None);
         //this.AISContext.SetColor(testWorkpiece.AIS, new OCCTK.Extension.Color(255, 0, 0), true);
         //testWorkpiece = new Workpiece(new BrepExchange("mods\\new_test01.brep"));
@@ -193,6 +197,7 @@ public partial class SimpleClamp : Window
 
         #region 构造底板
         BasePlate testBasePlate = new(testWorkpiece);
+        log.Info("底板完成");
         Display(testBasePlate, true);
         AISContext.SetSelectionMode(testBasePlate, SelectionMode.None);
         #endregion
@@ -204,7 +209,7 @@ public partial class SimpleClamp : Window
                 testWorkpiece.BndBox.YMin + testWorkpiece.DY / 2,
                 testBasePlate.Z
             );
-        Dir testVerticalDir = new(1, 0, 0);
+        Dir testVerticalDir = new(15, 10, 0);
         PlatePose testPose = new(testCenterLocation, testVerticalDir);
         #endregion
 
@@ -220,6 +225,9 @@ public partial class SimpleClamp : Window
         //num += 1;
         //}
         //#endregion
+
+        CreateVerticalPlate(testBasePlate, testPose, 5, 5, 5);
+
         Update();
     }
 
@@ -231,9 +239,50 @@ public partial class SimpleClamp : Window
         double cutDistance
     )
     {
+        List<Color> testColorMap =
+        [
+            new(255, 0, 0),
+            new(0, 255, 0),
+            new(0, 0, 255),
+            new(125, 0, 0),
+            new(125, 125, 0),
+            new(0, 125, 125)
+        ];
         VerticalPlate testVerticalPlate = new(basePlate, pose);
         testVerticalPlate.Clearances = clearances;
         testVerticalPlate.MinSupportLen = minSupportLen;
         testVerticalPlate.CutDistance = cutDistance;
+        //! 获取环
+        testVerticalPlate.GetRings();
+        //for (int i = 0; i < testVerticalPlate.Rings.Count; i++)
+        //{
+        //    Color color = testColorMap[i % testColorMap.Count];
+        //    List<MyEdge>? ring = testVerticalPlate.Rings[i];
+        //    foreach (var edge in ring)
+        //    {
+        //        //var newEdge = new Transform(edge.Edge, edge.Pose.Trsf);
+        //        //AShape AISEdge = new(newEdge);
+        //        AShape AISEdge = new(edge);
+        //        Display(AISEdge, false);
+        //        SetColor(AISEdge, color, false);
+        //    }
+        //}
+        //! 从环中获取下端线
+        try
+        {
+            testVerticalPlate.GetBottomEdges();
+            //foreach (var edge in testVerticalPlate.buttomEdges)
+            //{
+            //    AShape AISEdge = new(edge);
+            //    Display(AISEdge, false);
+            //    SetColor(AISEdge, new(255, 0, 0), false);
+            //    AISContext.SetWidth(AISEdge, 5, false);
+            //}
+        }
+        catch (Exception e)
+        {
+            log.Debug(e);
+        }
+        //!修剪
     }
 }

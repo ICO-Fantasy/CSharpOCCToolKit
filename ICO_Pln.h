@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <gp_Pln.hxx>
 
 //前向声明
+class gp_Pln;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
@@ -17,12 +17,15 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-public ref class Pln {
+public ref class Pln :System::ICloneable {
 public:
 	Pln();
+	Pln(gp_Pln pln);
+	Pln(gp_Pln* pln);
 	Pln(Ax3^ axis);
 	Pln(Pnt^ location, Dir^ direction);
 	gp_Pln GetOCC();
+	virtual System::Object^ Clone();
 protected:
 	gp_Pln* myPln;
 protected:

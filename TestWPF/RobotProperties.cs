@@ -34,8 +34,8 @@ public class RobotData
 
 public class RobotProperties
 {
-    private RobotData _RobotData;
-    public RobotData RobotData
+    private RobotData? _RobotData;
+    public RobotData? RobotData
     {
         get { return _RobotData; }
         private set

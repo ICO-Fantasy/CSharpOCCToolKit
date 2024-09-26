@@ -149,36 +149,6 @@ public struct VerticalPiece {
 	VerticalPiece() {};
 	VerticalPiece(PlatePose thePose, myEdge theMyEdge, double theZ) :pose(thePose), myEdge(theMyEdge), Z(theZ) {}
 
-	//// 拷贝构造函数
-	//VerticalPiece(const VerticalPiece& other)
-	//	: pose(other.pose), myEdge(other.myEdge), Z(other.Z), myLength(other.myLength) {
-	//	if (other.myShape) {
-	//		myShape = new TopoDS_Shape(*other.myShape);
-	//	}
-	//	else {
-	//		myShape = nullptr;
-	//	}
-	//}
-	//// 拷贝赋值运算符
-	//VerticalPiece& operator=(const VerticalPiece& other) {
-	//	if (this != &other) {
-	//		pose = other.pose;
-	//		myEdge = other.myEdge;
-	//		Z = other.Z;
-	//		myLength = other.myLength;
-	//		if (myShape) {
-	//			delete myShape;
-	//		}
-	//		if (other.myShape) {
-	//			myShape = new TopoDS_Shape(*other.myShape);
-	//		}
-	//		else {
-	//			myShape = nullptr;
-	//		}
-	//	}
-	//	return *this;
-	//}
-
 	PlatePose pose;
 	myEdge myEdge;
 	double Z;
