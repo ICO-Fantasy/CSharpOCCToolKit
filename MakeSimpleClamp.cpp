@@ -602,12 +602,13 @@ VerticalPlate MakeVerticalPieceWithSection(VerticalPlate& thePalte, TopoDS_Shape
 // 修剪边的两端
 static TopoDS_Edge TrimEdge(const TopoDS_Edge theOriginEdge, gp_Pnt p1, gp_Pnt p2) {
 	//获取底层曲线
+	TopLoc_Location l = TopLoc_Location();
 	double first, last;
-	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
+	Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theOriginEdge, l, first, last);
 	// 有时底层曲线没有创建，要手动创建
 	if (aCurve.IsNull()) {
 		BRepLib::BuildCurves3d(theOriginEdge, 1.0e-5, GeomAbs_C1);//创建曲线 (一阶导数的连续性)
-		aCurve = BRep_Tool::Curve(theOriginEdge, first, last);
+		aCurve = BRep_Tool::Curve(theOriginEdge, l, first, last);
 	}
 	if (!aCurve.IsNull()) {
 		//投影点到曲线上，并获取投影点处的参数

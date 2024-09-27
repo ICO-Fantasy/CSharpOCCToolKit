@@ -135,6 +135,18 @@
     <Filter Include="源文件\OCCProxy\Geom">
       <UniqueIdentifier>{0f0dba9a-56e6-49a9-a67a-8322d43e9e9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\BRepLib">
+      <UniqueIdentifier>{6f95ce1d-ab2e-47de-9a84-42d96bcaf702}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepLib">
+      <UniqueIdentifier>{65ba3961-8caa-4481-baab-4761a93f8e0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\GeomAPI">
+      <UniqueIdentifier>{95a4712f-8010-4111-bf9f-ae2ef8c1dfb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\GeomAPI">
+      <UniqueIdentifier>{2d9f3299-7c74-4828-a105-7632afc0b300}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -274,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="ICO_Geom_Curve.cpp">
       <Filter>源文件\OCCProxy\Geom</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_ProjectPointOnCurve.cpp">
+      <Filter>源文件\OCCProxy\GeomAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -444,6 +459,12 @@
     </ClInclude>
     <ClInclude Include="ICO_Geom_Curve.h">
       <Filter>头文件\OCCProxy\Geom</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ProjectPointOnCurve.h">
+      <Filter>头文件\OCCProxy\GeomAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Exception.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

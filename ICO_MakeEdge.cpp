@@ -4,10 +4,12 @@
 //Local
 #include "ICO_Topo_Shape.h"
 #include "ICO_Topo_Edge.h"
+#include "ICO_Geom_Curve.h"
 #include "ICO_Topo_Vertex.h"
 #include "ICO_Pnt.h"
 
 using namespace OCCTK::OCC::Topo;
+using namespace OCCTK::OCC::Geom;
 using namespace OCCTK::OCC::gp;
 
 namespace OCCTK {
@@ -18,12 +20,16 @@ MakeEdge::MakeEdge() {
 	myMaker = new BRepBuilderAPI_MakeEdge();
 }
 
-MakeEdge::MakeEdge(Pnt^ P1, Pnt^ P2) {
-	myMaker = new BRepBuilderAPI_MakeEdge(P1->GetOCC(), P2->GetOCC());
+MakeEdge::MakeEdge(Pnt^ p1, Pnt^ p2) {
+	myMaker = new BRepBuilderAPI_MakeEdge(p1->GetOCC(), p2->GetOCC());
 }
 
-MakeEdge::MakeEdge(Topo::TVertex^ P1, Topo::TVertex^ P2) {
-	myMaker = new BRepBuilderAPI_MakeEdge(P1->GetOCC(), P2->GetOCC());
+MakeEdge::MakeEdge(Topo::TVertex^ p1, Topo::TVertex^ p2) {
+	myMaker = new BRepBuilderAPI_MakeEdge(p1->GetOCC(), p2->GetOCC());
+}
+
+MakeEdge::MakeEdge(Geom::Curve^ curve, double p1, double p2) {
+	myMaker = new BRepBuilderAPI_MakeEdge(curve->GetOCC(), p1, p2);
 }
 
 TShape^ MakeEdge::Shape() {

@@ -5,13 +5,7 @@
 
 namespace OCCTK {
 namespace OCC {
-namespace gp {
-ref class Trsf;
-ref class Ax2;
-}
-namespace Topo {
-ref class TShape;
-}
+ref class BaseObject;
 }
 }
 

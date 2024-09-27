@@ -372,6 +372,7 @@ public partial class VerticalPlate
             double ratio = Clearances / edge.Length;
             if (ratio > 1e-2)
             {
+                //计算投影点
                 p1.X = (p1.X + (p2.X - p1.X) * ratio);
                 p1.Y = (p1.Y + (p2.Y - p1.Y) * ratio);
 
@@ -387,7 +388,6 @@ public partial class VerticalPlate
             else
             {
                 //不做改变
-                tempPieces.push_back(aPiece);
             }
             return trimedEdge;
         }

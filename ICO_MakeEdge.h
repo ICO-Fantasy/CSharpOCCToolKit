@@ -12,6 +12,9 @@ ref class TShape;
 ref class TVertex;
 ref class TEdge;
 }
+namespace Geom {
+ref class Curve;
+}
 }
 }
 
@@ -24,6 +27,7 @@ public:
 	MakeEdge();
 	MakeEdge(gp::Pnt^ P1, gp::Pnt^ P2);
 	MakeEdge(Topo::TVertex^ P1, Topo::TVertex^ P2);
+	MakeEdge(Geom::Curve^ curve, double min, double max);
 public:
 	Topo::TShape^ Shape();
 	Topo::TEdge^ Edge();

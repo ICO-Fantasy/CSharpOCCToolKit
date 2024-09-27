@@ -173,6 +173,7 @@
     <ClCompile Include="ICO_MakeSphere.cpp" />
     <ClCompile Include="ICO_MakeWire.cpp" />
     <ClCompile Include="ICO_Pln.cpp" />
+    <ClCompile Include="ICO_ProjectPointOnCurve.cpp" />
     <ClCompile Include="ICO_RubberBand.cpp" />
     <ClCompile Include="ICO_Splitter.cpp" />
     <ClCompile Include="ICO_TopExp_Explorer.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="ICO_MakeSphere.h" />
     <ClInclude Include="ICO_MakeWire.h" />
     <ClInclude Include="ICO_Pln.h" />
+    <ClInclude Include="ICO_ProjectPointOnCurve.h" />
     <ClInclude Include="ICO_RubberBand.h" />
     <ClInclude Include="ICO_Splitter.h" />
     <ClInclude Include="ICO_TopExp_Explorer.h" />
@@ -259,6 +261,7 @@
     <ClInclude Include="ICO_ManipulatorMode.h" />
     <ClInclude Include="ICO_ManipulatorAxisIndex.h" />
     <ClInclude Include="ICO_Arrow.h" />
+    <ClInclude Include="ICO_Exception.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
