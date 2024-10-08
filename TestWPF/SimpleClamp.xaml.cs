@@ -115,8 +115,10 @@ public partial class SimpleClamp : Window
         //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
         //ViewModel = new MainViewModel();
         //this.DataContext = ViewModel;
-        Canvas.OnAISSelected += OnSelectPiece;
-        Canvas.OnMouseMoved += MousePosition;
+        Canvas.OnAISSelectedEvent += OnSelectPiece;
+        Canvas.OnMouseMovedEvent += MousePosition;
+        Canvas.OnKeyDownEvent += KeyDown;
+        Canvas.OnKeyUpEvent += KeyUp;
 
         TextChangeSetting();
         //! test
@@ -136,6 +138,7 @@ public partial class SimpleClamp : Window
         Brushes.LightGreen,
         Brushes.LightCyan
     };
+
     private readonly OCCCanvas Canvas;
     private readonly InteractiveContext AISContext;
 
@@ -1449,39 +1452,30 @@ public partial class SimpleClamp : Window
     /// <param name="e"></param>
     private void Manipulator_Button_Click(object sender, RoutedEventArgs e)
     {
-        if (InputWorkpiece != null)
+        if (InputWorkpiece == null)
         {
-            if (manipulatedObject == null)
-            {
-                //关闭缩放、平移
-                Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Scaling, false);
-                Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
-                Canvas.SetManipulatorPart(OCCTK.OCC.AIS.ManipulatorMode.Translation, false);
-                //绑定AIS对象
-                manipulatedObject = InputWorkpiece.AIS;
-                Canvas.Attach(manipulatedObject);
-            }
-            else
-            {
-                var t = Canvas.GetManipulatorTransformation() ?? new Trsf();
-                Trsf ais_end = new();
-                if (manipulatedObject is AShape ais)
-                {
-                    ais_end = ais.LocalTransformation();
-                    Debug.WriteLine($"\nAIS_End: {ais_end}");
-                }
-                Debug.WriteLine($"Final: {t}");
-                t.PreMultiply(ais_end.Inverted());
-                Debug.WriteLine($"diff: {t}");
-                //! 必须先detach操作器，否则会因为AIS对象消失而出错
-                Canvas.Detach();
-                Canvas.Remove(manipulatedObject, false);
-                InputWorkpiece.Transform();
-                manipulatedObject = null;
-                DisplayEraseInputWorkpiece(false);
-            }
-            Canvas.Update();
+            return;
         }
+        if (manipulatedObject == null)
+        {
+            //关闭缩放、平移
+            Canvas.Manipulator.SetPart(OCCTK.OCC.AIS.ManipulatorMode.Scaling, false);
+            Canvas.Manipulator.SetPart(OCCTK.OCC.AIS.ManipulatorMode.TranslationPlane, false);
+            Canvas.Manipulator.SetPart(OCCTK.OCC.AIS.ManipulatorMode.Translation, false);
+            //绑定AIS对象
+            manipulatedObject = InputWorkpiece.AIS;
+            Canvas.Manipulator.Attach(manipulatedObject);
+        }
+        else
+        {
+            //! 必须先detach操作器，否则会因为AIS对象消失而出错
+            Canvas.Manipulator.Detach();
+            Canvas.Remove(manipulatedObject, false);
+            InputWorkpiece.Transform();
+            manipulatedObject = null;
+            DisplayEraseInputWorkpiece(false);
+        }
+        Canvas.Update();
     }
 
     #endregion
@@ -1491,10 +1485,7 @@ public partial class SimpleClamp : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Erase_Button_Click(object sender, RoutedEventArgs e)
-    {
-        Canvas.EraseSelected();
-    }
+    private void Erase_Button_Click(object sender, RoutedEventArgs e) => Canvas.EraseSelected();
 
     /// <summary>
     /// 显示当前片
@@ -1503,16 +1494,17 @@ public partial class SimpleClamp : Window
     /// <param name="e"></param>
     private void DisplayCurrentPieces_Button_Click(object sender, RoutedEventArgs e)
     {
-        if (CurrentPlate != null)
+        if (CurrentPlate == null)
         {
-            EraseAll(false);
-            DisplayEraseInputWorkpiece(false);
-            DisplayEraseBasePlates(false);
-            DisplayCurrentPieces(false);
-
-            Canvas.Update();
-            Canvas.FitAll();
+            return;
         }
+        EraseAll(false);
+        DisplayEraseInputWorkpiece(false);
+        DisplayEraseBasePlates(false);
+        DisplayCurrentPieces(false);
+
+        Canvas.Update();
+        Canvas.FitAll();
     }
 
     /// <summary>
@@ -1522,21 +1514,22 @@ public partial class SimpleClamp : Window
     /// <param name="e"></param>
     private void DisplayCurrentPlate_Button_Click(object sender, RoutedEventArgs e)
     {
-        if (CurrentPlate != null)
+        if (CurrentPlate == null)
         {
-            if (!CurrentPlate.Sutured)
-            {
-                MessageBox.Show("板未连接");
-                return;
-            }
-            EraseAll(false);
-            DisplayEraseInputWorkpiece(false);
-            DisplayEraseBasePlates(false);
-            DisplayCurrentPlate(false);
-
-            Canvas.Update();
-            Canvas.FitAll();
+            return;
         }
+        if (!CurrentPlate.Sutured)
+        {
+            MessageBox.Show("板未连接");
+            return;
+        }
+        EraseAll(false);
+        DisplayEraseInputWorkpiece(false);
+        DisplayEraseBasePlates(false);
+        DisplayCurrentPlate(false);
+
+        Canvas.Update();
+        Canvas.FitAll();
     }
 
     /// <summary>
@@ -2218,6 +2211,16 @@ public partial class SimpleClamp : Window
         currentMouse_Label.Content = $"鼠标坐标: {X}, {Y}";
     }
 
+    public void KeyDown(System.Windows.Forms.Keys keys)
+    {
+        currentPressKey_Label.Content = $"按下的按键: {keys}";
+    }
+
+    public void KeyUp(System.Windows.Forms.Keys keys)
+    {
+        // 清空显示
+        currentPressKey_Label.Content = "按下的按键: ";
+    }
     #endregion
 
     /// <summary>

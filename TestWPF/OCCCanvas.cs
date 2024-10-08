@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using System.Windows.Input;
+using log4net;
 using OCCTK.Extension;
 using OCCTK.OCC;
 using OCCTK.OCC.AIS;
@@ -10,59 +12,15 @@ using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.V3d;
 using OCCTK.Visualization;
+using TestWPF;
 using Color = OCCTK.Extension.Color;
 
 namespace OCCViewForm;
 
-#region Enum
-
-public enum Action3d
-{
-    // Normal
-    Nothing,
-    SingleSelect,
-    MultipleSelect,
-    XORSelect,
-    AreaSelect,
-    MultipleAreaSelect,
-    XORAreaSelect,
-    AreaZooming,
-    DynamicRotation,
-    DynamicPanning,
-    Prohibition,
-
-    // Manipulator
-    Manipulator_Translation
-}
-
-#endregion
-
-public class SingleManipulator
-{
-    // 私有静态变量用于保存单例实例
-    private static Manipulator? _instance;
-    private static readonly object _lock = new();
-
-    // 私有构造函数，防止外部实例化
-    private SingleManipulator() { }
-
-    // 公共静态属性，用于访问单例实例
-    public static Manipulator Instance
-    {
-        get
-        {
-            // 确保线程安全
-            lock (_lock)
-            {
-                _instance ??= new Manipulator();
-                return _instance;
-            }
-        }
-    }
-}
-
 public partial class OCCCanvas : Form
 {
+    private static readonly ILog log = LogManager.GetLogger(typeof(App));
+
     public OCCCanvas()
     {
         InitializeComponent();
@@ -74,7 +32,7 @@ public partial class OCCCanvas : Form
         SetStyle(ControlStyles.AllPaintingInWmPaint, true); // 防止擦除背景。
         SetStyle(ControlStyles.UserPaint, true); // 使用自定义的绘制。
 
-        Canvas = new CSharpViewer();
+        myCanvas = new CSharpViewer();
         //初始化画布，创建上下文
         Canvas.InitViewer();
         //创建相机
@@ -84,11 +42,12 @@ public partial class OCCCanvas : Form
             //MessageBox.Show("图形初始化失败", "Error!");
             throw new Exception("图形初始化失败");
         }
-
+        //创建操作器
+        myManipulator = new();
         //获取视图对象
-        Viewer = Canvas.GetViewer();
+        myViewer = Canvas.GetViewer();
         //获取上下文管理器对象
-        AISContext = Canvas.GetContext();
+        myAISContext = Canvas.GetContext();
         //创建选择框
         myBubberBand = new();
         //鼠标样式重置计时器
@@ -102,17 +61,24 @@ public partial class OCCCanvas : Form
 
     #region 字段
 
+    private readonly CSharpViewer myCanvas;
+    private readonly Viewer myViewer;
+    private readonly InteractiveContext myAISContext;
+
     /// <summary>
     /// 框选零宽度的最小值
     /// </summary>
     private const int ZEROWIDTHMIN = 1;
 
-    float devicePixelRatioX;
-    float devicePixelRatioY;
+    /// <summary>
+    /// 设备的像素宽高比
+    /// </summary>
+    private float devicePixelRatioX;
+    private float devicePixelRatioY;
 
-    private List<AShape> _CurrentAIS = new List<AShape>();
+    private List<AShape> _CurrentAIS = [];
 
-    public List<AShape> SelectedAISList = new List<AShape>();
+    public List<AShape> SelectedAISList = [];
 
     #region 视图立方
 
@@ -213,12 +179,8 @@ public partial class OCCCanvas : Form
 
     #region 操作器
 
-    /// <summary>
-    /// AIS操作器
-    /// </summary>
-    private readonly Manipulator myManipulator = SingleManipulator.Instance;
+    private Manipulator myManipulator;
 
-    private Trsf? myManipulatorTransfrom;
     private ManipulatorMode? _manipulatorMode;
     private ManipulatorAxisIndex? _manipulatorAxis;
 
@@ -229,14 +191,19 @@ public partial class OCCCanvas : Form
     #region 属性
 
     /// <summary>
+    /// AIS操作器
+    /// </summary>
+    public Manipulator Manipulator => myManipulator;
+
+    /// <summary>
     /// C++委托的视图对象
     /// </summary>
-    public CSharpViewer Canvas { get; set; }
+    public CSharpViewer Canvas => myCanvas;
 
     /// <summary>
     /// 画布对象
     /// </summary>
-    public Viewer Viewer { get; set; }
+    public Viewer Viewer => myViewer;
 
     /// <summary>
     /// 主视图
@@ -246,7 +213,7 @@ public partial class OCCCanvas : Form
     /// <summary>
     /// C++委托的交互对象管理器
     /// </summary>
-    public InteractiveContext AISContext { get; set; }
+    public InteractiveContext AISContext => myAISContext;
 
     #region 状态flag
 
@@ -330,7 +297,7 @@ public partial class OCCCanvas : Form
     {
         if (Viewer == null)
         {
-            throw new Exception("Canvas is null");
+            throw new Exception("OCC Canvas is null");
         }
         if (AISContext == null)
         {
@@ -361,7 +328,7 @@ public partial class OCCCanvas : Form
         #region 设置画布
 
         //默认操作
-        _currentAction3d = Action3d.Nothing;
+        _currentAction3d = Action3d.None;
         //隐藏线模式
         DegenerateMode = true;
         //显示网格
@@ -386,7 +353,7 @@ public partial class OCCCanvas : Form
     /// </summary>
     /// <param name="currentEnum"></param>
     /// <returns></returns>
-    private T CycleEnum<T>(T currentEnum)
+    private static T CycleEnum<T>(T currentEnum)
         where T : Enum
     {
         // 获取枚举类型的所有值
@@ -542,66 +509,6 @@ public partial class OCCCanvas : Form
     {
         return AISContext.SelectedAIS();
     }
-
-    #region 操作器
-
-    //Ax2 debugAX2;
-    //Trsf debugT;
-
-    public void Attach(InteractiveObject theAIS)
-    {
-        myManipulator.Attach(theAIS, true, true, true);
-        //if (theAIS is AShape) {
-        //AShape a = (AShape)theAIS;
-        //debugT = a.Shape().Location();
-        //myManipulatorTransfrom = debugT;
-        //debugAX2 = myManipulator.Position();
-        //Debug.WriteLine($"\n\n\nManipulator_ax2: {debugAX2}");
-        //Debug.WriteLine($"debugT: {debugT}");
-        //}
-    }
-
-    public void Dettach()
-    {
-        myManipulator.Detach();
-    }
-
-    public void SetManipulatorPart(ManipulatorMode theMode, bool enable)
-    {
-        myManipulator.SetPart(theMode, enable);
-    }
-
-    /// <summary>
-    /// 设置对应轴的可视部分
-    /// </summary>
-    /// <param name="axisIndex"></param>
-    /// <param name="theMode"></param>
-    /// <param name="enable"></param>
-    public void SetManipulatorPart(
-        ManipulatorAxisIndex axisIndex,
-        ManipulatorMode theMode,
-        bool enable
-    )
-    {
-        myManipulator.SetPart(axisIndex, theMode, enable);
-    }
-
-    public void Detach()
-    {
-        //myManipulator.DeactivateCurrentMode();
-        myManipulator.Detach();
-        //myManipulator.SetPart(ManipulatorMode.TranslationPlane, true);
-        //myManipulator.SetPart(ManipulatorMode.Rotation, true);
-        //myManipulator.SetPart(ManipulatorMode.Translation, true);
-        //myManipulator.SetPart(ManipulatorMode.Scaling, true);
-    }
-
-    public Trsf? GetManipulatorTransformation()
-    {
-        return myManipulatorTransfrom;
-    }
-
-    #endregion
 
     #endregion
 

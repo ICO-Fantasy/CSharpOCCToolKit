@@ -1,0 +1,7 @@
+﻿{
+	"Left_None": "LeftNone",
+	"Left_Control": "MultipleAreaSelect",
+	"Right_Shift": "AreaZooming",
+	"Middle_None": "DynamicRotation",
+	"Middle_Control": "DynamicPanning"
+}

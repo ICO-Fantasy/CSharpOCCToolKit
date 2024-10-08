@@ -40,6 +40,9 @@
 	  <None Update="Configs\testrobot.json">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </None>
+	  <None Update="interaction.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="log4net.config">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
