@@ -362,10 +362,10 @@ public partial class VerticalPiece
         {
             Pnt p1 = _edge.Start;
             Pnt p2 = _edge.End;
-            StackFrame stackFrame = new(0);
-            log.Debug(
-                $"Edge_Start: {p1} | Edge_End: {p2} | Method: {stackFrame.GetMethod().Name} | Line: {stackFrame.GetFileLineNumber()}"
-            );
+            //StackFrame stackFrame = new(0);
+            //log.Debug(
+            //    $"Edge_Start: {p1} | Edge_End: {p2} | Method: {stackFrame.GetMethod().Name} | Line: {stackFrame.GetFileLineNumber()}"
+            //);
             Pnt p0 = new(p1.X, p1.Y, BasePlate.Z);
             Pnt p3 = new(p2.X, p2.Y, BasePlate.Z);
             TEdge edge0 = new MakeEdge(p0, p1);

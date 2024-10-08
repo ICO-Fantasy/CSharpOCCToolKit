@@ -17,8 +17,11 @@ using OCCTK.OCC.BRep;
 using OCCTK.OCC.BRepAlgoAPI;
 using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.BRepPrimAPI;
+using OCCTK.OCC.Geom;
+using OCCTK.OCC.GeomAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
+using OCCTK.SimpleClamp;
 using Windows.System.Profile;
 using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
 
@@ -85,6 +88,7 @@ public partial class VerticalPiece
         context.SetColor(AISPiece, new(0, 255, 0), false);
         context.Display(_AISEdge, false);
         context.SetColor(_AISEdge, new(255, 0, 0), false);
+        context.SetWidth(_AISEdge, 5, false);
         if (update)
         {
             context.UpdateCurrentViewer();
@@ -132,19 +136,19 @@ public partial class VerticalPlate
     //原始的底部线段
     private List<MyEdge> buttomEdges = [];
 
-    //移除过短的线段
-    private List<MyEdge> filteredEdges = [];
-
     //修剪线段的两端
     private List<MyEdge> trimedEdges = [];
+
+    //移除过短的线段
+    private List<MyEdge> filteredEdges = [];
 
     //切断过长的线段
     private List<MyEdge> cuttedEdges = [];
 
     public List<Ring> DebugRings => rings;
     public List<MyEdge> DebugButtomEdges => buttomEdges;
-    public List<MyEdge> DebugFilteredEdges => filteredEdges;
     public List<MyEdge> DebugTrimedEdges => trimedEdges;
+    public List<MyEdge> DebugFilteredEdges => filteredEdges;
     public List<MyEdge> DebugCuttedEdges => cuttedEdges;
 
     #region 得到下端线
@@ -193,7 +197,7 @@ public partial class VerticalPlate
                         if (aRing.Start.Distance(edge.Start) < TOL)
                         {
                             //log.Debug($"分离Ring-点的距离:{aRing.Start.Distance(edge.Start)}");
-                            Debug.WriteLine($"分离Ring-点的距离:{aRing.Start.Distance(edge.Start)}");
+                            //Debug.WriteLine($"分离Ring-点的距离:{aRing.Start.Distance(edge.Start)}");
                             aRing.Add(edge);
                             aRing.Start = edge.End; // 更新起点
                             edges.RemoveAt(i); // 移除已处理的边
@@ -202,7 +206,7 @@ public partial class VerticalPlate
                         else if (aRing.Start.Distance(edge.End) < TOL)
                         {
                             //log.Debug($"分离Ring-点的距离:{aRing.Start.Distance(edge.End)}");
-                            Debug.WriteLine($"分离Ring-点的距离:{aRing.Start.Distance(edge.End)}");
+                            //Debug.WriteLine($"分离Ring-点的距离:{aRing.Start.Distance(edge.End)}");
                             aRing.Add(edge);
                             aRing.Start = edge.Start; // 更新起点
                             edges.RemoveAt(i);
@@ -211,7 +215,7 @@ public partial class VerticalPlate
                         else if (aRing.End.Distance(edge.Start) < TOL)
                         {
                             //log.Debug($"分离Ring-点的距离:{aRing.End.Distance(edge.Start)}");
-                            Debug.WriteLine($"分离Ring-点的距离:{aRing.End.Distance(edge.Start)}");
+                            //Debug.WriteLine($"分离Ring-点的距离:{aRing.End.Distance(edge.Start)}");
                             aRing.Add(edge);
                             aRing.End = edge.End; // 更新终点
                             edges.RemoveAt(i);
@@ -220,7 +224,7 @@ public partial class VerticalPlate
                         else if (aRing.End.Distance(edge.End) < TOL)
                         {
                             //log.Debug($"分离Ring-点的距离:{aRing.End.Distance(edge.End)}");
-                            Debug.WriteLine($"分离Ring-点的距离:{aRing.End.Distance(edge.End)}");
+                            //Debug.WriteLine($"分离Ring-点的距离:{aRing.End.Distance(edge.End)}");
                             aRing.Add(edge);
                             aRing.End = edge.Start; // 更新终点
                             edges.RemoveAt(i);
@@ -274,7 +278,7 @@ public partial class VerticalPlate
                     throw new Exception("环不闭合");
                 }
                 Ring ring = new();
-                foreach (var originEdge in originRing.Edges)
+                foreach (MyEdge originEdge in originRing.Edges)
                 {
                     ring.Add(originEdge);
                 }
@@ -357,16 +361,14 @@ public partial class VerticalPlate
         {
             if (edge.Length < Clearances * 2)
             {
+                //log.Info($"不修剪长度为:{Math.Round(edge.Length, 3)}的边，并删除");
                 continue;
             }
             originEdges.Add(edge);
         }
         //修剪线段
-        List<MyEdge> trimedEdges = [];
         MyEdge TrimEdgeEnd(MyEdge edge)
         {
-            MyEdge trimedEdge;
-
             Pnt p1 = (Pnt)edge.Start.Clone();
             Pnt p2 = (Pnt)edge.End.Clone();
             double ratio = Clearances / edge.Length;
@@ -378,22 +380,122 @@ public partial class VerticalPlate
 
                 p2.X = (p2.X + (p1.X - p2.X) * ratio);
                 p2.Y = (p2.Y + (p1.Y - p2.Y) * ratio);
-
-                TEdge outEdge = TrimEdge(aPiece.myEdge.edge, p1, p2);
-                if (outEdge != null)
+                try
                 {
-                    tempPieces.add(VerticalPiece(aPiece.pose, myEdge(outEdge), aPiece.Z));
+                    return new(GT.TrimCurve(edge, p1, p2), edge.Pose);
+                }
+                catch (Exception)
+                {
+                    //todo 暂不处理，直接返回原边
+                    log.Warn($"修剪失败 长度:{edge.Length}");
                 }
             }
-            else
-            {
-                //不做改变
-            }
-            return trimedEdge;
+            log.Warn($"修剪失败 修剪比率:{ratio}");
+            return edge;
         }
-        foreach (var edge in originEdges)
+
+        Parallel.ForEach(
+            originEdges,
+            edge =>
+            {
+                trimedEdges.Add(TrimEdgeEnd(edge));
+            }
+        );
+    }
+
+    /// <summary>
+    /// 移除过短的线
+    /// </summary>
+    public void RemoveShortEdge()
+    {
+        foreach (MyEdge edge in trimedEdges)
         {
-            trimedEdges.Add(TrimEdgeEnd(edge));
+            if (edge.Length < MinSupportLen)
+            {
+                log.Info($"移除长度为:{Math.Round(edge.Length, 3)}的边");
+                continue;
+            }
+            filteredEdges.Add(edge);
+        }
+    }
+
+    public void CutLongEdges()
+    {
+        //如果两个参数值均为 0，则不处理
+
+        foreach (MyEdge edge in trimedEdges)
+        {
+            //如果参数值过小，不进行切割
+            if (Math.Abs(MinSupportLen + CutDistance) < 1e-2)
+            {
+                cuttedEdges.Add(edge);
+            }
+            //跳过不需要切割的边
+            if (edge.Length < MinSupportLen * 2 + CutDistance)
+            {
+                filteredEdges.Add(edge);
+                continue;
+            }
+            // 以 (MinSupportLen + CutDistance) 作为分割依据，调整实际的 supLen, cutLen 值
+            // 如果小于它，同时增加 supLen, cutLen
+            double remainder = (edge.Length - MinSupportLen) % (MinSupportLen + CutDistance);
+            int quotient = (int)
+                Math.Truncate((edge.Length - MinSupportLen) / (MinSupportLen + CutDistance));
+            //实际的支撑长度
+            double supLen =
+                MinSupportLen
+                + remainder / (quotient + 1) * ((double)(quotient + 1) / (quotient * 2 + 1));
+            //实际的切割长度
+            double cutLen =
+                CutDistance + remainder / quotient * ((double)quotient / (quotient * 2 + 1));
+            void CutLongEdge(MyEdge edge, double supLen, double cutLen)
+            {
+                // 如果最小支撑长度不足，则不做切割(理论上在前面步骤已经处理了过短边)
+                if (supLen <= 1)
+                {
+                    return;
+                }
+
+                // 获取底层曲线
+                double first = 0.0;
+                double last = 0.0;
+                Curve aCurve = Tool.Curve(edge, ref first, ref last);
+
+                Pnt startP = (Pnt)edge.Start.Clone();
+                Pnt endP = (Pnt)edge.End.Clone();
+                // 减少投影误差，取线的中点为Z值
+                double zValue = GT.GetEdgeMidlePoint(edge).Z;
+                startP.Z = zValue;
+                endP.Z = zValue;
+                double param1;
+                double param2;
+
+                double currentNum = 0.0;
+                while (currentNum * (supLen + cutLen) < edge.Length)
+                {
+                    Trsf toStart = new();
+                    toStart.SetTranslation(
+                        new Vec(startP, endP)
+                            .Normalized()
+                            .Multiplied(currentNum * (supLen + cutLen))
+                    );
+                    Pnt start = startP.Transformed(toStart);
+
+                    Trsf toEnd = new();
+                    toEnd.SetTranslation(new Vec(startP, endP).Normalized().Multiplied(supLen));
+                    Pnt end = start.Transformed(toEnd);
+
+                    //投影点到曲线上，并获取投影点处的参数
+                    ProjectPointOnCurve ppc1S = new(start, aCurve);
+                    param1 = ppc1S.LowerDistanceParameter();
+                    ProjectPointOnCurve ppc2S = new(end, aCurve);
+                    param2 = ppc2S.LowerDistanceParameter();
+
+                    cuttedEdges.Add(new(new MakeEdge(aCurve, param1, param2), Pose));
+                    currentNum += 1.0;
+                }
+            }
+            CutLongEdge(edge, supLen, cutLen);
         }
     }
     #endregion

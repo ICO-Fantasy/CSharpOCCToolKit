@@ -121,7 +121,7 @@ public partial class SimpleClamp : Window
         TextChangeSetting();
         //! test
         //TestInput();
-        OCCFunctionTest();
+        //OCCFunctionTest();
         DisplayEraseInputWorkpiece(true);
     }
 

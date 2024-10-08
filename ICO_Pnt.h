@@ -6,6 +6,8 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
+ref class Trsf;
+
 public ref class Pnt :System::ICloneable {
 public:
 	Pnt();
@@ -17,6 +19,7 @@ public:
 	gp_Pnt GetOCC();
 public:
 	double Distance(Pnt^ otherPnt);
+	Pnt^ Transformed(Trsf^ T);
 public:
 	property double X;
 	property double Y;

@@ -25,6 +25,8 @@ public:
 	virtual System::String^ ToString() override;
 public:
 	bool IsParallel(Dir^ otherDir, double theAngularTolerance);
+	double Angle(Dir^ otherDir);
+	double AngleWithRef(Dir^ otherDir, Dir^ refDir);
 	void Cross(Dir^ other);
 	Dir^ Crossed(Dir^ other);
 public:

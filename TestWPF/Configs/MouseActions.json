@@ -1,0 +1,15 @@
+﻿//{
+//  "MouseActions": {
+//    "NoControl": {
+//      "": ""
+//    },
+//    "Control": {
+//      "Left": "Pan",
+//      "Right": "Zoom"
+//    },
+//    "Shift": {
+//      "Left": "Rotate",
+//      "Right": "Select"
+//    }
+//  }
+//}

@@ -1,8 +1,12 @@
 ﻿#include "ICO_Trsf.h"
 #include <gp_Quaternion.hxx>
+#include <gp_Trsf.hxx>
 //local
 #include <gp_Ax3.hxx>
 #include "ICO_Ax2.h"
+#include "ICO_Ax1.h"
+#include "ICO_Pnt.h"
+#include "ICO_Vec.h"
 
 using namespace System;
 
@@ -62,6 +66,19 @@ System::String^ Trsf::ToString() {
 /// <param name="toPoint"></param>
 void Trsf::SetTranslation(Pnt^ fromPoint, Pnt^ toPoint) {
 	myTrsf->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
+}
+
+void Trsf::SetTranslation(Vec^ vec) {
+	myTrsf->SetTranslation(vec->GetOCC());
+}
+
+/// <summary>
+/// 设置绕轴旋转
+/// </summary>
+/// <param name="axis"></param>
+/// <param name="angle"></param>
+void Trsf::SetRotation(Ax1^ axis, double angle) {
+	myTrsf->SetRotation(axis->GetOCC(), angle);
 }
 
 /// <summary>

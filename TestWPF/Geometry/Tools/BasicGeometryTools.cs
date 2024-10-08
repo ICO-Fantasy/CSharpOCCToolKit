@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using OCCTK.OCC.BRep;
 using OCCTK.OCC.BRepBuilderAPI;
+using OCCTK.OCC.Geom;
 using OCCTK.OCC.GeomAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.TopExp;
@@ -72,9 +73,9 @@ public class BasicGeometryTools
     public static TEdge TrimCurve(TEdge curve, Pnt p1, Pnt p2)
     {
         //获取底层曲线
-        double first = 0,
-            last = 0;
-        var ParametricCurves = Tool.Curve(curve, ref first, ref last);
+        double first = 0;
+        double last = 0;
+        Curve ParametricCurves = Tool.Curve(curve, ref first, ref last);
         // 有时底层曲线没有创建，要手动创建
         if (ParametricCurves.IsNull())
         {
@@ -94,8 +95,7 @@ public class BasicGeometryTools
         //处于起始和终止参数中间，则构建两个新边
         if (first <= param1 && param1 <= last && first <= param2 && param2 <= last)
         {
-            MakeEdge newEdge = new(ParametricCurves, param1, param2);
-            return newEdge;
+            return new MakeEdge(ParametricCurves, param1, param2);
         }
         else
         {

@@ -49,6 +49,25 @@ bool Dir::IsParallel(Dir^ otherDir, double theAngularTolerance) {
 	return GetOCC().IsParallel(otherDir->GetOCC(), theAngularTolerance);
 }
 
+/// <summary>
+/// 获取 [0,π] 范围内的角度
+/// </summary>
+/// <param name="otherDir"></param>
+/// <returns></returns>
+double Dir::Angle(Dir^ otherDir) {
+	return GetOCC().Angle(otherDir->GetOCC());
+}
+
+/// <summary>
+/// 获取 [-π,π] 范围内的角度，正负取决于参考方向
+/// </summary>
+/// <param name="otherDir"></param>
+/// <param name="refDir"></param>
+/// <returns></returns>
+double Dir::AngleWithRef(Dir^ otherDir, Dir^ refDir) {
+	return GetOCC().AngleWithRef(otherDir->GetOCC(), refDir->GetOCC());
+}
+
 void Dir::Cross(Dir^ other) {
 	X = (this->Y * other->Z) - (this->Z * other->Y);
 	Y = (this->Z * other->X) - (this->X * other->Z);

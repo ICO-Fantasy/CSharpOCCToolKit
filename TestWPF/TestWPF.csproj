@@ -10,6 +10,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Configs\MouseActions.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Include="Configs\MouseActions.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\CSharpOCCToolKit.vcxproj" />
 		<ProjectReference Include="..\OCCFramework\OCCFramework.csproj" />
 	</ItemGroup>

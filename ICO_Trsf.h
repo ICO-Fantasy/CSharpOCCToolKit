@@ -1,13 +1,13 @@
 ﻿#pragma once
-#include <gp_Trsf.hxx>
-//Local
-#include "ICO_Pnt.h"
-
 //前向声明
+class gp_Trsf;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
+ref class Ax1;
+ref class Pnt;
 ref class Ax2;
+ref class Vec;
 }
 }
 }
@@ -27,7 +27,10 @@ public:
 	gp_Trsf GetOCC();
 	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
+public:
 	void SetTranslation(Pnt^ fromPoint, Pnt^ toPoint);
+	void SetTranslation(Vec^ vec);
+	void SetRotation(Ax1^ axis, double angle);
 	void PreMultiply(Trsf^ leftTrsf);
 	Trsf^ Multiplied(Trsf^ rightTrsf);
 	Trsf^ Inverted();

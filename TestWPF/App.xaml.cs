@@ -59,7 +59,7 @@ public partial class App : Application
         var logRepository = LogManager.GetRepository(System.Reflection.Assembly.GetEntryAssembly());
         XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-        log.Info($"程序启动");
+        log.Info($"！！！！程序启动！！！！");
 
         AppContext.SetSwitch("Switch.System.Windows.Input.Stylus.EnablePointerSupport", true);
 

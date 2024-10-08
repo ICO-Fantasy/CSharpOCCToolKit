@@ -1,5 +1,7 @@
 ﻿#include "ICO_Vec.h"
 #include <gp_Vec.hxx>
+//local
+#include"ICO_Pnt.h"
 
 using namespace System;
 
@@ -17,6 +19,12 @@ Vec::Vec(double theX, double theY, double theZ) {
 	X = theX;
 	Y = theY;
 	Z = theZ;
+}
+
+Vec::Vec(Pnt^ fromPnt, Pnt^ toPnt) {
+	X = toPnt->X - fromPnt->X;
+	Y = toPnt->Y - fromPnt->Y;
+	Z = toPnt->Z - fromPnt->Z;
 }
 
 Vec::Vec(gp_Vec theVec) {
@@ -47,6 +55,34 @@ bool Vec::IsParallel(Vec^ otherVec, double theAngularTolerance) {
 	return GetOCC().IsParallel(otherVec->GetOCC(), theAngularTolerance);
 }
 
+void Vec::Normalize() {
+	double m = std::sqrt(X * X + Y * Y + Z * Z);
+	X = X / m;
+	Y = Y / m;
+	Z = Z / m;
+}
+
+Vec^ Vec::Normalized() {
+	double m = std::sqrt(X * X + Y * Y + Z * Z);
+	double newX = X / m;
+	double newY = Y / m;
+	double newZ = Z / m;
+	return gcnew Vec(newX, newY, newZ);
+}
+
+void Vec::Multiply(double value) {
+	X *= value;
+	Y *= value;
+	Z *= value;
+}
+
+Vec^ Vec::Multiplied(double value) {
+	double newX = X * value;
+	double newY = Y * value;
+	double newZ = Z * value;
+	return gcnew Vec(newX, newY, newZ);
+}
+
 void Vec::Cross(Vec^ other) {
 	X = (this->Y * other->Z) - (this->Z * other->Y);
 	Y = (this->Z * other->X) - (this->X * other->Z);
@@ -54,10 +90,10 @@ void Vec::Cross(Vec^ other) {
 }
 
 Vec^ Vec::Crossed(Vec^ other) {
-	double crossX = (this->Y * other->Z) - (this->Z * other->Y);
-	double crossY = (this->Z * other->X) - (this->X * other->Z);
-	double crossZ = (this->X * other->Y) - (this->Y * other->X);
-	return gcnew Vec(crossX, crossY, crossZ);
+	double newX = (this->Y * other->Z) - (this->Z * other->Y);
+	double newY = (this->Z * other->X) - (this->X * other->Z);
+	double newZ = (this->X * other->Y) - (this->Y * other->X);
+	return gcnew Vec(newX, newY, newZ);
 }
 
 }

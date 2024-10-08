@@ -110,8 +110,7 @@ public partial class SimpleClamp : Window
 
         // 获取 Grid（Label 是直接添加到 Grid 中的）
         Grid? parentGrid = clickedLabel.Parent as Grid;
-        StackPanel? parentStack = parentGrid.Parent as StackPanel;
-        if (parentGrid == null || parentStack == null)
+        if (parentGrid == null || parentGrid.Parent is not StackPanel parentStack)
             return;
 
         // 获取被点击 Label 所在的行
@@ -226,7 +225,7 @@ public partial class SimpleClamp : Window
         //}
         //#endregion
 
-        CreateVerticalPlate(testBasePlate, testPose, 5, 5, 5);
+        CreateVerticalPlate(testBasePlate, testPose, 1, 1, 1);
 
         Update();
     }
@@ -253,25 +252,34 @@ public partial class SimpleClamp : Window
         testVerticalPlate.MinSupportLen = minSupportLen;
         testVerticalPlate.CutDistance = cutDistance;
         //! 获取环
-        testVerticalPlate.GetRings();
-        //for (int i = 0; i < testVerticalPlate.Rings.Count; i++)
-        //{
-        //    Color color = testColorMap[i % testColorMap.Count];
-        //    List<MyEdge>? ring = testVerticalPlate.Rings[i];
-        //    foreach (var edge in ring)
-        //    {
-        //        //var newEdge = new Transform(edge.Edge, edge.Pose.Trsf);
-        //        //AShape AISEdge = new(newEdge);
-        //        AShape AISEdge = new(edge);
-        //        Display(AISEdge, false);
-        //        SetColor(AISEdge, color, false);
-        //    }
-        //}
+        try
+        {
+            testVerticalPlate.GetRings();
+            log.Info("截取环");
+            //for (int i = 0; i < testVerticalPlate.Rings.Count; i++)
+            //{
+            //    Color color = testColorMap[i % testColorMap.Count];
+            //    List<MyEdge>? ring = testVerticalPlate.Rings[i];
+            //    foreach (var edge in ring)
+            //    {
+            //        //var newEdge = new Transform(edge.Edge, edge.Pose.Trsf);
+            //        //AShape AISEdge = new(newEdge);
+            //        AShape AISEdge = new(edge);
+            //        Display(AISEdge, false);
+            //        SetColor(AISEdge, color, false);
+            //    }
+            //}
+        }
+        catch (Exception e)
+        {
+            log.Debug(e);
+        }
         //! 从环中获取下端线
         try
         {
             testVerticalPlate.GetBottomEdges();
-            //foreach (var edge in testVerticalPlate.buttomEdges)
+            log.Info("分离下端线");
+            //foreach (var edge in testVerticalPlate.DebugButtomEdges)
             //{
             //    AShape AISEdge = new(edge);
             //    Display(AISEdge, false);
@@ -283,6 +291,34 @@ public partial class SimpleClamp : Window
         {
             log.Debug(e);
         }
-        //!修剪
+        //! 修剪
+        try
+        {
+            testVerticalPlate.TrimEdgeEnds();
+            log.Info("修剪线");
+            //foreach (MyEdge edge in testVerticalPlate.DebugTrimedEdges)
+            //{
+            //    var piece = new VerticalPiece(edge, testVerticalPlate.BasePlate);
+            //    piece.Show(AISContext, false);
+            //}
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+        }
+        try
+        {
+            testVerticalPlate.CutLongEdges();
+            log.Info("修剪两端避让距离");
+            foreach (MyEdge edge in testVerticalPlate.DebugCuttedEdges)
+            {
+                var piece = new VerticalPiece(edge, testVerticalPlate.BasePlate);
+                piece.Show(AISContext, false);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+        }
     }
 }

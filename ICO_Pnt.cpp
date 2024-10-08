@@ -1,6 +1,8 @@
 ﻿#include "ICO_Pnt.h"
-#include <gp_Pnt.hxx>
 #include <cmath>
+#include <gp_Pnt.hxx>
+//local
+#include "ICO_Trsf.h"
 
 using namespace System;
 
@@ -49,6 +51,10 @@ double Pnt::Distance(Pnt^ otherPnt) {
 		std::pow(otherPnt->Y - Y, 2) +
 		std::pow(otherPnt->Z - Z, 2)
 	);
+}
+
+Pnt^ Pnt::Transformed(Trsf^ T) {
+	return gcnew Pnt(gp_Pnt(X, Y, Z).Transformed(T->GetOCC()));
 }
 
 }
