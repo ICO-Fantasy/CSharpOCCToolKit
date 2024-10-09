@@ -245,7 +245,7 @@ public partial class OCCCanvas : Form
         {
             if (AISContext != null)
             {
-                AISContext.SetSelectionMode(value);
+                AISContext.SetDefaultSelectionMode(value);
                 _currentSelectionMode = value;
             }
         }
@@ -496,9 +496,9 @@ public partial class OCCCanvas : Form
     /// 设置选择模式
     /// </summary>
     /// <param name="theMode"></param>
-    public void SetSelectionMode(OCCTK.OCC.AIS.SelectionMode theMode)
+    public void SetDefaultSelectionMode(OCCTK.OCC.AIS.SelectionMode theMode)
     {
-        AISContext.SetSelectionMode(theMode);
+        AISContext.SetDefaultSelectionMode(theMode);
     }
 
     /// <summary>

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using OCCTK.IO;
 using OCCTK.OCC.AIS;
@@ -80,7 +81,7 @@ public partial class SimpleClamp : Window
         deleteButton.Click += (sender, e) =>
         {
             //删除对应的 Piece
-            thePiece.Remove();
+            thePiece.Remove(true);
             //删除对应的grid
             if (outerStackPanel.Parent is StackPanel theS)
             {
@@ -184,10 +185,7 @@ public partial class SimpleClamp : Window
         Workpiece testWorkpiece;
         testWorkpiece = new Workpiece(new BrepExchange("mods\\test01.brep"));
         log.Info("工件加载完成");
-        Display(testWorkpiece, false);
-        SetTransparency(testWorkpiece, 0.8, false);
-        AISContext.SetSelectionMode(testWorkpiece, SelectionMode.None);
-        //this.AISContext.SetColor(testWorkpiece.AIS, new OCCTK.Extension.Color(255, 0, 0), true);
+        testWorkpiece.Show(AISContext, false);
         //testWorkpiece = new Workpiece(new BrepExchange("mods\\new_test01.brep"));
         //testWorkpiece.Dispose();
         //Display(testWorkpiece.AIS, true);
@@ -196,9 +194,8 @@ public partial class SimpleClamp : Window
 
         #region 构造底板
         BasePlate testBasePlate = new(testWorkpiece);
-        log.Info("底板完成");
-        Display(testBasePlate, true);
-        AISContext.SetSelectionMode(testBasePlate, SelectionMode.None);
+        log.Info("底板构造完成");
+        testBasePlate.Show(AISContext, false);
         #endregion
 
         #region 计算横截位置
@@ -224,13 +221,24 @@ public partial class SimpleClamp : Window
         //num += 1;
         //}
         //#endregion
-
-        CreateVerticalPlate(testBasePlate, testPose, 1, 1, 1);
+        #region 构造竖板
+        var testVerticalPlate = CreateVerticalPlate(testBasePlate, testPose, 1, 0, 0);
+        #endregion
+        testVerticalPlate.ShowPlate(AISContext, true);
 
         Update();
+        FitAll();
     }
 
-    private void CreateVerticalPlate(
+    /// <summary>
+    /// 创建竖板
+    /// </summary>
+    /// <param name="basePlate"></param>
+    /// <param name="pose"></param>
+    /// <param name="clearances">两端避让长度</param>
+    /// <param name="minSupportLen">最小支撑长度</param>
+    /// <param name="cutDistance">切断距离</param>
+    private VerticalPlate CreateVerticalPlate(
         BasePlate basePlate,
         PlatePose pose,
         double clearances,
@@ -251,24 +259,26 @@ public partial class SimpleClamp : Window
         testVerticalPlate.Clearances = clearances;
         testVerticalPlate.MinSupportLen = minSupportLen;
         testVerticalPlate.CutDistance = cutDistance;
+        double debugZValue = 20.0;
         //! 获取环
         try
         {
             testVerticalPlate.GetRings();
             log.Info("截取环");
-            //for (int i = 0; i < testVerticalPlate.Rings.Count; i++)
-            //{
-            //    Color color = testColorMap[i % testColorMap.Count];
-            //    List<MyEdge>? ring = testVerticalPlate.Rings[i];
-            //    foreach (var edge in ring)
-            //    {
-            //        //var newEdge = new Transform(edge.Edge, edge.Pose.Trsf);
-            //        //AShape AISEdge = new(newEdge);
-            //        AShape AISEdge = new(edge);
-            //        Display(AISEdge, false);
-            //        SetColor(AISEdge, color, false);
-            //    }
-            //}
+            for (int i = 0; i < testVerticalPlate.DebugRings.Count; i++)
+            {
+                Color color = testColorMap[i % testColorMap.Count];
+                List<MyEdge>? ring = testVerticalPlate.DebugRings[i];
+                foreach (var edge in ring)
+                {
+                    //var newEdge = new Transform(edge.Edge, edge.Pose.Trsf);
+                    //AShape AISEdge = new(newEdge);
+                    AShape AISEdge = new(edge);
+                    AISEdge.SetLocalTransformation(new(new Pnt(), new(0, 0, debugZValue)));
+                    Display(AISEdge, false);
+                    SetColor(AISEdge, color, false);
+                }
+            }
         }
         catch (Exception e)
         {
@@ -279,13 +289,14 @@ public partial class SimpleClamp : Window
         {
             testVerticalPlate.GetBottomEdges();
             log.Info("分离下端线");
-            //foreach (var edge in testVerticalPlate.DebugButtomEdges)
-            //{
-            //    AShape AISEdge = new(edge);
-            //    Display(AISEdge, false);
-            //    SetColor(AISEdge, new(255, 0, 0), false);
-            //    AISContext.SetWidth(AISEdge, 5, false);
-            //}
+            foreach (var edge in testVerticalPlate.DebugButtomEdges)
+            {
+                AShape AISEdge = new(edge);
+                AISEdge.SetLocalTransformation(new(new Pnt(), new(0, 0, debugZValue * 0.8)));
+                Display(AISEdge, false);
+                SetColor(AISEdge, new(0, 0, 255), false);
+                //AISContext.SetWidth(AISEdge, 5, false);
+            }
         }
         catch (Exception e)
         {
@@ -295,30 +306,58 @@ public partial class SimpleClamp : Window
         try
         {
             testVerticalPlate.TrimEdgeEnds();
-            log.Info("修剪线");
-            //foreach (MyEdge edge in testVerticalPlate.DebugTrimedEdges)
-            //{
-            //    var piece = new VerticalPiece(edge, testVerticalPlate.BasePlate);
-            //    piece.Show(AISContext, false);
-            //}
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine(e);
-        }
-        try
-        {
-            testVerticalPlate.CutLongEdges();
-            log.Info("修剪两端避让距离");
-            foreach (MyEdge edge in testVerticalPlate.DebugCuttedEdges)
+            log.Info("修剪线两端");
+            foreach (MyEdge edge in testVerticalPlate.DebugTrimedEdges)
             {
-                var piece = new VerticalPiece(edge, testVerticalPlate.BasePlate);
-                piece.Show(AISContext, false);
+                AShape AISEdge = new(edge);
+                AISEdge.SetLocalTransformation(new(new Pnt(), new(0, 0, debugZValue * 0.7)));
+                Display(AISEdge, false);
+                SetColor(AISEdge, new(0, 125, 200), false);
             }
         }
         catch (Exception e)
         {
             Debug.WriteLine(e);
         }
+        //! 移除
+        try
+        {
+            testVerticalPlate.RemoveShortEdge();
+            log.Info("移除过短边");
+            foreach (MyEdge edge in testVerticalPlate.DebugFilteredEdges)
+            {
+                AShape AISEdge = new(edge);
+                AISEdge.SetLocalTransformation(new(new Pnt(), new(0, 0, debugZValue * 0.6)));
+                Display(AISEdge, false);
+                SetColor(AISEdge, new(125, 0, 150), false);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+        }
+        //! 分割
+        try
+        {
+            testVerticalPlate.CutLongEdges();
+            log.Info("切割过长边");
+            foreach (MyEdge edge in testVerticalPlate.DebugCuttedEdges)
+            {
+                AShape AISEdge = new(edge);
+                AISEdge.SetLocalTransformation(new(new Pnt(), new(0, 0, debugZValue * 0.5)));
+                Display(AISEdge, false);
+                SetColor(AISEdge, new(0, 0, 255), false);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+        }
+        //保存结果
+        foreach (var edge in testVerticalPlate.DebugCuttedEdges)
+        {
+            testVerticalPlate.Pieces.Add(new VerticalPiece(edge, basePlate));
+        }
+        return testVerticalPlate;
     }
 }

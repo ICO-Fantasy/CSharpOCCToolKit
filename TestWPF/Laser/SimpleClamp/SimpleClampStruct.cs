@@ -8,6 +8,7 @@ using System.Windows.Forms.VisualStyles;
 using System.Windows.Shapes;
 using System.Windows.Xps.Packaging;
 using log4net;
+using MathNet.Numerics;
 using MathNet.Numerics.Optimization;
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;
@@ -23,7 +24,7 @@ using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
 
 namespace TestWPF.Laser.SimpleClamp;
 
-public partial class Workpiece : IDisposable
+public partial class Workpiece
 {
     /// <summary>
     /// 会默认把输入的Shape的左下角挪动到原点
@@ -60,7 +61,7 @@ public partial class Workpiece : IDisposable
         get { return _AIS; }
         private set
         {
-            _AIS?.RemoveSelf();
+            _AIS.RemoveSelf(false);
             _AIS = value;
         }
     }
@@ -70,32 +71,6 @@ public partial class Workpiece : IDisposable
     {
         return workpiece.AIS;
     }
-
-    #region 析构
-    // 手动释放非托管资源
-    public void Dispose()
-    {
-        Dispose(true);
-        //不需要再自动GC
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            // Dispose managed resources
-            _AIS?.RemoveSelf();
-        }
-        // Dispose unmanaged resources if any
-    }
-
-    // 析构
-    ~Workpiece()
-    {
-        Dispose(false);
-    }
-    #endregion
 
     public AABB BndBox;
     public Pnt CornerLeft
@@ -241,7 +216,7 @@ public partial class BasePlate
         }
         private set
         {
-            _AIS?.RemoveSelf();
+            _AIS?.RemoveSelf(false);
             _AIS = value;
         }
     }
@@ -252,6 +227,7 @@ public partial class BasePlate
         return baseplate.AIS;
     }
 
+    //todo 开槽和烙印
     //TopoDS_Shape mySlotShape = TopoDS_Shape();
     //BRep_Builder mySlotBuilder = BRep_Builder();
 }
@@ -318,8 +294,11 @@ public partial class MyEdge
 
     public TEdge Edge { get; private set; }
 
+    public double OrderStart { get; private set; }
+    public double OrderEnd { get; private set; }
+
     /// <summary>
-    /// 根据pose旋转后的XMin值；
+    /// 根据pose旋转后的X的中间值；
     /// </summary>
     public double Order { get; private set; }
 
@@ -331,7 +310,9 @@ public partial class MyEdge
         {
             (Start, End) = (End, Start);
         }
-        Order = new[] { resetStart.X, resetEnd.X }.Min();
+        OrderStart = new[] { resetStart.X, resetEnd.X }.Min();
+        OrderEnd = new[] { resetStart.X, resetEnd.X }.Max();
+        Order = (OrderStart + OrderEnd) / 2;
     }
 
     // 定义隐式转换运算符，将 Workpiece 隐式转换为 TShape
@@ -341,7 +322,7 @@ public partial class MyEdge
     }
 }
 
-public partial class VerticalPiece
+public partial class VerticalPiece : IComparable<VerticalPiece>
 {
     public VerticalPiece(MyEdge edge, BasePlate baseplate)
     {
@@ -376,13 +357,28 @@ public partial class VerticalPiece
             return new MakeFace(wire);
         }
     }
+
+    // 定义隐式转换运算符，将 VerticalPiece 隐式转换为 TEdge
+    public static implicit operator TEdge(VerticalPiece piece)
+    {
+        return piece.Edge.Edge;
+    }
+
     private readonly MyEdge _edge;
+    public MyEdge Edge => _edge;
     public AShape AISPiece { get; private set; }
     private readonly AShape _AISEdge;
-    public int Order { get; set; }
+    public double Order => _edge.Order;
     public List<AShape> AISs
     {
         get { return [AISPiece, _AISEdge]; }
+    }
+
+    public int CompareTo(VerticalPiece? other)
+    {
+        if (other == null)
+            return 1;
+        return Order.CompareTo(other.Order);
     }
 }
 
@@ -402,38 +398,51 @@ public partial class VerticalPlate
         set => pose = value;
     }
 
+    private double clearances;
+
     /// <summary>
     /// 两端避让长度
     /// </summary>
-    private double clearances;
     public double Clearances
     {
         get => clearances;
         set => clearances = value;
     }
 
+    private double minSupportLen;
+
     /// <summary>
     /// 最小支撑长度
     /// </summary>
-    private double minSupportLen;
     public double MinSupportLen
     {
         get => minSupportLen;
         set => minSupportLen = value;
     }
 
+    private double cutDistance;
+
     /// <summary>
     /// 切断距离
     /// </summary>
-    private double cutDistance;
     public double CutDistance
     {
         get => cutDistance;
         set => cutDistance = value;
     }
 
+    /// <summary>
+    /// 连接避让高度
+    /// </summary>
+    public double AvoidanceHeight { get; set; } = 20.0;
+
+    /// <summary>
+    /// 连接槽宽度（板厚）
+    /// </summary>
+    public double ConnectionThickness { get; set; } = 2.0;
+
     public readonly BasePlate BasePlate;
     public readonly Workpiece Workpiece;
 
-    public readonly List<VerticalPiece> Pieces = [];
+    public readonly SortedSet<VerticalPiece> Pieces = [];
 }

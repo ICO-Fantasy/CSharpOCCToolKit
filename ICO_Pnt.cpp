@@ -57,6 +57,33 @@ Pnt^ Pnt::Transformed(Trsf^ T) {
 	return gcnew Pnt(gp_Pnt(X, Y, Z).Transformed(T->GetOCC()));
 }
 
+/// <summary>
+/// 返回修改了X值之后的新点
+/// </summary>
+/// <param name="value"></param>
+/// <returns></returns>
+Pnt^ Pnt::SetX(double value) {
+	return gcnew Pnt(gp_Pnt(value, Y, Z));
+}
+
+/// <summary>
+/// 返回修改了Y值之后的新点
+/// </summary>
+/// <param name="value"></param>
+/// <returns></returns>
+Pnt^ Pnt::SetY(double value) {
+	return gcnew Pnt(gp_Pnt(X, value, Z));
+}
+
+/// <summary>
+/// 返回修改了Z值之后的新点
+/// </summary>
+/// <param name="value"></param>
+/// <returns></returns>
+Pnt^ Pnt::SetZ(double value) {
+	return gcnew Pnt(gp_Pnt(X, Y, value));
+}
+
 }
 }
 }

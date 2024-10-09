@@ -55,7 +55,7 @@ public class InputWorkpiece
             _AISInputWorkpiece.LocalTransformation()
         );
         _InputWorkpiece = trans.Shape();
-        _AISInputWorkpiece.RemoveSelf();
+        _AISInputWorkpiece.RemoveSelf(false);
         _AISInputWorkpiece = new AShape(_InputWorkpiece);
     }
 }
@@ -123,7 +123,7 @@ public partial class SimpleClamp : Window
         TextChangeSetting();
         //! test
         //TestInput();
-        //OCCFunctionTest();
+        OCCFunctionTest();
         DisplayEraseInputWorkpiece(true);
     }
 
@@ -587,31 +587,31 @@ public partial class SimpleClamp : Window
 
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetSelectionMode(SelectionMode.Shape);
+        Canvas.SetDefaultSelectionMode(SelectionMode.Shape);
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetSelectionMode(SelectionMode.Face);
+        Canvas.SetDefaultSelectionMode(SelectionMode.Face);
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetSelectionMode(SelectionMode.Edge);
+        Canvas.SetDefaultSelectionMode(SelectionMode.Edge);
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetSelectionMode(SelectionMode.Vertex);
+        Canvas.SetDefaultSelectionMode(SelectionMode.Vertex);
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void Select_Shell_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetSelectionMode(SelectionMode.Shell);
+        Canvas.SetDefaultSelectionMode(SelectionMode.Shell);
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 
@@ -1864,6 +1864,7 @@ public partial class SimpleClamp : Window
 
     #region 视图显示
 
+    //简化函数调用
     private Action<InteractiveObject, bool> Display => Canvas.Display;
     private Action<InteractiveObject, Color, bool> SetColor => AISContext.SetColor;
     private Action<InteractiveObject, double, bool> SetTransparency => AISContext.SetTransparency;

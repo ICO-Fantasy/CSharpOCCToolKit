@@ -1,12 +1,11 @@
 ﻿#pragma once
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
-#include <TopoDS_Shape.hxx>
-//包装C++类到托管类
-#include <NCollection_Haft.h> 
+//#include <TopoDS_Shape.hxx>
 //Local
 #include "ICO_InteractiveObject.h"
 
+class TopoDS_Shape;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
@@ -38,8 +37,8 @@ public:
 public:
 	Topo::TShape^ Shape();
 	void SetColor(int R, int G, int B);
+	void SetLocalTransformation(gp::Trsf^ trsf);
 	void SetTransparency(double theFactor);
-	bool HasInteractiveContext();
 	gp::Trsf^ LocalTransformation();
 	virtual bool Equals(System::Object^ obj) override;
 };

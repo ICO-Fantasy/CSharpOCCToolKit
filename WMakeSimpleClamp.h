@@ -46,7 +46,7 @@ public:
 	Trsf^ Translation;
 	void UpdateAIS() {
 		if (myAIS != nullptr) {
-			myAIS->RemoveSelf();
+			myAIS->RemoveSelf(false);
 		}
 		myAIS = gcnew OCC::AIS::AShape(Shape);
 	}

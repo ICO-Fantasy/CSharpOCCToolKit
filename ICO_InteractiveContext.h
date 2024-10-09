@@ -47,7 +47,7 @@ public:
 
 	void MoveTo(int theX, int theY, V3d::View^ theView);
 	void SetDisplayMode(DisplayMode theMode);
-	void SetSelectionMode(SelectionMode theMode);
+	void SetDefaultSelectionMode(SelectionMode theMode);
 	void SetSelectionMode(InteractiveObject^ theAISObject, SelectionMode theMode);
 	void Select(void);
 	void SelectAIS(InteractiveObject^ theAISObject, bool update);

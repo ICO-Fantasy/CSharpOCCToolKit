@@ -128,7 +128,7 @@ void InteractiveContext::SetDisplayMode(DisplayMode theMode) {
 /// 点、边线、线、面、壳体、实体
 /// </remark>
 /// <param name="theMode"></param>
-void InteractiveContext::SetSelectionMode(SelectionMode theMode) {
+void InteractiveContext::SetDefaultSelectionMode(SelectionMode theMode) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->Deactivate();
 	if ((int)theMode != -1) {

@@ -47,11 +47,11 @@ System::IntPtr AShape::GetIntPtr() {
 }
 
 /// <summary>
-/// 构造一个新的包含LocalTransformation的TShape
+/// 返回正在显示的TShape
 /// </summary>
 /// <returns></returns>
 TShape^ AShape::Shape() {
-	return gcnew TShape(myShape()->Shape());
+	return gcnew Topo::TShape(myShape()->Shape());
 }
 
 /// <summary>
@@ -66,20 +66,20 @@ void AShape::SetColor(int R, int G, int B) {
 }
 
 /// <summary>
+/// 设置AShape自身的变换（从TShape原始状态到当前显示状态的变换）
+/// </summary>
+/// <param name="trsf"></param>
+void AShape::SetLocalTransformation(gp::Trsf^ trsf) {
+	myShape()->SetLocalTransformation(trsf->GetOCC());
+}
+
+/// <summary>
 /// 定义AShape的透明度，不建议直接使用
 /// </summary>
 /// <param name="theFactor"></param>
 void AShape::SetTransparency(double theFactor) {
 	myShape()->SetTransparency(theFactor);
 
-}
-
-/// <summary>
-/// 是否有交互上下文
-/// </summary>
-/// <returns></returns>
-bool AShape::HasInteractiveContext() {
-	return myShape()->HasInteractiveContext();
 }
 
 /// <summary>

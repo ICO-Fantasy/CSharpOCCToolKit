@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -10,6 +11,7 @@ using System.Windows.Forms.VisualStyles;
 using System.Windows.Shapes;
 using System.Windows.Xps.Packaging;
 using log4net;
+using MathNet.Numerics.RootFinding;
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.Bnd;
@@ -27,16 +29,83 @@ using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
 
 namespace TestWPF.Laser.SimpleClamp;
 
-public partial class Workpiece : IDisposable
+public partial class Workpiece
 {
     private static TShape MoveToOrigin(TShape shape)
     {
         BoundingBox Bnd = new(shape);
         return new Transform(shape, new Trsf(Bnd.GetAABB().CornerMin(), new Pnt()));
     }
+
+    private double transparency = 0.8;
+    public double Transparency
+    {
+        get => transparency;
+        set
+        {
+            if (value < 0.0 || value > 1.0)
+                return; //应该抛出异常
+            transparency = value;
+        }
+    }
+
+    public void Show(InteractiveContext context, bool update)
+    {
+        if (context.IsDisplayed(_AIS))
+        {
+            context.Redisplay(_AIS, false);
+        }
+        context.Display(_AIS, false);
+        context.SetColor(_AIS, new(125, 125, 125), false);
+        context.SetTransparency(_AIS, transparency, false);
+        context.SetSelectionMode(_AIS, SelectionMode.None);
+        if (update)
+        {
+            context.UpdateCurrentViewer();
+        }
+    }
+
+    public void Remove(bool update)
+    {
+        _AIS.RemoveSelf(update);
+    }
 }
 
-public partial class BasePlate { }
+public partial class BasePlate
+{
+    private double transparency = 0.8;
+    public double Transparency
+    {
+        get => transparency;
+        set
+        {
+            if (value < 0.0 || value > 1.0)
+                return; //应该抛出异常
+            transparency = value;
+        }
+    }
+
+    public void Show(InteractiveContext context, bool update)
+    {
+        if (context.IsDisplayed(AIS))
+        {
+            context.Redisplay(AIS, false);
+        }
+        context.Display(AIS, false);
+        context.SetColor(AIS, new(125, 125, 125), false);
+        context.SetTransparency(AIS, transparency, false);
+        context.SetSelectionMode(AIS, SelectionMode.None);
+        if (update)
+        {
+            context.UpdateCurrentViewer();
+        }
+    }
+
+    public void Remove(bool update)
+    {
+        _AIS?.RemoveSelf(update);
+    }
+}
 
 public partial class PlatePose
 {
@@ -51,6 +120,10 @@ public partial class PlatePose
                 workpiece.BndBox.YMax
             )
         );
+        if (context.IsDisplayed(_AIS))
+        {
+            context.Redisplay(_AIS, false);
+        }
         context.Display(_AIS, false);
         context.SetColor(_AIS, new(0, 255, 97), false);
         context.SetTransparency(_AIS, 0.8, false);
@@ -58,9 +131,9 @@ public partial class PlatePose
         context.UpdateCurrentViewer();
     }
 
-    public void Remove()
+    public void Remove(bool update)
     {
-        _AIS?.RemoveSelf();
+        _AIS?.RemoveSelf(update);
     }
 
     //// 定义隐式转换运算符，将 PlatePose 隐式转换为 TShape
@@ -84,8 +157,16 @@ public partial class VerticalPiece
 
     public void Show(InteractiveContext context, bool update)
     {
+        if (context.IsDisplayed(AISPiece))
+        {
+            context.Redisplay(AISPiece, false);
+        }
         context.Display(AISPiece, false);
         context.SetColor(AISPiece, new(0, 255, 0), false);
+        if (context.IsDisplayed(_AISEdge))
+        {
+            context.Redisplay(_AISEdge, false);
+        }
         context.Display(_AISEdge, false);
         context.SetColor(_AISEdge, new(255, 0, 0), false);
         context.SetWidth(_AISEdge, 5, false);
@@ -95,10 +176,26 @@ public partial class VerticalPiece
         }
     }
 
-    public void Remove()
+    public void ShowEdge(InteractiveContext context, bool update)
     {
-        AISPiece.RemoveSelf();
-        _AISEdge.RemoveSelf();
+        if (context.IsDisplayed(_AISEdge))
+        {
+            context.Redisplay(_AISEdge, false);
+        }
+        context.Display(_AISEdge, false);
+        context.SetColor(_AISEdge, new(255, 0, 0), false);
+        context.SetWidth(_AISEdge, 5, false);
+        context.SetSelectionMode(_AISEdge, SelectionMode.None);
+        if (update)
+        {
+            context.UpdateCurrentViewer();
+        }
+    }
+
+    public void Remove(bool update)
+    {
+        AISPiece.RemoveSelf(update);
+        _AISEdge.RemoveSelf(update);
     }
 }
 
@@ -121,11 +218,11 @@ public partial class VerticalPlate
             return platePose.Edges;
         }
 
-        public void Add(MyEdge edge) => Edges.Add(edge);
+        public readonly void Add(MyEdge edge) => Edges.Add(edge);
 
-        public void Remove(MyEdge edge) => Edges.Remove(edge);
+        public readonly void Remove(MyEdge edge) => Edges.Remove(edge);
 
-        public void RemoveAt(int i) => Edges.RemoveAt(i);
+        public readonly void RemoveAt(int i) => Edges.RemoveAt(i);
     }
 
     private static readonly ILog log = LogManager.GetLogger(typeof(App));
@@ -265,7 +362,7 @@ public partial class VerticalPlate
             rings,
             originRing =>
             {
-                // 理论上 Ring 不应该少于4条边
+                //理论上 Ring 不应该少于4条边
                 if (originRing.Edges.Count < 4)
                 {
                     //todo 错误处理
@@ -277,6 +374,7 @@ public partial class VerticalPlate
                     //todo 错误处理
                     throw new Exception("环不闭合");
                 }
+
                 Ring ring = new();
                 foreach (MyEdge originEdge in originRing.Edges)
                 {
@@ -284,7 +382,8 @@ public partial class VerticalPlate
                 }
                 Ring firstWire = new();
                 //从Order最大值开始（反向循环从尾端开始）
-                MyEdge? startEdge = ring.Edges.MaxBy(edge => edge.Order);
+                MyEdge? startEdge =
+                    ring.Edges.MaxBy(edge => edge.Order) ?? throw new Exception("输入的环为空");
                 firstWire.Add(startEdge);
                 firstWire.Start = startEdge.Start;
                 firstWire.End = startEdge.End;
@@ -317,7 +416,7 @@ public partial class VerticalPlate
                 //剩余的线作为第二段
                 List<MyEdge> secondWire = ring.Edges;
                 //去掉与Z平行的边
-                Vec Zaxis = new Vec(0, 0, 1);
+                Vec Zaxis = new(0, 0, 1);
                 firstWire.Edges.RemoveAll(edge =>
                     new Vec(edge.Start, edge.End).IsParallel(Zaxis, Math.PI * 2 / 180)
                 );
@@ -345,11 +444,50 @@ public partial class VerticalPlate
                         buttomEdges.Add(e);
                     }
                 }
+                //最终检查
+                for (int i = ring.Edges.Count - 1; i >= 0; --i)
+                {
+                    //todo
+                    break;
+                    MyEdge edge1 = buttomEdges[i];
+                    bool overlap = false;
+                    for (int j = ring.Edges.Count - 1; j >= 0; --j)
+                    {
+                        if (i == j)
+                        {
+                            continue;
+                        }
+                        MyEdge edge2 = buttomEdges[j];
+                        if (
+                            (
+                                edge2.OrderStart - TOL < edge1.OrderStart
+                                && edge1.OrderStart < edge2.OrderEnd + TOL
+                            )
+                            || (
+                                edge2.OrderStart - TOL < edge1.OrderEnd
+                                && edge1.OrderEnd < edge2.OrderEnd + TOL
+                            )
+                        )
+                        {
+                            //与其它线存在重叠
+                            overlap = true;
+                        }
+                        if (overlap)
+                        {
+                            //todo 将存在重叠的点，投影到另一个线上，判断谁更低
+                            //删除高的线
+                            //重新开始判断
+                            i = ring.Edges.Count - 1;
+                        }
+                    }
+                }
             }
         );
     }
     #endregion
+
     #region 处理线段
+
     /// <summary>
     /// 修剪线段两端
     /// </summary>
@@ -419,21 +557,27 @@ public partial class VerticalPlate
         }
     }
 
+    /// <summary>
+    /// 分割过长线段
+    /// </summary>
     public void CutLongEdges()
     {
-        //如果两个参数值均为 0，则不处理
-
         foreach (MyEdge edge in trimedEdges)
         {
-            //如果参数值过小，不进行切割
-            if (Math.Abs(MinSupportLen + CutDistance) < 1e-2)
+            //如果两个参数值任意为 0，则不处理
+            if (
+                Math.Abs(MinSupportLen) < 1e-2
+                || Math.Abs(CutDistance) < 1e-2
+                || Math.Abs(MinSupportLen + CutDistance) < 1e-2
+            )
             {
                 cuttedEdges.Add(edge);
+                continue;
             }
             //跳过不需要切割的边
             if (edge.Length < MinSupportLen * 2 + CutDistance)
             {
-                filteredEdges.Add(edge);
+                cuttedEdges.Add(edge);
                 continue;
             }
             // 以 (MinSupportLen + CutDistance) 作为分割依据，调整实际的 supLen, cutLen 值
@@ -498,13 +642,142 @@ public partial class VerticalPlate
             CutLongEdge(edge, supLen, cutLen);
         }
     }
+
     #endregion
 
     #region Display
-    public void ShowPlate(InteractiveContext context, bool update) { }
+    //直接连接
+    public AShape? SuturedShape;
+
+    //切连接槽
+    private bool sloted = false;
+    public AShape? SlotedShape;
+
+    //烙印数字
+    private bool Branded = false;
+    public AShape? BrandedShape;
+
+    //有辅助板
+    private bool WithSupport = false;
+    public AShape? SupportPlate;
+
+    public void ShowPlate(InteractiveContext context, bool update)
+    {
+        this.Remove(false);
+        TEdge leftWire;
+        List<TEdge> topWire = [];
+        TEdge rightWire;
+        List<TEdge> bottomWire = [];
+
+        #region 处理通用部分
+
+        //左、右、上均一致
+        //! 左
+        VerticalPiece first = Pieces.First();
+        Pnt leftBottom = first.Edge.Start.SetZ(this.BasePlate.Z);
+        leftWire = new MakeEdge(leftBottom, first.Edge.Start);
+        //! 右
+        VerticalPiece last = Pieces.Last();
+        Pnt rightBottom = last.Edge.End.SetZ(this.BasePlate.Z);
+        rightWire = new MakeEdge(last.Edge.End, rightBottom);
+        //! 上
+        var tempPieces = Pieces.ToList();
+        //处理首
+        topWire.Add(first);
+        //记录最后一个点，用于下一段构建
+        Pnt tempPnt = first.Edge.End.SetZ(first.Edge.End.Z - AvoidanceHeight);
+        topWire.Add(new MakeEdge(first.Edge.End, tempPnt));
+        //去掉首尾，其它的处理
+        for (var i = 1; i < tempPieces.Count - 1; i++)
+        {
+            topWire.Add(
+                new MakeEdge(
+                    tempPnt,
+                    tempPieces[i].Edge.Start.SetZ(tempPieces[i].Edge.Start.Z - AvoidanceHeight)
+                )
+            );
+            topWire.Add(
+                new MakeEdge(
+                    tempPieces[i].Edge.Start.SetZ(tempPieces[i].Edge.Start.Z - AvoidanceHeight),
+                    tempPieces[i].Edge.Start
+                )
+            );
+            topWire.Add(tempPieces[i].Edge);
+            tempPnt = tempPieces[i].Edge.End.SetZ(tempPieces[i].Edge.End.Z - AvoidanceHeight);
+            topWire.Add(new MakeEdge(tempPieces[i].Edge.End, tempPnt));
+        }
+        //处理尾
+        topWire.Add(
+            new MakeEdge(tempPnt, last.Edge.Start.SetZ(last.Edge.Start.Z - AvoidanceHeight))
+        );
+        topWire.Add(
+            new MakeEdge(last.Edge.Start.SetZ(last.Edge.Start.Z - AvoidanceHeight), last.Edge.Start)
+        );
+        topWire.Add(last);
+
+        //! 构造不封闭的线
+        MakeWire maker = new();
+        maker.Add(leftWire);
+        foreach (var topEdge in topWire)
+        {
+            maker.Add(topEdge);
+        }
+        maker.Add(rightWire);
+
+        #endregion
+
+        //需要开连接槽
+        if (sloted)
+        {
+            //不烙印数字
+            if (!Branded)
+            {
+                return;
+            }
+            else
+            //需要烙印数字
+            {
+                //todo
+                return;
+            }
+        }
+        else
+        //直接连接
+        {
+            maker.Add(new MakeEdge(rightBottom, leftBottom));
+            SuturedShape = new(new MakeFace(maker));
+            //显示用于构造的线
+            foreach (var piece in Pieces)
+            {
+                piece.ShowEdge(context, false);
+            }
+            //显示连接后的板
+            context.Display(SuturedShape, true);
+            context.SetColor(SuturedShape, new(0, 255, 0), true);
+        }
+        //需要绘制辅助板
+        if (WithSupport)
+        {
+            return;
+        }
+    }
 
     public void ShowPieces(InteractiveContext context, bool update) { }
 
-    public void Remove() { }
+    public void Remove(bool update)
+    {
+        SuturedShape?.RemoveSelf(false);
+        SlotedShape?.RemoveSelf(false);
+        BrandedShape?.RemoveSelf(false);
+        SupportPlate?.RemoveSelf(false);
+        foreach (var piece in Pieces)
+        {
+            piece.Remove(false);
+        }
+        if (update)
+        {
+            Pieces.First().AISPiece.GetContext().UpdateCurrentViewer();
+        }
+    }
     #endregion
 }

@@ -147,6 +147,9 @@
     <Filter Include="源文件\OCCProxy\GeomAPI">
       <UniqueIdentifier>{2d9f3299-7c74-4828-a105-7632afc0b300}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\TopAbs\enum">
+      <UniqueIdentifier>{6f354f8e-80f8-4cb4-a187-02221abb6742}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -328,9 +331,6 @@
     <ClInclude Include="ICO_InteractiveContext.h">
       <Filter>头文件\OCCProxy\AIS</Filter>
     </ClInclude>
-    <ClInclude Include="ICO_ShapeEnum.h">
-      <Filter>头文件\OCCProxy\TopAbs</Filter>
-    </ClInclude>
     <ClInclude Include="ICO_Color.h">
       <Filter>头文件\Extension</Filter>
     </ClInclude>
@@ -465,6 +465,9 @@
     </ClInclude>
     <ClInclude Include="ICO_Exception.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ShapeEnum.h">
+      <Filter>头文件\OCCProxy\TopAbs\enum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

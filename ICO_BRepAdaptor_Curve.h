@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <BRepAdaptor_Curve.hxx>
-//包装C++类到托管类
-#include <NCollection_Haft.h> 
+//Local
+#include "ICO_BaseObject.h"
+
 
 namespace OCCTK {
 namespace OCC {
@@ -19,8 +20,9 @@ ref class Pnt;
 namespace OCCTK {
 namespace OCC {
 namespace BRepAdaptor {
-
-public ref class Curve {
+public ref class Curve : BaseObject {
+private:
+	Handle(BRepAdaptor_Curve) myCure() { return Handle(BRepAdaptor_Curve)::DownCast(NativeHandle); }
 public:
 	Curve();
 	Curve(Topo::TEdge^ edge);
@@ -29,8 +31,6 @@ public:
 	gp::Pnt^ Value(double UVValue);
 	double FirstParameter();
 	double LastParameter();
-private:
-	NCollection_Haft<Handle(BRepAdaptor_Curve)> myCure;
 };
 
 }

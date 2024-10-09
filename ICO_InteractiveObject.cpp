@@ -2,6 +2,8 @@
 #include "ICO_InteractiveObject.h"
 #include <AIS_Shape.hxx>
 #include<AIS_InteractiveContext.hxx>
+//local
+#include "ICO_InteractiveContext.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -21,11 +23,29 @@ bool InteractiveObject::IsShape() {
 /// <summary>
 /// 从上下文中删除自身
 /// </summary>
-void InteractiveObject::RemoveSelf() {
-	Handle(AIS_InteractiveContext) theContext = Handle(AIS_InteractiveObject)::DownCast(NativeHandle)->GetContext();
+void InteractiveObject::RemoveSelf(bool update) {
+	Handle(AIS_InteractiveContext) theContext = myObj()->GetContext();
 	if (!theContext.IsNull()) {
-		theContext->Remove(Handle(AIS_InteractiveObject)::DownCast(NativeHandle), false);
+		theContext->Remove(myObj(), update);
 	}
+}
+/// <summary>
+/// 是否有交互上下文
+/// </summary>
+/// <returns></returns>
+bool InteractiveObject::HasInteractiveContext() {
+	return myObj()->HasInteractiveContext();
+}
+
+/// <summary>
+/// 获取当前交互上下文
+/// </summary>
+/// <returns></returns>
+InteractiveContext^ InteractiveObject::GetContext() {
+	if (myObj()->HasInteractiveContext()) {
+		return gcnew InteractiveContext(myObj()->GetContext());
+	}
+	throw gcnew System::Exception("对象没有交互上下文");
 }
 
 }

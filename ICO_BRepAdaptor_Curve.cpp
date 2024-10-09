@@ -1,7 +1,9 @@
-﻿#include "ICO_BRepAdaptor_Curve.h"
+﻿#include "ICO_BaseObject.h"
+#include "ICO_BRepAdaptor_Curve.h"
+#include "ICO_Pnt.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Topo_Face.h"
-#include "ICO_Pnt.h"
+#include <BRepAdaptor_Curve.hxx>
 
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::gp;
@@ -13,20 +15,20 @@ namespace BRepAdaptor {
 /// <summary>
 /// 创建空的构造器
 /// </summary>
-Curve::Curve() {
-	myCure() = new BRepAdaptor_Curve();
+Curve::Curve() :BaseObject() {
+	NativeHandle = new BRepAdaptor_Curve();
 }
 
 /// <summary>
 /// 从TopoEdge构建3D曲线
 /// </summary>
 /// <param name="edge"></param>
-Curve::Curve(TEdge^ edge) {
-	myCure() = new BRepAdaptor_Curve(edge->GetOCC());
+Curve::Curve(TEdge^ edge) :BaseObject() {
+	NativeHandle = new BRepAdaptor_Curve(edge->GetOCC());
 }
 
-Curve::Curve(TEdge^ edge, TFace^ face) {
-	myCure() = new BRepAdaptor_Curve(edge->GetOCC(), face->GetOCC());
+Curve::Curve(TEdge^ edge, TFace^ face) :BaseObject() {
+	NativeHandle = new BRepAdaptor_Curve(edge->GetOCC(), face->GetOCC());
 }
 
 /// <summary>

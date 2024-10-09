@@ -20,6 +20,9 @@ public:
 public:
 	double Distance(Pnt^ otherPnt);
 	Pnt^ Transformed(Trsf^ T);
+	Pnt^ SetX(double value);
+	Pnt^ SetY(double value);
+	Pnt^ SetZ(double value);
 public:
 	property double X;
 	property double Y;
