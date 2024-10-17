@@ -1,6 +1,7 @@
 ﻿#include "ICO_Pnt.h"
 #include <cmath>
 #include <gp_Pnt.hxx>
+#include <gp_XYZ.hxx>
 //local
 #include "ICO_Trsf.h"
 
@@ -27,6 +28,13 @@ Pnt::Pnt(gp_Pnt thePnt) {
 	Y = thePnt.Y();
 	Z = thePnt.Z();
 }
+
+Pnt::Pnt(gp_XYZ theXYZ) {
+	X = theXYZ.X();
+	Y = theXYZ.Y();
+	Z = theXYZ.Z();
+}
+
 Pnt::Pnt(gp_Pnt* thePnt) {
 	X = thePnt->X();
 	Y = thePnt->Y();

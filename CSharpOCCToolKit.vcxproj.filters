@@ -174,6 +174,9 @@
     <Filter Include="头文件\Laser">
       <UniqueIdentifier>{63c61224-7f17-4df0-b9bb-1cb45688da93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\gp\enum">
+      <UniqueIdentifier>{381de0a7-b9ed-4be6-8a32-0f542e2d53f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="ICO_BRepGProp_Face.cpp">
       <Filter>源文件\OCCProxy\BRepGProp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Quaternion.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -561,6 +567,12 @@
     </ClInclude>
     <ClInclude Include="ICO_ColorMap.h">
       <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Quaternion.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_EulerSequence.h">
+      <Filter>头文件\OCCProxy\gp\enum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

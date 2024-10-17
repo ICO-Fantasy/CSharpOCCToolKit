@@ -271,7 +271,7 @@ public partial class SimpleClamp : Window
                 List<MyEdge>? ring = testVerticalPlate.DebugRings[i];
                 foreach (var edge in ring)
                 {
-                    //var newEdge = new Transform(edge.Edge, edge.Pose.Trsf);
+                    //var newEdge = new Transform(edge.Edge, edge.pose.Trsf);
                     //AShape AISEdge = new(newEdge);
                     AShape AISEdge = new(edge);
                     AISEdge.SetLocalTransformation(new(new Pnt(), new(0, 0, debugZValue)));

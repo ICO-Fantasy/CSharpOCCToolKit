@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 //前向声明
 class gp_Trsf;
 namespace OCCTK {
@@ -7,6 +8,7 @@ namespace gp {
 ref class Ax1;
 ref class Pnt;
 ref class Ax2;
+ref class Quat;
 ref class Vec;
 }
 }
@@ -30,11 +32,15 @@ public:
 public:
 	void SetTranslation(Pnt^ fromPoint, Pnt^ toPoint);
 	void SetTranslation(Vec^ vec);
+	void SetTranslationPart(Vec^ vec);
+	void SetRotationPart(Quat^ quat);
 	void SetRotation(Ax1^ axis, double angle);
 	void PreMultiply(Trsf^ leftTrsf);
 	Trsf^ Multiplied(Trsf^ rightTrsf);
 	Trsf^ Inverted();
-
+public:
+	property System::Tuple<double, double, double>^ Translation {System::Tuple<double, double, double>^ get(); };
+	property Quat^ Rotation {Quat^ get(); };
 private:
 	gp_Trsf* myTrsf;
 protected:

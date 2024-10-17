@@ -182,6 +182,7 @@
     <ClCompile Include="ICO_Pln.cpp" />
     <ClCompile Include="ICO_Pnt2D.cpp" />
     <ClCompile Include="ICO_ProjectPointOnCurve.cpp" />
+    <ClCompile Include="ICO_Quaternion.cpp" />
     <ClCompile Include="ICO_RubberBand.cpp" />
     <ClCompile Include="ICO_Splitter.cpp" />
     <ClCompile Include="ICO_TopExp_Explorer.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="ICO_Pln.h" />
     <ClInclude Include="ICO_Pnt2D.h" />
     <ClInclude Include="ICO_ProjectPointOnCurve.h" />
+    <ClInclude Include="ICO_Quaternion.h" />
     <ClInclude Include="ICO_RubberBand.h" />
     <ClInclude Include="ICO_Splitter.h" />
     <ClInclude Include="ICO_TopExp_Explorer.h" />
@@ -285,6 +287,7 @@
     <ClInclude Include="ICO_CurveType.h" />
     <ClInclude Include="ICO_BRepGProp.h" />
     <ClInclude Include="ICO_ColorMap.h" />
+    <ClInclude Include="ICO_EulerSequence.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

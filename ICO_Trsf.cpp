@@ -7,6 +7,7 @@
 #include "ICO_Ax1.h"
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
+#include "ICO_Quaternion.h"
 
 using namespace System;
 
@@ -72,6 +73,14 @@ void Trsf::SetTranslation(Vec^ vec) {
 	myTrsf->SetTranslation(vec->GetOCC());
 }
 
+void Trsf::SetTranslationPart(Vec^ vec) {
+	myTrsf->SetTranslationPart(vec->GetOCC());
+}
+
+void Trsf::SetRotationPart(Quat^ quat) {
+	myTrsf->SetRotationPart(quat->GetOCC());
+}
+
 /// <summary>
 /// 设置绕轴旋转
 /// </summary>
@@ -104,6 +113,15 @@ Trsf^ Trsf::Multiplied(Trsf^ rightTrsf) {
 /// <returns></returns>
 Trsf^ Trsf::Inverted() {
 	return gcnew Trsf(myTrsf->Inverted());
+}
+
+System::Tuple<double, double, double>^ Trsf::Translation::get() {
+	gp_XYZ xyz = myTrsf->TranslationPart();
+	return gcnew Tuple<double, double, double> { xyz.X(), xyz.Y(), xyz.Z()};
+}
+
+Quat^ Trsf::Rotation::get() {
+	return gcnew Quat(myTrsf->GetRotation());
 }
 
 }

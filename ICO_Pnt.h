@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 class gp_Pnt;
+class gp_XYZ;
 
 namespace OCCTK {
 namespace OCC {
@@ -13,6 +14,7 @@ public:
 	Pnt();
 	Pnt(double theX, double theY, double theZ);
 	Pnt(gp_Pnt thePnt);
+	Pnt(gp_XYZ theXYZ);
 	Pnt(gp_Pnt* thePnt);
 	gp_Pnt GetOCC();
 	virtual System::Object^ Clone();
