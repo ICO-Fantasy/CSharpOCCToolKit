@@ -115,7 +115,7 @@ public partial class SimpleClamp : Window
         //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
         //ViewModel = new MainViewModel();
         //this.DataContext = ViewModel;
-        Canvas.OnAISSelectedEvent += OnSelectPiece;
+        Canvas.OnAISSelectionEvent += OnSelectPiece;
         Canvas.OnMouseMovedEvent += MousePosition;
         Canvas.OnKeyDownEvent += KeyDown;
         Canvas.OnKeyUpEvent += KeyUp;

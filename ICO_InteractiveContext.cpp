@@ -447,9 +447,9 @@ void InteractiveContext::Remove(InteractiveObject^ theAISObject, bool theToUpdat
 /// <param name="theAIS"></param>
 /// <param name="theColor"></param>
 /// <param name="theToUpdateViewer"></param>
-void InteractiveContext::SetColor(InteractiveObject^ theAISObject, Extension::Color^ theColor, bool theToUpdateViewer) {
+void InteractiveContext::SetColor(InteractiveObject^ theAISObject, Extension::Color theColor, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->SetColor(theAISObject->GetOCC(), theColor->GetOCC(), theToUpdateViewer);
+	myAISContext()->SetColor(theAISObject->GetOCC(), theColor.GetOCC(), theToUpdateViewer);
 }
 
 /// <summary>

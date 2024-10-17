@@ -26,7 +26,7 @@ public:
 	void SetDefaultRendering();
 	void SetICORendering();
 	void SetDefaultBGColor();
-	void SetBgGradientColors(Color^ C1, Color^ C2, bool update);
+	void SetBgGradientColors(Color C1, Color C2, bool update);
 	double GetScale();
 
 #pragma region 渲染

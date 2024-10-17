@@ -99,9 +99,9 @@ void View::SetDefaultBGColor() {
 /// <param name="C1"></param>
 /// <param name="C2"></param>
 /// <param name="update"></param>
-void View::SetBgGradientColors(Color^ C1, Color^ C2, bool update) {
+void View::SetBgGradientColors(Color C1, Color C2, bool update) {
 	if (myView().IsNull()) { return; }
-	myView()->SetBgGradientColors(C1->GetOCC(), C2->GetOCC(), Aspect_GradientFillMethod_Vertical, update);
+	myView()->SetBgGradientColors(C1.GetOCC(), C2.GetOCC(), Aspect_GradientFillMethod_Vertical, update);
 }
 
 /// <summary>

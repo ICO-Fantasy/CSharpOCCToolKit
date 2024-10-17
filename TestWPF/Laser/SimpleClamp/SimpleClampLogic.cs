@@ -24,6 +24,7 @@ using OCCTK.OCC.GeomAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.SimpleClamp;
+using TestWPF.Geometry.Tools;
 using Windows.System.Profile;
 using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
 
@@ -488,6 +489,16 @@ public partial class VerticalPlate
 
     #region 处理线段
 
+    //切连接槽
+    private bool sloted = false;
+    private List<Pnt> slotPnts = [];
+
+    //烙印数字
+    private bool branded = false;
+
+    //有辅助板
+    private bool withSupport = false;
+
     /// <summary>
     /// 修剪线段两端
     /// </summary>
@@ -520,7 +531,7 @@ public partial class VerticalPlate
                 p2.Y = (p2.Y + (p1.Y - p2.Y) * ratio);
                 try
                 {
-                    return new(GT.TrimCurve(edge, p1, p2), edge.Pose);
+                    return new(BrepGeomtryTools.TrimCurve(edge, p1, p2), edge.Pose);
                 }
                 catch (Exception)
                 {
@@ -643,22 +654,31 @@ public partial class VerticalPlate
         }
     }
 
+    public void CalculateSlot(List<VerticalPlate> otherPlate)
+    {
+        if (Pieces.Count == 0)
+        {
+            throw new Exception("竖板片为空");
+        }
+
+        slotPnts.Add(new());
+        sloted = true;
+    }
+
     #endregion
 
     #region Display
+
     //直接连接
     public AShape? SuturedShape;
 
     //切连接槽
-    private bool sloted = false;
     public AShape? SlotedShape;
 
     //烙印数字
-    private bool Branded = false;
     public AShape? BrandedShape;
 
     //有辅助板
-    private bool WithSupport = false;
     public AShape? SupportPlate;
 
     public void ShowPlate(InteractiveContext context, bool update)
@@ -730,7 +750,7 @@ public partial class VerticalPlate
         if (sloted)
         {
             //不烙印数字
-            if (!Branded)
+            if (!branded)
             {
                 return;
             }
@@ -744,6 +764,7 @@ public partial class VerticalPlate
         else
         //直接连接
         {
+            //直接封闭
             maker.Add(new MakeEdge(rightBottom, leftBottom));
             SuturedShape = new(new MakeFace(maker));
             //显示用于构造的线
@@ -756,7 +777,7 @@ public partial class VerticalPlate
             context.SetColor(SuturedShape, new(0, 255, 0), true);
         }
         //需要绘制辅助板
-        if (WithSupport)
+        if (withSupport)
         {
             return;
         }

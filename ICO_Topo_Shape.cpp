@@ -127,6 +127,10 @@ TShape^ TShape::Located(gp::Ax2^ newOrigin) {
 	return gcnew TShape(myShape->Located(TopLoc_Location(t->GetOCC())));
 }
 
+int TShape::HashCode(int upperBound) {
+	return myShape->HashCode(upperBound);
+}
+
 
 }
 }

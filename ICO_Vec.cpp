@@ -83,6 +83,10 @@ Vec^ Vec::Multiplied(double value) {
 	return gcnew Vec(newX, newY, newZ);
 }
 
+double Vec::Dot(Vec^ other) {
+	return  X * other->X + Y * other->Y + Z * other->Z;
+}
+
 void Vec::Cross(Vec^ other) {
 	X = (this->Y * other->Z) - (this->Z * other->Y);
 	Y = (this->Z * other->X) - (this->X * other->Z);
@@ -94,6 +98,10 @@ Vec^ Vec::Crossed(Vec^ other) {
 	double newY = (this->Z * other->X) - (this->X * other->Z);
 	double newZ = (this->X * other->Y) - (this->Y * other->X);
 	return gcnew Vec(newX, newY, newZ);
+}
+
+Vec^ Vec::CrossProduct(Vec^ other) {
+	return Crossed(other);
 }
 
 }

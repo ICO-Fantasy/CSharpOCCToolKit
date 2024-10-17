@@ -1,12 +1,16 @@
-﻿#include "ICO_BaseObject.h"
-#include "ICO_BRepAdaptor_Curve.h"
+﻿#include "ICO_BRepAdaptor_Curve.h"
+#include <BRepAdaptor_Curve.hxx>
+//local
+#include "ICO_BaseObject.h"
 #include "ICO_Pnt.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Topo_Face.h"
-#include <BRepAdaptor_Curve.hxx>
+#include "ICO_CurveType.h"
+#include "ICO_Circle.h"
 
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::gp;
+using namespace OCCTK::OCC::GeomAbs;
 
 namespace OCCTK {
 namespace OCC {
@@ -54,6 +58,14 @@ double Curve::FirstParameter() {
 /// <returns></returns>
 double Curve::LastParameter() {
 	return myCure()->LastParameter();
+}
+
+CurveType Curve::GetType() {
+	return CurveType(myCure()->GetType());
+}
+
+gp::Circle^ Curve::Circle() {
+	return gcnew gp::Circle(myCure()->Circle());
 }
 
 }

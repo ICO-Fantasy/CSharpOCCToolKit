@@ -12,6 +12,7 @@ using Microsoft.VisualBasic.Logging;
 using OCCTK.OCC.AIS;
 using OCCViewForm;
 using TestWPF;
+using TestWPF.Bending;
 using Application = System.Windows.Application;
 
 namespace TestWPF;
@@ -74,7 +75,10 @@ public partial class App : Application
         // Start main window
         //MainWindow = new RobotWindows();
         //MainWindow = new CanvasTest();
-        MainWindow = new SimpleClamp();
+        //! 简易夹具测试
+        //MainWindow = new SimpleClamp();
+        //! 折弯测试
+        MainWindow = new BendingTest();
         MainWindow.Show();
 
         ShutdownMode = ShutdownMode.OnMainWindowClose;

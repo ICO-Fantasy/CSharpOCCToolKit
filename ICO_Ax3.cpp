@@ -1,6 +1,7 @@
 ﻿#include "ICO_Ax3.h"
 //local
 #include "ICO_Trsf.h"
+#include "ICO_Ax1.h"
 
 using namespace System;
 
@@ -42,6 +43,10 @@ void Ax3::Transform(Trsf^ theT) {
 
 Ax3^ Ax3::Transformed(Trsf^ theT) {
 	return gcnew Ax3(myAx3->Transformed(theT->GetOCC()));
+}
+
+Ax1^ Ax3::Axis() {
+	return gcnew Ax1(myAx3->Axis());
 }
 
 }

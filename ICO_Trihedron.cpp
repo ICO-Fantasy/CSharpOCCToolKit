@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "ICO_Trihedron.h"
 #include <Geom_Axis2Placement.hxx>
+//local
+#include "ICO_Color.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -58,19 +60,18 @@ void Trihedron::SetAxis() {
 	myTrihedron()->Attributes()->DatumAspect()->LineAspect(Prs3d_DatumParts_XAxis)->SetWidth(ArrowWidth);
 	myTrihedron()->Attributes()->DatumAspect()->LineAspect(Prs3d_DatumParts_YAxis)->SetWidth(ArrowWidth);
 	myTrihedron()->Attributes()->DatumAspect()->LineAspect(Prs3d_DatumParts_ZAxis)->SetWidth(ArrowWidth);
-
 	// 坐标轴颜色
-	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts_XAxis, Extension::Color().XAxis);
-	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts_YAxis, Extension::Color().YAxis);
-	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts_ZAxis, Extension::Color().ZAxis);
+	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts_XAxis, Extension::Color::XAxis().GetOCC());
+	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts_YAxis, Extension::Color::YAxis().GetOCC());
+	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts_ZAxis, Extension::Color::ZAxis().GetOCC());
 	// 箭头颜色
-	myTrihedron()->SetArrowColor(Prs3d_DatumParts_XAxis, Extension::Color().XAxis);
-	myTrihedron()->SetArrowColor(Prs3d_DatumParts_YAxis, Extension::Color().YAxis);
-	myTrihedron()->SetArrowColor(Prs3d_DatumParts_ZAxis, Extension::Color().ZAxis);
+	myTrihedron()->SetArrowColor(Prs3d_DatumParts_XAxis, Extension::Color::XAxis().GetOCC());
+	myTrihedron()->SetArrowColor(Prs3d_DatumParts_YAxis, Extension::Color::YAxis().GetOCC());
+	myTrihedron()->SetArrowColor(Prs3d_DatumParts_ZAxis, Extension::Color::ZAxis().GetOCC());
 	// 文字颜色
-	myTrihedron()->SetTextColor(Prs3d_DatumParts_XAxis, Extension::Color().XAxis);
-	myTrihedron()->SetTextColor(Prs3d_DatumParts_YAxis, Extension::Color().YAxis);
-	myTrihedron()->SetTextColor(Prs3d_DatumParts_ZAxis, Extension::Color().ZAxis);
+	myTrihedron()->SetTextColor(Prs3d_DatumParts_XAxis, Extension::Color::XAxis().GetOCC());
+	myTrihedron()->SetTextColor(Prs3d_DatumParts_YAxis, Extension::Color::YAxis().GetOCC());
+	myTrihedron()->SetTextColor(Prs3d_DatumParts_ZAxis, Extension::Color::ZAxis().GetOCC());
 }
 
 }

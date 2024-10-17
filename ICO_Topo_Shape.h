@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <cstdint>
 #include <TopoDS_Shape.hxx>
 
 namespace OCCTK {
@@ -38,6 +39,10 @@ public:
 	gp::Trsf^ Location();
 	void Location(gp::Ax2^ newOrigin);
 	TShape^ Located(gp::Ax2^ newOrigin);
+	virtual int GetHashCode() override {
+		return HashCode(INT32_MAX);
+	}
+	int HashCode(int upperBound);
 protected:
 	TopoDS_Shape* myShape;
 protected:

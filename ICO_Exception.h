@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <exception>
 #include <Standard_Failure.hxx>
+using namespace System;
 
 // 定义宏来简化异常处理
 #define THROW_MANAGED_EXCEPTION(e) throw gcnew System::Exception(gcnew System::String(e.what()));

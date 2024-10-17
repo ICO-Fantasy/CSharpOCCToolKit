@@ -890,7 +890,7 @@ VerticalPlate SlotVerticalPlate(VerticalPlate& thePlate, std::vector<VerticalPla
 	std::sort(thePlate.cutPoints.begin(), thePlate.cutPoints.end(), [&](const gp_Pnt& p1, const gp_Pnt& p2) {
 		return p1.Distance(thePlate.start) < p2.Distance(thePlate.start);
 		});
-	// 如果没用相交点，则添加辅助板
+	// 如果没有相交点，则添加辅助板
 	if (cutPoints.empty()) {
 		thePlate.singlePlate = true;
 		cutPoints.push_back(gp_Pnt((thePlate.start.XYZ() + thePlate.end.XYZ()) / 2));

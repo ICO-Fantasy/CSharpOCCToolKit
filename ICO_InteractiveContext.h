@@ -6,7 +6,7 @@
 
 namespace OCCTK {
 namespace Extension {
-ref class Color;
+value struct Color;
 }
 namespace OCC {
 namespace AIS {
@@ -88,7 +88,7 @@ public:
 
 #pragma region 设置AIS
 
-	void SetColor(InteractiveObject^ theAISObject, Extension::Color^ theColor, bool theToUpdateViewer);
+	void SetColor(InteractiveObject^ theAISObject, Extension::Color theColor, bool theToUpdateViewer);
 	void UnsetColor(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 	void SetTransparency(InteractiveObject^ theAISObject, double theTransparency, bool theToUpdateViewer);
 	void UnsetTransparency(InteractiveObject^ theAISObject, bool theToUpdateViewer);

@@ -1,39 +1,53 @@
 ﻿#pragma once
 #include <Quantity_Color.hxx>
+#include <Quantity_TypeOfColor.hxx>
 
 namespace OCCTK {
 namespace Extension {
 
-public ref class Color {
+public value struct Color {
 public:
-	Color() { myColor = new Quantity_Color(Quantity_NOC_GRAY); }
-	Color(int R, int G, int B) {
-		myColor = new Quantity_Color((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
+	Color(int r, int g, int b) {
+		R = r;
+		G = g;
+		B = b;
 	};
 
 	Quantity_Color GetOCC() {
-		return *myColor;
+		return Quantity_Color((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
 	};
-
-	property Quantity_Color XAxis {Quantity_Color get() { return Quantity_Color(Quantity_NOC_RED); }}
-	property Quantity_Color YAxis {Quantity_Color get() { return Quantity_Color(Quantity_NOC_GREEN); }}
-	property Quantity_Color ZAxis {Quantity_Color get() { return Quantity_Color(Quantity_NOC_BLUE); }}
-private:
-	Quantity_Color* myColor;
-protected:
-	// 析构函数用于清理非托管资源
-	!Color() {
-		if (myColor != 0) {
-			delete myColor;
-			myColor = 0;
-		}
+public:
+	// 定义一些常用的颜色
+	static Color Red() {
+		return Color(255, 0, 0);
+	}
+	static Color Green() {
+		return Color(0, 255, 0);
+	}
+	static Color Blue() {
+		return Color(0, 0, 255);
+	}
+	static Color Black() {
+		return Color(0, 0, 0);
+	}
+	static Color White() {
+		return Color(255, 255, 255);
 	}
 
-	// 终结器（finalizer）用于垃圾回收时的清理
-	~Color() {
-		// 调用析构函数来清理非托管资源
-		this->!Color();
+	static Color XAxis() {
+		return Blue();
 	}
+	static Color YAxis() {
+		return Green();
+	}
+	static Color ZAxis() {
+		return Red();
+	}
+
+public:
+	property int R;
+	property int G;
+	property int B;
 };
 
 }

@@ -12,6 +12,10 @@ ref class TFace;
 }
 namespace gp {
 ref class Pnt;
+ref class Circle;
+}
+namespace GeomAbs {
+enum class CurveType;
 }
 }
 }
@@ -31,6 +35,8 @@ public:
 	gp::Pnt^ Value(double UVValue);
 	double FirstParameter();
 	double LastParameter();
+	GeomAbs::CurveType GetType();
+	gp::Circle^ Circle();
 };
 
 }

@@ -1,7 +1,18 @@
 ﻿#pragma once
 #include <gp_Ax3.hxx>
-//local
-#include "ICO_Trsf.h"
+
+//前向声明
+class gp_Cylinder;
+namespace OCCTK {
+namespace OCC {
+namespace gp {
+ref class Trsf;
+ref class Ax1;
+ref class Pnt;
+ref class Dir;
+}
+}
+}
 
 namespace OCCTK {
 namespace OCC {
@@ -15,9 +26,10 @@ public:
 	gp_Ax3 GetOCC();
 	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
-
+public:
 	void Transform(Trsf^ theT);
 	Ax3^ Transformed(Trsf^ theT);
+	Ax1^ Axis();
 
 protected:
 	gp_Ax3* myAx3;

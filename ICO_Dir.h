@@ -29,6 +29,7 @@ public:
 	double AngleWithRef(Dir^ otherDir, Dir^ refDir);
 	void Cross(Dir^ other);
 	Dir^ Crossed(Dir^ other);
+	double Dot(Dir^ other);
 public:
 	property double X;
 	property double Y;

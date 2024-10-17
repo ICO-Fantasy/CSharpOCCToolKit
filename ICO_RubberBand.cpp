@@ -1,5 +1,8 @@
 ﻿#include "ICO_RubberBand.h"
 #include<Aspect_TypeOfLine.hxx>
+//local
+#include "ICO_Color.h"
+
 namespace OCCTK {
 namespace OCC {
 namespace AIS {
@@ -18,9 +21,9 @@ void RubberBand::SetLineType(Aspect::Line theType) {
 	myRubber()->SetLineType(Aspect_TypeOfLine((int)theType));
 }
 
-void RubberBand::SetFillColor(Color^ theColor) {
+void RubberBand::SetFillColor(Color theColor) {
 	if (myRubber().IsNull())return;
-	myRubber()->SetFillColor(theColor->GetOCC());
+	myRubber()->SetFillColor(theColor.GetOCC());
 }
 
 void RubberBand::SetFillTransparency(double transparency) {
@@ -28,9 +31,9 @@ void RubberBand::SetFillTransparency(double transparency) {
 	myRubber()->SetFillTransparency(transparency);
 }
 
-void RubberBand::SetLineColor(Color^ theColor) {
+void RubberBand::SetLineColor(Color theColor) {
 	if (myRubber().IsNull())return;
-	myRubber()->SetLineColor(theColor->GetOCC());
+	myRubber()->SetLineColor(theColor.GetOCC());
 }
 
 void RubberBand::SetFilling(bool isFilling) {

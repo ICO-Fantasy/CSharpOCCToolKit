@@ -87,9 +87,6 @@
     <Filter Include="源文件\OCCProxy\Aspect">
       <UniqueIdentifier>{4d9baac6-228c-4f96-83ee-42f2bdf4a739}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\Laset">
-      <UniqueIdentifier>{63c61224-7f17-4df0-b9bb-1cb45688da93}</UniqueIdentifier>
-    </Filter>
     <Filter Include="源文件\Laser">
       <UniqueIdentifier>{8eadf91c-c88e-49bb-8cfa-6f400d6fd7c0}</UniqueIdentifier>
     </Filter>
@@ -149,6 +146,33 @@
     </Filter>
     <Filter Include="头文件\OCCProxy\TopAbs\enum">
       <UniqueIdentifier>{6f354f8e-80f8-4cb4-a187-02221abb6742}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\GeomAbs">
+      <UniqueIdentifier>{a45a910b-8757-4fae-9de1-cf0f54353c31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\GeomAbs\enum">
+      <UniqueIdentifier>{88492995-ab25-4da7-b4fd-4ade1479a8cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\GProp">
+      <UniqueIdentifier>{c8351522-0ec5-4baf-9891-0bca7dd714d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\GProp">
+      <UniqueIdentifier>{bef2facf-a21e-481b-9e76-1c9e3a4c8a1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRepGProp">
+      <UniqueIdentifier>{aade564e-e2be-4739-971a-5a75ac757478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRepExtrema">
+      <UniqueIdentifier>{b848217d-034e-4bd4-a930-f43d0a446958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepExtrema">
+      <UniqueIdentifier>{88d95622-94bf-4c75-9e3c-5794b0e91293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepGProp">
+      <UniqueIdentifier>{4fa58d54-065f-47dc-8b0a-bee692e37694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Laser">
+      <UniqueIdentifier>{63c61224-7f17-4df0-b9bb-1cb45688da93}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -293,6 +317,36 @@
     <ClCompile Include="ICO_ProjectPointOnCurve.cpp">
       <Filter>源文件\OCCProxy\GeomAPI</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_Pnt2D.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Vec2D.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepAdaptor_Surface.cpp">
+      <Filter>源文件\OCCProxy\BRepAdaptor</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Cylinder.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Circle.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_GProps.cpp">
+      <Filter>源文件\OCCProxy\GProp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepExtrema_DistShapeShape.cpp">
+      <Filter>源文件\OCCProxy\BRepExtrema</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepGProp.cpp">
+      <Filter>源文件\OCCProxy\BRepGProp</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_AIS_Axis.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepGProp_Face.cpp">
+      <Filter>源文件\OCCProxy\BRepGProp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CSharpViewer.h">
@@ -380,10 +434,10 @@
       <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
     <ClInclude Include="MakeSimpleClamp.h">
-      <Filter>头文件\Laset</Filter>
+      <Filter>头文件\Laser</Filter>
     </ClInclude>
     <ClInclude Include="WMakeSimpleClamp.h">
-      <Filter>头文件\Laset</Filter>
+      <Filter>头文件\Laser</Filter>
     </ClInclude>
     <ClInclude Include="ICO_Aspect_GridType.h">
       <Filter>头文件\OCCProxy\Aspect</Filter>
@@ -468,6 +522,45 @@
     </ClInclude>
     <ClInclude Include="ICO_ShapeEnum.h">
       <Filter>头文件\OCCProxy\TopAbs\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Pnt2D.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Vec2D.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepAdaptor_Surface.h">
+      <Filter>头文件\OCCProxy\BRepAdaptor</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_SurfaceType.h">
+      <Filter>头文件\OCCProxy\GeomAbs\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Cylinder.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_CurveType.h">
+      <Filter>头文件\OCCProxy\GeomAbs\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Circle.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_GProps.h">
+      <Filter>头文件\OCCProxy\GProp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepGProp.h">
+      <Filter>头文件\OCCProxy\BRepGProp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepExtrema_DistShapeShape.h">
+      <Filter>头文件\OCCProxy\BRepExtrema</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_AIS_Axis.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepGProp_Face.h">
+      <Filter>头文件\OCCProxy\BRepGProp</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ColorMap.h">
+      <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

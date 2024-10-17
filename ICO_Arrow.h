@@ -10,6 +10,7 @@
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
+
 namespace OCCTK {
 namespace Extension {
 
@@ -23,7 +24,6 @@ public:
 			20 * M_PI / 180,
 			myVec->GetOCC().Magnitude()
 		);
-
 	}
 	//		myStructure.Display()
 	//	# it would be more coherent if a AIS_InteractiveObject

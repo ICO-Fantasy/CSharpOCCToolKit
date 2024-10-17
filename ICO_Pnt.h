@@ -14,9 +14,21 @@ public:
 	Pnt(double theX, double theY, double theZ);
 	Pnt(gp_Pnt thePnt);
 	Pnt(gp_Pnt* thePnt);
+	gp_Pnt GetOCC();
 	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
-	gp_Pnt GetOCC();
+#pragma region 重载操作符
+	// 重载 + 操作符
+	static Pnt^ operator+(Pnt^ a, Pnt^ b) {
+		// 创建一个新的 Pnt 对象，表示相加的结果
+		return gcnew Pnt(a->X + b->X, a->Y + b->Y, a->Z + b->Z);
+	}
+	// 重载 + 操作符
+	static Pnt^ operator-(Pnt^ a, Pnt^ b) {
+		// 创建一个新的 Pnt 对象，表示相加的结果
+		return gcnew Pnt(a->X - b->X, a->Y - b->Y, a->Z - b->Z);
+	}
+#pragma endregion
 public:
 	double Distance(Pnt^ otherPnt);
 	Pnt^ Transformed(Trsf^ T);

@@ -82,6 +82,10 @@ Dir^ Dir::Crossed(Dir^ other) {
 	return gcnew Dir(crossX, crossY, crossZ);
 }
 
+double Dir::Dot(Dir^ other) {
+	return GetOCC().Dot(other->GetOCC());
+}
+
 void Dir::Normalize() {
 	double m = std::sqrt(X * X + Y * Y + Z * Z);
 	X = X / m;

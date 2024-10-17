@@ -25,7 +25,7 @@ public enum Action3d
     // Confusions
     LeftNone = -1,
 
-    // Normal
+    // normal
     None,
     SingleSelect,
     MultipleSelect,
@@ -79,7 +79,7 @@ public delegate void KeyUpHandler(Keys keys);
 public partial class OCCCanvas
 {
     // 定义事件
-    public event AISSelectionMadeHandler? OnAISSelectedEvent;
+    public event AISSelectionMadeHandler? OnAISSelectionEvent;
     public event MouseMovedHandler? OnMouseMovedEvent;
     public event KeyDownHandler? OnKeyDownEvent;
     public event KeyUpHandler? OnKeyUpEvent;
@@ -186,7 +186,7 @@ public partial class OCCCanvas
             { Action3d.AreaSelect, Cursors.Cross },
             { Action3d.MultipleAreaSelect, Cursors.Cross },
             { Action3d.XORAreaSelect, Cursors.Default },
-            { Action3d.AreaZooming, Cursors.Default },
+            { Action3d.AreaZooming, Cursors.SizeAll },
             { Action3d.DynamicRotation, Cursors.NoMove2D },
             { Action3d.DynamicPanning, Cursors.SizeAll },
             { Action3d.Prohibition, Cursors.No },
@@ -419,7 +419,7 @@ public partial class OCCCanvas
                 if (AISContext.IsSelected())
                 {
                     // 触发事件，调用所有订阅的方法
-                    OnAISSelectedEvent?.Invoke(AISContext.SelectedAIS());
+                    OnAISSelectionEvent?.Invoke(AISContext.SelectedAIS());
                 }
                 break;
             case Action3d.MultipleSelect:
