@@ -4,6 +4,8 @@
 #include <gp_Trsf.hxx>
 #include <gp_Quaternion.hxx>
 
+using namespace OCCTK::OCC::gp;
+
 namespace OCCTK {
 namespace Tool {
 

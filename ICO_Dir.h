@@ -5,6 +5,8 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Vec;
+ref class Pnt;
+ref class Trsf;
 }
 }
 }
@@ -18,6 +20,7 @@ public:
 	Dir();
 	Dir(double theX, double theY, double theZ);
 	Dir(Vec^ theDir);
+	Dir(Pnt^ fromPoint, Pnt^ toPoint);
 	Dir(gp_Dir theDir);
 	Dir(gp_Dir* theDir);
 	gp_Dir GetOCC();
@@ -30,6 +33,12 @@ public:
 	void Cross(Dir^ other);
 	Dir^ Crossed(Dir^ other);
 	double Dot(Dir^ other);
+	void Reverse();
+	Dir^ Reversed();
+	void Transform(Trsf^ T);
+	Dir^ Transformed(Trsf^ T);
+public:
+	Vec^ ToVec(double factor);
 public:
 	property double X;
 	property double Y;

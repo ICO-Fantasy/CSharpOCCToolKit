@@ -11,23 +11,27 @@ namespace TestWPF.Bending;
 
 public class Kparam
 {
-    private Kparam()
+    public Kparam(string? filePath = null)
     {
-        kTable = new();
-        //使用默认的 kTable
-        DataColumn Rt = new();
-        Rt.DataType = typeof(double);
-        Rt.ColumnName = "R/t";
-        DataColumn K = new();
-        K.DataType = typeof(double);
-        K.ColumnName = "K";
-        kTable.Columns.Add();
-        foreach (var d in defaultData)
+        KTable = new();
+        if (filePath == null)
         {
-            var row = kTable.NewRow();
-            row["R/t"] = d.Item1;
-            row["K"] = d.Item2;
-            kTable.Rows.Add(row);
+            //使用默认的 KTable
+            DataColumn Rt = new() { DataType = typeof(double), ColumnName = "R/t" };
+            DataColumn K = new() { DataType = typeof(double), ColumnName = "K" };
+            KTable.Columns.Add(Rt);
+            KTable.Columns.Add(K);
+            foreach (var d in defaultData)
+            {
+                var row = KTable.NewRow();
+                row["R/t"] = d.Item1;
+                row["K"] = d.Item2;
+                KTable.Rows.Add(row);
+            }
+        }
+        else
+        {
+            //todo 加载外部K表格
         }
     }
 
@@ -100,7 +104,7 @@ public class Kparam
         (5, 0.5),
     ];
 
-    public DataTable kTable { get; set; }
+    public DataTable KTable { get; set; }
 
     /// <summary>
     /// 获取中性层半径
@@ -108,14 +112,14 @@ public class Kparam
     /// <param name="innerRadius"></param>
     /// <param name="thickness"></param>
     /// <returns></returns>
-    double GetKRadius(double innerRadius, double thickness)
+    public double GetKRadius(double innerRadius, double thickness)
     {
         // 计算 R/t
         double rt = innerRadius / thickness;
 
         // 找到 R/t 列和 k 列
-        var rtColumn = kTable.AsEnumerable().Select(row => Convert.ToDouble(row["R/t"])).ToArray();
-        var kColumn = kTable.AsEnumerable().Select(row => Convert.ToDouble(row["k"])).ToArray();
+        var rtColumn = KTable.AsEnumerable().Select(row => Convert.ToDouble(row["R/t"])).ToArray();
+        var kColumn = KTable.AsEnumerable().Select(row => Convert.ToDouble(row["k"])).ToArray();
 
         // 计算 k 系数
         double k;

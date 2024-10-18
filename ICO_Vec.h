@@ -1,12 +1,20 @@
 ﻿#pragma once
 #include <cmath>
 
+//前向声明
 class gp_Vec;
-
 namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Pnt;
+ref class Trsf;
+}
+}
+}
+
+namespace OCCTK {
+namespace OCC {
+namespace gp {
 public ref class Vec :System::ICloneable {
 public:
 	Vec();
@@ -40,6 +48,8 @@ public:
 	void Cross(Vec^ other);
 	Vec^ Crossed(Vec^ other);
 	Vec^ CrossProduct(Vec^ other);
+	void Transform(Trsf^ T);
+	Vec^ Transformed(Trsf^ T);
 public:
 	property double X;
 	property double Y;

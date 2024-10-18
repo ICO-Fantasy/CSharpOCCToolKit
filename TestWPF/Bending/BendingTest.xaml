@@ -107,17 +107,17 @@
                     x:Name="ShowWorkPiece_Button"
                     Grid.Row="0"
                     Grid.Column="0"
-                    Content="显示原始工件" />
+                    Content="显示原始工件" Click="ShowWorkPiece_Button_Click" />
                 <Button
                     x:Name="ShowAllNode_Button"
                     Grid.Row="0"
                     Grid.Column="2"
-                    Content="显示全部节点" Click="ShowAllNode_Button_Click" />
+                    Content="全部折叠" Click="ShowAllNode_Button_Click" />
                 <Button
                     x:Name="ShowUnfold_Button"
                     Grid.Row="0"
                     Grid.Column="1"
-                    Content="显示展开后工件" />
+                    Content="全部展开" Click="ShowUnfold_Button_Click" />
                 <CheckBox
                     x:Name="ShowBendingArrow_CheckBox"
                     Grid.Row="1"

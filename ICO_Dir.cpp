@@ -2,7 +2,9 @@
 #include <cmath>
 //Local
 #include "ICO_Dir.h"
+#include "ICO_Pnt.h"
 #include "ICO_Vec.h"
+#include "ICO_Trsf.h"
 
 using namespace System;
 
@@ -28,6 +30,14 @@ Dir::Dir(Vec^ theDir) {
 	X = theDir->X;
 	Y = theDir->Y;
 	Z = theDir->Z;
+	Normalize();
+}
+
+Dir::Dir(Pnt^ fromPoint, Pnt^ toPoint) {
+	Pnt^ p = toPoint - fromPoint;
+	X = p->X;
+	Y = p->Y;
+	Z = p->Z;
 	Normalize();
 }
 
@@ -84,6 +94,35 @@ Dir^ Dir::Crossed(Dir^ other) {
 
 double Dir::Dot(Dir^ other) {
 	return GetOCC().Dot(other->GetOCC());
+}
+
+void Dir::Reverse() {
+	X = -X;
+	Y = -Y;
+	Z = -Z;
+}
+
+Dir^ Dir::Reversed() {
+	double newX = -X;
+	double newY = -Y;
+	double newZ = -Z;
+	return gcnew Dir(newX, newY, newZ);
+}
+
+void Dir::Transform(Trsf^ T) {
+	gp_Dir newD = GetOCC().Transformed(T->GetOCC());
+	X = newD.X();
+	Y = newD.Y();
+	Z = newD.Z();
+}
+
+Dir^ Dir::Transformed(Trsf^ T) {
+	gp_Dir newD = GetOCC().Transformed(T->GetOCC());
+	return gcnew Dir(newD);
+}
+
+Vec^ Dir::ToVec(double factor) {
+	return gcnew Vec(X * factor, Y * factor, Z * factor);
 }
 
 void Dir::Normalize() {

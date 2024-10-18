@@ -66,28 +66,11 @@ void AShape::SetColor(int R, int G, int B) {
 }
 
 /// <summary>
-/// 设置AShape自身的变换（从TShape原始状态到当前显示状态的变换）
-/// </summary>
-/// <param name="trsf"></param>
-void AShape::SetLocalTransformation(gp::Trsf^ trsf) {
-	myShape()->SetLocalTransformation(trsf->GetOCC());
-}
-
-/// <summary>
 /// 定义AShape的透明度，不建议直接使用
 /// </summary>
 /// <param name="theFactor"></param>
 void AShape::SetTransparency(double theFactor) {
 	myShape()->SetTransparency(theFactor);
-
-}
-
-/// <summary>
-/// 返回自身的变换（从TShape原始状态到当前显示状态的变换）
-/// </summary>
-/// <returns></returns>
-Trsf^ AShape::LocalTransformation() {
-	return gcnew Trsf(myShape()->LocalTransformation());
 }
 
 /// <summary>

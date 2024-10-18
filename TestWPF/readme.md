@@ -20,20 +20,6 @@
 
 在 OCC 源码中包含 HashCode 函数，其与 `.NET Core` 中的方法 `System::HashCode` 存在符号混淆，因此需要改写 OCC 源码中存在混淆的 `HashCode` 为 `::HashCode`
 
-# OCCView 的交互逻辑
+# 生成后事件
 
-| 模式        |       交互       | mouseButton | ModifierKeys |      CurrentAction3d      |     Cursor      |
-| ----------- | :--------------: | :---------: | :----------: | :-----------------------: | :-------------: |
-| Normal      |      无操作      |             |              |      Normal_Nothing       | Cursors.Default |
-| Normal      |       单选       |    Left     |              |    Normal_SingleSelect    |  Cursors.Hand   |
-| Normal      |     连续选择     |    Left     |   Control    |   Normal_MultipleSelect   |  Cursors.Hand   |
-| Normal      |     异或选择     |    Left     |    Shift     |     Normal_XORSelect      |    "XOR.cur"    |
-| Normal      |       框选       |    Left     |              |     Normal_AreaSelect     |  Cursors.Cross  |
-| Normal      |     连续框选     |    Left     |   Control    | Normal_MultipleAreaSelect |  Cursors.Cross  |
-| Normal      |     异或框选     |    Left     |    Shift     |   Normal_XORAreaSelect    |    "XOR.cur"    |
-| Normal      |   框选区域放大   |    Right    |    Shift     |    Normal_AreaZooming     |   "Zoom.cur"    |
-| Normal      |       旋转       |   Middle    |              |  Normal_DynamicRotation   | "Rotation.cur"  |
-| Normal      |       平移       |   Middle    |   Control    |   Normal_DynamicPanning   | Cursors.SizeAll |
-| Manipulator |      无操作      |             |              |    Manipulator_Nothing    | Cursors.Default |
-| Manipulator | 单选并应用操作器 |    Left     |              | Manipulator_SingleSelect  |  Cursors.Hand   |
-| Manipulator |    移动操作器    |    Left     |              |  Manipulator_Translation  |  Cursors.Cross  |
+OCC 自身需要引用TKxxx.dll，以及第三方dll，包括：freetype、tcl、FreeImage

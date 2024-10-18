@@ -28,6 +28,9 @@ public:
 public:
 	void Transform(Trsf^ theT);
 	Ax1^ Transformed(Trsf^ theT);
+	void Reverse();
+	Ax1^ Reversed();
+	bool IsCoaxial(Ax1^ other, double AngularTOL, double LinearTOL);
 public:
 	property Pnt^ Location;
 	property Dir^ Direction;

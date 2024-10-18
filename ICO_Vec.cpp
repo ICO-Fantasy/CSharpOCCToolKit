@@ -2,6 +2,7 @@
 #include <gp_Vec.hxx>
 //local
 #include"ICO_Pnt.h"
+#include"ICO_Trsf.h"
 
 using namespace System;
 
@@ -102,6 +103,20 @@ Vec^ Vec::Crossed(Vec^ other) {
 
 Vec^ Vec::CrossProduct(Vec^ other) {
 	return Crossed(other);
+}
+
+void Vec::Transform(Trsf^ T) {
+	gp_Vec v = gp_Vec(X, Y, Z);
+	v.Transform(T->GetOCC());
+	X = v.X();
+	Y = v.Y();
+	Z = v.Z();
+}
+
+Vec^ Vec::Transformed(Trsf^ T) {
+	gp_Vec v = gp_Vec(X, Y, Z);
+	v.Transform(T->GetOCC());
+	return gcnew Vec(v.X(), v.Y(), v.Z());
 }
 
 }

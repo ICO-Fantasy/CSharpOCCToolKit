@@ -53,6 +53,18 @@ Ax1^ Ax1::Transformed(Trsf^ theT) {
 	return gcnew Ax1(gp_Ax1(Location->GetOCC(), Direction->GetOCC()).Transformed(theT->GetOCC()));
 }
 
+void Ax1::Reverse() {
+	Direction->Reverse();
+}
+
+Ax1^ Ax1::Reversed() {
+	return gcnew Ax1(Location, Direction->Reversed());
+}
+
+bool Ax1::IsCoaxial(Ax1^ other, double AngularTOL, double LinearTOL) {
+	return GetOCC().IsCoaxial(other->GetOCC(), AngularTOL, LinearTOL);
+}
+
 }
 }
 }

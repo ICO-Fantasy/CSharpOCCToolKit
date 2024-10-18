@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using log4net;
+using MathNet.Spatial.Units;
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRep;
@@ -80,6 +81,7 @@ public class Face
     public Ax1? CircleAixs { get; private set; }
     public double? CircleRadius { get; private set; }
     public Pnt? CircleCenter { get; private set; }
+    public double? CircleAngle { get; private set; }
     public Dir? CircleNormal { get; private set; }
     #endregion
 
@@ -195,6 +197,7 @@ public class Face
 
         #endregion
         CircleCenter = C.CircleCenter;
+        CircleAngle = C.Angle;
         CircleNormal = new Dir(new Vec(point2, CircleCenter));
     }
 
@@ -300,12 +303,12 @@ public class BendingDS
         if (cylin[0].CircleRadius < cylin[1].CircleRadius)
         {
             InnerFace = cylin[0];
-            OutFace = cylin[1];
+            OutterFace = cylin[1];
         }
         else
         {
             InnerFace = cylin[1];
-            OutFace = cylin[0];
+            OutterFace = cylin[0];
         }
         List<Face> plane = faces
             .Where(x => x.Type == SurfaceType.Plane || x.Type == SurfaceType.BSplineSurface)
@@ -324,15 +327,19 @@ public class BendingDS
         }
 
         PlaneFaces = (plane[0], plane[1]);
-        Axis = new(InnerFace.CircleCenter, InnerFace.CircleNormal);
+        Normal = new(InnerFace.CircleCenter, InnerFace.CircleNormal);
+        Angle = InnerFace.CircleAngle ?? throw new Exception("内圆柱面角度为空");
+        Axis = InnerFace.CircleAixs ?? throw new Exception("内圆柱面轴线为空");
     }
 
-    public (Face, Face) CylinderFaces => (InnerFace, OutFace);
+    public (Face, Face) CylinderFaces => (InnerFace, OutterFace);
     public (Face, Face) PlaneFaces { get; private set; }
     public Face InnerFace { get; private set; }
-    public Face OutFace { get; private set; }
+    public Face OutterFace { get; private set; }
+    public double Angle { get; private set; }
     public List<Face> BendingFaces =>
         [CylinderFaces.Item1, CylinderFaces.Item2, PlaneFaces.Item1, PlaneFaces.Item2];
+    public Ax1 Normal { get; private set; }
     public Ax1 Axis { get; private set; }
     public double Thickness { get; private set; } = 0.0;
 

@@ -10,6 +10,9 @@ namespace AIS {
 ref class AShape;
 ref class InteractiveContext;
 }
+namespace gp {
+ref class Trsf;
+}
 }
 }
 
@@ -24,8 +27,11 @@ public:
 	InteractiveObject() :BaseObject() {}
 	InteractiveObject(Handle(AIS_InteractiveObject) theAISObject);
 	Handle(AIS_InteractiveObject) GetOCC() { return Handle(AIS_InteractiveObject)::DownCast(NativeHandle); };
-	bool IsShape();
 	void RemoveSelf(bool update);
+public:
+	void SetLocalTransformation(gp::Trsf^ trsf);
+	gp::Trsf^ LocalTransformation();
+	bool IsShape();
 	bool HasInteractiveContext();
 	InteractiveContext^ GetContext();
 };

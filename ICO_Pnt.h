@@ -20,12 +20,14 @@ public:
 	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
 #pragma region 重载操作符
+	Pnt^ Add(Pnt^ other);
 	// 重载 + 操作符
 	static Pnt^ operator+(Pnt^ a, Pnt^ b) {
 		// 创建一个新的 Pnt 对象，表示相加的结果
 		return gcnew Pnt(a->X + b->X, a->Y + b->Y, a->Z + b->Z);
 	}
-	// 重载 + 操作符
+	Pnt^ Minus(Pnt^ other);
+	// 重载 - 操作符
 	static Pnt^ operator-(Pnt^ a, Pnt^ b) {
 		// 创建一个新的 Pnt 对象，表示相加的结果
 		return gcnew Pnt(a->X - b->X, a->Y - b->Y, a->Z - b->Z);

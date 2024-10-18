@@ -37,9 +37,7 @@ public:
 public:
 	Topo::TShape^ Shape();
 	void SetColor(int R, int G, int B);
-	void SetLocalTransformation(gp::Trsf^ trsf);
 	void SetTransparency(double theFactor);
-	gp::Trsf^ LocalTransformation();
 	virtual bool Equals(System::Object^ obj) override;
 };
 

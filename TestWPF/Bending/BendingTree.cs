@@ -9,19 +9,37 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using log4net;
+using MathNet.Spatial.Units;
 using Microsoft.VisualBasic.Logging;
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRep;
+using OCCTK.OCC.BRepBuilderAPI;
+using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.GeomAbs;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.TopExp;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.TopoAbs;
+using TestWPF.Geometry.Tools;
+using TestWPF.Utils;
 using Color = OCCTK.Extension.Color;
 using ColorMap = OCCTK.Extension.ColorMap;
 
 namespace TestWPF.Bending;
+
+//参考资料 https://www.approvedsheetmetal.com/blog/what-type-of-hem-does-your-custom-sheet-metal-part-need
+public enum BendingType
+{
+    VBend,
+    OpenHem,
+    ClosedHem,
+    TeardropHem,
+    Curl,
+    SimpleBendFlange,
+    Normal = VBend,
+    Hem = OpenHem
+}
 
 public class BendingTree
 {
@@ -32,9 +50,11 @@ public class BendingTree
     public BendingTree(
         TShape input,
         string mainfaceRule = "Area",
+        string? KparamfilePath = null,
         InteractiveContext? debugContext = null
     )
     {
+        _Kparam = new(KparamfilePath);
         C = debugContext;
         Shape = input;
         GetData();
@@ -47,10 +67,11 @@ public class BendingTree
             throw new Exception("不支持的模式");
         }
         log.Info($"主平面为:{MainFace}");
-        RootNode = new(MainFace, null, null);
+        RootNode = new(MainFace, null, null, _Kparam);
         CreateTree();
     }
 
+    private Kparam _Kparam;
     private InteractiveContext? C;
     public TShape Shape { get; private set; }
     public HashSet<Face> AllFaces { get; private set; } = [];
@@ -59,10 +80,9 @@ public class BendingTree
 
     public Node RootNode { get; private set; }
     public List<Node> Nodes => GetAllNodes(RootNode);
-    #region 整体属性
     public double Thickness { get; private set; }
     public Face MainFace { get; private set; }
-    #endregion
+
     private static List<Node> GetAllNodes(Node node)
     {
         List<Node> allNodes = [];
@@ -155,11 +175,12 @@ public class BendingTree
             .Select(g => new { Value = g.Key, Count = g.Count() }); // 返回值和对应的出现次数
         foreach (var e in top3)
         {
-            //获取所有折弯
+            //! 获取所有折弯
             if (e.Value == null)
                 continue;
             Thickness = (double)e.Value;
             GetAllBendings();
+
             if (AllBendings.Count > 0)
                 break;
         }
@@ -248,10 +269,10 @@ public class BendingTree
         temptFace.RemoveAll(item => mainFaceSet.Contains(item));
 
         //首先找到相邻的折弯面
-        GetNode(MainFace, RootNode, temptFace);
+        CreateNode(MainFace, RootNode, temptFace);
     }
 
-    private void GetNode(Face mainFace, Node parentNode, List<Face> temptFace)
+    private void CreateNode(Face mainFace, Node parentNode, List<Face> temptFace)
     {
         if (temptFace.Count == 0)
             return;
@@ -269,10 +290,10 @@ public class BendingTree
                     //迭代获取所有非折弯面的邻面，构建节点面组
                     HashSet<Face> faceSet = [];
                     GetFaceSet(adj2, ref faceSet);
-                    Node newNode = new(adj2, b, parentNode) { FaceSet = faceSet };
+                    Node newNode = new(adj2, parentNode, b, _Kparam) { FaceSet = faceSet };
                     parentNode.Leafs.Add(newNode);
                     temptFace.RemoveAll(item => faceSet.Contains(item));
-                    GetNode(adj2, newNode, temptFace);
+                    CreateNode(adj2, newNode, temptFace);
                 }
             }
         }
@@ -304,18 +325,192 @@ public class BendingTree
             GetFaceSet(f, ref faceSet);
         }
     }
+
+    public void UnfoldAllBendings()
+    {
+        foreach (Node node in Nodes)
+        {
+            if (node.IsRoot)
+            {
+                continue;
+            }
+            node.Unfolded = true;
+        }
+    }
+
+    public void FoldAllBendings()
+    {
+        foreach (Node node in Nodes)
+        {
+            if (node.IsRoot)
+            {
+                continue;
+            }
+            node.Unfolded = false;
+        }
+    }
 }
 
-public class Node(Face mainFace, BendingDS? bending, Node? parentNode)
+public class Node
 {
-    public Face MainFace { get; private set; } = mainFace;
-    public Node? Parent { get; private set; } = parentNode;
-    public BendingDS? Bending { get; private set; } = bending;
+    public Node(Face mainFace, Node? parent, BendingDS? bending, Kparam kparam)
+    {
+        MainFace = mainFace;
+        Parent = parent;
+        Bending = bending;
+        IsRoot = bending == null;
+        if (parent == null || bending == null)
+            return;
+        //+ 计算展开长度
+        KRadius = kparam.GetKRadius(
+            bending.InnerFace.CircleRadius ?? throw new Exception("内圆柱面半径为空"),
+            bending.Thickness
+        );
+        if ((Math.PI - bending.Angle) > 1e-4)
+        {
+            BendingType = BendingType.VBend;
+            BendingAngle = (Math.PI - bending.Angle);
+            FlatLength = KRadius * BendingAngle;
+        }
+        else
+        {
+            //处理死边
+            BendingType = BendingType.Hem;
+            BendingAngle = Math.PI;
+            //死边的K值暂时按1.2算
+            FlatLength = (1.2 * bending.Thickness);
+        }
+        Debug.WriteLine(
+            $"{Math.Round((double)bending.InnerFace.CircleRadius, 2)}|{Math.Round((double)KRadius, 2)}|{BendingAngle.ToDegrees(1)}|{FlatLength}"
+        );
+        //+ 计算折弯长度
+        BendingLength = 0.0;
+        foreach (Edge edge in bending.InnerFace.Edges)
+        {
+            if (edge.Length != null)
+            {
+                double l = (double)edge.Length;
+                if (BendingLength < l)
+                {
+                    BendingLength = l;
+                }
+            }
+        }
+        //计算辅助信息
+        foreach (Edge e in bending.InnerFace.Edges)
+        {
+            //理论上只会有两根直线
+            if (e.Type != CurveType.Line)
+                continue;
+            if (parent.MainFace.Edges.Contains(e))
+            {
+                InnerEdge = e;
+            }
+            OutterEdge = e;
+        }
+        if (InnerEdge == null || OutterEdge == null)
+        {
+            foreach (Edge e in bending.OutterFace.Edges)
+            {
+                //理论上只会有两根直线
+                if (e.Type != CurveType.Line)
+                    continue;
+                if (parent.MainFace.Edges.Contains(e))
+                {
+                    InnerEdge = e;
+                }
+                OutterEdge = e;
+            }
+        }
+        if (InnerEdge == null || OutterEdge == null)
+        {
+            throw new ArgumentException("折弯边检查失败");
+        }
+        //+ 计算折弯轴和方向
+        BendingAxis = bending.Axis;
+        Trsf rotT = new();
+        rotT.SetRotation(bending.Axis, bending.Angle);
+        (Pnt p1, Pnt p2) = BasicGeometryTools.GetEdgeEndPoints(InnerEdge.TopoEdge);
+        (Pnt p3, Pnt p4) = BasicGeometryTools.GetEdgeEndPoints(OutterEdge.TopoEdge);
+        Dir parentVec = (Dir)parent.MainFace.Normal.Direction.Clone();
+        Dir myVec = (Dir)mainFace.Normal.Direction.Clone();
+        if (myVec.Transformed(rotT).Dot(parentVec) < 0)
+        {
+            BendingAxis.Reverse();
+        }
+        //+ 计算展开方向
+        UnfoldingDirection = parent.MainFace.Normal.Direction.Crossed(new(p1, p2));
+        if (UnfoldingDirection.Dot(bending.Normal.Direction) > 0)
+        {
+            UnfoldingDirection.Reverse();
+        }
+        Pnt local = BasicGeometryTools.GetEdgeMidlePoint(InnerEdge.TopoEdge);
+        AISUnfoldingLocation = new(new MakeSphere(local, 1));
+        AISUnfoldingDirection = new(new(local, UnfoldingDirection), 20);
+        //+ 计算展开变换
+        Trsf T = new();
+        T.SetTranslation(UnfoldingDirection.ToVec((double)FlatLength));
+        Trsf R = new();
+        R.SetRotation(BendingAxis, BendingAngle);
+        //先平移再旋转
+        UnfoldTransform = T.Multiplied(R);
+    }
+
+    #region 折弯展开
+    public Trsf Location
+    {
+        get
+        {
+            if (Unfolded)
+            {
+                return Parent?.Location.Multiplied(UnfoldTransform) ?? UnfoldTransform;
+            }
+            else
+            {
+                return new();
+            }
+        }
+    }
+    public bool Unfolded { get; set; } = false;
+    public Trsf UnfoldTransform { get; private set; } = new();
+    private Edge? InnerEdge;
+    private Edge? OutterEdge;
+    private readonly double? KRadius;
+    public double BendingAngle { get; private set; }
+    public double? FlatLength { get; private set; }
+
+    /// <summary>
+    /// 折弯线长度（取圆柱面两直线中最长的一条，用于计算折弯力）
+    /// </summary>
+    public double? BendingLength { get; private set; }
+    public Dir? UnfoldingDirection { get; private set; }
+
+    /// <summary>
+    /// 折弯轴为右手坐标轴，旋转方向与折弯方向保持一致
+    /// </summary>
+    public Ax1? BendingAxis { get; private set; }
+    #endregion
+
+    public Face MainFace { get; private set; }
+    public Node? Parent { get; private set; }
+    public BendingDS? Bending { get; private set; }
+    public BendingType BendingType { get; private set; }
+
+    #region VBend
+    /// <summary>
+    /// 合并的其它折弯
+    /// </summary>
     public List<BendingDS> Bendings { get; } = [];
-    public bool IsRoot { get; private set; } = bending != null;
+    #endregion
+    #region OpenHem
+    /// <summary>
+    /// 死边之后的所有折弯
+    /// </summary>
+    public List<Node> HemNodes { get; set; } = [];
+    #endregion
+    public bool IsRoot { get; private set; }
     public HashSet<Face> FaceSet { get; set; } = [];
     public List<Node> Leafs { get; set; } = [];
-    public Ax1? BendingLine { get; set; }
 
     #region override
 
@@ -330,10 +525,14 @@ public class Node(Face mainFace, BendingDS? bending, Node? parentNode)
         return hashCode;
     }
     #endregion
+
+    #region 显示
     private List<AShape> AISFaces = [];
     private List<AShape> AISBendingFaces = [];
     private AAxis? AISBendingNormal;
     private AAxis? AISMainFaceNormal;
+    private AShape? AISUnfoldingLocation;
+    private AAxis? AISUnfoldingDirection;
 
     public void Show(
         InteractiveContext context,
@@ -349,6 +548,7 @@ public class Node(Face mainFace, BendingDS? bending, Node? parentNode)
             foreach (Face f in FaceSet)
             {
                 AShape ais = new(f.TopoFace);
+                ais.SetLocalTransformation(Location);
                 AISFaces.Add(ais);
                 context.Display(ais, false);
                 context.SetColor(ais, faceSetColor, false);
@@ -359,6 +559,7 @@ public class Node(Face mainFace, BendingDS? bending, Node? parentNode)
         {
             foreach (AShape ais in AISFaces)
             {
+                ais.SetLocalTransformation(Location);
                 context.Display(ais, false);
                 context.SetColor(ais, faceSetColor, false);
                 context.SetTransparency(ais, 0.0, false);
@@ -366,44 +567,51 @@ public class Node(Face mainFace, BendingDS? bending, Node? parentNode)
         }
         if (AISBendingFaces.Count == 0)
         {
-            if (Bending == null)
-                return;
-            foreach (Face f in Bending.BendingFaces)
+            if (Bending != null && Unfolded == false)
             {
-                AShape ais = new(f.TopoFace);
-                AISBendingFaces.Add(ais);
-                context.Display(ais, false);
-                context.SetColor(ais, bendingColor, false);
-                context.SetTransparency(ais, 0.0, false);
+                foreach (Face f in Bending.BendingFaces)
+                {
+                    AShape ais = new(f.TopoFace);
+                    AISBendingFaces.Add(ais);
+                    context.Display(ais, false);
+                    context.SetColor(ais, bendingColor, false);
+                    context.SetTransparency(ais, 0.0, false);
+                }
             }
         }
         else
         {
-            foreach (AShape ais in AISBendingFaces)
+            if (Unfolded == false)
             {
-                context.Display(ais, false);
-                context.SetColor(ais, bendingColor, false);
-                context.SetTransparency(ais, 0.0, false);
+                foreach (AShape ais in AISBendingFaces)
+                {
+                    context.Display(ais, false);
+                    context.SetColor(ais, bendingColor, false);
+                    context.SetTransparency(ais, 0.0, false);
+                }
             }
         }
-        if (showBendingNormal)
+        if (showBendingNormal && Bending != null && Unfolded == false)
         {
-            if (AISBendingNormal == null)
-            {
-                AISBendingNormal = new(Bending?.Axis);
-            }
+            AISBendingNormal ??= new(Bending?.Normal, 5);
             context.Display(AISBendingNormal, false);
             context.SetColor(AISBendingNormal, bendingColor, false);
+            if (AISUnfoldingDirection != null)
+            {
+                context.Display(AISUnfoldingDirection, false);
+                context.Display(AISUnfoldingLocation, false);
+                context.SetColor(AISUnfoldingDirection, bendingColor, false);
+                context.SetColor(AISUnfoldingLocation, bendingColor, false);
+            }
         }
         if (showMainFaceNormal)
         {
-            if (AISMainFaceNormal == null)
-            {
-                AISMainFaceNormal = new(MainFace.Normal);
-            }
+            AISMainFaceNormal ??= new(MainFace.Normal, 10);
+            AISMainFaceNormal.SetLocalTransformation(Location);
             context.Display(AISMainFaceNormal, false);
             context.SetColor(AISMainFaceNormal, faceSetColor, false);
         }
+
         if (update)
         {
             context.UpdateCurrentViewer();
@@ -434,9 +642,19 @@ public class Node(Face mainFace, BendingDS? bending, Node? parentNode)
         {
             context.Erase(AISMainFaceNormal, false);
         }
+        if (AISUnfoldingLocation != null)
+        {
+            context.Erase(AISUnfoldingLocation, false);
+        }
+        if (AISUnfoldingDirection != null)
+        {
+            context.Erase(AISUnfoldingDirection, false);
+        }
+
         if (update)
         {
             context.UpdateCurrentViewer();
         }
     }
+    #endregion
 }

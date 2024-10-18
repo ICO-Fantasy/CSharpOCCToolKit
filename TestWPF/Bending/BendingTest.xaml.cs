@@ -20,6 +20,7 @@ using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepAdaptor;
 using OCCTK.OCC.Topo;
 using OCCViewForm;
+using TestWPF.Utils;
 //设置别名
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
@@ -67,6 +68,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #region 算法逻辑
 
     public TShape InputWorkpiece { get; private set; }
+    private AShape AISInputWorkpiece;
 
     public BendingTree BendingTree { get; private set; }
 
@@ -140,7 +142,8 @@ public partial class BendingTest : Window, IAISSelectionHandler
         TreeViewItem treeViewItem =
             new()
             {
-                Header = node.MainFace, // 或其他合适的属性
+                Header =
+                    $"{node.MainFace} | Angle:{node.Bending?.Angle.ToDegrees(1)} | FlatLength: {Math.Round(node.FlatLength ?? 0.0, 3)}", // 或其他合适的属性
                 Tag = node
             };
         // 绑定事件
@@ -164,7 +167,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
         if (sender is TreeViewItem selectedItem && selectedItem.Tag is Node node)
         {
             int i = random.Next(ColorMap.Colors.Count);
-            int j = random.Next(ColorMap.Colors.Count);
+            //int j = random.Next(ColorMap.Colors.Count);
             // 调用 Node 的 Show 方法
             node.Show(
                 Context,
@@ -172,7 +175,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
                 _isBendingArrowVisible,
                 _isMainFaceNormalVisible,
                 ColorMap.Colors[i],
-                ColorMap.Colors[j]
+                ColorMap.Colors[i]
             );
         }
 
@@ -211,35 +214,6 @@ public partial class BendingTest : Window, IAISSelectionHandler
     }
 
     #region 选中所有树节点
-    // 递归函数：遍历 TreeViewItem 并选中所有子项
-    private void SelectAllTreeViewItems(TreeViewItem item)
-    {
-        if (item == null)
-            return;
-
-        //显示Node的逻辑
-        Node node = (Node)item.Tag;
-        Random random = new();
-        // 获取被选中的 TreeViewItem
-        int i = random.Next(ColorMap.Colors.Count);
-        int j = random.Next(ColorMap.Colors.Count);
-        // 调用 Node 的 Show 方法
-        node.Show(
-            Context,
-            false,
-            _isBendingArrowVisible,
-            _isMainFaceNormalVisible,
-            ColorMap.Colors[i],
-            ColorMap.Colors[j]
-        );
-        node.Bending?.InnerFace.DebugShow(Context, ColorMap.Colors[i]);
-
-        // 递归遍历子项
-        foreach (var childItem in GetTreeViewItems(item))
-        {
-            SelectAllTreeViewItems(childItem);
-        }
-    }
 
     // 获取指定 TreeViewItem 的子项
     private IEnumerable<TreeViewItem> GetTreeViewItems(ItemsControl parent)
@@ -255,15 +229,6 @@ public partial class BendingTest : Window, IAISSelectionHandler
         }
     }
 
-    // 主函数：遍历 TreeView 并选中所有项
-    private void SelectAllItemsInTreeView(TreeView treeView)
-    {
-        foreach (TreeViewItem item in GetTreeViewItems(treeView))
-        {
-            SelectAllTreeViewItems(item);
-        }
-        Update();
-    }
     #endregion
 
     #region Buttons
@@ -337,7 +302,6 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #endregion
 
     #endregion
-
     private void InputWorkPiece_Button_Click(object sender, RoutedEventArgs e)
     {
         // 创建文件选择对话框
@@ -358,9 +322,9 @@ public partial class BendingTest : Window, IAISSelectionHandler
 
             InputWorkpiece = new STEPExchange(selectedFilePath).Shape(); // 使用选择的文件路径
             EraseAll(false);
-            AShape ais = new(InputWorkpiece);
-            Display(ais, false);
-            SetTransparency(ais, 0.4, false);
+            AISInputWorkpiece = new(InputWorkpiece);
+            Display(AISInputWorkpiece, false);
+            SetTransparency(AISInputWorkpiece, 0.4, false);
             Update();
             FitAll();
         }
@@ -400,6 +364,61 @@ public partial class BendingTest : Window, IAISSelectionHandler
 
     private void ShowAllNode_Button_Click(object sender, RoutedEventArgs e)
     {
-        SelectAllItemsInTreeView(BendingTree_TreeView);
+        EraseAll(false);
+        Display(AISInputWorkpiece, false);
+        SetTransparency(AISInputWorkpiece, 0.8, false);
+        BendingTree.FoldAllBendings();
+        Random random = new();
+        foreach (Node node in BendingTree.Nodes)
+        {
+            // 获取被选中的 TreeViewItem
+            int i = random.Next(ColorMap.Colors.Count);
+            node.Show(
+                Context,
+                false,
+                _isBendingArrowVisible,
+                _isMainFaceNormalVisible,
+                ColorMap.Colors[i],
+                ColorMap.Colors[i]
+            );
+        }
+        Update();
+    }
+
+    private void ShowUnfold_Button_Click(object sender, RoutedEventArgs e)
+    {
+        EraseAll(false);
+        Display(AISInputWorkpiece, false);
+        SetTransparency(AISInputWorkpiece, 0.8, false);
+        BendingTree.UnfoldAllBendings();
+        Random random = new();
+        foreach (Node node in BendingTree.Nodes)
+        {
+            // 获取被选中的 TreeViewItem
+            int i = random.Next(ColorMap.Colors.Count);
+            node.Show(
+                Context,
+                false,
+                _isBendingArrowVisible,
+                _isMainFaceNormalVisible,
+                ColorMap.Colors[i],
+                ColorMap.Colors[i]
+            );
+        }
+        Update();
+    }
+
+    private void ShowWorkPiece_Button_Click(object sender, RoutedEventArgs e)
+    {
+        if (InputWorkpiece == null || AISInputWorkpiece == null)
+        {
+            MessageBox.Show("请先导入工件", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        EraseAll(false);
+        Display(AISInputWorkpiece, false);
+        SetTransparency(AISInputWorkpiece, 0.4, false);
+        Update();
     }
 }

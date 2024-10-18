@@ -53,6 +53,14 @@ System::String^ Pnt::ToString() {
 	return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
 }
 
+Pnt^ Pnt::Add(Pnt^ other) {
+	return gcnew Pnt(X + other->X, Y + other->Y, Z + other->Z);
+}
+
+Pnt^ Pnt::Minus(Pnt^ other) {
+	return gcnew Pnt(X - other->X, Y - other->Y, Z - other->Z);
+}
+
 double Pnt::Distance(Pnt^ otherPnt) {
 	return std::sqrt(
 		std::pow(otherPnt->X - X, 2) +
