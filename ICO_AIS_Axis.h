@@ -26,6 +26,9 @@ public:
 	AAxis(gp::Ax1^ aAxis);
 	AAxis(gp::Ax1^ aAxis, double len);
 public:
+	void SetWidth(double size);
+	void UnsetWidth();
+public:
 	Handle(AIS_Axis) GetOCC() { return myAxis(); }
 };
 

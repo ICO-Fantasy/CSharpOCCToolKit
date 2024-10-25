@@ -13,6 +13,7 @@
 #include "ICO_InteractiveObject.h"
 #include "ICO_Viewer.h"
 #include "ICO_DisplayMode.h"
+#include "ICO_XShape.h"
 
 using namespace OCCTK::OCC::V3d;
 
@@ -291,6 +292,9 @@ InteractiveObject^ InteractiveContext::SelectedInteractive() {
 AShape^ InteractiveContext::SelectedAIS() {
 	if (myAISContext().IsNull()) return nullptr;
 	myAISContext()->InitSelected();
+	if (!myAISContext()->HasSelectedShape()) {
+		return nullptr;
+	}
 	auto owner = myAISContext()->SelectedOwner();
 	if (!owner.IsNull()) {
 		const Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(owner);
@@ -358,6 +362,34 @@ void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpda
 	catch (Standard_Failure e) {
 		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
 	}
+}
+
+static void DisplayXShapeNode(XShapeNode^ node, const Handle(AIS_InteractiveContext)& context) {
+	if (node->AISShape != nullptr) {
+		context->Display(node->AISShape->GetOCC(), false);
+		context->SetColor(node->AISShape->GetOCC(), node->Color->GetOCC(), false);
+		context->SetTransparency(node->AISShape->GetOCC(), node->Transparence, false);
+	}
+	for each (XShapeNode ^ node in node->Children) {
+		DisplayXShapeNode(node, context);
+	}
+}
+
+void InteractiveContext::Display(Extension::XShape^ theXShape, bool theToUpdateViewer) {
+	if (myAISContext().IsNull()) return;
+	//显示单个
+	if (theXShape->AISShape != nullptr) {
+		myAISContext()->Display(theXShape->AISShape->GetOCC(), false);
+		myAISContext()->SetColor(theXShape->AISShape->GetOCC(), theXShape->Color->GetOCC(), false);
+		myAISContext()->SetTransparency(theXShape->AISShape->GetOCC(), theXShape->Transparence, false);
+	}
+	//显示组合体
+	else if (theXShape->Nodes->Count > 0) {
+		for each (XShapeNode ^ node in theXShape->Nodes) {
+			DisplayXShapeNode(node, myAISContext());
+		}
+	}
+	if (theToUpdateViewer) { myAISContext()->UpdateCurrentViewer(); }
 }
 
 /// <summary>

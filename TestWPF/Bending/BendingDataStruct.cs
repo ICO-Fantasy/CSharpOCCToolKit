@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography.Pkcs;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms.VisualStyles;
 using log4net;
 using MathNet.Spatial.Units;
 using OCCTK.Extension;
@@ -150,6 +152,14 @@ public class Face
         context.SetColor(AIScenter, color, false);
     }
 
+    public void DebugErase()
+    {
+        AISp1.RemoveSelf(false);
+        AISp2.RemoveSelf(false);
+        AISp3.RemoveSelf(false);
+        AIScenter.RemoveSelf(false);
+    }
+
     private void GetCylinderData(Surface brep_face)
     {
         if (Type != SurfaceType.Cylinder || brep_face == null)
@@ -178,6 +188,11 @@ public class Face
         //+ 圆弧终点
         double u3 = brep_face.LastUParameter();
         Pnt point3 = brep_face.Value(u3, bv);
+        if (point1.Distance(point3) < 1e-3)
+        {
+            //todo 圆柱为完整圆柱，非折弯面
+            return;
+        }
         //三点定圆
         (Pnt CircleCenter, double Radius, double Angle) C =
             Geometry.Tools.BasicGeometryTools.ThreePointFixedCircle(point1, point2, point3);
@@ -186,9 +201,9 @@ public class Face
             log.Debug($"半径计算错误 计算值{C.Radius}和{CircleRadius}不一致");
         }
         #region Debug
-        MakeSphere p1 = new(point1, 0.2);
-        MakeSphere p2 = new(point2, 0.2);
-        MakeSphere p3 = new(point3, 0.2);
+        MakeSphere p1 = new(point1, C.Angle * (double)CircleRadius / 50.0);
+        MakeSphere p2 = new(point2, C.Angle * (double)CircleRadius / 50.0);
+        MakeSphere p3 = new(point3, C.Angle * (double)CircleRadius / 50.0);
         MakeSphere center = new(C.CircleCenter, 1);
         AISp1 = new(p1);
         AISp2 = new(p2);
@@ -197,6 +212,7 @@ public class Face
 
         #endregion
         CircleCenter = C.CircleCenter;
+        CircleAixs.Location = CircleCenter;
         CircleAngle = C.Angle;
         CircleNormal = new Dir(new Vec(point2, CircleCenter));
     }
@@ -262,11 +278,12 @@ public class Edge
 
     public TEdge TopoEdge { get; private set; }
     public CurveType Type { get; private set; }
+    public List<Pnt> Points { get; private set; } = [];
 
     /// <summary>
     /// 长度，用于计算板厚
     /// </summary>
-    public double? Length { get; private set; }
+    public double Length { get; private set; } = 0.0;
 
     #region 圆弧属性
     public double? CircleRadius { get; private set; }
@@ -286,9 +303,29 @@ public class Edge
             var c = BE.Circle();
             CircleCenter = c.Location();
             CircleRadius = c.Radius;
-            Length = null;
+        }
+        Explorer exp = new(TopoEdge, ShapeEnum.VERTEX);
+        while (exp.More())
+        {
+            var v = exp.Current();
+            Points.Add(v.AsVertex().ToPnt());
+            exp.Next();
         }
     }
+}
+
+//参考资料 https://www.approvedsheetmetal.com/blog/what-type-of-hem-does-your-custom-sheet-metal-part-need
+//todo 目前只支持V弯和压死边
+public enum BendingType
+{
+    VBend,
+    OpenHem,
+    ClosedHem,
+    TeardropHem,
+    Curl,
+    SimpleBendFlange,
+    Normal = VBend,
+    Hem = ClosedHem
 }
 
 public class BendingDS
@@ -326,21 +363,39 @@ public class BendingDS
             break;
         }
 
-        PlaneFaces = (plane[0], plane[1]);
+        PlaneFaces = [plane[0], plane[1]];
         Normal = new(InnerFace.CircleCenter, InnerFace.CircleNormal);
         Angle = InnerFace.CircleAngle ?? throw new Exception("内圆柱面角度为空");
+        //todo 暂时只处理V弯和闭合压边两类
+        if (Math.Abs(Math.PI - Angle) < 1e-4)
+        {
+            Type = BendingType.ClosedHem;
+        }
+        else
+        {
+            Type = BendingType.VBend;
+        }
         Axis = InnerFace.CircleAixs ?? throw new Exception("内圆柱面轴线为空");
+        List<Edge> cylinEdges = InnerFace.Edges.Where(edge => edge.Type != CurveType.Line).ToList();
+        if (cylinEdges.Count != 2)
+        {
+            throw new Exception("圆柱面没有两条圆弧边");
+        }
+        Pnt p1 = Geometry.Tools.BrepGeomtryTools.GetEdgeMidlePoint(cylinEdges[0].TopoEdge);
+        Pnt p2 = Geometry.Tools.BrepGeomtryTools.GetEdgeMidlePoint(cylinEdges[1].TopoEdge);
+        Length = p1.Distance(p2);
     }
 
-    public (Face, Face) CylinderFaces => (InnerFace, OutterFace);
-    public (Face, Face) PlaneFaces { get; private set; }
+    public List<Face> CylinderFaces => [InnerFace, OutterFace];
+    public List<Face> PlaneFaces { get; private set; }
     public Face InnerFace { get; private set; }
     public Face OutterFace { get; private set; }
     public double Angle { get; private set; }
-    public List<Face> BendingFaces =>
-        [CylinderFaces.Item1, CylinderFaces.Item2, PlaneFaces.Item1, PlaneFaces.Item2];
+    public BendingType Type { get; private set; }
+    public List<Face> BendingFaces => [.. CylinderFaces, .. PlaneFaces];
     public Ax1 Normal { get; private set; }
     public Ax1 Axis { get; private set; }
+    public double Length { get; private set; }
     public double Thickness { get; private set; } = 0.0;
 
     #region override
@@ -356,12 +411,7 @@ public class BendingDS
     // 重写 GetHashCode 方法，返回 Index 的哈希码
     public override int GetHashCode()
     {
-        return HashCode.Combine(
-            CylinderFaces.Item1,
-            CylinderFaces.Item2,
-            PlaneFaces.Item1,
-            PlaneFaces.Item2
-        );
+        return HashCode.Combine(CylinderFaces[0], CylinderFaces[1], PlaneFaces[0], PlaneFaces[1]);
         ;
     }
 

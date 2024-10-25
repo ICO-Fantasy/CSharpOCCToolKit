@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms.Integration;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Shapes;
+using MathNet.Spatial.Units;
 using Microsoft.Win32;
 using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepAdaptor;
+using OCCTK.OCC.BRepBuilderAPI;
+using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
+using OCCTK.OCC.TopoAbs;
 using OCCViewForm;
 using TestWPF.Utils;
 //设置别名
@@ -75,9 +72,11 @@ public partial class BendingTest : Window, IAISSelectionHandler
     public void CreateBendingTree()
     {
         BendingTree = new BendingTree(InputWorkpiece, debugContext: Context);
-        //BendingTree.MainFace.ShowNormal(Context);
         try { }
-        catch (Exception) { }
+        catch (Exception e)
+        {
+            Debug.WriteLine($"{e}");
+        }
     }
 
     #endregion
@@ -85,6 +84,10 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #region 界面更新
     private void UpdateTestBox_StackPanel()
     {
+        if (BendingTree == null)
+        {
+            return;
+        }
         TestBox_StackPanel.Children.Clear();
         BendingTree_TreeView.Items.Clear();
         #region 构建折弯树
@@ -122,7 +125,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
         //    Display(aisF, false);
         //}
         //Random random = new();
-        //foreach (var n in BendingTree.Nodes)
+        //foreach (var n in BendingTree.AllNodes)
         //{
         //    int i = random.Next(ColorMap.Colors.Count);
         //    foreach (var f in n.FaceSet)
@@ -143,7 +146,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
             new()
             {
                 Header =
-                    $"{node.MainFace} | Angle:{node.Bending?.Angle.ToDegrees(1)} | FlatLength: {Math.Round(node.FlatLength ?? 0.0, 3)}", // 或其他合适的属性
+                    $"{node.MainFace} | 角度:{node.BendingAngle?.ToDegrees(1)} | 平移长度: {Math.Round(node.FlatLength ?? 0.0, 3)} | 折弯边厚:  {node.Bending?.Thickness}", // 或其他合适的属性
                 Tag = node
             };
         // 绑定事件
@@ -151,7 +154,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
         treeViewItem.Unselected += TreeViewItem_Unselected;
         treeViewItem.IsExpanded = true;
         // 递归添加子节点
-        foreach (Node child in node.Leafs)
+        foreach (Node child in node.Children)
         {
             treeViewItem.Items.Add(CreateTreeViewItem(child));
         }
@@ -174,7 +177,6 @@ public partial class BendingTest : Window, IAISSelectionHandler
                 true,
                 _isBendingArrowVisible,
                 _isMainFaceNormalVisible,
-                ColorMap.Colors[i],
                 ColorMap.Colors[i]
             );
         }
@@ -202,14 +204,50 @@ public partial class BendingTest : Window, IAISSelectionHandler
     {
         if (theAIS.IsShape())
         {
+            //TShape
             TShape shape = theAIS.Shape();
-            try
+            if (shape.ShapeType() == ShapeEnum.FACE)
             {
-                TFace f = shape.AsFace();
-                Surface BE = new(f);
-                Debug.WriteLine($"{BE.GetType()}");
+                try
+                {
+                    TFace f = shape.AsFace();
+                    //Surface BE = new(f);
+                    Face face = new(f, InputWorkpiece);
+                    double? angle = null;
+                    if (face.CircleAngle != null)
+                    {
+                        angle = ((double)face.CircleAngle).ToDegrees(1);
+                    }
+                    double? radius = null;
+                    if (face.CircleRadius != null)
+                    {
+                        radius = Math.Round((double)face.CircleRadius, 1);
+                    }
+                    Debug.WriteLine(
+                        $"{face} | {face.Type} | Center: {face.CircleCenter} | Angle: {angle} | Radius: {radius}"
+                    );
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine($"{e}");
+                }
             }
-            catch (Exception) { }
+            if (shape.ShapeType() == ShapeEnum.EDGE)
+            {
+                try
+                {
+                    TEdge e = shape.AsEdge();
+                    Curve BE = new(e);
+                    (var p1, var p2) = Geometry.Tools.BrepGeomtryTools.GetEdgeEndPoints(e);
+                    Debug.WriteLine(
+                        $"{e.GetHashCode()} | {BE.GetType()} | {p1} | {p2} | D:{p1.Distance(p2)}"
+                    );
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine($"{e}");
+                }
+            }
         }
     }
 
@@ -227,6 +265,29 @@ public partial class BendingTest : Window, IAISSelectionHandler
                 yield return item;
             }
         }
+    }
+
+    #endregion
+
+    #region CheckBox
+    private void ShowBendingArrow_CheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        _isBendingArrowVisible = true;
+    }
+
+    private void ShowBendingArrow_CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _isBendingArrowVisible = false;
+    }
+
+    private void ShowMainArrow_CheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        _isMainFaceNormalVisible = true;
+    }
+
+    private void ShowMainArrow_CheckBox_Unchecked(object sender, RoutedEventArgs e)
+    {
+        _isMainFaceNormalVisible = false;
     }
 
     #endregion
@@ -302,6 +363,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #endregion
 
     #endregion
+
     private void InputWorkPiece_Button_Click(object sender, RoutedEventArgs e)
     {
         // 创建文件选择对话框
@@ -319,13 +381,27 @@ public partial class BendingTest : Window, IAISSelectionHandler
         if (openFileDialog.ShowDialog() == true)
         {
             string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
-
-            InputWorkpiece = new STEPExchange(selectedFilePath).Shape(); // 使用选择的文件路径
+            //更新Label
+            InputWorkpiece_Label.Content = $"导入工件：{System.IO.Path.GetFileName(selectedFilePath)}";
+            ;
+            TShape inputWorkpiece = new STEPExchange(selectedFilePath); // 使用选择的文件路径
+            //包围盒左下角点作为原点
+            BoundingBox bnd = new(inputWorkpiece);
+            var AABB = bnd.GetAABB();
+            Trsf toOrigin = new();
+            toOrigin.SetTranslation(AABB.CornerMin(), new());
+            InputWorkpiece = new Transform(inputWorkpiece, toOrigin);
             EraseAll(false);
             AISInputWorkpiece = new(InputWorkpiece);
             Display(AISInputWorkpiece, false);
             SetTransparency(AISInputWorkpiece, 0.4, false);
             Update();
+            FitAll();
+
+            //! DEBUG 读取组合体
+            //STEPExchange ex = new(selectedFilePath); // 使用选择的文件路径
+            //EraseAll(false);
+            //Canvas.AISContext.Display(ex.AssemblyShape(), true);
             FitAll();
         }
     }
@@ -341,35 +417,20 @@ public partial class BendingTest : Window, IAISSelectionHandler
         UpdateTestBox_StackPanel();
     }
 
-    private void ShowBendingArrow_CheckBox_Checked(object sender, RoutedEventArgs e)
-    {
-        _isBendingArrowVisible = true;
-    }
-
-    private void ShowBendingArrow_CheckBox_Unchecked(object sender, RoutedEventArgs e)
-    {
-        _isBendingArrowVisible = false;
-    }
-
-    private void ShowMainArrow_CheckBox_Checked(object sender, RoutedEventArgs e)
-    {
-        _isMainFaceNormalVisible = true;
-    }
-
-    private void ShowMainArrow_CheckBox_Unchecked(object sender, RoutedEventArgs e)
-    {
-        _isMainFaceNormalVisible = false;
-    }
-    #endregion
-
     private void ShowAllNode_Button_Click(object sender, RoutedEventArgs e)
     {
+        if (BendingTree == null)
+        {
+            MessageBox.Show("请计算折弯树", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         EraseAll(false);
         Display(AISInputWorkpiece, false);
         SetTransparency(AISInputWorkpiece, 0.8, false);
         BendingTree.FoldAllBendings();
+        BendingTree.RootNode.Show(Context, false, false, _isMainFaceNormalVisible, ColorMap.Red);
         Random random = new();
-        foreach (Node node in BendingTree.Nodes)
+        foreach (Node node in BendingTree.AllNodes)
         {
             // 获取被选中的 TreeViewItem
             int i = random.Next(ColorMap.Colors.Count);
@@ -378,7 +439,6 @@ public partial class BendingTest : Window, IAISSelectionHandler
                 false,
                 _isBendingArrowVisible,
                 _isMainFaceNormalVisible,
-                ColorMap.Colors[i],
                 ColorMap.Colors[i]
             );
         }
@@ -391,17 +451,16 @@ public partial class BendingTest : Window, IAISSelectionHandler
         Display(AISInputWorkpiece, false);
         SetTransparency(AISInputWorkpiece, 0.8, false);
         BendingTree.UnfoldAllBendings();
+        BendingTree.RootNode.Show(Context, false, false, _isMainFaceNormalVisible, ColorMap.Red);
         Random random = new();
-        foreach (Node node in BendingTree.Nodes)
+        foreach (Node node in BendingTree.AllNodes)
         {
-            // 获取被选中的 TreeViewItem
             int i = random.Next(ColorMap.Colors.Count);
             node.Show(
                 Context,
                 false,
                 _isBendingArrowVisible,
                 _isMainFaceNormalVisible,
-                ColorMap.Colors[i],
                 ColorMap.Colors[i]
             );
         }
@@ -421,4 +480,29 @@ public partial class BendingTest : Window, IAISSelectionHandler
         SetTransparency(AISInputWorkpiece, 0.4, false);
         Update();
     }
+
+    private void ShowSector_Button_Click(object sender, RoutedEventArgs e)
+    {
+        // 获取当前选中的 TreeViewItem
+        TreeViewItem? selectedItem = BendingTree_TreeView.SelectedItem as TreeViewItem;
+
+        if (selectedItem == null)
+        {
+            MessageBox.Show("请先选择一个 TreeViewItem。");
+            return;
+        }
+
+        // 从 TreeViewItem 的 Tag 中获取 Node 对象
+        Node? selectedNode = selectedItem.Tag as Node;
+
+        if (selectedNode == null)
+        {
+            MessageBox.Show("无法找到关联的 Node 对象。");
+            return;
+        }
+        // 执行 Node 的 ShowSectors 方法
+        selectedNode.ShowSectors(Context, false);
+        Update();
+    }
+    #endregion
 }

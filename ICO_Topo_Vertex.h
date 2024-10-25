@@ -1,8 +1,14 @@
 ﻿#pragma once
-#include <TopoDS_Vertex.hxx>
 //local
 #include "ICO_Topo_Shape.h"
-
+class TopoDS_Vertex;
+namespace OCCTK {
+namespace OCC {
+namespace gp {
+ref class Pnt;
+}
+}
+}
 namespace OCCTK {
 namespace OCC {
 namespace Topo {
@@ -14,6 +20,8 @@ public:
 	TVertex(System::IntPtr theVertexIntPtr);
 	TVertex(TopoDS_Vertex* theVertex);
 	TopoDS_Vertex GetOCC();
+public:
+	gp::Pnt^ ToPnt();
 };
 
 }

@@ -2,8 +2,8 @@
 #include <AIS_ViewCube.hxx>
 #include <Prs3d_DatumAspect.hxx>
 #include <Standard_Handle.hxx>
-//字符编码转换
-#include "ConvertChinese.h"
+//local
+#include "ICO_StringExchange.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -24,7 +24,7 @@ ViewCube::ViewCube(double axesRadius) :ViewCube() {
 
 void ViewCube::SetDefault() {
 	int R, G, B;
-
+	myViewCube()->SetSize(myAxisSize * 10);
 	// 设置坐标轴半径
 	myViewCube()->SetAxesRadius(myAxisSize);
 	myViewCube()->SetAxesConeRadius(myAxisSize * 1.5);
@@ -51,12 +51,12 @@ void ViewCube::SetDefault() {
 	B = 255;
 	aDrawer->FaceBoundaryAspect()->SetColor(Quantity_Color(R / 255, G / 255, B / 255, Quantity_TOC_RGB));
 	//设置立方体标签
-	myViewCube()->SetBoxSideLabel(V3d_Xneg, Tool::ConvertChineseToUnicode("左"));
-	myViewCube()->SetBoxSideLabel(V3d_Xpos, Tool::ConvertChineseToUnicode("右"));
-	myViewCube()->SetBoxSideLabel(V3d_Yneg, Tool::ConvertChineseToUnicode("前"));
-	myViewCube()->SetBoxSideLabel(V3d_Ypos, Tool::ConvertChineseToUnicode("后"));
-	myViewCube()->SetBoxSideLabel(V3d_Zpos, Tool::ConvertChineseToUnicode("上"));
-	myViewCube()->SetBoxSideLabel(V3d_Zneg, Tool::ConvertChineseToUnicode("下"));
+	myViewCube()->SetBoxSideLabel(V3d_Xneg, DataExchange::ConvertChineseToUnicode("左"));
+	myViewCube()->SetBoxSideLabel(V3d_Xpos, DataExchange::ConvertChineseToUnicode("右"));
+	myViewCube()->SetBoxSideLabel(V3d_Yneg, DataExchange::ConvertChineseToUnicode("前"));
+	myViewCube()->SetBoxSideLabel(V3d_Ypos, DataExchange::ConvertChineseToUnicode("后"));
+	myViewCube()->SetBoxSideLabel(V3d_Zpos, DataExchange::ConvertChineseToUnicode("上"));
+	myViewCube()->SetBoxSideLabel(V3d_Zneg, DataExchange::ConvertChineseToUnicode("下"));
 	myViewCube()->SetFont("MSYHL");
 	myViewCube()->SetFontHeight(50);
 	R = 241;

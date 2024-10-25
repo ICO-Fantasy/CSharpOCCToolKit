@@ -177,16 +177,31 @@
     <Filter Include="头文件\OCCProxy\gp\enum">
       <UniqueIdentifier>{381de0a7-b9ed-4be6-8a32-0f542e2d53f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\TDF">
+      <UniqueIdentifier>{6e875cba-8734-4469-82a1-5d0b05827027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\TDF">
+      <UniqueIdentifier>{d255e2ff-c77b-4d62-a532-4dad2ea5e281}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRepFeat">
+      <UniqueIdentifier>{5744fa41-d2b5-43ca-a5be-d6df4a627cfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepFeat">
+      <UniqueIdentifier>{6d08401a-82e9-4d1a-8227-37dd6f3c02e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\BRepCheck">
+      <UniqueIdentifier>{44c87a9a-41b3-434a-bd2a-7b308f02fbc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepCheck">
+      <UniqueIdentifier>{54f57409-fecb-47a8-9085-24389c3e4e0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
-    <ClCompile Include="CSharpViewer.cpp">
+    <ClCompile Include="ICO_CSharpViewer.cpp">
       <Filter>源文件\Visualization</Filter>
-    </ClCompile>
-    <ClCompile Include="convertChinese.cpp">
-      <Filter>源文件\Tools</Filter>
     </ClCompile>
     <ClCompile Include="ICO_InteractiveObject.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
@@ -353,13 +368,25 @@
     <ClCompile Include="ICO_Quaternion.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_XShape.cpp">
+      <Filter>源文件\Extension</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakePolygon.cpp">
+      <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_Feat_MakeRevol.cpp">
+      <Filter>源文件\OCCProxy\BRepFeat</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepPrimAPI_MakeRevol.cpp">
+      <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_BRepCheck_Analyzer.cpp">
+      <Filter>源文件\OCCProxy\BRepCheck</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CSharpViewer.h">
+    <ClInclude Include="ICO_CSharpViewer.h">
       <Filter>头文件\Visualization</Filter>
-    </ClInclude>
-    <ClInclude Include="ConvertChinese.h">
-      <Filter>头文件\Tools</Filter>
     </ClInclude>
     <ClInclude Include="ICO_StringExchange.h">
       <Filter>头文件\DataExchange</Filter>
@@ -573,6 +600,21 @@
     </ClInclude>
     <ClInclude Include="ICO_EulerSequence.h">
       <Filter>头文件\OCCProxy\gp\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_XShape.h">
+      <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakePolygon.h">
+      <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Feat_MakeRevol.h">
+      <Filter>头文件\OCCProxy\BRepFeat</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepPrimAPI_MakeRevol.h">
+      <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_BRepCheck_Analyzer.h">
+      <Filter>头文件\OCCProxy\BRepCheck</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

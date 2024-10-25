@@ -17,12 +17,18 @@ Vec::Vec() {
 }
 
 Vec::Vec(double theX, double theY, double theZ) {
+	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
+		throw gcnew System::ArgumentException("不能创建零向量");
+	}
 	X = theX;
 	Y = theY;
 	Z = theZ;
 }
 
 Vec::Vec(Pnt^ fromPnt, Pnt^ toPnt) {
+	if (fromPnt->Distance(toPnt) < 1e-6) {
+		throw gcnew System::ArgumentException("不能创建零向量");
+	}
 	X = toPnt->X - fromPnt->X;
 	Y = toPnt->Y - fromPnt->Y;
 	Z = toPnt->Z - fromPnt->Z;

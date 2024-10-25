@@ -453,7 +453,7 @@ public partial class SimpleClamp : Window
             string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
 
             EraseAll(false);
-            InputWorkpiece = new(new STEPExchange(selectedFilePath).Shape()); // 使用选择的文件路径
+            InputWorkpiece = new(new STEPExchange(selectedFilePath)); // 使用选择的文件路径
             BasePlate = null;
             MiddleToDownPlates.Clear();
             MiddleToUpPlates.Clear();
@@ -500,7 +500,7 @@ public partial class SimpleClamp : Window
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
         Canvas.EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test1.stp").Shape());
+        InputWorkpiece = new(new STEPExchange("mods\\test1.stp"));
         BasePlate = null;
         Canvas.Display(InputWorkpiece.AIS, true);
         Canvas.FitAll();
@@ -566,7 +566,7 @@ public partial class SimpleClamp : Window
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
         Canvas.EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test4.stp").Shape());
+        InputWorkpiece = new(new STEPExchange("mods\\test4.stp"));
         BasePlate = null;
         Canvas.Display(InputWorkpiece.AIS, true);
         Canvas.FitAll();
@@ -575,7 +575,7 @@ public partial class SimpleClamp : Window
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
         Canvas.EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test5.stp").Shape());
+        InputWorkpiece = new(new STEPExchange("mods\\test5.stp"));
         BasePlate = null;
         Canvas.Display(InputWorkpiece.AIS, true);
         Canvas.FitAll();
@@ -2289,7 +2289,7 @@ public partial class SimpleClamp : Window
 
     private void TestInput()
     {
-        InputWorkpiece = new(new STEPExchange("mods\\mytest.stp").Shape());
+        InputWorkpiece = new(new STEPExchange("mods\\mytest.stp"));
     }
 
     #endregion

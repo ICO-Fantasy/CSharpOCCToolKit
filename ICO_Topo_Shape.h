@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <cstdint>
 #include <TopoDS_Shape.hxx>
+#include "ICO_ShapeEnum.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -31,6 +32,7 @@ public:
 	TopoDS_Shape GetOCC();
 	System::IntPtr GetPtr();
 public:
+	TopoAbs::ShapeEnum ShapeType();
 	TVertex^ AsVertex();
 	TEdge^ AsEdge();
 	TFace^ AsFace();

@@ -24,49 +24,6 @@ public class BasicGeometryTools
 {
     private BasicGeometryTools() { }
 
-    /// <summary>
-    /// 获取两端点
-    /// </summary>
-    /// <param name="edge"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    public static Tuple<Pnt, Pnt> GetEdgeEndPoints(TEdge edge)
-    {
-        List<Pnt> endpoints = new();
-        Explorer PntExp = new(edge, ShapeEnum.VERTEX);
-        //while (PntExp.More())
-        //{
-        //    TVertex endPoint = PntExp.Current().AsVertex();
-        //    Pnt p = Tool.Pnt(endPoint);
-        //    endpoints.Add(p);
-        //    PntExp.Next();
-        //}
-        for (; PntExp.More(); PntExp.Next())
-        {
-            TVertex endPoint = PntExp.Current().AsVertex();
-            Pnt p = Tool.Pnt(endPoint);
-            endpoints.Add(p);
-        }
-        if (endpoints.Count != 2)
-        {
-            throw new Exception($"获取到的端点数不为2，有{endpoints.Count}个点");
-        }
-        return Tuple.Create(endpoints[0], endpoints[1]);
-    }
-
-    /// <summary>
-    /// 获取中点
-    /// </summary>
-    /// <param name="edge"></param>
-    /// <returns></returns>
-    public static Pnt GetEdgeMidlePoint(TEdge edge)
-    {
-        OCCTK.OCC.BRepAdaptor.Curve aBAC = new(edge);
-        return aBAC.Value(
-            aBAC.FirstParameter() + (aBAC.LastParameter() - aBAC.FirstParameter()) / 2
-        );
-    }
-
     #region 求交点
     /// <summary>
     /// 计算两直线交点
@@ -78,7 +35,7 @@ public class BasicGeometryTools
     /// <param name="TOL"></param>
     /// <param name="isSegment"></param>
     /// <returns></returns>
-    public static Pnt GetIntersectionPoint(
+    public static Pnt? GetIntersectionPoint(
         Pnt2D p1,
         Pnt2D p2,
         Pnt2D p3,
@@ -124,7 +81,7 @@ public class BasicGeometryTools
     /// <param name="isSegment"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static Pnt GetSegmentIntersectionPoint(
+    public static Pnt? GetSegmentIntersectionPoint(
         double x1,
         double y1,
         double x2,
@@ -148,7 +105,7 @@ public class BasicGeometryTools
         }
     }
 
-    private static Pnt _GetSegmentIntersectionPoint(
+    private static Pnt? _GetSegmentIntersectionPoint(
         double x1,
         double y1,
         double x2,
@@ -160,7 +117,7 @@ public class BasicGeometryTools
         double TOL = 1e-2
     )
     {
-        return new();
+        return null;
     }
     #endregion
 
@@ -174,12 +131,17 @@ public class BasicGeometryTools
         // 检查点是否共线
         Vec localX = new(p1, p2); // x轴
         Vec localY = new(p3, p2); // y轴
-        Vec localZ = localX.Crossed(localY); // z轴
-        if (localZ.Length == 0) // 如果叉积为零，说明共线
+        Vec localZ;
+        try
+        {
+            localZ = localX.Crossed(localY); // z轴
+        }
+        catch (Exception)
         {
             throw new ArgumentException("三点共线，无法确定圆");
         }
-        Trsf localT = new Trsf(new Ax2(p2, new(localZ), new(localX)));
+
+        Trsf localT = new(new Ax2(p2, new(localZ), new(localX)));
 
         // 转换到局部坐标系
         Pnt localP1 = p1.Transformed(localT);
@@ -234,19 +196,19 @@ public class BasicGeometryTools
         // 计算 v2 和 v3 之间的夹角
         double angle2 = Math.Acos(v2.Dot(v3));
 
-        // 使用叉积来确定方向
-        var cross12 = v1.CrossProduct(v2);
-        var cross23 = v2.CrossProduct(v3);
+        //// 使用叉积来确定方向
+        //var cross12 = v1.CrossProduct(v2);
+        //var cross23 = v2.CrossProduct(v3);
 
-        // 如果叉积为负值，表示顺时针旋转，需要从 2π 中减去角度
-        if (cross12.Z < 0)
-        {
-            angle1 = 2 * Math.PI - angle1;
-        }
-        if (cross23.Z < 0)
-        {
-            angle2 = 2 * Math.PI - angle2;
-        }
+        //// 如果叉积为负值，表示顺时针旋转，需要从 2π 中减去角度
+        //if (cross12.Z < 0)
+        //{
+        //    angle1 = 2 * Math.PI - angle1;
+        //}
+        //if (cross23.Z < 0)
+        //{
+        //    angle2 = 2 * Math.PI - angle2;
+        //}
 
         // 将两部分角度相加，确保返回的总角度在 0 到 2π 之间
         double totalAngle = angle1 + angle2;

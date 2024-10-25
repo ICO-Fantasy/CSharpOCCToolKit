@@ -12,7 +12,11 @@ public:
 		G = g;
 		B = b;
 	};
-
+	Color(Quantity_Color Qcolor) {
+		R = (int)(Qcolor.Red() * 255.0);
+		G = (int)(Qcolor.Green() * 255.0);
+		B = (int)(Qcolor.Blue() * 255.0);
+	}
 	Quantity_Color GetOCC() {
 		return Quantity_Color((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
 	};
@@ -32,6 +36,9 @@ public:
 	}
 	static Color White() {
 		return Color(255, 255, 255);
+	}
+	static Color Gray() {
+		return Color(125, 125, 125);
 	}
 
 	static Color XAxis() {

@@ -110,7 +110,7 @@
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>TKBin.lib;TKBinL.lib;TKBinTObj.lib;TKBinXCAF.lib;TKBO.lib;TKBool.lib;TKBRep.lib;TKCAF.lib;TKCDF.lib;TKDCAF.lib;TKDraw.lib;TKernel.lib;TKExpress.lib;TKFeat.lib;TKFillet.lib;TKG2d.lib;TKG3d.lib;TKGeomAlgo.lib;TKGeomBase.lib;TKHLR.lib;TKIGES.lib;TKLCAF.lib;TKMath.lib;TKMesh.lib;TKMeshVS.lib;TKOffset.lib;TKOpenGl.lib;TKOpenGlTest.lib;TKPrim.lib;TKQADraw.lib;TKRWMesh.lib;TKService.lib;TKShHealing.lib;TKStd.lib;TKStdL.lib;TKSTEP.lib;TKSTEP209.lib;TKSTEPAttr.lib;TKSTEPBase.lib;TKSTL.lib;TKTObj.lib;TKTObjDRAW.lib;TKTopAlgo.lib;TKTopTest.lib;TKV3d.lib;TKVCAF.lib;TKViewerTest.lib;TKVRML.lib;TKXCAF.lib;TKXDE.lib;TKXDECascade.lib;TKXDEDRAW.lib;TKXDEIGES.lib;TKXDESTEP.lib;TKXMesh.lib;TKXml.lib;TKXmlL.lib;TKXmlTObj.lib;TKXmlXCAF.lib;TKXSBase.lib;TKXSDRAW.lib;</AdditionalDependencies>
+      <AdditionalDependencies>TKBin.lib;TKBinL.lib;TKBinTObj.lib;TKBinXCAF.lib;TKBO.lib;TKBool.lib;TKBRep.lib;TKCAF.lib;TKCDF.lib;TKDCAF.lib;TKDraw.lib;TKernel.lib;TKExpress.lib;TKFeat.lib;TKFillet.lib;TKG2d.lib;TKG3d.lib;TKGeomAlgo.lib;TKGeomBase.lib;TKHLR.lib;TKIGES.lib;TKLCAF.lib;TKMath.lib;TKMesh.lib;TKMeshVS.lib;TKOffset.lib;TKOpenGl.lib;TKOpenGlTest.lib;TKPrim.lib;TKQADraw.lib;TKRWMesh.lib;TKService.lib;TKShHealing.lib;TKStd.lib;TKStdL.lib;TKSTEP.lib;TKSTEP209.lib;TKSTEPAttr.lib;TKSTEPBase.lib;TKSTL.lib;TKTObj.lib;TKTObjDRAW.lib;TKTopAlgo.lib;TKTopTest.lib;TKV3d.lib;TKVCAF.lib;TKViewerTest.lib;TKVRML.lib;TKXCAF.lib;TKXDE.lib;TKXDECascade.lib;TKXDEDRAW.lib;TKXDEIGES.lib;TKXDESTEP.lib;TKXMesh.lib;TKXml.lib;TKXmlL.lib;TKXmlTObj.lib;TKXmlXCAF.lib;TKXSBase.lib;TKXSDRAW.lib;kernel32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OCC_LibTKDebug);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -155,8 +155,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="convertChinese.cpp" />
-    <ClCompile Include="CSharpViewer.cpp" />
+    <ClCompile Include="ICO_BRepCheck_Analyzer.cpp" />
+    <ClCompile Include="ICO_BRepPrimAPI_MakeRevol.cpp" />
+    <ClCompile Include="ICO_CSharpViewer.cpp" />
     <ClCompile Include="ICO_AABB.cpp" />
     <ClCompile Include="ICO_AIS_Axis.cpp" />
     <ClCompile Include="ICO_Ax1.cpp" />
@@ -177,6 +178,8 @@
     <ClCompile Include="ICO_MakeDir.cpp" />
     <ClCompile Include="ICO_MakeEdge.cpp" />
     <ClCompile Include="ICO_MakeFace.cpp" />
+    <ClCompile Include="ICO_MakePolygon.cpp" />
+    <ClCompile Include="ICO_Feat_MakeRevol.cpp" />
     <ClCompile Include="ICO_MakeSphere.cpp" />
     <ClCompile Include="ICO_MakeWire.cpp" />
     <ClCompile Include="ICO_Pln.cpp" />
@@ -194,6 +197,7 @@
     <ClCompile Include="ICO_Vec.cpp" />
     <ClCompile Include="ICO_Vec2D.cpp" />
     <ClCompile Include="ICO_Viewer.cpp" />
+    <ClCompile Include="ICO_XShape.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
     <ClCompile Include="ICO_STEPExchange.cpp" />
     <ClCompile Include="ICO_StringExchange.cpp" />
@@ -215,8 +219,9 @@
     <ClCompile Include="ICO_BRepGProp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ConvertChinese.h" />
-    <ClInclude Include="CSharpViewer.h" />
+    <ClInclude Include="ICO_BRepCheck_Analyzer.h" />
+    <ClInclude Include="ICO_BRepPrimAPI_MakeRevol.h" />
+    <ClInclude Include="ICO_CSharpViewer.h" />
     <ClInclude Include="ICO_AABB.h" />
     <ClInclude Include="ICO_AIS_Axis.h" />
     <ClInclude Include="ICO_Aspect_Line.h" />
@@ -239,6 +244,8 @@
     <ClInclude Include="ICO_MakeDir.h" />
     <ClInclude Include="ICO_MakeEdge.h" />
     <ClInclude Include="ICO_MakeFace.h" />
+    <ClInclude Include="ICO_MakePolygon.h" />
+    <ClInclude Include="ICO_Feat_MakeRevol.h" />
     <ClInclude Include="ICO_MakeSphere.h" />
     <ClInclude Include="ICO_MakeWire.h" />
     <ClInclude Include="ICO_Pln.h" />
@@ -257,6 +264,7 @@
     <ClInclude Include="ICO_Vec2D.h" />
     <ClInclude Include="ICO_Viewer.h" />
     <ClInclude Include="ICO_ViewOrientation.h" />
+    <ClInclude Include="ICO_XShape.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="ICO_STEPExchange.h" />
     <ClInclude Include="ICO_Trihedron.h" />

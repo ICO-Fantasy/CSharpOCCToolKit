@@ -17,6 +17,14 @@ AAxis::AAxis(gp::Ax1^ aAxis, double len) {
 	NativeHandle = new AIS_Axis(aAxis->GetOCC(), len);
 }
 
+void AAxis::SetWidth(double size) {
+	myAxis()->SetWidth(size);
+}
+
+void AAxis::UnsetWidth() {
+	myAxis()->UnsetWidth();
+}
+
 }
 }
 }

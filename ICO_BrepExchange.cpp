@@ -7,7 +7,6 @@
 #include "ICO_BrepExchange.h"
 #include "ICO_Topo_Shape.h"
 #include "ICO_StringExchange.h"
-#include "ConvertChinese.h"
 
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::gp;
@@ -38,7 +37,7 @@ TShape^ BrepExchange::Shape() {
 
 bool BrepExchange::SaveFile(String^ filePath) {
 	TopoDS_Shape theoccShape = myShape->GetOCC();
-	auto cPath = Tool::ConvertChineseToUnicode(filePath);
+	auto cPath = DataExchange::ConvertChineseToUnicode(filePath);
 	TCollection_AsciiString asciiString(cPath, 'x');
 
 	BRepTools brepTool;

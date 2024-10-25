@@ -8,7 +8,9 @@ using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.Geom;
 using OCCTK.OCC.GeomAPI;
 using OCCTK.OCC.gp;
+using OCCTK.OCC.TopExp;
 using OCCTK.OCC.Topo;
+using OCCTK.OCC.TopoAbs;
 
 namespace TestWPF.Geometry.Tools;
 
@@ -16,9 +18,58 @@ public class BrepGeomtryTools
 {
     private BrepGeomtryTools() { }
 
+    /// <summary>
+    /// 获取曲面面积
+    /// (未完成)
+    /// </summary>
+    /// <param name="face"></param>
+    /// <returns></returns>
     public static double GetFaceArea(TFace face)
     {
         return 0.0;
+    }
+
+    /// <summary>
+    /// 获取两端点
+    /// </summary>
+    /// <param name="edge"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public static Tuple<Pnt, Pnt> GetEdgeEndPoints(TEdge edge)
+    {
+        List<Pnt> endpoints = new();
+        Explorer PntExp = new(edge, ShapeEnum.VERTEX);
+        //while (PntExp.More())
+        //{
+        //    TVertex endPoint = PntExp.Current().AsVertex();
+        //    Pnt p = Tool.Pnt(endPoint);
+        //    endpoints.Add(p);
+        //    PntExp.Next();
+        //}
+        for (; PntExp.More(); PntExp.Next())
+        {
+            TVertex endPoint = PntExp.Current().AsVertex();
+            Pnt p = Tool.Pnt(endPoint);
+            endpoints.Add(p);
+        }
+        if (endpoints.Count != 2)
+        {
+            throw new Exception($"获取到的端点数不为2，有{endpoints.Count}个点");
+        }
+        return Tuple.Create(endpoints[0], endpoints[1]);
+    }
+
+    /// <summary>
+    /// 获取中点
+    /// </summary>
+    /// <param name="edge"></param>
+    /// <returns></returns>
+    public static Pnt GetEdgeMidlePoint(TEdge edge)
+    {
+        OCCTK.OCC.BRepAdaptor.Curve aBAC = new(edge);
+        return aBAC.Value(
+            aBAC.FirstParameter() + (aBAC.LastParameter() - aBAC.FirstParameter()) / 2
+        );
     }
 
     /// <summary>
@@ -60,5 +111,22 @@ public class BrepGeomtryTools
             //如果投影点参数小于起始参数或大于终止参数，则分割失败
             throw new Exception("修剪失败");
         }
+    }
+
+    /// <summary>
+    /// 获取边的长度，支持曲线
+    /// </summary>
+    /// <param name="edge"></param>
+    /// <returns></returns>
+    public static double GetEdgeLength(TEdge edge, bool isCurve = false)
+    {
+        OCCTK.OCC.BRepAdaptor.Curve adaptor = new(edge);
+        if (isCurve)
+        {
+            //todo
+            //GCPnts_AbscissaPoint.length(adaptor);
+            return 0.0;
+        }
+        return adaptor.FirstParameter() - adaptor.LastParameter();
     }
 }

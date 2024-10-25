@@ -36,6 +36,7 @@ void Viewer::SetICOLight() {
 	if (myViewer().IsNull()) return;
 	Handle(V3d_AmbientLight) anAmbLight = new V3d_AmbientLight(Quantity_NOC_WHITE);
 	anAmbLight->SetName("AmbLight");
+	anAmbLight->SetIntensity(1.0);
 	//打开光源
 	myViewer()->SetLightOn(anAmbLight);
 }

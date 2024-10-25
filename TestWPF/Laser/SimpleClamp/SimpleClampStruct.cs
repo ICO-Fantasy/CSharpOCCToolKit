@@ -1,26 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms.VisualStyles;
-using System.Windows.Shapes;
-using System.Windows.Xps.Packaging;
-using log4net;
-using MathNet.Numerics;
-using MathNet.Numerics.Optimization;
 using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.Bnd;
 using OCCTK.OCC.BRepBuilderAPI;
-using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
-using Windows.Devices.Bluetooth;
-using Windows.Graphics.Printing.Workflow;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
-using GT = TestWPF.Geometry.Tools.BasicGeometryTools;
+using TestWPF.Geometry.Tools;
 
 namespace TestWPF.Laser.SimpleClamp;
 
@@ -281,8 +268,8 @@ public partial class MyEdge
     {
         Edge = edge;
         Pose = pose;
-        (Start, End) = GT.GetEdgeEndPoints(edge);
-        Middle = GT.GetEdgeMidlePoint(edge);
+        (Start, End) = BrepGeomtryTools.GetEdgeEndPoints(edge);
+        Middle = BrepGeomtryTools.GetEdgeMidlePoint(edge);
         GetOrder();
     }
 

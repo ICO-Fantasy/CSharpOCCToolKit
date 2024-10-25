@@ -78,7 +78,7 @@ void View::SetICORendering() {
 	//抗锯齿
 	myView()->ChangeRenderingParams().IsAntialiasingEnabled = true;
 	//透明阴影
-	myView()->ChangeRenderingParams().IsTransparentShadowEnabled = true;
+	myView()->ChangeRenderingParams().IsTransparentShadowEnabled = false;
 	//多重采样抗锯齿
 	myView()->ChangeRenderingParams().NbMsaaSamples = 8;
 	//禁用所有的性能计数器

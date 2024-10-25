@@ -1,7 +1,6 @@
 ﻿#include "ICO_BRep_Tool.h"
-#include <exception>
 #include <BRep_Tool.hxx>
-#include <Standard_Failure.hxx>
+#include<TopoDS_Vertex.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Geom_Curve.h"

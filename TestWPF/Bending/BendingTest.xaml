@@ -87,9 +87,10 @@
             Grid.Column="1"
             Background="WhiteSmoke">
             <Grid.RowDefinitions>
+                <RowDefinition Height="3*" />
                 <RowDefinition Height="1*" />
-                <RowDefinition Height="14*" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="30*" />
+                <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
             <Grid x:Name="Display_Grid" Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -99,7 +100,7 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="2*" />
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
@@ -107,23 +108,33 @@
                     x:Name="ShowWorkPiece_Button"
                     Grid.Row="0"
                     Grid.Column="0"
-                    Content="显示原始工件" Click="ShowWorkPiece_Button_Click" />
+                    Click="ShowWorkPiece_Button_Click"
+                    Content="显示原始工件" />
                 <Button
                     x:Name="ShowAllNode_Button"
                     Grid.Row="0"
                     Grid.Column="2"
-                    Content="全部折叠" Click="ShowAllNode_Button_Click" />
+                    Click="ShowAllNode_Button_Click"
+                    Content="全部折叠" />
+                <Button
+                    x:Name="ShowSector_Button"
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    Click="ShowSector_Button_Click"
+                    Content="显示扇形" />
                 <Button
                     x:Name="ShowUnfold_Button"
                     Grid.Row="0"
                     Grid.Column="1"
-                    Content="全部展开" Click="ShowUnfold_Button_Click" />
+                    Click="ShowUnfold_Button_Click"
+                    Content="全部展开" Height="52" Grid.RowSpan="2" VerticalAlignment="Top" />
                 <CheckBox
                     x:Name="ShowBendingArrow_CheckBox"
                     Grid.Row="1"
                     Grid.ColumnSpan="2"
                     Checked="ShowBendingArrow_CheckBox_Checked"
                     Content="显示折弯方向"
+                    IsChecked="True"
                     Unchecked="ShowBendingArrow_CheckBox_Unchecked" />
                 <CheckBox
                     x:Name="ShowMainArrow_CheckBox"
@@ -131,20 +142,25 @@
                     Grid.ColumnSpan="2"
                     Checked="ShowMainArrow_CheckBox_Checked"
                     Content="显示主平面法相"
+                    IsChecked="True"
                     Unchecked="ShowMainArrow_CheckBox_Unchecked" />
             </Grid>
+            <Label
+                x:Name="InputWorkpiece_Label"
+                Grid.Row="1"
+                Content="导入工件: " />
             <TreeView
                 x:Name="BendingTree_TreeView"
-                Grid.Row="1"
+                Grid.Row="2"
                 Background="LightSkyBlue"
                 Visibility="Visible" />
             <ScrollViewer
                 x:Name="TestBox_ScrollViewer"
-                Grid.Row="1"
+                Grid.Row="2"
                 Visibility="Hidden">
                 <StackPanel x:Name="TestBox_StackPanel" Background="LightYellow" />
             </ScrollViewer>
-            <Grid x:Name="Buttons_Grid" Grid.Row="2">
+            <Grid x:Name="Buttons_Grid" Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />

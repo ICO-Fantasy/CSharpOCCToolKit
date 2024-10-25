@@ -619,7 +619,7 @@ public partial class VerticalPlate
                 Pnt startP = (Pnt)edge.Start.Clone();
                 Pnt endP = (Pnt)edge.End.Clone();
                 // 减少投影误差，取线的中点为Z值
-                double zValue = GT.GetEdgeMidlePoint(edge).Z;
+                double zValue = BrepGeomtryTools.GetEdgeMidlePoint(edge).Z;
                 startP.Z = zValue;
                 endP.Z = zValue;
                 double param1;

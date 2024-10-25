@@ -20,6 +20,9 @@ Dir::Dir() {
 }
 
 Dir::Dir(double theX, double theY, double theZ) {
+	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
+		throw gcnew System::ArgumentException("不能创建零向量");
+	}
 	X = theX;
 	Y = theY;
 	Z = theZ;
@@ -34,6 +37,9 @@ Dir::Dir(Vec^ theDir) {
 }
 
 Dir::Dir(Pnt^ fromPoint, Pnt^ toPoint) {
+	if (fromPoint->Distance(toPoint) < 1e-6) {
+		throw gcnew System::ArgumentException("不能创建零向量");
+	}
 	Pnt^ p = toPoint - fromPoint;
 	X = p->X;
 	Y = p->Y;

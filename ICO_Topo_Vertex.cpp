@@ -1,5 +1,12 @@
 ﻿#include "ICO_Topo_Vertex.h"
+#include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
+//local
+#include "ICO_Pnt.h"
+#include "ICO_Exception.h"
+
+using namespace OCCTK::OCC::gp;
 
 namespace OCCTK {
 namespace OCC {
@@ -25,6 +32,13 @@ TVertex::TVertex(TopoDS_Vertex* theVertex) {
 
 TopoDS_Vertex TVertex::GetOCC() {
 	return TopoDS::Vertex(*myShape);
+}
+
+gp::Pnt^ TVertex::ToPnt() {
+	try {
+		return gcnew Pnt(BRep_Tool::Pnt(GetOCC()));
+	}
+	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
 }

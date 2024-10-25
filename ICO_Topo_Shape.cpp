@@ -1,6 +1,7 @@
 ﻿#include "ICO_Topo_Shape.h"
 #include<TopAbs_ShapeEnum.hxx>
 #include<TopoDS.hxx>
+#include<TopoDS_Vertex.hxx>
 #include <Standard_TypeMismatch.hxx>
 //local
 #include "ICO_Trsf.h"
@@ -49,6 +50,10 @@ TopoDS_Shape TShape::GetOCC() {
 
 System::IntPtr TShape::GetPtr() {
 	return System::IntPtr(myShape);
+}
+
+TopoAbs::ShapeEnum TShape::ShapeType() {
+	return TopoAbs::ShapeEnum(myShape->ShapeType());
 }
 
 /// <summary>
