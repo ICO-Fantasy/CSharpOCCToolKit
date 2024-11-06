@@ -30,7 +30,5 @@ public class ColorMap
         Purple,
         Blue,
         Black,
-        White,
-        Gray,
     ];
 }

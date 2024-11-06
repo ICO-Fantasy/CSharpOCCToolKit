@@ -21,6 +21,11 @@ Ax1::Ax1(Pnt^ location, Dir^ direction) {
 	Direction = direction;
 }
 
+Ax1::Ax1(Pnt^ fromPnt, Pnt^ toPnt) {
+	Location = fromPnt;
+	Direction = gcnew Dir(fromPnt, toPnt);
+}
+
 Ax1::Ax1(gp_Ax1 theAx1) {
 	Location = gcnew Pnt(theAx1.Location());
 	Direction = gcnew Dir(theAx1.Direction());
@@ -60,9 +65,30 @@ void Ax1::Reverse() {
 Ax1^ Ax1::Reversed() {
 	return gcnew Ax1(Location, Direction->Reversed());
 }
-
+/// <summary>
+/// 是否同轴（Direction方向相同）
+/// </summary>
+/// <param name="other"></param>
+/// <param name="AngularTOL"></param>
+/// <param name="LinearTOL"></param>
+/// <returns></returns>
 bool Ax1::IsCoaxial(Ax1^ other, double AngularTOL, double LinearTOL) {
 	return GetOCC().IsCoaxial(other->GetOCC(), AngularTOL, LinearTOL);
+}
+/// <summary>
+/// 是否共线（Direction方向可以相反）
+/// </summary>
+/// <param name="other"></param>
+/// <param name="AngularTOL"></param>
+/// <returns></returns>
+bool Ax1::IsCollinear(Ax1^ other, double AngularTOL) {
+	if (Location->Distance(other->Location) > 1e-4) {
+		Dir^ tempDir = gcnew Dir(Location, other->Location);
+		if (!tempDir->IsParallel(Direction, AngularTOL)) {
+			return false;
+		}
+	}
+	return Direction->IsParallel(other->Direction, AngularTOL);
 }
 
 }

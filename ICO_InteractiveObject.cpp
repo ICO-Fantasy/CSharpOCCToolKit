@@ -1,10 +1,12 @@
 ﻿#include "ICO_AIS_Shape.h"
 #include "ICO_InteractiveObject.h"
-#include <AIS_Shape.hxx>
 #include<AIS_InteractiveContext.hxx>
+#include <AIS_Shape.hxx>
+#include <Graphic3d_ZLayerId.hxx>
 //local
 #include "ICO_InteractiveContext.h"
 #include "ICO_Trsf.h"
+#include "ICO_ZLayerId.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -21,6 +23,14 @@ InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject)
 /// <param name="trsf"></param>
 void InteractiveObject::SetLocalTransformation(gp::Trsf^ trsf) {
 	GetOCC()->SetLocalTransformation(trsf->GetOCC());
+}
+
+void InteractiveObject::SetZLayer(Graphic3d::ZLayerId id) {
+	GetOCC()->SetZLayer(Graphic3d_ZLayerId((int)id));
+}
+
+void InteractiveObject::SetZLayer(int Zlayerid) {
+	GetOCC()->SetZLayer(Zlayerid);
 }
 
 /// <summary>

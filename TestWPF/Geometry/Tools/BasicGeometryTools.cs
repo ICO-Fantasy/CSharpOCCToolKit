@@ -121,6 +121,63 @@ public class BasicGeometryTools
     }
     #endregion
 
+    /// <summary>
+    /// 两直线是否共线
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    /// <param name="p3"></param>
+    /// <param name="p4"></param>
+    /// <param name="TOL"></param>
+    /// <returns></returns>
+    public static bool TwoSegmentsIsCollinear(Pnt p1, Pnt p2, Pnt p3, Pnt p4, double TOL)
+    {
+        Vec v1 = new(p1, p2);
+        Vec v2 = new(p3, p4);
+
+        if (!v1.IsParallel(v2, TOL))
+        {
+            return false;
+        }
+        if (p1.Distance(p3) > TOL)
+        {
+            Vec v3 = v1.Normalized().Multiplied(new Vec(p1, p3).Length);
+            Trsf t3 = new();
+            t3.SetTranslation(v3);
+            Pnt newp3 = p1.Transformed(t3);
+            //尝试正向
+            if (newp3.Distance(p3) > TOL)
+            {
+                //尝试反向
+                t3.SetTranslation(v3.Reversed());
+                newp3 = p1.Transformed(t3);
+                if (newp3.Distance(p3) > TOL)
+                {
+                    return false;
+                }
+            }
+        }
+        if (p1.Distance(p4) > TOL)
+        {
+            Vec v4 = v1.Normalized().Multiplied(new Vec(p1, p4).Length);
+            Trsf t4 = new();
+            t4.SetTranslation(v4);
+            Pnt newp4 = p1.Transformed(t4);
+            //尝试正向
+            if (Math.Abs(newp4.Distance(p4)) > TOL)
+            {
+                //尝试反向
+                t4.SetTranslation(v4.Reversed());
+                newp4 = p1.Transformed(t4);
+                if (Math.Abs(newp4.Distance(p4)) > TOL)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     #region 三点定圆
     public static (Pnt CircleCenter, double Radius, double Angle) ThreePointFixedCircle(
         Pnt p1,

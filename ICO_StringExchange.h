@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <cstring>
 #include <Resource_Unicode.hxx>
+#include <Standard_TypeDef.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <vcclr.h> 
@@ -22,6 +23,10 @@ inline TCollection_AsciiString ToAsciiString(System::String^ theString) {
 	return TCollection_AsciiString(aWCharPtr);
 }
 
+// 将C#字符串转换为TCollection_AsciiString字符串
+inline Standard_CString ToCString(System::String^ theString) {
+	return ToAsciiString(theString).ToCString();
+}
 // 转换中文字符为Unicode
 inline TCollection_ExtendedString ConvertChineseToUnicode(const char* chineseString) {
 	TCollection_ExtendedString unicodeString("");

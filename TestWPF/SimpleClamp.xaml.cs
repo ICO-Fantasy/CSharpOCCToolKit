@@ -403,12 +403,12 @@ public partial class SimpleClamp : Window
 
     private void Wireframe_Button_Click(object sender, RoutedEventArgs e)
     {
-        //Canvas.SetDisplayMode(DisplayMode.Wireframe);
+        //OCCCanvas.SetDisplayMode(DisplayMode.Wireframe);
     }
 
     private void Shading_Button_Click(object sender, RoutedEventArgs e)
     {
-        //Canvas.SetDisplayMode(DisplayMode.Shading);
+        //OCCCanvas.SetDisplayMode(DisplayMode.Shading);
     }
     #endregion
 
@@ -1371,12 +1371,12 @@ public partial class SimpleClamp : Window
             //foreach (var item in MiddleToDownPlates)
             //{
             //    Display(item.AIS, false);
-            //    Canvas.AISContext.SetTransparency(item.AIS, 0.9, false);
+            //    OCCCanvas.AISContext.SetTransparency(item.AIS, 0.9, false);
             //}
             //foreach (var item in MiddleToUpPlates)
             //{
             //    Display(item.AIS, false);
-            //    Canvas.AISContext.SetTransparency(item.AIS, 0.9, false);
+            //    OCCCanvas.AISContext.SetTransparency(item.AIS, 0.9, false);
             //}
         }
         Update();

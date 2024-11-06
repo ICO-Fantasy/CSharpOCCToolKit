@@ -62,6 +62,7 @@ public:
 #pragma endregion
 
 	void DisplayDefault_GraduatedTrihedron();
+	void Hide_GraduatedTrihedron();
 };
 
 }

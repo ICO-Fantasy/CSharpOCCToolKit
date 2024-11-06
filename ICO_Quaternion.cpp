@@ -1,8 +1,12 @@
 ﻿#include "ICO_Quaternion.h"
 #include <gp_EulerSequence.hxx>
 #include <gp_Quaternion.hxx>
+#include <gp_Vec.hxx>
 //local
 #include "ICO_EulerSequence.h"
+#include "ICO_Ax1.h"
+#include "ICO_Dir.h"
+#include "ICO_Vec.h"
 
 using namespace System;
 
@@ -27,6 +31,24 @@ Quat::Quat(double theX, double theY, double theZ, double theW) {
 Quat::Quat(double alpha, double beta, double gamma, EulerSequence sequence) {
 	gp_Quaternion q = gp_Quaternion();
 	q.SetEulerAngles(gp_EulerSequence(sequence), alpha, beta, gamma);
+	X = q.X();
+	Y = q.Y();
+	Z = q.Z();
+	W = q.W();
+}
+
+Quat::Quat(Ax1^ axis, double angle) {
+	gp_Quaternion q = gp_Quaternion();
+	q.SetVectorAndAngle(gp_Vec(axis->Direction->GetOCC()), angle);
+	X = q.X();
+	Y = q.Y();
+	Z = q.Z();
+	W = q.W();
+}
+
+Quat::Quat(Vec^ axis, double angle) {
+	gp_Quaternion q = gp_Quaternion();
+	q.SetVectorAndAngle(axis->GetOCC(), angle);
 	X = q.X();
 	Y = q.Y();
 	Z = q.Z();

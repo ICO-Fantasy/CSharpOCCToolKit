@@ -74,6 +74,18 @@ public class Face
     public TFace TopoFace { get; private set; }
     public TShape Shape { get; private set; }
     public HashSet<Edge> Edges { get; private set; } = [];
+    public List<TVertex> TopoVertices
+    {
+        get
+        {
+            List<TVertex> facePoints = [];
+            foreach (var v in new Explorer(TopoFace, ShapeEnum.VERTEX))
+            {
+                facePoints.Add(v.AsVertex());
+            }
+            return facePoints;
+        }
+    }
     public double Area { get; private set; }
     public Pnt FaceCenter { get; private set; }
     public SurfaceType Type { get; private set; }
@@ -191,6 +203,14 @@ public class Face
         if (point1.Distance(point3) < 1e-3)
         {
             //todo 圆柱为完整圆柱，非折弯面
+            Trsf t = new();
+            Vec v = new(point1, point2);
+            v.Multiply(0.5);
+            t.SetTranslation(v);
+            CircleCenter = point1.Transformed(t);
+            CircleAixs.Location = CircleCenter;
+            CircleAngle = Math.PI * 2;
+            CircleNormal = new Dir(new Vec(point2, CircleCenter));
             return;
         }
         //三点定圆
@@ -223,7 +243,7 @@ public class Face
         double U = BF.FirstUParameter() + (BF.LastUParameter() - BF.FirstUParameter()) / 2.0;
         double V = BF.FirstVParameter() + (BF.LastVParameter() - BF.FirstVParameter()) / 2.0;
         BRepGlobalProperties_Face BGPF = new(TopoFace);
-        normal = new(FaceCenter, new(BGPF.Normal(U, V)));
+        normal = new(FaceCenter, new Dir(BGPF.Normal(U, V)));
     }
 }
 
@@ -250,6 +270,22 @@ public class Edge
 
         // 比较 Index
         return Index == ((Edge)obj).Index;
+    }
+
+    // 重载 == 运算符
+    public static bool operator ==(Edge? a, Edge? b)
+    {
+        if (a is null && b is null)
+            return true;
+        if (a is null || b is null)
+            return false;
+        return a.Equals(b);
+    }
+
+    // 重载 != 运算符
+    public static bool operator !=(Edge? a, Edge? b)
+    {
+        return !(a == b);
     }
 
     // 重写 GetHashCode 方法，返回 Index 的哈希码
@@ -304,13 +340,8 @@ public class Edge
             CircleCenter = c.Location();
             CircleRadius = c.Radius;
         }
-        Explorer exp = new(TopoEdge, ShapeEnum.VERTEX);
-        while (exp.More())
-        {
-            var v = exp.Current();
-            Points.Add(v.AsVertex().ToPnt());
-            exp.Next();
-        }
+        var twoPnts = Geometry.Tools.BrepGeomtryTools.GetEdgeEndPoints(TopoEdge);
+        Points = [twoPnts.Item1, twoPnts.Item2];
     }
 }
 
@@ -330,42 +361,47 @@ public enum BendingType
 
 public class BendingDS
 {
-    public BendingDS(HashSet<Face> faces)
+    public BendingDS(Face cylin1, Face cylin2, HashSet<Face> otherFaces)
     {
-        List<Face> cylin = faces.Where(x => x.Type == SurfaceType.Cylinder).ToList();
-        if (cylin.Count != 2)
+        if (cylin1.CircleRadius < cylin2.CircleRadius)
         {
-            throw new Exception("圆柱面数不为2");
-        }
-        if (cylin[0].CircleRadius < cylin[1].CircleRadius)
-        {
-            InnerFace = cylin[0];
-            OutterFace = cylin[1];
+            InnerFace = cylin1;
+            OutterFace = cylin2;
         }
         else
         {
-            InnerFace = cylin[1];
-            OutterFace = cylin[0];
+            InnerFace = cylin2;
+            OutterFace = cylin1;
         }
-        List<Face> plane = faces
-            .Where(x => x.Type == SurfaceType.Plane || x.Type == SurfaceType.BSplineSurface)
-            .ToList();
-        if (plane.Count != 2)
+        Thickness = Math.Round((double)OutterFace.CircleRadius - (double)InnerFace.CircleRadius, 1);
+        if (otherFaces.Count < 2)
         {
             throw new Exception("扇形面不为2");
         }
-        //todo 暂时取扇形面的直边作为板厚
-        foreach (var e in plane[0].Edges)
-        {
-            if (e.Length == null)
-                continue;
-            Thickness = Math.Round((double)e.Length, 1);
-            break;
-        }
 
-        PlaneFaces = [plane[0], plane[1]];
+        void GetAdjFaces(Face face, ref List<Face> adjFaces)
+        {
+            adjFaces.Add(face);
+            foreach (var f in face.AdjacentFaces.Values)
+            {
+                if (f == cylin1 || f == cylin2 || adjFaces.Contains(f))
+                {
+                    continue;
+                }
+                if (f.AdjacentFaces.ContainsValue(cylin1) || f.AdjacentFaces.ContainsValue(cylin2))
+                {
+                    adjFaces.Add(f);
+                    GetAdjFaces(f, ref adjFaces);
+                }
+            }
+        }
+        List<Face> leftTempt = [];
+        GetAdjFaces(otherFaces.First(), ref leftTempt);
+        LeftSectorFaces = leftTempt;
+        RightSectorFaces = otherFaces.Where(f => !leftTempt.Contains(f)).ToList();
+
         Normal = new(InnerFace.CircleCenter, InnerFace.CircleNormal);
-        Angle = InnerFace.CircleAngle ?? throw new Exception("内圆柱面角度为空");
+        Angle = InnerFace.CircleAngle ?? throw new Exception("(内)圆柱面角度为空");
         //todo 暂时只处理V弯和闭合压边两类
         if (Math.Abs(Math.PI - Angle) < 1e-4)
         {
@@ -375,24 +411,36 @@ public class BendingDS
         {
             Type = BendingType.VBend;
         }
-        Axis = InnerFace.CircleAixs ?? throw new Exception("内圆柱面轴线为空");
-        List<Edge> cylinEdges = InnerFace.Edges.Where(edge => edge.Type != CurveType.Line).ToList();
-        if (cylinEdges.Count != 2)
+        Axis = InnerFace.CircleAixs ?? throw new Exception("(内)圆柱面轴线为空");
+        List<Edge> cylinLines = InnerFace
+            .Edges.Where(edge => edge.Type == CurveType.Line)
+            .Where(line => new Dir(line.Points[0], line.Points[1]).IsParallel(Axis.Direction, 1e-4))
+            .ToList();
+        if (cylinLines.Count < 2)
         {
-            throw new Exception("圆柱面没有两条圆弧边");
+            throw new Exception("圆柱面没有两条直边");
         }
-        Pnt p1 = Geometry.Tools.BrepGeomtryTools.GetEdgeMidlePoint(cylinEdges[0].TopoEdge);
-        Pnt p2 = Geometry.Tools.BrepGeomtryTools.GetEdgeMidlePoint(cylinEdges[1].TopoEdge);
-        Length = p1.Distance(p2);
+        Length = cylinLines
+            .Select(line => line.Length) // 提取每个 line 的长度
+            .OrderByDescending(length => length) // 从大到小排序
+            .Take(2) // 取前两个最大的值
+            .Average(); // 计算这两个值的平均值
     }
 
     public List<Face> CylinderFaces => [InnerFace, OutterFace];
-    public List<Face> PlaneFaces { get; private set; }
+
+    //左右只是为了做区分，不具备实际的意义
+    public List<Face> LeftSectorFaces { get; private set; }
+    public List<Face> RightSectorFaces { get; private set; }
+    public List<Face> SectorFaces
+    {
+        get => [.. LeftSectorFaces, .. RightSectorFaces];
+    }
     public Face InnerFace { get; private set; }
     public Face OutterFace { get; private set; }
     public double Angle { get; private set; }
     public BendingType Type { get; private set; }
-    public List<Face> BendingFaces => [.. CylinderFaces, .. PlaneFaces];
+    public List<Face> BendingFaces => [.. CylinderFaces, .. SectorFaces];
     public Ax1 Normal { get; private set; }
     public Ax1 Axis { get; private set; }
     public double Length { get; private set; }
@@ -411,12 +459,15 @@ public class BendingDS
     // 重写 GetHashCode 方法，返回 Index 的哈希码
     public override int GetHashCode()
     {
-        return HashCode.Combine(CylinderFaces[0], CylinderFaces[1], PlaneFaces[0], PlaneFaces[1]);
+        return HashCode.Combine(CylinderFaces[0], CylinderFaces[1]);
         ;
     }
 
-    //public override string ToString() {
-    //return Index.ToString();
-    //}
+    public int Index => GetHashCode();
+
+    public override string ToString()
+    {
+        return Index.ToString();
+    }
     #endregion
 }

@@ -7,6 +7,8 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 enum class EulerSequence;
+ref class Ax1;
+ref class Vec;
 }
 }
 }
@@ -19,6 +21,8 @@ public:
 	Quat();
 	Quat(double theX, double theY, double theZ, double theW);
 	Quat(double alpha, double beta, double gamma, EulerSequence sequence);
+	Quat(Ax1^ axis, double angle);
+	Quat(Vec^ axis, double angle);
 	Quat(gp_Quaternion theQuat);
 	Quat(gp_Quaternion* theQuat);
 	gp_Quaternion GetOCC();
@@ -30,9 +34,9 @@ public:
 	//	// 创建一个新的 Quat 对象，表示相加的结果
 	//	return gcnew Quat(a->X + b->X, a->Y + b->Y, a->Z + b->Z);
 	//}
-	//// 重载 + 操作符
+	//// 重载 - 操作符
 	//static Quat^ operator-(Quat^ a, Quat^ b) {
-	//	// 创建一个新的 Quat 对象，表示相加的结果
+	//	// 创建一个新的 Quat 对象，表示相减的结果
 	//	return gcnew Quat(a->X - b->X, a->Y - b->Y, a->Z - b->Z);
 	//}
 #pragma endregion

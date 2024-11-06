@@ -37,26 +37,8 @@ public class BrepGeomtryTools
     /// <exception cref="Exception"></exception>
     public static Tuple<Pnt, Pnt> GetEdgeEndPoints(TEdge edge)
     {
-        List<Pnt> endpoints = new();
-        Explorer PntExp = new(edge, ShapeEnum.VERTEX);
-        //while (PntExp.More())
-        //{
-        //    TVertex endPoint = PntExp.Current().AsVertex();
-        //    Pnt p = Tool.Pnt(endPoint);
-        //    endpoints.Add(p);
-        //    PntExp.Next();
-        //}
-        for (; PntExp.More(); PntExp.Next())
-        {
-            TVertex endPoint = PntExp.Current().AsVertex();
-            Pnt p = Tool.Pnt(endPoint);
-            endpoints.Add(p);
-        }
-        if (endpoints.Count != 2)
-        {
-            throw new Exception($"获取到的端点数不为2，有{endpoints.Count}个点");
-        }
-        return Tuple.Create(endpoints[0], endpoints[1]);
+        OCCTK.OCC.BRepAdaptor.Curve a = new(edge);
+        return Tuple.Create(a.Value(a.FirstParameter()), a.Value(a.LastParameter()));
     }
 
     /// <summary>

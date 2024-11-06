@@ -62,6 +62,13 @@ bool Vec::IsParallel(Vec^ otherVec, double theAngularTolerance) {
 	return GetOCC().IsParallel(otherVec->GetOCC(), theAngularTolerance);
 }
 
+Vec^ Vec::Reversed() {
+	double newX = -X;
+	double newY = -Y;
+	double newZ = -Z;
+	return gcnew Vec(newX, newY, newZ);
+}
+
 void Vec::Normalize() {
 	double m = std::sqrt(X * X + Y * Y + Z * Z);
 	X = X / m;
@@ -123,6 +130,10 @@ Vec^ Vec::Transformed(Trsf^ T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
 	v.Transform(T->GetOCC());
 	return gcnew Vec(v.X(), v.Y(), v.Z());
+}
+
+double Vec::Magnitude() {
+	return std::sqrt(X * X + Y * Y + Z * Z);
 }
 
 }

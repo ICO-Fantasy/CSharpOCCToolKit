@@ -13,6 +13,9 @@ ref class InteractiveContext;
 namespace gp {
 ref class Trsf;
 }
+namespace Graphic3d {
+enum class ZLayerId;
+}
 }
 }
 
@@ -30,6 +33,8 @@ public:
 	void RemoveSelf(bool update);
 public:
 	void SetLocalTransformation(gp::Trsf^ trsf);
+	void SetZLayer(Graphic3d::ZLayerId id);
+	void SetZLayer(int Zlayerid);
 	gp::Trsf^ LocalTransformation();
 	bool IsShape();
 	bool HasInteractiveContext();

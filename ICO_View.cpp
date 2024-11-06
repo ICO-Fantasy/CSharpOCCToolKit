@@ -306,6 +306,10 @@ void View::DisplayDefault_GraduatedTrihedron() {
 	myView()->GraduatedTrihedronDisplay(GT);
 }
 
+void View::Hide_GraduatedTrihedron() {
+	myView()->GraduatedTrihedronErase();
+}
+
 }
 }
 }

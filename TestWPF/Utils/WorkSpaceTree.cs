@@ -249,15 +249,15 @@ public class Node
             }
             if (DOF == DOF.W)
             {
-                T.SetRotation(new(new(), new(1, 0, 0)), CurrentValue);
+                T.SetRotation(new(new Pnt(), new Dir(1, 0, 0)), CurrentValue);
             }
             if (DOF == DOF.W)
             {
-                T.SetRotation(new(new(), new(0, 1, 0)), CurrentValue);
+                T.SetRotation(new(new Pnt(), new Dir(0, 1, 0)), CurrentValue);
             }
             if (DOF == DOF.W)
             {
-                T.SetRotation(new(new(), new(0, 0, 1)), CurrentValue);
+                T.SetRotation(new(new Pnt(), new Dir(0, 0, 1)), CurrentValue);
             }
             return T;
         }

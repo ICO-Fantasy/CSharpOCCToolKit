@@ -40,6 +40,7 @@ public:
 
 public:
 	bool IsParallel(Vec^ otherVec, double theAngularTolerance);
+	Vec^ Reversed();
 	void Normalize();
 	Vec^ Normalized();
 	void Multiply(double value);
@@ -50,6 +51,7 @@ public:
 	Vec^ CrossProduct(Vec^ other);
 	void Transform(Trsf^ T);
 	Vec^ Transformed(Trsf^ T);
+	double Magnitude();
 public:
 	property double X;
 	property double Y;

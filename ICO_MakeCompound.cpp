@@ -1,4 +1,5 @@
 ﻿#include "ICO_MakeCompound.h"
+#include "ICO_Topo_Shape.h"
 
 using namespace OCCTK::OCC::Topo;
 
@@ -8,7 +9,7 @@ namespace Tool {
 CompoundMaker::CompoundMaker() {
 }
 
-CompoundMaker::CompoundMaker(List<TShape^> theShapeList) {
+CompoundMaker::CompoundMaker(List<TShape^>^ theShapeList) {
 	for each (auto oneShape in theShapeList) {
 		myShapeList->push_back(oneShape->GetOCC());
 	}

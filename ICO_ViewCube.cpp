@@ -24,7 +24,7 @@ ViewCube::ViewCube(double axesRadius) :ViewCube() {
 
 void ViewCube::SetDefault() {
 	int R, G, B;
-	myViewCube()->SetSize(myAxisSize * 10);
+	myViewCube()->SetSize(myAxisSize * 30.0);
 	// 设置坐标轴半径
 	myViewCube()->SetAxesRadius(myAxisSize);
 	myViewCube()->SetAxesConeRadius(myAxisSize * 1.5);
@@ -58,7 +58,7 @@ void ViewCube::SetDefault() {
 	myViewCube()->SetBoxSideLabel(V3d_Zpos, DataExchange::ConvertChineseToUnicode("上"));
 	myViewCube()->SetBoxSideLabel(V3d_Zneg, DataExchange::ConvertChineseToUnicode("下"));
 	myViewCube()->SetFont("MSYHL");
-	myViewCube()->SetFontHeight(50);
+	myViewCube()->SetFontHeight(myAxisSize * 15.0);
 	R = 241;
 	G = 217;
 	B = 37;

@@ -188,6 +188,7 @@
     <ClCompile Include="ICO_Quaternion.cpp" />
     <ClCompile Include="ICO_RubberBand.cpp" />
     <ClCompile Include="ICO_Splitter.cpp" />
+    <ClCompile Include="ICO_TextLabel.cpp" />
     <ClCompile Include="ICO_TopExp_Explorer.cpp" />
     <ClCompile Include="ICO_Topo_Edge.cpp" />
     <ClCompile Include="ICO_Topo_Face.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="ICO_Quaternion.h" />
     <ClInclude Include="ICO_RubberBand.h" />
     <ClInclude Include="ICO_Splitter.h" />
+    <ClInclude Include="ICO_TextLabel.h" />
     <ClInclude Include="ICO_TopExp_Explorer.h" />
     <ClInclude Include="ICO_Topo_Edge.h" />
     <ClInclude Include="ICO_Topo_Face.h" />
@@ -265,6 +267,7 @@
     <ClInclude Include="ICO_Viewer.h" />
     <ClInclude Include="ICO_ViewOrientation.h" />
     <ClInclude Include="ICO_XShape.h" />
+    <ClInclude Include="ICO_ZLayerId.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
     <ClInclude Include="ICO_STEPExchange.h" />
     <ClInclude Include="ICO_Trihedron.h" />
@@ -296,6 +299,7 @@
     <ClInclude Include="ICO_BRepGProp.h" />
     <ClInclude Include="ICO_ColorMap.h" />
     <ClInclude Include="ICO_EulerSequence.h" />
+    <ClInclude Include="ICO_Orientation.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

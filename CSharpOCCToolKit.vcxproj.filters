@@ -195,6 +195,12 @@
     <Filter Include="源文件\OCCProxy\BRepCheck">
       <UniqueIdentifier>{54f57409-fecb-47a8-9085-24389c3e4e0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\Graphic3d">
+      <UniqueIdentifier>{c6c5bfd2-bdd5-4e7c-931e-51b179c7200a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\Graphic3d\enum">
+      <UniqueIdentifier>{b4446d3b-49f3-4bc9-a664-ad86898cc154}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -382,6 +388,9 @@
     </ClCompile>
     <ClCompile Include="ICO_BRepCheck_Analyzer.cpp">
       <Filter>源文件\OCCProxy\BRepCheck</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_TextLabel.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -615,6 +624,15 @@
     </ClInclude>
     <ClInclude Include="ICO_BRepCheck_Analyzer.h">
       <Filter>头文件\OCCProxy\BRepCheck</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_Orientation.h">
+      <Filter>头文件\OCCProxy\TopAbs\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_TextLabel.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_ZLayerId.h">
+      <Filter>头文件\OCCProxy\Graphic3d\enum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

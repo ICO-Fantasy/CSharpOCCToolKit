@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <TopoDS_Shape.hxx>
 #include "ICO_ShapeEnum.h"
+#include "ICO_Orientation.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -28,9 +29,28 @@ public:
 	TShape(System::IntPtr theShapeIntPtr);
 	TShape(TopoDS_Shape* theShape);
 	bool IsEqual(TShape^ otherShape);
+#pragma region 重载操作符
+	// 重载 == 操作符
+	static bool operator ==(TShape^ left, TShape^ right) {
+		// 检查是否有任何一个对象为 null
+		if (Object::ReferenceEquals(left, nullptr) || Object::ReferenceEquals(right, nullptr))
+			return Object::ReferenceEquals(left, right);
+		return left->IsEqual(right);
+	}
+	// 为了确保兼容，同时重写 Equals
 	virtual bool Equals(System::Object^ obj) override;
+	// 重写 GetHashCode
+	virtual int GetHashCode() override {
+		return HashCode(INT32_MAX);
+	}
+	// 重载 != 操作符
+	static bool operator !=(TShape^ left, TShape^ right) {
+		return !(left == right); // 利用重载的 == 操作符
+	}
+#pragma endregion
 	TopoDS_Shape GetOCC();
 	System::IntPtr GetPtr();
+	int HashCode(int upperBound);
 public:
 	TopoAbs::ShapeEnum ShapeType();
 	TVertex^ AsVertex();
@@ -41,10 +61,7 @@ public:
 	gp::Trsf^ Location();
 	void Location(gp::Ax2^ newOrigin);
 	TShape^ Located(gp::Ax2^ newOrigin);
-	virtual int GetHashCode() override {
-		return HashCode(INT32_MAX);
-	}
-	int HashCode(int upperBound);
+	property TopoAbs::Orientation Orientation {TopoAbs::Orientation get(); void set(TopoAbs::Orientation orientation); }
 protected:
 	TopoDS_Shape* myShape;
 protected:

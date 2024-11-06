@@ -76,11 +76,54 @@
                 Content="Shell" />
             <GridSplitter Width="3" Background="Black" />
         </ToolBar>
-        <Grid
-            x:Name="Canvas_Grid"
-            Grid.Row="1"
-            Grid.Column="0"
-            Background="LightBlue" />
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="6*" />
+                <RowDefinition Height="2*" />
+            </Grid.RowDefinitions>
+            <Grid
+                x:Name="Canvas_Grid"
+                Grid.Row="0"
+                Background="LightBlue" />
+            <!--  几何信息  -->
+            <Grid Grid.Row="1" Background="LightPink">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Label
+                    x:Name="selectedFace1_Label"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    Background="White"
+                    Content="面1" />
+                <ScrollViewer
+                    x:Name="selectedFace1_ScrollViewer"
+                    Grid.Row="1"
+                    Grid.Column="0">
+                    <StackPanel x:Name="selectedFace1_StackPanel" />
+                </ScrollViewer>
+                <Label
+                    x:Name="selectedFace2_Label"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Background="White"
+                    Content="面2" />
+                <ScrollViewer
+                    x:Name="selectedFace2_ScrollViewer"
+                    Grid.Row="1"
+                    Grid.Column="1">
+                    <StackPanel x:Name="selectedFace2_StackPanel" />
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
         <Grid
             x:Name="Properties_Grid"
             Grid.Row="1"
@@ -88,12 +131,14 @@
             Background="WhiteSmoke">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="30*" />
                 <RowDefinition Height="30*" />
                 <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
             <Grid x:Name="Display_Grid" Grid.Row="0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
@@ -123,11 +168,17 @@
                     Click="ShowSector_Button_Click"
                     Content="显示扇形" />
                 <Button
+                    x:Name="ShowAllBendings_Button"
+                    Grid.Row="0"
+                    Grid.Column="4"
+                    Click="ShowAllBendings_Button_Click"
+                    Content="显示全部" />
+                <Button
                     x:Name="ShowUnfold_Button"
                     Grid.Row="0"
                     Grid.Column="1"
                     Click="ShowUnfold_Button_Click"
-                    Content="全部展开" Height="52" Grid.RowSpan="2" VerticalAlignment="Top" />
+                    Content="全部展开" />
                 <CheckBox
                     x:Name="ShowBendingArrow_CheckBox"
                     Grid.Row="1"
@@ -156,17 +207,16 @@
                 Visibility="Visible" />
             <ScrollViewer
                 x:Name="TestBox_ScrollViewer"
-                Grid.Row="2"
-                Visibility="Hidden">
+                Grid.Row="3"
+                Visibility="Visible">
                 <StackPanel x:Name="TestBox_StackPanel" Background="LightYellow" />
             </ScrollViewer>
-            <Grid x:Name="Buttons_Grid" Grid.Row="3">
+            <Grid x:Name="Buttons_Grid" Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
                 <Button

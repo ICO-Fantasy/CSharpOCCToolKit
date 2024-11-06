@@ -20,6 +20,7 @@ public ref class Ax1 :System::ICloneable {
 public:
 	Ax1();
 	Ax1(Pnt^ location, Dir^ direction);
+	Ax1(Pnt^ fromPnt, Pnt^ toPnt);
 	Ax1(gp_Ax1 theAx1);
 	Ax1(gp_Ax1* theAx1);
 	gp_Ax1 GetOCC();
@@ -31,6 +32,7 @@ public:
 	void Reverse();
 	Ax1^ Reversed();
 	bool IsCoaxial(Ax1^ other, double AngularTOL, double LinearTOL);
+	bool IsCollinear(Ax1^ other, double AngularTOL);
 public:
 	property Pnt^ Location;
 	property Dir^ Direction;

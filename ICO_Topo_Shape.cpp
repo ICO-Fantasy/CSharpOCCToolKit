@@ -3,12 +3,16 @@
 #include<TopoDS.hxx>
 #include<TopoDS_Vertex.hxx>
 #include <Standard_TypeMismatch.hxx>
+#include <TopAbs_Orientation.hxx>
 //local
 #include "ICO_Trsf.h"
 #include "ICO_Ax2.h"
 #include "ICO_Topo_Vertex.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Topo_Face.h"
+
+using namespace OCCTK::OCC::TopoAbs;
+
 
 namespace OCCTK {
 namespace OCC {
@@ -136,6 +140,14 @@ int TShape::HashCode(int upperBound) {
 	return myShape->HashCode(upperBound);
 }
 
+
+TopoAbs::Orientation TShape::Orientation::get() {
+	return TopoAbs::Orientation(myShape->Orientation());
+}
+
+void TShape::Orientation::set(TopoAbs::Orientation orientation) {
+	myShape->Orientation(TopAbs_Orientation(orientation));
+}
 
 }
 }

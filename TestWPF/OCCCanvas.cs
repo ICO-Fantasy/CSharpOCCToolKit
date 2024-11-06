@@ -177,6 +177,33 @@ public partial class OCCCanvas : Form
 
     #endregion
 
+    #region 原点坐标系
+
+    private bool _ShowGraduatedTrihedron;
+    public bool ShowGraduatedTrihedron
+    {
+        get { return _ShowGraduatedTrihedron; }
+        set
+        {
+            _ShowGraduatedTrihedron = value;
+            DisplayGraduatedTrihedron();
+        }
+    }
+
+    private void DisplayGraduatedTrihedron()
+    {
+        if (_ShowOriginTrihedron)
+        {
+            MainView.DisplayDefault_GraduatedTrihedron();
+        }
+        else
+        {
+            MainView.Hide_GraduatedTrihedron();
+        }
+    }
+
+    #endregion
+
     #region 操作器
 
     private Manipulator myManipulator;
@@ -196,7 +223,7 @@ public partial class OCCCanvas : Form
     public Manipulator Manipulator => myManipulator;
 
     /// <summary>
-    /// C++委托的视图对象
+    /// DebugC++委托的视图对象
     /// </summary>
     public CSharpViewer Canvas => myCanvas;
 
@@ -211,7 +238,7 @@ public partial class OCCCanvas : Form
     public OCCTK.OCC.V3d.View MainView { get; set; }
 
     /// <summary>
-    /// C++委托的交互对象管理器
+    /// DebugC++委托的交互对象管理器
     /// </summary>
     public InteractiveContext AISContext => myAISContext;
 
@@ -297,7 +324,7 @@ public partial class OCCCanvas : Form
     {
         if (Viewer == null)
         {
-            throw new Exception("OCC Canvas is null");
+            throw new Exception("OCC OCCCanvas is null");
         }
         if (AISContext == null)
         {

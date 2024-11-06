@@ -227,7 +227,7 @@ public partial class PlatePose
         Direction = direction;
         resetT = new();
         resetT.SetRotation(
-            new Ax1(location, new(0, 0, 1)),
+            new Ax1(location, new Dir(0, 0, 1)),
             direction.AngleWithRef(new(0, 1, 0), new(0, 0, 1))
         );
     }

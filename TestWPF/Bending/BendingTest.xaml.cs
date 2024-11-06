@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
@@ -36,29 +37,30 @@ public partial class BendingTest : Window, IAISSelectionHandler
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
-        Canvas = new OCCCanvas();
-        aHost.Child = Canvas;
+        OCCCanvas = new OCCCanvas();
+        aHost.Child = OCCCanvas;
         Canvas_Grid.Children.Add(aHost);
-        Canvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-        Canvas.Show();
-        Canvas.OnAISSelectionEvent += OnAISSelection;
+        OCCCanvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+        OCCCanvas.Show();
+        OCCCanvas.ShowGraduatedTrihedron = false;
+        OCCCanvas.OnAISSelectionEvent += OnAISSelection;
     }
 
     #region 窗口属性和字段
 
-    private readonly OCCCanvas Canvas;
-    private InteractiveContext Context => Canvas.AISContext;
+    private readonly OCCCanvas OCCCanvas;
+    private InteractiveContext Context => OCCCanvas.AISContext;
     private bool _isBendingArrowVisible = false;
     private bool _isMainFaceNormalVisible = false;
 
     //简化函数调用
-    private Action<InteractiveObject, bool> Display => Canvas.Display;
+    private Action<InteractiveObject, bool> Display => OCCCanvas.Display;
     private Action<InteractiveObject, Color, bool> SetColor => Context.SetColor;
     private Action<InteractiveObject, double, bool> SetTransparency => Context.SetTransparency;
-    private Action<InteractiveObject, bool> Erase => Canvas.Erase;
-    private Action<bool> EraseAll => Canvas.EraseAll;
-    private Action Update => Canvas.Update;
-    private Action FitAll => Canvas.FitAll;
+    private Action<InteractiveObject, bool> Erase => OCCCanvas.Erase;
+    private Action<bool> EraseAll => OCCCanvas.EraseAll;
+    private Action Update => OCCCanvas.Update;
+    private Action FitAll => OCCCanvas.FitAll;
 
     #endregion
 
@@ -125,7 +127,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
         //    Display(aisF, false);
         //}
         //Random random = new();
-        //foreach (var n in BendingTree.AllNodes)
+        //foreach (var n in BendingTree.AllLeafNodes)
         //{
         //    int i = random.Next(ColorMap.Colors.Count);
         //    foreach (var f in n.FaceSet)
@@ -140,21 +142,32 @@ public partial class BendingTest : Window, IAISSelectionHandler
     }
 
     // 递归创建 TreeViewItem
-    private TreeViewItem CreateTreeViewItem(Node node)
+    private TreeViewItem CreateTreeViewItem(NodeDS node)
     {
-        TreeViewItem treeViewItem =
-            new()
+        TreeViewItem? treeViewItem = null;
+        if (node is RootNode root)
+        {
+            treeViewItem = new() { Header = $"根节点：{root.MainFace}", Tag = root };
+        }
+        if (node is LeafNode leaf)
+        {
+            treeViewItem = new()
             {
                 Header =
-                    $"{node.MainFace} | 角度:{node.BendingAngle?.ToDegrees(1)} | 平移长度: {Math.Round(node.FlatLength ?? 0.0, 3)} | 折弯边厚:  {node.Bending?.Thickness}", // 或其他合适的属性
-                Tag = node
+                    $"{leaf.MainFace} | 角度:{leaf.BendingAngle.ToDegrees(1)} | 平移长度: {Math.Round(leaf.FlatLength, 3)} | 折弯边厚:  {leaf.Bending?.Thickness}", // 或其他合适的属性
+                Tag = leaf
             };
+        }
+        if (treeViewItem == null)
+        {
+            throw new Exception("未知节点");
+        }
         // 绑定事件
         treeViewItem.Selected += TreeViewItem_Selected;
         treeViewItem.Unselected += TreeViewItem_Unselected;
         treeViewItem.IsExpanded = true;
         // 递归添加子节点
-        foreach (Node child in node.Children)
+        foreach (NodeDS child in node.Children)
         {
             treeViewItem.Items.Add(CreateTreeViewItem(child));
         }
@@ -167,18 +180,20 @@ public partial class BendingTest : Window, IAISSelectionHandler
     {
         Random random = new();
         // 获取被选中的 TreeViewItem
-        if (sender is TreeViewItem selectedItem && selectedItem.Tag is Node node)
+        if (sender is TreeViewItem selectedItem && selectedItem.Tag is NodeDS node)
         {
             int i = random.Next(ColorMap.Colors.Count);
             //int j = random.Next(ColorMap.Colors.Count);
             // 调用 Node 的 Show 方法
-            node.Show(
-                Context,
-                true,
-                _isBendingArrowVisible,
-                _isMainFaceNormalVisible,
-                ColorMap.Colors[i]
-            );
+            if (node is RootNode root)
+            {
+                root.Show(Context, true);
+            }
+            if (node is LeafNode leaf)
+            {
+                leaf.BendingColor = ColorMap.Colors[i];
+                leaf.Show(Context, true, _isBendingArrowVisible, _isMainFaceNormalVisible);
+            }
         }
 
         // 防止事件向父级传播
@@ -189,10 +204,10 @@ public partial class BendingTest : Window, IAISSelectionHandler
     private void TreeViewItem_Unselected(object sender, RoutedEventArgs e)
     {
         // 获取取消选中的 TreeViewItem
-        if (sender is TreeViewItem unselectedItem && unselectedItem.Tag is Node node)
+        if (sender is TreeViewItem unselectedItem && unselectedItem.Tag is NodeDS node)
         {
             // 调用 Node 的 Erase 方法
-            node.Erase(Context, true);
+            node.RemoveSelf(true);
         }
 
         // 防止事件向父级传播
@@ -200,8 +215,12 @@ public partial class BendingTest : Window, IAISSelectionHandler
     }
 
     #endregion
-    public void OnAISSelection(AShape theAIS)
+    public void OnAISSelection(AShape? theAIS)
     {
+        if (theAIS == null)
+        {
+            return;
+        }
         if (theAIS.IsShape())
         {
             //TShape
@@ -226,6 +245,34 @@ public partial class BendingTest : Window, IAISSelectionHandler
                     Debug.WriteLine(
                         $"{face} | {face.Type} | Center: {face.CircleCenter} | Angle: {angle} | Radius: {radius}"
                     );
+                    UpdateSelectFace(f);
+                    if (BendingTree == null)
+                        return;
+                    LeafNode? selectNode = BendingTree
+                        .BendingFaceMap.Where(face => face.Key.IsEqual(f)) // 筛选出符合条件的元素
+                        .Select(face => face.Value) // 获取对应的 value
+                        .FirstOrDefault(); // 获取第一个匹配的值，若没有则为 null
+                    if (selectNode != null)
+                    {
+                        selectNode.Unfolded = !selectNode.Unfolded;
+                        selectNode.Show(
+                            Context,
+                            false,
+                            _isBendingArrowVisible,
+                            _isMainFaceNormalVisible
+                        );
+                        foreach (var node in BendingTree.GetAllChildNodes(selectNode))
+                        {
+                            node.Show(
+                                Context,
+                                false,
+                                _isBendingArrowVisible,
+                                _isMainFaceNormalVisible
+                            );
+                        }
+                        Context.UpdateCurrentViewer();
+                        Debug.WriteLine($"选中了节点{selectNode}");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -240,7 +287,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
                     Curve BE = new(e);
                     (var p1, var p2) = Geometry.Tools.BrepGeomtryTools.GetEdgeEndPoints(e);
                     Debug.WriteLine(
-                        $"{e.GetHashCode()} | {BE.GetType()} | {p1} | {p2} | D:{p1.Distance(p2)}"
+                        $"{e.GetHashCode()} | {BE.GetType()} | {p1} | {p2} | D:{p1.Distance(p2)} | Orientation: {e.Orientation}"
                     );
                 }
                 catch (Exception e)
@@ -248,6 +295,29 @@ public partial class BendingTest : Window, IAISSelectionHandler
                     Debug.WriteLine($"{e}");
                 }
             }
+        }
+    }
+
+    private void UpdateSelectFace(TFace face)
+    {
+        selectedFace2_StackPanel.Children.Clear();
+        while (selectedFace1_StackPanel.Children.Count > 0)
+        {
+            UIElement item = selectedFace1_StackPanel.Children[0];
+            selectedFace1_StackPanel.Children.Remove(item);
+            selectedFace2_StackPanel.Children.Add(item);
+        }
+        selectedFace2_Label.Content = selectedFace1_Label.Content;
+        selectedFace1_Label.Content = face.GetHashCode();
+        Face f = new(face, InputWorkpiece);
+        foreach (var edge in f.Edges)
+        {
+            Label label =
+                new()
+                {
+                    Content = $"{edge.Index} |{edge.Type}| {edge.Points[0]} | {edge.Points[1]}"
+                };
+            selectedFace1_StackPanel.Children.Add(label);
         }
     }
 
@@ -299,32 +369,32 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #region 视角
     private void ForntView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetViewOrientation(ViewOrientation.Front);
+        OCCCanvas.SetViewOrientation(ViewOrientation.Front);
     }
 
     private void BackView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetViewOrientation(ViewOrientation.Back);
+        OCCCanvas.SetViewOrientation(ViewOrientation.Back);
     }
 
     private void TopView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetViewOrientation(ViewOrientation.Top);
+        OCCCanvas.SetViewOrientation(ViewOrientation.Top);
     }
 
     private void BottomView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetViewOrientation(ViewOrientation.Bottom);
+        OCCCanvas.SetViewOrientation(ViewOrientation.Bottom);
     }
 
     private void LeftView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetViewOrientation(ViewOrientation.Left);
+        OCCCanvas.SetViewOrientation(ViewOrientation.Left);
     }
 
     private void RightView_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetViewOrientation(ViewOrientation.Right);
+        OCCCanvas.SetViewOrientation(ViewOrientation.Right);
     }
     #endregion
 
@@ -332,31 +402,31 @@ public partial class BendingTest : Window, IAISSelectionHandler
 
     private void SelectShape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Shape);
+        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Shape);
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void SelectFace_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Face);
+        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Face);
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void SelectEdge_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Edge);
+        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Edge);
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void SelectVertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Vertex);
+        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Vertex);
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void SelectShell_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Shell);
+        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Shell);
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 
@@ -401,7 +471,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
             //! DEBUG 读取组合体
             //STEPExchange ex = new(selectedFilePath); // 使用选择的文件路径
             //EraseAll(false);
-            //Canvas.AISContext.Display(ex.AssemblyShape(), true);
+            //OCCCanvas.AISContext.Display(ex.AssemblyShape(), true);
             FitAll();
         }
     }
@@ -428,19 +498,19 @@ public partial class BendingTest : Window, IAISSelectionHandler
         Display(AISInputWorkpiece, false);
         SetTransparency(AISInputWorkpiece, 0.8, false);
         BendingTree.FoldAllBendings();
-        BendingTree.RootNode.Show(Context, false, false, _isMainFaceNormalVisible, ColorMap.Red);
+        BendingTree.RootNode.Show(Context, false);
         Random random = new();
-        foreach (Node node in BendingTree.AllNodes)
+        foreach (LeafNode node in BendingTree.AllLeafNodes)
         {
             // 获取被选中的 TreeViewItem
             int i = random.Next(ColorMap.Colors.Count);
-            node.Show(
-                Context,
-                false,
-                _isBendingArrowVisible,
-                _isMainFaceNormalVisible,
-                ColorMap.Colors[i]
-            );
+            node.BendingColor = ColorMap.Colors[i];
+            node.Show(Context, false, _isBendingArrowVisible, _isMainFaceNormalVisible);
+        }
+        foreach (var node in BendingTree.NodesAfterHem)
+        {
+            node.BendingColor = ColorMap.Yellow;
+            node.Show(Context, false, _isBendingArrowVisible, _isMainFaceNormalVisible);
         }
         Update();
     }
@@ -451,18 +521,18 @@ public partial class BendingTest : Window, IAISSelectionHandler
         Display(AISInputWorkpiece, false);
         SetTransparency(AISInputWorkpiece, 0.8, false);
         BendingTree.UnfoldAllBendings();
-        BendingTree.RootNode.Show(Context, false, false, _isMainFaceNormalVisible, ColorMap.Red);
+        BendingTree.RootNode.Show(Context, false);
         Random random = new();
-        foreach (Node node in BendingTree.AllNodes)
+        foreach (LeafNode node in BendingTree.AllLeafNodes)
         {
             int i = random.Next(ColorMap.Colors.Count);
-            node.Show(
-                Context,
-                false,
-                _isBendingArrowVisible,
-                _isMainFaceNormalVisible,
-                ColorMap.Colors[i]
-            );
+            node.BendingColor = ColorMap.Colors[i];
+            node.Show(Context, false, _isBendingArrowVisible, _isMainFaceNormalVisible);
+        }
+        foreach (var node in BendingTree.NodesAfterHem)
+        {
+            node.BendingColor = ColorMap.Yellow;
+            node.Show(Context, false, _isBendingArrowVisible, _isMainFaceNormalVisible);
         }
         Update();
     }
@@ -493,15 +563,42 @@ public partial class BendingTest : Window, IAISSelectionHandler
         }
 
         // 从 TreeViewItem 的 Tag 中获取 Node 对象
-        Node? selectedNode = selectedItem.Tag as Node;
+        NodeDS? selectedNode = selectedItem.Tag as NodeDS;
 
         if (selectedNode == null)
         {
             MessageBox.Show("无法找到关联的 Node 对象。");
             return;
         }
-        // 执行 Node 的 ShowSectors 方法
-        selectedNode.ShowSectors(Context, false);
+        if (selectedNode is RootNode)
+        {
+            return;
+        }
+        if (selectedNode is LeafNode leaf)
+        {
+            // 执行 Node 的 ShowSectors 方法
+            leaf.ShowSectors(Context, false);
+        }
+
+        Update();
+    }
+
+    private void ShowAllBendings_Button_Click(object sender, RoutedEventArgs e)
+    {
+        EraseAll(false);
+        Display(AISInputWorkpiece, false);
+        SetTransparency(AISInputWorkpiece, 0.8, false);
+        BendingTree.RootNode.Show(Context, false);
+        foreach (LeafNode node in BendingTree.AllLeafNodes)
+        {
+            node.BendingColor = ColorMap.Green;
+            node.Show(Context, false, _isBendingArrowVisible, _isMainFaceNormalVisible);
+        }
+        foreach (var node in BendingTree.NodesAfterHem)
+        {
+            node.BendingColor = ColorMap.Yellow;
+            node.Show(Context, false, _isBendingArrowVisible, _isMainFaceNormalVisible);
+        }
         Update();
     }
     #endregion
