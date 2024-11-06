@@ -9,11 +9,13 @@ using OCCTK.Extension;
 using OCCTK.OCC;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
+using OCCTK.OCC.OpenGL;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.V3d;
 using OCCTK.Visualization;
 using TestWPF;
 using Color = OCCTK.Extension.Color;
+using View = OCCTK.OCC.V3d.View;
 
 namespace OCCViewForm;
 
@@ -32,11 +34,15 @@ public partial class OCCCanvas : Form
         SetStyle(ControlStyles.AllPaintingInWmPaint, true); // 防止擦除背景。
         SetStyle(ControlStyles.UserPaint, true); // 使用自定义的绘制。
 
-        myCanvas = new CSharpViewer();
-        //初始化画布，创建上下文
-        Canvas.InitViewer();
+        //创建引擎
+        myGraphicDriver = new();
+        //创建视图对象
+        myViewer = new(myGraphicDriver);
+        //创建上下文管理器
+        myAISContext = new InteractiveContext(myViewer);
         //创建相机
-        MainView = Canvas.CreateView(this.Handle);
+        ViewList.Add(myViewer.CreateView());
+        MainView?.SetWindow(this.Handle);
         if (MainView == null)
         {
             //MessageBox.Show("图形初始化失败", "Error!");
@@ -44,10 +50,6 @@ public partial class OCCCanvas : Form
         }
         //创建操作器
         myManipulator = new();
-        //获取视图对象
-        myViewer = Canvas.GetViewer();
-        //获取上下文管理器对象
-        myAISContext = Canvas.GetContext();
         //创建选择框
         myBubberBand = new();
         //鼠标样式重置计时器
@@ -61,7 +63,7 @@ public partial class OCCCanvas : Form
 
     #region 字段
 
-    private readonly CSharpViewer myCanvas;
+    private readonly GraphicDriver myGraphicDriver;
     private readonly Viewer myViewer;
     private readonly InteractiveContext myAISContext;
 
@@ -223,19 +225,19 @@ public partial class OCCCanvas : Form
     public Manipulator Manipulator => myManipulator;
 
     /// <summary>
-    /// DebugC++委托的视图对象
-    /// </summary>
-    public CSharpViewer Canvas => myCanvas;
-
-    /// <summary>
-    /// 画布对象
+    /// 画布对象(设置灯光等)
     /// </summary>
     public Viewer Viewer => myViewer;
 
     /// <summary>
-    /// 主视图
+    /// 视图列表
     /// </summary>
-    public OCCTK.OCC.V3d.View MainView { get; set; }
+    public List<View> ViewList { get; set; } = [];
+
+    /// <summary>
+    /// 主视图（第一个创建的视图）
+    /// </summary>
+    public View? MainView => ViewList.Count > 0 ? ViewList[0] : null;
 
     /// <summary>
     /// DebugC++委托的交互对象管理器

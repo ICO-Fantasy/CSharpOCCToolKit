@@ -77,7 +77,7 @@ public class BendingTree
     /// </summary>
     public Face MainFace => RootNode.MainFace;
 
-    private HashSet<Face> AllFaces { get; set; } = [];
+    public HashSet<Face> AllFaces { get; set; } = [];
     private HashSet<Edge> AllEdges { get; set; } = [];
     private HashSet<BendingDS> AllBendings { get; set; } = [];
 
@@ -347,9 +347,15 @@ public class BendingTree
         temptFace.RemoveAll(RootNode.FaceSet.Contains);
 
         //迭代获取子节点
-        CreateNode(MainFace, RootNode, ref temptFace);
+        CreateNodeBFS(MainFace, RootNode, ref temptFace);
     }
 
+    /// <summary>
+    /// 折弯树的深度迭代
+    /// </summary>
+    /// <param name="parentMainFace"></param>
+    /// <param name="parentNode"></param>
+    /// <param name="temptFace"></param>
     private void CreateNode(Face parentMainFace, NodeDS parentNode, ref List<Face> temptFace)
     {
         if (temptFace.Count == 0)
@@ -370,17 +376,15 @@ public class BendingTree
                     HashSet<Face> faceSet = [];
                     GetFaceSet(adj2, ref faceSet);
                     LeafNode? newNode = null;
-                    try
+                    if (b.Type == BendingType.VBend)
                     {
-                        if (b.Type == BendingType.VBend)
-                        {
-                            newNode = new VBendNode(adj2, faceSet, parentNode, b, _Kparam);
-                        }
-                        else if (b.Type == BendingType.Hem)
-                        {
-                            newNode = new ClosedHemNode(adj2, faceSet, parentNode, b, _Kparam);
-                        }
+                        newNode = new VBendNode(adj2, faceSet, parentNode, b, _Kparam);
                     }
+                    else if (b.Type == BendingType.Hem)
+                    {
+                        newNode = new ClosedHemNode(adj2, faceSet, parentNode, b, _Kparam);
+                    }
+                    try { }
                     catch (Exception e)
                     {
                         log.Debug($"节点创建失败\n{e}");
@@ -392,6 +396,83 @@ public class BendingTree
                     parentNode.Children.Add(newNode);
                     temptFace.RemoveAll(item => faceSet.Contains(item));
                     CreateNode(adj2, newNode, ref temptFace);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 广度优先的节点搜索
+    /// </summary>
+    /// <param name="rootFace"></param>
+    /// <param name="rootNode"></param>
+    /// <param name="temptFace"></param>
+    private void CreateNodeBFS(Face rootFace, NodeDS rootNode, ref List<Face> temptFace)
+    {
+        if (temptFace.Count == 0)
+            return;
+
+        // 初始化队列，包含根节点的面和节点
+        Queue<(Face mainFace, NodeDS node)> queue = new();
+        queue.Enqueue((rootFace, rootNode));
+
+        while (queue.Count > 0)
+        {
+            var (currentFace, currentNode) = queue.Dequeue();
+
+            foreach (var adj1 in currentFace.AdjacentFaces.Values)
+            {
+                foreach (var bending in AllBendings)
+                {
+                    if (!bending.CylinderFaces.Contains(adj1))
+                        continue;
+
+                    // 找到与当前折弯邻接的平面
+                    foreach (var adj2 in adj1.AdjacentFaces.Values)
+                    {
+                        if (bending.BendingFaces.Contains(adj2) || !temptFace.Contains(adj2))
+                            continue;
+
+                        HashSet<Face> faceSet = new();
+                        GetFaceSet(adj2, ref faceSet);
+                        LeafNode? newNode = null;
+                        try
+                        {
+                            if (bending.Type == BendingType.VBend)
+                            {
+                                newNode = new VBendNode(
+                                    adj2,
+                                    faceSet,
+                                    currentNode,
+                                    bending,
+                                    _Kparam
+                                );
+                            }
+                            else if (bending.Type == BendingType.Hem)
+                            {
+                                newNode = new ClosedHemNode(
+                                    adj2,
+                                    faceSet,
+                                    currentNode,
+                                    bending,
+                                    _Kparam
+                                );
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            log.Debug($"节点创建失败\n{e}");
+                        }
+
+                        if (newNode == null)
+                            continue;
+
+                        currentNode.Children.Add(newNode);
+                        temptFace.RemoveAll(item => faceSet.Contains(item));
+
+                        // 将新节点及其主面加入队列
+                        queue.Enqueue((adj2, newNode));
+                    }
                 }
             }
         }

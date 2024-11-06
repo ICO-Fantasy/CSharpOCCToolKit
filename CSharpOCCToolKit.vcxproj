@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClCompile Include="ICO_BRepCheck_Analyzer.cpp" />
     <ClCompile Include="ICO_BRepPrimAPI_MakeRevol.cpp" />
-    <ClCompile Include="ICO_CSharpViewer.cpp" />
     <ClCompile Include="ICO_AABB.cpp" />
     <ClCompile Include="ICO_AIS_Axis.cpp" />
     <ClCompile Include="ICO_Ax1.cpp" />
@@ -182,6 +181,7 @@
     <ClCompile Include="ICO_Feat_MakeRevol.cpp" />
     <ClCompile Include="ICO_MakeSphere.cpp" />
     <ClCompile Include="ICO_MakeWire.cpp" />
+    <ClCompile Include="ICO_OpenGl_GraphicDriver.cpp" />
     <ClCompile Include="ICO_Pln.cpp" />
     <ClCompile Include="ICO_Pnt2D.cpp" />
     <ClCompile Include="ICO_ProjectPointOnCurve.cpp" />
@@ -222,7 +222,6 @@
   <ItemGroup>
     <ClInclude Include="ICO_BRepCheck_Analyzer.h" />
     <ClInclude Include="ICO_BRepPrimAPI_MakeRevol.h" />
-    <ClInclude Include="ICO_CSharpViewer.h" />
     <ClInclude Include="ICO_AABB.h" />
     <ClInclude Include="ICO_AIS_Axis.h" />
     <ClInclude Include="ICO_Aspect_Line.h" />
@@ -249,6 +248,7 @@
     <ClInclude Include="ICO_Feat_MakeRevol.h" />
     <ClInclude Include="ICO_MakeSphere.h" />
     <ClInclude Include="ICO_MakeWire.h" />
+    <ClInclude Include="ICO_OpenGl_GraphicDriver.h" />
     <ClInclude Include="ICO_Pln.h" />
     <ClInclude Include="ICO_Pnt2D.h" />
     <ClInclude Include="ICO_ProjectPointOnCurve.h" />

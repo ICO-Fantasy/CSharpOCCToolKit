@@ -2095,56 +2095,51 @@ public partial class SimpleClamp : Window
         Label clickedLabel = sender as Label;
 
         // 确保 Label 不为空且 Tag 不为空
-        if (clickedLabel != null && clickedLabel.Tag != null)
+        if (clickedLabel == null || clickedLabel.Tag == null)
+            return;
+        // 获取 Grid（假设 Label 是直接添加到 Grid 中的）
+        Grid parentGrid = clickedLabel.Parent as Grid;
+        StackPanel parentStack = parentGrid.Parent as StackPanel;
+
+        if (parentGrid == null || parentStack == null)
+            return;
+        // 获取被点击 Label 所在的行
+        int clickedRow = parentStack.Children.IndexOf(parentGrid);
+
+        // 遍历 StackPanel 的所有子元素
+        foreach (UIElement theGrid in parentStack.Children)
         {
-            // 获取 Grid（假设 Label 是直接添加到 Grid 中的）
-            Grid parentGrid = clickedLabel.Parent as Grid;
-            StackPanel parentStack = parentGrid.Parent as StackPanel;
+            if (theGrid is not Grid grid)
+                continue;
+            int row = parentStack.Children.IndexOf(grid);
 
-            if (parentGrid != null && parentStack != null)
+            // 遍历每个 Grid 中的子元素
+            foreach (UIElement element in grid.Children)
             {
-                // 获取被点击 Label 所在的行
-                int clickedRow = parentStack.Children.IndexOf(parentGrid);
+                if (element is not Label label)
+                    continue;
+                int column = Grid.GetColumn(label);
 
-                // 遍历 StackPanel 的所有子元素
-                foreach (UIElement theGrid in parentStack.Children)
+                // 如果是点击的行，按照颜色数组设置背景颜色
+                if (row != clickedRow)
+                    continue;
+                if (column >= 0 && column < colorSequence.Length)
                 {
-                    if (theGrid is Grid grid)
-                    {
-                        int row = parentStack.Children.IndexOf(grid);
-
-                        // 遍历每个 Grid 中的子元素
-                        foreach (UIElement element in grid.Children)
-                        {
-                            if (element is Label label)
-                            {
-                                int column = Grid.GetColumn(label);
-
-                                // 如果是点击的行，按照颜色数组设置背景颜色
-                                if (row == clickedRow)
-                                {
-                                    if (column >= 0 && column < colorSequence.Length)
-                                    {
-                                        label.Background = colorSequence[column];
-                                    }
-                                }
-                                else
-                                {
-                                    // 其他行设置为透明
-                                    label.Background = Brushes.Transparent;
-                                }
-                            }
-                        }
-                    }
+                    label.Background = colorSequence[column];
+                }
+                else
+                {
+                    // 其他行设置为透明
+                    label.Background = Brushes.Transparent;
                 }
             }
+        }
 
-            // 选中 AIS
-            var piece = clickedLabel.Tag as VerticalPiece;
-            if (piece != null && piece.AIS != null)
-            {
-                AISContext.SelectAIS(piece.AIS, true);
-            }
+        // 选中 AIS
+        var piece = clickedLabel.Tag as VerticalPiece;
+        if (piece != null && piece.AIS != null)
+        {
+            AISContext.SelectAIS(piece.AIS, true);
         }
     }
 

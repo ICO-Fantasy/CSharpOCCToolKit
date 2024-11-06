@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Input;
 using System.Windows.Shapes;
 using MathNet.Spatial.Units;
 using Microsoft.Win32;
@@ -138,6 +139,13 @@ public partial class BendingTest : Window, IAISSelectionHandler
         //    }
         //}
         #endregion
+        #region 列出所有面
+        List<Face> allFaces = BendingTree.AllFaces.ToList().OrderBy(f => f.Index).ToList();
+        foreach (Face face in allFaces)
+        {
+            TestBox_StackPanel.Children.Add(CreateStackItem(face));
+        }
+        #endregion
         Update();
     }
 
@@ -173,6 +181,105 @@ public partial class BendingTest : Window, IAISSelectionHandler
         }
 
         return treeViewItem;
+    }
+
+    private Grid CreateStackItem(Face face)
+    {
+        Grid grid = new Grid();
+        // 定义显示内容和列索引
+        var labelDefinitions = new (string Content, int ColumnIndex)[]
+        {
+            ($"{face.Index}", 0),
+            ($"L: {face.Type}", 1),
+        };
+
+        // 创建并添加列定义
+        for (int i = 0; i < labelDefinitions.Length + 1; i++)
+        {
+            ColumnDefinition column =
+                new()
+                {
+                    Width =
+                        i == 0
+                            ? new GridLength(1, GridUnitType.Star)
+                            : new GridLength(1, GridUnitType.Auto)
+                };
+            grid.ColumnDefinitions.Add(column);
+        }
+
+        // 创建并添加子元素
+        foreach (var (content, columnIndex) in labelDefinitions)
+        {
+            Label label = new Label
+            {
+                Content = content,
+                HorizontalContentAlignment = HorizontalAlignment.Left
+            };
+
+            // 设置标签的列索引
+            Grid.SetColumn(label, columnIndex);
+
+            // 将标签添加到 Grid 中
+            grid.Children.Add(label);
+        }
+        void FaceLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // 获取点击的 Label
+            Label? clickedLabel = sender as Label;
+
+            // 确保 Label 不为空且 Tag 不为空
+            if (clickedLabel == null || clickedLabel.Tag == null)
+                return;
+            // 获取 StackPanel
+            StackPanel? parentStack = ((Grid)clickedLabel.Parent).Parent as StackPanel;
+
+            if ((Grid)clickedLabel.Parent == null || parentStack == null)
+                return;
+            // 获取被点击 Label 所在的行
+            int clickedRow = parentStack.Children.IndexOf((Grid)clickedLabel.Parent);
+
+            // 遍历 StackPanel 的所有子元素
+            foreach (UIElement theGrid in parentStack.Children)
+            {
+                if (theGrid is not Grid grid)
+                    continue;
+                int row = parentStack.Children.IndexOf(grid);
+
+                // 遍历每个 Grid 中的子元素
+                foreach (UIElement element in grid.Children)
+                {
+                    if (element is not Label label)
+                        continue;
+                    int column = Grid.GetColumn(label);
+
+                    // 如果是点击的行，按照颜色数组设置背景颜色
+                    if (row != clickedRow)
+                    {
+                        label.Background = Brushes.Transparent;
+                        continue;
+                    }
+
+                    label.Background = Brushes.LightGreen;
+                }
+            }
+            // 选中 AIS
+            var piece = clickedLabel.Tag as Face;
+            if (piece != null && piece.TopoFace != null)
+            {
+                AShape faceAIS = new AShape(piece.TopoFace);
+                Context.Display(faceAIS, true);
+                Context.SetColor(faceAIS, ColorMap.Red, true);
+            }
+        }
+
+        // 绑定 thePiece 对象到第一个 Label 的 Tag 属性
+        if (grid.Children[0] is Label firstLabel)
+        {
+            firstLabel.Tag = face;
+            // 添加鼠标左键点击事件处理程序
+            firstLabel.MouseLeftButtonDown += FaceLabel_MouseLeftButtonDown;
+        }
+        return grid;
     }
 
     // TreeViewItem 被选中时触发

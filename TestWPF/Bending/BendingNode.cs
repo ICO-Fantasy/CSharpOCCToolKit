@@ -260,7 +260,7 @@ public class LeafNode : NodeDS
             }
             if (leftFatherFace == null || rightFatherFace == null)
             {
-                throw new Exception($"没找到{Bending}InnerFatherEdge对应的扇形面对");
+                throw new Exception($"没找到InnerFatherEdge {Bending.OutterFace} 对应的扇形面对");
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -359,7 +359,7 @@ public class LeafNode : NodeDS
             }
             if (leftChildFace == null || rightChildFace == null)
             {
-                throw new Exception($"没找到{Bending}InnerChildEdge对应的扇形面对");
+                throw new Exception($"没找到InnerChildEdge {Bending.OutterFace} 对应的扇形面对");
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -543,7 +543,7 @@ public class LeafNode : NodeDS
                 }
                 if (leftFatherFace == null || rightFatherFace == null)
                 {
-                    throw new Exception($"没找到{Bending}OutterFatherEdge对应的扇形面对");
+                    throw new Exception($"没找到OutterFatherEdge {Bending.OutterFace} 对应的扇形面对");
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -638,7 +638,7 @@ public class LeafNode : NodeDS
                 }
                 if (leftChildFace == null || rightChildFace == null)
                 {
-                    throw new Exception($"没找到{Bending}InnerChildEdge对应的扇形面对");
+                    throw new Exception($"没找到InnerChildEdge {Bending.OutterFace} 对应的扇形面对");
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线

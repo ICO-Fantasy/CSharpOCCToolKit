@@ -1,13 +1,23 @@
 ﻿#pragma once
 #include <V3d_Viewer.hxx>
-#include <OpenGl_GraphicDriver.hxx>
-//包装C++类到托管类
-#include <NCollection_Haft.h> 
 //local
-#include "ICO_Aspect_GridType.h"
 #include "ICO_BaseObject.h"
-#include "ICO_View.h"
-#include "ICO_Aspect_GridDrawMode.h"
+
+namespace OCCTK {
+namespace OCC {
+namespace V3d {
+ref class View;
+}
+namespace OpenGL {
+ref class GraphicDriver;
+}
+namespace Aspect {
+enum class GridType;
+enum class GridDrawMode;
+}
+}
+}
+
 
 namespace OCCTK {
 namespace OCC {
@@ -17,7 +27,7 @@ public ref class Viewer :BaseObject {
 private:
 	Handle(V3d_Viewer) myViewer() { return Handle(V3d_Viewer)::DownCast(NativeHandle); }
 public:
-	Viewer(Handle(OpenGl_GraphicDriver) theGraphicDriver);
+	Viewer(OpenGL::GraphicDriver^ theGraphicDriver);
 	Viewer(const Handle(V3d_Viewer)& theViewer) :BaseObject(theViewer) {};
 	Handle(V3d_Viewer) GetOCC() { return myViewer(); };
 	void SetDefaultLight();

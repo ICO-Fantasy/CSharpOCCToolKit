@@ -1,6 +1,14 @@
 ﻿#include "ICO_Viewer.h"
-#include<V3d_DirectionalLight.hxx>
+#include <V3d_Viewer.hxx>
 #include<V3d_AmbientLight.hxx>
+#include<V3d_DirectionalLight.hxx>
+//local
+#include "ICO_Aspect_GridType.h"
+#include "ICO_View.h"
+#include "ICO_Aspect_GridDrawMode.h"
+#include "ICO_OpenGl_GraphicDriver.h"
+
+using namespace OCCTK::OCC::OpenGL;
 
 namespace OCCTK {
 namespace OCC {
@@ -10,8 +18,8 @@ namespace V3d {
 /// 从窗口句柄创建画面并绑定
 /// </summary>
 /// <param name=""></param>
-Viewer::Viewer(Handle(OpenGl_GraphicDriver) theGraphicDriver) :BaseObject() {
-	NativeHandle = new V3d_Viewer(theGraphicDriver);
+Viewer::Viewer(GraphicDriver^ theGraphicDriver) :BaseObject() {
+	NativeHandle = new V3d_Viewer(theGraphicDriver->GetOCC());
 }
 
 /// <summary>

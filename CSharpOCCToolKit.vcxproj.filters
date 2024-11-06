@@ -12,12 +12,6 @@
     <Filter Include="源文件\DataExchange">
       <UniqueIdentifier>{65aecf19-a24a-4c58-9fc2-b6e61bd070be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Visualization">
-      <UniqueIdentifier>{08385bf5-1a58-4d58-a570-e53ef69bf8b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\Visualization">
-      <UniqueIdentifier>{0fcf6117-8bb6-4d83-b5e1-9fd5d5f7ad53}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\DataExchange">
       <UniqueIdentifier>{59584460-156d-479d-877b-f92d18032130}</UniqueIdentifier>
     </Filter>
@@ -201,13 +195,16 @@
     <Filter Include="头文件\OCCProxy\Graphic3d\enum">
       <UniqueIdentifier>{b4446d3b-49f3-4bc9-a664-ad86898cc154}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\OCCProxy\OpenGL">
+      <UniqueIdentifier>{9e04ff45-6afa-468c-ac79-407ab6d1480e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\OCCProxy\OpenGL">
+      <UniqueIdentifier>{15a2eaa4-096d-4129-97f0-4c8d8ec5a987}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
-    </ClCompile>
-    <ClCompile Include="ICO_CSharpViewer.cpp">
-      <Filter>源文件\Visualization</Filter>
     </ClCompile>
     <ClCompile Include="ICO_InteractiveObject.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
@@ -392,11 +389,11 @@
     <ClCompile Include="ICO_TextLabel.cpp">
       <Filter>源文件\OCCProxy\AIS</Filter>
     </ClCompile>
+    <ClCompile Include="ICO_OpenGl_GraphicDriver.cpp">
+      <Filter>源文件\OCCProxy\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ICO_CSharpViewer.h">
-      <Filter>头文件\Visualization</Filter>
-    </ClInclude>
     <ClInclude Include="ICO_StringExchange.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
@@ -633,6 +630,9 @@
     </ClInclude>
     <ClInclude Include="ICO_ZLayerId.h">
       <Filter>头文件\OCCProxy\Graphic3d\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_OpenGl_GraphicDriver.h">
+      <Filter>头文件\OCCProxy\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
