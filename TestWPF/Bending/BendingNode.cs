@@ -265,8 +265,8 @@ public class LeafNode : NodeDS
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
-            Pnt? leftOutterFatherPoint = null;
-            Pnt? rightOutterFatherPoint = null;
+            TVertex? leftOutterFatherPoint = null;
+            TVertex? rightOutterFatherPoint = null;
             foreach (var outterEdge in Bending.OutterFace.Edges)
             {
                 //理论上只会有两根直线
@@ -289,8 +289,8 @@ public class LeafNode : NodeDS
                     )
                 )
                 {
-                    leftOutterFatherPoint = outterEdgePoints[0].ToPnt();
-                    rightOutterFatherPoint = outterEdgePoints[1].ToPnt();
+                    leftOutterFatherPoint = outterEdgePoints[0];
+                    rightOutterFatherPoint = outterEdgePoints[1];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                     OutterFatherEdge = outterEdge;
                     break;
@@ -300,8 +300,8 @@ public class LeafNode : NodeDS
                     && rightFatherFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[0]))
                 )
                 {
-                    leftOutterFatherPoint = outterEdgePoints[1].ToPnt();
-                    rightOutterFatherPoint = outterEdgePoints[0].ToPnt();
+                    leftOutterFatherPoint = outterEdgePoints[1];
+                    rightOutterFatherPoint = outterEdgePoints[0];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                     OutterFatherEdge = outterEdge;
                     break;
@@ -364,8 +364,8 @@ public class LeafNode : NodeDS
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
-            Pnt? leftOutterChildPoint = null;
-            Pnt? rightOutterChildPoint = null;
+            TVertex? leftOutterChildPoint = null;
+            TVertex? rightOutterChildPoint = null;
             foreach (var outterEdge in Bending.OutterFace.Edges)
             {
                 //理论上只会有两根直线
@@ -391,8 +391,8 @@ public class LeafNode : NodeDS
                 {
                     if (outterEdge.Index == OutterFatherEdge.Index)
                         continue;
-                    leftOutterChildPoint = outterEdgePoints[0].ToPnt();
-                    rightOutterChildPoint = outterEdgePoints[1].ToPnt();
+                    leftOutterChildPoint = outterEdgePoints[0];
+                    rightOutterChildPoint = outterEdgePoints[1];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                     OutterChildEdge = outterEdge;
                     break;
@@ -404,8 +404,8 @@ public class LeafNode : NodeDS
                 {
                     if (outterEdge.Index == OutterFatherEdge.Index)
                         continue;
-                    leftOutterChildPoint = outterEdgePoints[1].ToPnt();
-                    rightOutterChildPoint = outterEdgePoints[0].ToPnt();
+                    leftOutterChildPoint = outterEdgePoints[1];
+                    rightOutterChildPoint = outterEdgePoints[0];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                     OutterChildEdge = outterEdge;
                     break;
@@ -423,94 +423,21 @@ public class LeafNode : NodeDS
             {
                 throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
             }
-            //不能直接构建平面，四个点有可能不在一个平面上
-            Pln? pln = null;
-            try
-            {
-                pln = new(
-                    LeftInnerChildPoint,
-                    new Dir(LeftInnerFatherPoint, LeftInnerChildPoint).Crossed(
-                        new(LeftInnerChildPoint, leftOutterChildPoint)
-                    )
-                );
-            }
-            catch { }
-            MakeWire wrieMaker = new();
-            if (pln != null && pln.Distance(leftOutterChildPoint) > 1e-4)
-            {
-                Vec projectionVec = pln.Axis.Direction.ToVec(-pln.Distance(leftOutterChildPoint));
-                Trsf t = new();
-                t.SetTranslation(projectionVec);
-                Pnt projectedPoint = leftOutterChildPoint.Transformed(t);
-                wrieMaker = new(
-                    [
-                        new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
-                        new MakeEdge(LeftInnerChildPoint, projectedPoint),
-                        new MakeEdge(projectedPoint, leftOutterFatherPoint),
-                        new MakeEdge(leftOutterFatherPoint, LeftInnerFatherPoint),
-                    ]
-                );
-            }
-            else
-            {
-                wrieMaker = new(
-                    [
-                        new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
-                        new MakeEdge(LeftInnerChildPoint, leftOutterChildPoint),
-                        new MakeEdge(leftOutterChildPoint, leftOutterFatherPoint),
-                        new MakeEdge(leftOutterFatherPoint, LeftInnerFatherPoint),
-                    ]
-                );
-            }
-            Analyzer ana = new(new MakeFace(wrieMaker));
-            if (!ana.IsValid())
+            var d = Parent.FaceSet.SelectMany(f => f.TopoVertices).Select(p => p).ToList();
+            if (d.Any(p => p == leftOutterFatherPoint))
             {
                 //todo 这里逻辑反了，不知道为什么
-                LeftOutterChildPoint = leftOutterFatherPoint;
-                LeftOutterFatherPoint = leftOutterChildPoint;
-                RightOutterFatherPoint = rightOutterChildPoint;
-                RightOutterChildPoint = rightOutterFatherPoint;
+                LeftOutterChildPoint = leftOutterFatherPoint.ToPnt();
+                LeftOutterFatherPoint = leftOutterChildPoint.ToPnt();
+                RightOutterFatherPoint = rightOutterChildPoint.ToPnt();
+                RightOutterChildPoint = rightOutterFatherPoint.ToPnt();
             }
             else
             {
-                MakeWire wrieMaker2 = new();
-                if (pln != null && pln.Distance(leftOutterChildPoint) > 1e-4)
-                {
-                    Vec projectionVec = pln.Axis.Direction.ToVec(
-                        -pln.Distance(leftOutterChildPoint)
-                    );
-                    Trsf t = new();
-                    t.SetTranslation(projectionVec);
-                    Pnt projectedPoint = leftOutterChildPoint.Transformed(t);
-                    wrieMaker2 = new(
-                        [
-                            new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
-                            new MakeEdge(LeftInnerChildPoint, leftOutterFatherPoint),
-                            new MakeEdge(leftOutterFatherPoint, projectedPoint),
-                            new MakeEdge(projectedPoint, LeftInnerFatherPoint),
-                        ]
-                    );
-                }
-                else
-                {
-                    wrieMaker2 = new(
-                        [
-                            new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
-                            new MakeEdge(LeftInnerChildPoint, leftOutterFatherPoint),
-                            new MakeEdge(leftOutterFatherPoint, leftOutterChildPoint),
-                            new MakeEdge(leftOutterChildPoint, LeftInnerFatherPoint),
-                        ]
-                    );
-                }
-                Analyzer ana2 = new(new MakeFace(wrieMaker));
-                if (!ana2.IsValid())
-                {
-                    throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
-                }
-                LeftOutterChildPoint = leftOutterChildPoint;
-                LeftOutterFatherPoint = leftOutterFatherPoint;
-                RightOutterFatherPoint = rightOutterFatherPoint;
-                RightOutterChildPoint = rightOutterChildPoint;
+                LeftOutterChildPoint = leftOutterChildPoint.ToPnt();
+                LeftOutterFatherPoint = leftOutterFatherPoint.ToPnt();
+                RightOutterFatherPoint = rightOutterFatherPoint.ToPnt();
+                RightOutterChildPoint = rightOutterChildPoint.ToPnt();
             }
             #endregion
             #endregion
@@ -599,8 +526,8 @@ public class LeafNode : NodeDS
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线
-                Pnt? leftInnerFatherPoint = null;
-                Pnt? rightInnerFatherPoint = null;
+                TVertex? leftInnerFatherPoint = null;
+                TVertex? rightInnerFatherPoint = null;
                 foreach (var innerEdge in Bending.InnerFace.Edges)
                 {
                     //理论上只会有两根直线
@@ -623,8 +550,8 @@ public class LeafNode : NodeDS
                         )
                     )
                     {
-                        leftInnerFatherPoint = innerEdgePoints[0].ToPnt();
-                        rightInnerFatherPoint = innerEdgePoints[1].ToPnt();
+                        leftInnerFatherPoint = innerEdgePoints[0];
+                        rightInnerFatherPoint = innerEdgePoints[1];
                         //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                         InnerFatherEdge = innerEdge;
                         break;
@@ -634,8 +561,8 @@ public class LeafNode : NodeDS
                         && rightFatherFace.TopoVertices.Any(v => v.IsEqual(innerEdgePoints[0]))
                     )
                     {
-                        leftInnerFatherPoint = innerEdgePoints[1].ToPnt();
-                        rightInnerFatherPoint = innerEdgePoints[0].ToPnt();
+                        leftInnerFatherPoint = innerEdgePoints[1];
+                        rightInnerFatherPoint = innerEdgePoints[0];
                         //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                         InnerFatherEdge = innerEdge;
                         break;
@@ -698,8 +625,8 @@ public class LeafNode : NodeDS
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线
-                Pnt? leftInnerChildPoint = null;
-                Pnt? rightInnerChildPoint = null;
+                TVertex? leftInnerChildPoint = null;
+                TVertex? rightInnerChildPoint = null;
                 foreach (var innerEdge in Bending.InnerFace.Edges)
                 {
                     //理论上只会有两根直线
@@ -725,8 +652,8 @@ public class LeafNode : NodeDS
                     {
                         if (innerEdge.Index == InnerFatherEdge.Index)
                             continue;
-                        leftInnerChildPoint = innerEdgePoints[0].ToPnt();
-                        rightInnerChildPoint = innerEdgePoints[1].ToPnt();
+                        leftInnerChildPoint = innerEdgePoints[0];
+                        rightInnerChildPoint = innerEdgePoints[1];
                         //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                         InnerChildEdge = innerEdge;
                         break;
@@ -738,8 +665,8 @@ public class LeafNode : NodeDS
                     {
                         if (innerEdge.Index == InnerFatherEdge.Index)
                             continue;
-                        leftInnerChildPoint = innerEdgePoints[1].ToPnt();
-                        rightInnerChildPoint = innerEdgePoints[0].ToPnt();
+                        leftInnerChildPoint = innerEdgePoints[1];
+                        rightInnerChildPoint = innerEdgePoints[0];
                         //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
                         InnerChildEdge = innerEdge;
                         break;
@@ -758,97 +685,21 @@ public class LeafNode : NodeDS
                     throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
                 }
                 //均按照左侧面去找点
-                //todo 不能直接构建平面，四个点可能不在一个平面上，需要将第四个点投影到一个平面上再进行构建
-                Pln? pln = null;
-                try
-                {
-                    pln = new(
-                        leftInnerChildPoint,
-                        new Dir(leftInnerFatherPoint, leftInnerChildPoint).Crossed(
-                            new(leftInnerChildPoint, LeftOutterChildPoint)
-                        )
-                    );
-                }
-                catch { }
-                MakeWire wrieMaker = new();
-                if (pln != null && pln.Distance(LeftOutterFatherPoint) > 1e-4)
-                {
-                    Vec projectionVec = pln.Axis.Direction.ToVec(
-                        -pln.Distance(LeftOutterFatherPoint)
-                    );
-                    Trsf t = new();
-                    t.SetTranslation(projectionVec);
-                    Pnt projectedPoint = LeftOutterFatherPoint.Transformed(t);
-                    wrieMaker = new(
-                        [
-                            new MakeEdge(leftInnerFatherPoint, leftInnerChildPoint),
-                            new MakeEdge(leftInnerChildPoint, LeftOutterChildPoint),
-                            new MakeEdge(LeftOutterChildPoint, projectedPoint),
-                            new MakeEdge(projectedPoint, leftInnerFatherPoint),
-                        ]
-                    );
-                }
-                else
-                {
-                    wrieMaker = new(
-                        [
-                            new MakeEdge(leftInnerFatherPoint, leftInnerChildPoint),
-                            new MakeEdge(leftInnerChildPoint, LeftOutterChildPoint),
-                            new MakeEdge(LeftOutterChildPoint, LeftOutterFatherPoint),
-                            new MakeEdge(LeftOutterFatherPoint, leftInnerFatherPoint),
-                        ]
-                    );
-                }
-                TFace tempf = new MakeFace(wrieMaker);
-                Analyzer ana = new(tempf);
-                if (!ana.IsValid())
+                var d = Parent.FaceSet.SelectMany(f => f.TopoVertices).Select(p => p).ToList();
+                if (d.Any(p => p == leftInnerFatherPoint))
                 {
                     //todo 这里逻辑反了，不知道为什么
-                    LeftInnerFatherPoint = leftInnerChildPoint;
-                    LeftInnerChildPoint = leftInnerFatherPoint;
-                    RightInnerFatherPoint = rightInnerChildPoint;
-                    RightInnerChildPoint = rightInnerFatherPoint;
+                    LeftInnerFatherPoint = leftInnerChildPoint.ToPnt();
+                    LeftInnerChildPoint = leftInnerFatherPoint.ToPnt();
+                    RightInnerFatherPoint = rightInnerChildPoint.ToPnt();
+                    RightInnerChildPoint = rightInnerFatherPoint.ToPnt();
                 }
                 else
                 {
-                    MakeWire wrieMaker2 = new();
-                    if (pln != null && pln.Distance(LeftOutterFatherPoint) > 1e-4)
-                    {
-                        Vec projectionVec = pln.Axis.Direction.ToVec(
-                            -pln.Distance(LeftOutterFatherPoint)
-                        );
-                        Trsf t = new();
-                        t.SetTranslation(projectionVec);
-                        Pnt projectedPoint = LeftOutterFatherPoint.Transformed(t);
-                        wrieMaker2 = new(
-                            [
-                                new MakeEdge(leftInnerChildPoint, leftInnerFatherPoint),
-                                new MakeEdge(leftInnerFatherPoint, LeftOutterChildPoint),
-                                new MakeEdge(LeftOutterChildPoint, projectedPoint),
-                                new MakeEdge(projectedPoint, leftInnerChildPoint),
-                            ]
-                        );
-                    }
-                    else
-                    {
-                        wrieMaker2 = new(
-                            [
-                                new MakeEdge(leftInnerChildPoint, leftInnerFatherPoint),
-                                new MakeEdge(leftInnerFatherPoint, LeftOutterChildPoint),
-                                new MakeEdge(LeftOutterChildPoint, LeftOutterFatherPoint),
-                                new MakeEdge(LeftOutterFatherPoint, leftInnerChildPoint),
-                            ]
-                        );
-                    }
-                    Analyzer ana2 = new(new MakeFace(wrieMaker));
-                    if (!ana2.IsValid())
-                    {
-                        throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
-                    }
-                    LeftInnerFatherPoint = leftInnerFatherPoint;
-                    LeftInnerChildPoint = leftInnerChildPoint;
-                    RightInnerFatherPoint = rightInnerFatherPoint;
-                    RightInnerChildPoint = rightInnerChildPoint;
+                    LeftInnerFatherPoint = leftInnerFatherPoint.ToPnt();
+                    LeftInnerChildPoint = leftInnerChildPoint.ToPnt();
+                    RightInnerFatherPoint = rightInnerFatherPoint.ToPnt();
+                    RightInnerChildPoint = rightInnerChildPoint.ToPnt();
                 }
                 #endregion
                 #endregion

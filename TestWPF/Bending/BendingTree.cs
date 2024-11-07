@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using System.Windows.Forms;
 using log4net;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.GeomAbs;
@@ -365,7 +367,7 @@ public class BendingTree
         // 初始化队列，包含根节点的面和节点
         Queue<(Face mainFace, NodeDS node)> queue = new();
         queue.Enqueue((rootFace, rootNode));
-
+        string createFailedInfo = "";
         while (queue.Count > 0)
         {
             var (currentFace, currentNode) = queue.Dequeue();
@@ -390,26 +392,35 @@ public class BendingTree
                         HashSet<Face> faceSet = new();
                         GetFaceSet(adj2, ref faceSet);
                         LeafNode? newNode = null;
-                        if (bending.Type == BendingType.VBend)
+                        try
                         {
-                            newNode = new VBendNode(adj2, faceSet, currentNode, bending, _Kparam);
+                            if (bending.Type == BendingType.VBend)
+                            {
+                                newNode = new VBendNode(
+                                    adj2,
+                                    faceSet,
+                                    currentNode,
+                                    bending,
+                                    _Kparam
+                                );
+                            }
+                            else if (bending.Type == BendingType.Hem)
+                            {
+                                newNode = new ClosedHemNode(
+                                    adj2,
+                                    faceSet,
+                                    currentNode,
+                                    bending,
+                                    _Kparam
+                                );
+                            }
                         }
-                        else if (bending.Type == BendingType.Hem)
-                        {
-                            newNode = new ClosedHemNode(
-                                adj2,
-                                faceSet,
-                                currentNode,
-                                bending,
-                                _Kparam
-                            );
-                        }
-                        try { }
                         catch (Exception e)
                         {
+                            //throw new Exception($"主平面:{adj2} 节点创建失败\n{e}");
+                            createFailedInfo += $"\n{adj2}";
                             log.Debug($"主平面:{adj2} 节点创建失败\n{e}");
                         }
-
                         if (newNode == null)
                             continue;
 
@@ -421,6 +432,15 @@ public class BendingTree
                     }
                 }
             }
+        }
+        if (createFailedInfo != "")
+        {
+            System.Windows.MessageBox.Show(
+                $"折弯解析失败，平面:{createFailedInfo}\n对应折弯创建失败",
+                "警告",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning
+            );
         }
     }
 
