@@ -27,32 +27,32 @@ public partial class OCCCanvasView : System.Windows.Controls.UserControl
     public OCCCanvasView()
     {
         InitializeComponent();
-        DataContext = new OCCCanvasViewModel();
+        //DataContext = new OCCCanvasViewModel();
 
-        // 创建一个 Windows Forms 的 Panel 并将其嵌入到 WindowsFormsHost 中
-        System.Windows.Forms.Panel winFormsPanel = new();
-        winFormsPanel.Paint += new System.Windows.Forms.PaintEventHandler(OnPaint);
-        WindowsFormsHost formHost = new();
-        canvasGrid.Children.Add(formHost);
-        formHost.Child = winFormsPanel;
+        //// 创建一个 Windows Forms 的 Panel 并将其嵌入到 WindowsFormsHost 中
+        //System.Windows.Forms.Panel winFormsPanel = new();
+        //winFormsPanel.Paint += new System.Windows.Forms.PaintEventHandler(OnPaint);
+        //WindowsFormsHost formHost = new();
+        //canvasGrid.Children.Add(formHost);
+        //formHost.Child = winFormsPanel;
 
-        // 获取 Windows Forms Panel 的句柄
-        IntPtr windowHandle = winFormsPanel.Handle;
-        _mainView = ((OCCCanvasViewModel)DataContext).CreateView(windowHandle);
-        _mainView.SetDefault();
+        //// 获取 Windows Forms Panel 的句柄
+        //IntPtr windowHandle = winFormsPanel.Handle;
+        //_mainView = ((OCCCanvasViewModel)DataContext).CreateView(windowHandle);
+        //_mainView.SetDefault();
     }
 
-    private void OnPaint(object? sender, PaintEventArgs e)
-    {
-        if (((OCCCanvasViewModel)DataContext)._context == null)
-        {
-            return;
-        }
-        if (_mainView == null)
-        {
-            return;
-        }
-        _mainView.Redraw();
-        ((OCCCanvasViewModel)DataContext)._context.UpdateCurrentViewer();
-    }
+    //private void OnPaint(object? sender, PaintEventArgs e)
+    //{
+    //    if (((OCCCanvasViewModel)DataContext)._context == null)
+    //    {
+    //        return;
+    //    }
+    //    if (_mainView == null)
+    //    {
+    //        return;
+    //    }
+    //    _mainView.Redraw();
+    //    ((OCCCanvasViewModel)DataContext)._context.UpdateCurrentViewer();
+    //}
 }

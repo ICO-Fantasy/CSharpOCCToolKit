@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Windows.Forms;
-using System.Windows.Input;
 using log4net;
-using OCCTK.Extension;
-using OCCTK.OCC;
 using OCCTK.OCC.AIS;
-using OCCTK.OCC.gp;
 using OCCTK.OCC.OpenGL;
-using OCCTK.OCC.Topo;
 using OCCTK.OCC.V3d;
-using OCCTK.Visualization;
 using TestWPF;
 using Color = OCCTK.Extension.Color;
 using View = OCCTK.OCC.V3d.View;

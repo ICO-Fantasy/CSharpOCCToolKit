@@ -6,6 +6,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
+ref class Ax1;
 ref class Ax3;
 ref class Pnt;
 ref class Dir;
@@ -26,6 +27,10 @@ public:
 	Pln(Pnt^ location, Dir^ direction);
 	gp_Pln GetOCC();
 	virtual System::Object^ Clone();
+public:
+	double Distance(Pnt^ point);
+	System::ValueTuple<double, double, double, double> Coefficients();
+	property Ax1^ Axis {Ax1^ get(); };
 protected:
 	gp_Pln* myPln;
 protected:

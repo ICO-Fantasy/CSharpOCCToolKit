@@ -39,7 +39,7 @@ public:
 	Trsf^ Multiplied(Trsf^ rightTrsf);
 	Trsf^ Inverted();
 public:
-	property System::Tuple<double, double, double>^ Translation {System::Tuple<double, double, double>^ get(); };
+	property System::ValueTuple<double, double, double> Translation {System::ValueTuple<double, double, double> get(); };
 	property Quat^ Rotation {Quat^ get(); };
 private:
 	gp_Trsf* myTrsf;

@@ -133,6 +133,7 @@
                 <RowDefinition Height="3*" />
                 <RowDefinition Height="2*" />
                 <RowDefinition Height="30*" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="30*" />
                 <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
@@ -205,13 +206,40 @@
                 Grid.Row="2"
                 Background="LightSkyBlue"
                 Visibility="Visible" />
+            <!--  搜索  -->
+            <Grid  Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <!--  搜索框  -->
+                <TextBox
+                    x:Name="SearchTextBox"
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Top"
+                    TextChanged="OnSearchTextChanged" />
+                <!--  重置按钮  -->
+                <Button
+                    x:Name="ResetButton"
+                    Width="100"
+                    Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Click="OnResetButtonClick"
+                    Content="重置" />
+            </Grid>
             <ScrollViewer
                 x:Name="TestBox_ScrollViewer"
-                Grid.Row="3"
+                Grid.Row="4"
                 Visibility="Visible">
                 <StackPanel x:Name="TestBox_StackPanel" Background="LightYellow" />
             </ScrollViewer>
-            <Grid x:Name="Buttons_Grid" Grid.Row="4">
+            <Grid x:Name="Buttons_Grid" Grid.Row="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />

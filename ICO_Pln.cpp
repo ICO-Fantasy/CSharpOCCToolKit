@@ -2,6 +2,7 @@
 #include <gp_Pln.hxx>
 //local
 #include "ICO_Trsf.h"
+#include "ICO_Ax1.h"
 #include "ICO_Ax3.h"
 #include "ICO_Dir.h"
 #include "ICO_pnt.h"
@@ -39,6 +40,18 @@ gp_Pln Pln::GetOCC() {
 Object^ Pln::Clone() {
 	return gcnew Pln(myPln);
 }
+
+double Pln::Distance(Pnt^ point) {
+	return myPln->Distance(point->GetOCC());
+}
+
+System::ValueTuple<double, double, double, double> Pln::Coefficients() {
+	double a, b, c, d;
+	myPln->Coefficients(a, b, c, d);
+	return System::ValueTuple<double, double, double, double>(a, b, c, d);
+}
+
+Ax1^ Pln::Axis::get() { return gcnew Ax1(myPln->Axis()); }
 
 }
 }

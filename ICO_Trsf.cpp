@@ -115,9 +115,9 @@ Trsf^ Trsf::Inverted() {
 	return gcnew Trsf(myTrsf->Inverted());
 }
 
-System::Tuple<double, double, double>^ Trsf::Translation::get() {
+ValueTuple<double, double, double> Trsf::Translation::get() {
 	gp_XYZ xyz = myTrsf->TranslationPart();
-	return gcnew Tuple<double, double, double> { xyz.X(), xyz.Y(), xyz.Z()};
+	return ValueTuple<double, double, double>(xyz.X(), xyz.Y(), xyz.Z());
 }
 
 Quat^ Trsf::Rotation::get() {

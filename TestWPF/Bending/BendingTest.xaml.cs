@@ -321,6 +321,34 @@ public partial class BendingTest : Window, IAISSelectionHandler
         e.Handled = true;
     }
 
+    // 搜索框内容变化时执行的事件
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        var searchText = SearchTextBox.Text.ToLower();
+        foreach (var child in TestBox_StackPanel.Children.OfType<Grid>())
+        {
+            if (child.Children[0] is Label label && label.Content is string content)
+            {
+                child.Visibility = content.Contains(
+                    searchText,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+    }
+
+    // 重置按钮点击事件，恢复显示所有项
+    private void OnResetButtonClick(object sender, RoutedEventArgs e)
+    {
+        SearchTextBox.Text = string.Empty;
+        foreach (var child in TestBox_StackPanel.Children.OfType<Grid>())
+        {
+            child.Visibility = Visibility.Visible;
+        }
+    }
+
     #endregion
     public void OnAISSelection(AShape? theAIS)
     {
@@ -679,11 +707,13 @@ public partial class BendingTest : Window, IAISSelectionHandler
         }
         if (selectedNode is RootNode)
         {
+            MessageBox.Show("请选择叶子节点");
             return;
         }
         if (selectedNode is LeafNode leaf)
         {
             // 执行 Node 的 ShowSectors 方法
+            leaf.CalculateSectors(5);
             leaf.ShowSectors(Context, false);
         }
 

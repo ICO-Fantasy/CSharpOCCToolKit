@@ -13,7 +13,6 @@ using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.V3d;
-using OCCTK.Visualization;
 using Color = OCCTK.Extension.Color;
 
 namespace OCCViewForm;

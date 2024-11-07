@@ -204,12 +204,12 @@ public class BendingTree
         #region 计算板厚并获取折弯，计算主平面和主方向
         //! 必须在计算折弯之前计算板厚，板厚是判断折弯面的依据
         // 使用 GroupBy 分组并计算出现次数
-        var top3 = AllEdges
+        var top8 = AllEdges
             .GroupBy(x => Math.Round(x.Length, 2)) // 按值分组
             .OrderByDescending(g => g.Count()) // 按分组数量降序排列
-            .Take(5) // 取出现次数最多的前5个
+            .Take(8) // 取出现次数最多的前5个
             .Select(g => new { Value = g.Key, Count = g.Count() }); // 返回值和对应的出现次数
-        foreach (var e in top3)
+        foreach (var e in top8)
         {
             log.Debug($"尝试板厚:{e.Value}");
             //+ 获取所有折弯
@@ -351,57 +351,6 @@ public class BendingTree
     }
 
     /// <summary>
-    /// 折弯树的深度迭代
-    /// </summary>
-    /// <param name="parentMainFace"></param>
-    /// <param name="parentNode"></param>
-    /// <param name="temptFace"></param>
-    private void CreateNode(Face parentMainFace, NodeDS parentNode, ref List<Face> temptFace)
-    {
-        if (temptFace.Count == 0)
-            return;
-        foreach (var adj1 in parentMainFace.AdjacentFaces.Values)
-        {
-            foreach (var b in AllBendings)
-            {
-                if (!b.CylinderFaces.Contains(adj1))
-                    continue;
-
-                //该折弯面(圆柱面)的下一个邻面即为下一个节点的主平面
-                foreach (var adj2 in adj1.AdjacentFaces.Values)
-                {
-                    if (b.BendingFaces.Contains(adj2) || !temptFace.Contains(adj2))
-                        continue;
-                    //迭代获取所有非折弯面的邻面，构建节点面组
-                    HashSet<Face> faceSet = [];
-                    GetFaceSet(adj2, ref faceSet);
-                    LeafNode? newNode = null;
-                    if (b.Type == BendingType.VBend)
-                    {
-                        newNode = new VBendNode(adj2, faceSet, parentNode, b, _Kparam);
-                    }
-                    else if (b.Type == BendingType.Hem)
-                    {
-                        newNode = new ClosedHemNode(adj2, faceSet, parentNode, b, _Kparam);
-                    }
-                    try { }
-                    catch (Exception e)
-                    {
-                        log.Debug($"节点创建失败\n{e}");
-                    }
-                    if (newNode == null)
-                    {
-                        return;
-                    }
-                    parentNode.Children.Add(newNode);
-                    temptFace.RemoveAll(item => faceSet.Contains(item));
-                    CreateNode(adj2, newNode, ref temptFace);
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// 广度优先的节点搜索
     /// </summary>
     /// <param name="rootFace"></param>
@@ -412,6 +361,7 @@ public class BendingTree
         if (temptFace.Count == 0)
             return;
 
+        //var allSectorFaces = AllBendings.SelectMany(b => b.SectorFaces).ToList();
         // 初始化队列，包含根节点的面和节点
         Queue<(Face mainFace, NodeDS node)> queue = new();
         queue.Enqueue((rootFace, rootNode));
@@ -430,38 +380,34 @@ public class BendingTree
                     // 找到与当前折弯邻接的平面
                     foreach (var adj2 in adj1.AdjacentFaces.Values)
                     {
-                        if (bending.BendingFaces.Contains(adj2) || !temptFace.Contains(adj2))
+                        if (
+                            bending.BendingFaces.Contains(adj2) //不能是折弯的面
+                            || !temptFace.Contains(adj2) //尚未被使用
+                        //|| adj2.AdjacentFaces.Values.Any(allSectorFaces.Contains) //todo 不能和折弯侧面是邻面（不知道是否必须）
+                        )
                             continue;
 
                         HashSet<Face> faceSet = new();
                         GetFaceSet(adj2, ref faceSet);
                         LeafNode? newNode = null;
-                        try
+                        if (bending.Type == BendingType.VBend)
                         {
-                            if (bending.Type == BendingType.VBend)
-                            {
-                                newNode = new VBendNode(
-                                    adj2,
-                                    faceSet,
-                                    currentNode,
-                                    bending,
-                                    _Kparam
-                                );
-                            }
-                            else if (bending.Type == BendingType.Hem)
-                            {
-                                newNode = new ClosedHemNode(
-                                    adj2,
-                                    faceSet,
-                                    currentNode,
-                                    bending,
-                                    _Kparam
-                                );
-                            }
+                            newNode = new VBendNode(adj2, faceSet, currentNode, bending, _Kparam);
                         }
+                        else if (bending.Type == BendingType.Hem)
+                        {
+                            newNode = new ClosedHemNode(
+                                adj2,
+                                faceSet,
+                                currentNode,
+                                bending,
+                                _Kparam
+                            );
+                        }
+                        try { }
                         catch (Exception e)
                         {
-                            log.Debug($"节点创建失败\n{e}");
+                            log.Debug($"主平面:{adj2} 节点创建失败\n{e}");
                         }
 
                         if (newNode == null)

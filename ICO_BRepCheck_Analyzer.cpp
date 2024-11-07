@@ -2,6 +2,7 @@
 #include<BRepCheck_Analyzer.hxx>
 //local
 #include"ICO_Topo_Shape.h"
+#include"ICO_Exception.h"
 
 using namespace OCCTK::OCC::Topo;
 
@@ -14,7 +15,9 @@ namespace BRepCheck {
 /// </summary>
 /// <param name="shape"></param>
 Analyzer::Analyzer(TShape^ shape) {
-	myAna = new BRepCheck_Analyzer(shape->GetOCC());
+	try {
+		myAna = new BRepCheck_Analyzer(shape->GetOCC());
+	}CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
 /// <summary>

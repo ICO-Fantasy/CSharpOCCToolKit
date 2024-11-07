@@ -905,7 +905,7 @@ public partial class SimpleClamp : Window
                     return plate.Order;
                 })
                 .ToList();
-            for (global::System.Int32 i = 0; i < CurrentPlate.Pieces.Count; ++i)
+            for (int i = 0; i < CurrentPlate.Pieces.Count; ++i)
             {
                 CurrentPlate_StackPanel.Children.Add(MakeStackItem(CurrentPlate.Pieces[i], i));
             }

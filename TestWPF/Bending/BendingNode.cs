@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.BRepCheck;
@@ -155,7 +156,7 @@ public class LeafNode : NodeDS
         #endregion
         #region 计算展开方向
         UnfoldingDirection = parent.MainFace.Normal.Direction.Crossed(
-            new(LeftInnerFatherPoint, RightInnerChildPoint)
+            new(LeftInnerFatherPoint, RightInnerFatherPoint)
         );
         if (UnfoldingDirection.Dot(bending.Normal.Direction) > 0)
         {
@@ -220,7 +221,7 @@ public class LeafNode : NodeDS
             }
             if (InnerFatherEdgePoints.Count != 2)
             {
-                throw new Exception("构成边的点不为2");
+                throw new Exception($"主平面: {MainFace} 构成边的点不为2");
             }
 
             //+ 将直线两个点与面上的点进行比较，找出扇形面对
@@ -260,7 +261,7 @@ public class LeafNode : NodeDS
             }
             if (leftFatherFace == null || rightFatherFace == null)
             {
-                throw new Exception($"没找到InnerFatherEdge {Bending.OutterFace} 对应的扇形面对");
+                throw new Exception($"没找到主平面: {MainFace} InnerFatherEdge 对应的扇形面对");
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -278,7 +279,7 @@ public class LeafNode : NodeDS
                 }
                 if (outterEdgePoints.Count != 2)
                 {
-                    throw new Exception("构成边的点不为2");
+                    throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
                 //找到那条直线
                 if (
@@ -319,7 +320,7 @@ public class LeafNode : NodeDS
             }
             if (InnerChildEdgePoints.Count != 2)
             {
-                throw new Exception("构成边的点不为2");
+                throw new Exception($"主平面: {MainFace} 构成边的点不为2");
             }
 
             //将直线两个点与面上的点进行比较，找出扇形面对
@@ -359,7 +360,7 @@ public class LeafNode : NodeDS
             }
             if (leftChildFace == null || rightChildFace == null)
             {
-                throw new Exception($"没找到InnerChildEdge {Bending.OutterFace} 对应的扇形面对");
+                throw new Exception($"没找到主平面: {MainFace} InnerChildEdge 对应的扇形面对");
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -377,7 +378,7 @@ public class LeafNode : NodeDS
                 }
                 if (outterEdgePoints.Count != 2)
                 {
-                    throw new Exception("构成边的点不为2");
+                    throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
 
                 //找到那条直线
@@ -420,10 +421,39 @@ public class LeafNode : NodeDS
                 || rightOutterChildPoint == null
             )
             {
-                throw new Exception("没找到扇形面对应4个点");
+                throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
             }
-            MakeWire wrieMaker =
-                new(
+            //不能直接构建平面，四个点有可能不在一个平面上
+            Pln? pln = null;
+            try
+            {
+                pln = new(
+                    LeftInnerChildPoint,
+                    new Dir(LeftInnerFatherPoint, LeftInnerChildPoint).Crossed(
+                        new(LeftInnerChildPoint, leftOutterChildPoint)
+                    )
+                );
+            }
+            catch { }
+            MakeWire wrieMaker = new();
+            if (pln != null && pln.Distance(leftOutterChildPoint) > 1e-4)
+            {
+                Vec projectionVec = pln.Axis.Direction.ToVec(-pln.Distance(leftOutterChildPoint));
+                Trsf t = new();
+                t.SetTranslation(projectionVec);
+                Pnt projectedPoint = leftOutterChildPoint.Transformed(t);
+                wrieMaker = new(
+                    [
+                        new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
+                        new MakeEdge(LeftInnerChildPoint, projectedPoint),
+                        new MakeEdge(projectedPoint, leftOutterFatherPoint),
+                        new MakeEdge(leftOutterFatherPoint, LeftInnerFatherPoint),
+                    ]
+                );
+            }
+            else
+            {
+                wrieMaker = new(
                     [
                         new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
                         new MakeEdge(LeftInnerChildPoint, leftOutterChildPoint),
@@ -431,18 +461,39 @@ public class LeafNode : NodeDS
                         new MakeEdge(leftOutterFatherPoint, LeftInnerFatherPoint),
                     ]
                 );
+            }
             Analyzer ana = new(new MakeFace(wrieMaker));
             if (!ana.IsValid())
             {
-                LeftOutterChildPoint = leftOutterChildPoint;
-                LeftOutterFatherPoint = leftOutterFatherPoint;
-                RightOutterFatherPoint = rightOutterFatherPoint;
-                RightOutterChildPoint = rightOutterChildPoint;
+                //todo 这里逻辑反了，不知道为什么
+                LeftOutterChildPoint = leftOutterFatherPoint;
+                LeftOutterFatherPoint = leftOutterChildPoint;
+                RightOutterFatherPoint = rightOutterChildPoint;
+                RightOutterChildPoint = rightOutterFatherPoint;
             }
             else
             {
-                MakeWire wrieMaker2 =
-                    new(
+                MakeWire wrieMaker2 = new();
+                if (pln != null && pln.Distance(leftOutterChildPoint) > 1e-4)
+                {
+                    Vec projectionVec = pln.Axis.Direction.ToVec(
+                        -pln.Distance(leftOutterChildPoint)
+                    );
+                    Trsf t = new();
+                    t.SetTranslation(projectionVec);
+                    Pnt projectedPoint = leftOutterChildPoint.Transformed(t);
+                    wrieMaker2 = new(
+                        [
+                            new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
+                            new MakeEdge(LeftInnerChildPoint, leftOutterFatherPoint),
+                            new MakeEdge(leftOutterFatherPoint, projectedPoint),
+                            new MakeEdge(projectedPoint, LeftInnerFatherPoint),
+                        ]
+                    );
+                }
+                else
+                {
+                    wrieMaker2 = new(
                         [
                             new MakeEdge(LeftInnerFatherPoint, LeftInnerChildPoint),
                             new MakeEdge(LeftInnerChildPoint, leftOutterFatherPoint),
@@ -450,15 +501,16 @@ public class LeafNode : NodeDS
                             new MakeEdge(leftOutterChildPoint, LeftInnerFatherPoint),
                         ]
                     );
+                }
                 Analyzer ana2 = new(new MakeFace(wrieMaker));
                 if (!ana2.IsValid())
                 {
-                    throw new Exception("没找到扇形面对应4个点");
+                    throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
                 }
-                LeftOutterChildPoint = leftOutterFatherPoint;
-                LeftOutterFatherPoint = leftOutterChildPoint;
-                RightOutterFatherPoint = rightOutterChildPoint;
-                RightOutterChildPoint = rightOutterFatherPoint;
+                LeftOutterChildPoint = leftOutterChildPoint;
+                LeftOutterFatherPoint = leftOutterFatherPoint;
+                RightOutterFatherPoint = rightOutterFatherPoint;
+                RightOutterChildPoint = rightOutterChildPoint;
             }
             #endregion
             #endregion
@@ -507,7 +559,7 @@ public class LeafNode : NodeDS
                 }
                 if (outterFatherEdgePoints.Count != 2)
                 {
-                    throw new Exception("构成边的点不为2");
+                    throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
 
                 //将直线两个点与面上的点进行比较，找出扇形面对
@@ -543,7 +595,7 @@ public class LeafNode : NodeDS
                 }
                 if (leftFatherFace == null || rightFatherFace == null)
                 {
-                    throw new Exception($"没找到OutterFatherEdge {Bending.OutterFace} 对应的扇形面对");
+                    throw new Exception($"没找到主平面: {MainFace} OutterFatherEdge 对应的扇形面对");
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -561,7 +613,7 @@ public class LeafNode : NodeDS
                     }
                     if (innerEdgePoints.Count != 2)
                     {
-                        throw new Exception("构成边的点不为2");
+                        throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                     }
                     //找到那条直线
                     if (
@@ -589,6 +641,10 @@ public class LeafNode : NodeDS
                         break;
                     }
                 }
+                if (InnerFatherEdge == null)
+                {
+                    throw new Exception($"主平面: {MainFace} 没找到InnerFatherEdge");
+                }
                 #endregion
                 #region 找到与 Child 对应的直线（平面可能由多个面构成）
                 //+ 找到扇形面对
@@ -602,7 +658,7 @@ public class LeafNode : NodeDS
                 }
                 if (outterChildEdgePoints.Count != 2)
                 {
-                    throw new Exception("构成边的点不为2");
+                    throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
 
                 //将直线两个点与面上的点进行比较，找出扇形面对
@@ -638,7 +694,7 @@ public class LeafNode : NodeDS
                 }
                 if (leftChildFace == null || rightChildFace == null)
                 {
-                    throw new Exception($"没找到InnerChildEdge {Bending.OutterFace} 对应的扇形面对");
+                    throw new Exception($"没找到主平面: {MainFace} InnerChildEdge 对应的扇形面对");
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -656,7 +712,7 @@ public class LeafNode : NodeDS
                     }
                     if (innerEdgePoints.Count != 2)
                     {
-                        throw new Exception("构成边的点不为2");
+                        throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                     }
 
                     //找到那条直线
@@ -699,11 +755,42 @@ public class LeafNode : NodeDS
                     || rightInnerChildPoint == null
                 )
                 {
-                    throw new Exception("没找到扇形面对应4个点");
+                    throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
                 }
                 //均按照左侧面去找点
-                MakeWire wrieMaker =
-                    new(
+                //todo 不能直接构建平面，四个点可能不在一个平面上，需要将第四个点投影到一个平面上再进行构建
+                Pln? pln = null;
+                try
+                {
+                    pln = new(
+                        leftInnerChildPoint,
+                        new Dir(leftInnerFatherPoint, leftInnerChildPoint).Crossed(
+                            new(leftInnerChildPoint, LeftOutterChildPoint)
+                        )
+                    );
+                }
+                catch { }
+                MakeWire wrieMaker = new();
+                if (pln != null && pln.Distance(LeftOutterFatherPoint) > 1e-4)
+                {
+                    Vec projectionVec = pln.Axis.Direction.ToVec(
+                        -pln.Distance(LeftOutterFatherPoint)
+                    );
+                    Trsf t = new();
+                    t.SetTranslation(projectionVec);
+                    Pnt projectedPoint = LeftOutterFatherPoint.Transformed(t);
+                    wrieMaker = new(
+                        [
+                            new MakeEdge(leftInnerFatherPoint, leftInnerChildPoint),
+                            new MakeEdge(leftInnerChildPoint, LeftOutterChildPoint),
+                            new MakeEdge(LeftOutterChildPoint, projectedPoint),
+                            new MakeEdge(projectedPoint, leftInnerFatherPoint),
+                        ]
+                    );
+                }
+                else
+                {
+                    wrieMaker = new(
                         [
                             new MakeEdge(leftInnerFatherPoint, leftInnerChildPoint),
                             new MakeEdge(leftInnerChildPoint, LeftOutterChildPoint),
@@ -711,18 +798,40 @@ public class LeafNode : NodeDS
                             new MakeEdge(LeftOutterFatherPoint, leftInnerFatherPoint),
                         ]
                     );
-                Analyzer ana = new(new MakeFace(wrieMaker));
+                }
+                TFace tempf = new MakeFace(wrieMaker);
+                Analyzer ana = new(tempf);
                 if (!ana.IsValid())
                 {
-                    LeftInnerFatherPoint = leftInnerFatherPoint;
-                    LeftInnerChildPoint = leftInnerChildPoint;
-                    RightInnerFatherPoint = rightInnerFatherPoint;
-                    RightInnerChildPoint = rightInnerChildPoint;
+                    //todo 这里逻辑反了，不知道为什么
+                    LeftInnerFatherPoint = leftInnerChildPoint;
+                    LeftInnerChildPoint = leftInnerFatherPoint;
+                    RightInnerFatherPoint = rightInnerChildPoint;
+                    RightInnerChildPoint = rightInnerFatherPoint;
                 }
                 else
                 {
-                    MakeWire wrieMaker2 =
-                        new(
+                    MakeWire wrieMaker2 = new();
+                    if (pln != null && pln.Distance(LeftOutterFatherPoint) > 1e-4)
+                    {
+                        Vec projectionVec = pln.Axis.Direction.ToVec(
+                            -pln.Distance(LeftOutterFatherPoint)
+                        );
+                        Trsf t = new();
+                        t.SetTranslation(projectionVec);
+                        Pnt projectedPoint = LeftOutterFatherPoint.Transformed(t);
+                        wrieMaker2 = new(
+                            [
+                                new MakeEdge(leftInnerChildPoint, leftInnerFatherPoint),
+                                new MakeEdge(leftInnerFatherPoint, LeftOutterChildPoint),
+                                new MakeEdge(LeftOutterChildPoint, projectedPoint),
+                                new MakeEdge(projectedPoint, leftInnerChildPoint),
+                            ]
+                        );
+                    }
+                    else
+                    {
+                        wrieMaker2 = new(
                             [
                                 new MakeEdge(leftInnerChildPoint, leftInnerFatherPoint),
                                 new MakeEdge(leftInnerFatherPoint, LeftOutterChildPoint),
@@ -730,22 +839,23 @@ public class LeafNode : NodeDS
                                 new MakeEdge(LeftOutterFatherPoint, leftInnerChildPoint),
                             ]
                         );
+                    }
                     Analyzer ana2 = new(new MakeFace(wrieMaker));
                     if (!ana2.IsValid())
                     {
-                        throw new Exception("没找到扇形面对应4个点");
+                        throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
                     }
-                    LeftInnerFatherPoint = leftInnerChildPoint;
-                    LeftInnerChildPoint = leftInnerFatherPoint;
-                    RightInnerFatherPoint = rightInnerChildPoint;
-                    RightInnerChildPoint = rightInnerFatherPoint;
+                    LeftInnerFatherPoint = leftInnerFatherPoint;
+                    LeftInnerChildPoint = leftInnerChildPoint;
+                    RightInnerFatherPoint = rightInnerFatherPoint;
+                    RightInnerChildPoint = rightInnerChildPoint;
                 }
                 #endregion
                 #endregion
                 break;
             }
             if (OutterFatherEdge == null || OutterChildEdge == null)
-                throw new ArgumentException("没找到主平面相邻圆柱的两条直线");
+                throw new ArgumentException($"没找到主平面: {MainFace} 相邻圆柱的两条直线");
         }
 
         #endregion
@@ -766,7 +876,7 @@ public class LeafNode : NodeDS
             {
                 return Parent.Location;
             }
-            throw new Exception("未知的父节点");
+            throw new Exception($"主平面: {MainFace} 未知的父节点");
         }
     }
 
@@ -804,12 +914,12 @@ public class LeafNode : NodeDS
         get => LeftPoints[1];
         set { LeftPoints[1] = value; }
     }
-    protected Pnt LeftOutterFatherPoint
+    protected Pnt LeftOutterChildPoint
     {
         get => LeftPoints[2];
         set { LeftPoints[2] = value; }
     }
-    protected Pnt LeftOutterChildPoint
+    protected Pnt LeftOutterFatherPoint
     {
         get => LeftPoints[3];
         set { LeftPoints[3] = value; }
@@ -839,12 +949,12 @@ public class LeafNode : NodeDS
         get => RightPoints[1];
         set { RightPoints[1] = value; }
     }
-    protected Pnt RightOutterFatherPoint
+    protected Pnt RightOutterChildPoint
     {
         get => RightPoints[2];
         set { RightPoints[2] = value; }
     }
-    protected Pnt RightOutterChildPoint
+    protected Pnt RightOutterFatherPoint
     {
         get => RightPoints[3];
         set { RightPoints[3] = value; }
@@ -878,8 +988,18 @@ public class LeafNode : NodeDS
     public List<AAxis> DebugSectorAxis { get; private set; } = [];
     public AAxis AISSectorDir;
     #endregion
+    public void CalculateSectors(int intervals)
+    {
+        Sectors.Clear();
+        foreach ((double angle, Ax1 axis) in GetProcessBendAxis(intervals))
+        {
+            AAxis aAxis = new(axis);
+            DebugSectorAxis.Add(aAxis);
+            CreateSectors(angle, axis);
+        }
+    }
 
-    public List<(double, Ax1)> GetProcessBendAxis(int intervals)
+    protected List<(double, Ax1)> GetProcessBendAxis(int intervals)
     {
         //todo 可能为空的引用需要错误处理
         List<(double, Ax1)> processBendAxis = [];
@@ -887,245 +1007,14 @@ public class LeafNode : NodeDS
         double step = (double)BendingAngle / (double)intervals;
 
         #region 计算轴移动方向
-        //! 从父节点直接找可能出现错误
-        //! 改为从八个点中找
-        //任取一个为基准点
-        Pnt? p1 = null;
-        Pnt? p2 = null;
-        Pnt? p41 = null;
-        Pnt? p42 = null;
-        bool outter = false;
-        if (InnerFatherEdge != null)
-        {
-            p1 = InnerFatherEdge.Points[0];
-            (p41, p42) = (InnerChildEdge.Points[0], InnerChildEdge.Points[1]);
-            outter = false;
-        }
-        else if (OutterFatherEdge != null)
-        {
-            p1 = OutterFatherEdge.Points[0];
-            (p41, p42) = (OutterChildEdge.Points[0], OutterChildEdge.Points[1]);
-            outter = true;
-        }
-        if (p1 == null)
-            throw new Exception("找不到展开向量的基准点");
-        //+ 找扇形面的其余三点(有可能超过3个点)
-        List<Pnt> face1Pnts = [];
-        List<Pnt> face2Pnts = [];
-        //先找到扇形面的所有点（可能不止8个）
-        List<Pnt> sectorPnts = [];
-        foreach (var f in Bending.CylinderFaces)
-        {
-            foreach (var e in f.Edges)
-            {
-                foreach (var p in e.Points)
-                {
-                    if (!sectorPnts.Any(pp => pp.Distance(p) < 1e-1))
-                    {
-                        sectorPnts.Add(p);
-                    }
-                }
-            }
-        }
-        //找到平面1的所有点，筛选出和扇形面点重合的点
-        List<Pnt> t1 = [];
-        foreach (var f in Bending.LeftSectorFaces)
-        {
-            foreach (var e in f.Edges)
-            {
-                foreach (var p in e.Points)
-                {
-                    if (!t1.Any(pp => pp.Distance(p) < 1e-1))
-                    {
-                        t1.Add(p);
-                    }
-                }
-            }
-        }
-        //筛选相同点(理论上有4个)
-        foreach (var p in t1)
-        {
-            foreach (var pp in sectorPnts)
-            {
-                //todo 此处的精度不确定
-                if (p.Distance(pp) < 5e-2)
-                {
-                    face1Pnts.Add(p);
-                }
-            }
-        }
-        //找到平面2的所有点(理论上有4个)，筛选出和扇形面点重合的点
-        List<Pnt> t2 = [];
-        foreach (var e in Bending.SectorFaces[1].Edges)
-        {
-            foreach (var p in e.Points)
-            {
-                if (!t2.Any(pp => pp.Distance(p) < 1e-2))
-                {
-                    t2.Add(p);
-                }
-            }
-        }
-        //筛选相同点(理论上有4个)
-        foreach (var p in t2)
-        {
-            foreach (var pp in sectorPnts)
-            {
-                if (p.Distance(pp) < 5e-2)
-                {
-                    face2Pnts.Add(p);
-                }
-            }
-        }
 
-        if (face1Pnts.Any(p => p.Distance(p1) < 1e-2))
-        {
-            if (face1Pnts.Count != 4)
-                throw new Exception("扇形面对应的点不为4");
-            Pnt? p4 = null;
-            for (int i = face1Pnts.Count - 1; i >= 0; i--)
-            {
-                var p = face1Pnts[i];
-
-                if (p.Distance(p1) < 1e-2)
-                {
-                    face1Pnts.RemoveAt(i);
-                }
-                else if (p.Distance(p41) < 1e-2)
-                {
-                    p4 = p;
-                    face1Pnts.RemoveAt(i);
-                }
-                else if (p.Distance(p42) < 1e-2)
-                {
-                    p4 = p;
-                    face1Pnts.RemoveAt(i);
-                }
-            }
-            if (face1Pnts.Count != 2 || p4 == null)
-            {
-                throw new Exception("找不到另一个扇形面点");
-            }
-            //+ 四个点构建一个面，找到和方向对应的另一个点
-            MakeWire maker1 =
-                new(
-                    [
-                        new MakeEdge(p1, p4),
-                        new MakeEdge(p4, face1Pnts[0]),
-                        new MakeEdge(face1Pnts[0], face1Pnts[1]),
-                        new MakeEdge(face1Pnts[1], p1)
-                    ]
-                );
-            Analyzer ana1 = new(new MakeFace(maker1));
-            if (!ana1.IsValid())
-            {
-                MakeWire maker2 =
-                    new(
-                        [
-                            new MakeEdge(p1, p4),
-                            new MakeEdge(p4, face1Pnts[1]),
-                            new MakeEdge(face1Pnts[1], face1Pnts[0]),
-                            new MakeEdge(face1Pnts[0], p1)
-                        ]
-                    );
-                Analyzer ana2 = new(new MakeFace(maker2));
-                if (ana2.IsValid())
-                {
-                    p2 = face1Pnts[0];
-                }
-                else
-                {
-                    throw new Exception("找不到扇形面对应点p2");
-                }
-            }
-            else
-            {
-                p2 = face1Pnts[1];
-            }
-        }
-
-        if (face2Pnts.Any(p => p.Distance(p1) < 1e-2))
-        {
-            if (face2Pnts.Count != 4)
-                throw new Exception("扇形面对应的点不为4");
-            Pnt? p4 = null;
-            for (int i = face2Pnts.Count - 1; i >= 0; i--)
-            {
-                var p = face2Pnts[i];
-
-                if (p.Distance(p1) < 1e-2)
-                {
-                    face2Pnts.RemoveAt(i);
-                }
-                else if (p.Distance(p41) < 1e-2)
-                {
-                    p4 = p;
-                    face2Pnts.RemoveAt(i);
-                }
-                else if (p.Distance(p42) < 1e-2)
-                {
-                    p4 = p;
-                    face2Pnts.RemoveAt(i);
-                }
-            }
-            if (face2Pnts.Count != 2 || p4 == null)
-            {
-                throw new Exception("找不到另一个扇形面点");
-            }
-            //+ 四个点构建一个面，找到和方向对应的另一个点
-            MakeWire maker1 =
-                new(
-                    [
-                        new MakeEdge(p1, p4),
-                        new MakeEdge(p4, face2Pnts[0]),
-                        new MakeEdge(face2Pnts[0], face2Pnts[1]),
-                        new MakeEdge(face2Pnts[1], p1)
-                    ]
-                );
-            Analyzer ana1 = new(new MakeFace(maker1));
-            if (!ana1.IsValid())
-            {
-                MakeWire maker2 =
-                    new(
-                        [
-                            new MakeEdge(p1, p4),
-                            new MakeEdge(p4, face2Pnts[1]),
-                            new MakeEdge(face2Pnts[1], face2Pnts[0]),
-                            new MakeEdge(face2Pnts[0], p1)
-                        ]
-                    );
-                Analyzer ana2 = new(new MakeFace(maker2));
-                if (ana2.IsValid())
-                {
-                    p2 = face2Pnts[0];
-                }
-                else
-                {
-                    throw new Exception("找不到扇形面对应点p2");
-                }
-            }
-            else
-            {
-                p2 = face2Pnts[1];
-            }
-        }
-
-        if (p2 == null)
-            throw new Exception("展开向量创建失败，另一个点为空");
-        //p1为外侧点，指向圆心
-        if (!outter)
-        {
-            (p1, p2) = (p2, p1);
-        }
-        if (p1 == null || p2 == null)
-            throw new Exception("展开向量创建失败，另一个点为空");
-        Vec vec = new Vec(p1, p2).Normalized();
+        Vec vec = new Vec(LeftOutterFatherPoint, LeftInnerFatherPoint).Normalized();
         double l = Bending.Thickness * 1.5;
         if (Bending.Thickness == 0.0)
         {
             l = 10.0;
         }
-        AISSectorDir = new(new(p1, new Dir(vec)), l);
+        AISSectorDir = new(new(LeftOutterFatherPoint, new Dir(vec)), l);
         #endregion
         while (tempA < BendingAngle)
         {
@@ -1141,35 +1030,32 @@ public class LeafNode : NodeDS
         return processBendAxis;
     }
 
-    public void CreateSectors(double angle, Ax1 axis)
+    protected void CreateSectors(double angle, Ax1 axis)
     {
-        List<TFace> sectors = [];
         //+ 构建靠近父节点的平面
-        if (InnerFatherEdge == null || OutterFatherEdge == null)
-            return;
-        (Pnt p1, Pnt p2) = BrepGeomtryTools.GetEdgeEndPoints(InnerFatherEdge.TopoEdge);
-        (Pnt p3, Pnt p4) = BrepGeomtryTools.GetEdgeEndPoints(OutterFatherEdge.TopoEdge);
 
-        MakePolygon polygonBuilder = new(p1, p2, p3, p4, true);
-        Analyzer ana = new(polygonBuilder);
-        if (!ana.IsValid())
-        {
-            polygonBuilder = new(p1, p2, p4, p3, true);
-        }
+        MakePolygon polygonBuilder =
+            new(
+                LeftInnerFatherPoint,
+                LeftOutterFatherPoint,
+                RightOutterFatherPoint,
+                RightInnerFatherPoint,
+                true
+            );
         MakeFace makeface = new(polygonBuilder.Wire());
-        TShape sector = new MakeRevol(makeface, axis, angle);
-        Sectors.Add(angle, sector);
-        //try
-        //{
-        //}
-        //catch (Exception ex)
-        //{
-        //    //! Debug
-        //    Trsf testR = new();
-        //    testR.SetRotation(axis, angle);
-        //    Transform testF = new(makeface, testR);
-        //    Sectors.Add(angle, testF);
-        //}
+        try
+        {
+            TShape sector = new MakeRevol(makeface, axis, angle);
+            Sectors.Add(angle, sector);
+        }
+        catch (Exception ex)
+        {
+            //! Debug
+            Trsf testR = new();
+            testR.SetRotation(axis, angle);
+            Transform testF = new(makeface, testR);
+            Sectors.Add(angle, testF);
+        }
     }
 
     public int Order { get; set; } = 0;
@@ -1249,15 +1135,19 @@ public class LeafNode : NodeDS
         }
 
         #region Debug
-        foreach (var pnt in LeftPoints)
+        for (int i = 0; i < LeftPoints.Count; i++)
         {
+            Pnt? pnt = LeftPoints[i];
             AShape DebugAISVertex = new(new MakeSphere(pnt, 1));
-            DisplayAndSetColor(DebugAISVertex);
+            Display(DebugAISVertex);
+            context.SetColor(DebugAISVertex, ColorMap.Colors[i], false);
         }
-        foreach (var pnt in RightPoints)
+        for (int i = 0; i < RightPoints.Count; i++)
         {
+            Pnt? pnt = RightPoints[i];
             AShape DebugAISVertex = new(new MakeSphere(pnt, 1));
-            DisplayAndSetColor(DebugAISVertex);
+            Display(DebugAISVertex);
+            context.SetColor(DebugAISVertex, ColorMap.Colors[i], false);
         }
 
         Trsf normalT = new();
@@ -1344,7 +1234,7 @@ public class VBendNode : LeafNode
         #region 计算展开长度
         // 计算中性层半径
         KRadius = kparam.GetKRadius(
-            bending.InnerFace.CircleRadius ?? throw new Exception("内圆柱面半径为空"),
+            bending.InnerFace.CircleRadius ?? throw new Exception($"主平面: {MainFace} 内圆柱面半径为空"),
             bending.Thickness
         );
         BendingAngle = Math.PI - bending.Angle;
@@ -1360,14 +1250,7 @@ public class VBendNode : LeafNode
         //先平移再旋转
         UnfoldTransform = T.Multiplied(R);
         #endregion
-        //! 计算折弯过程中的扇形面
-        //foreach ((double angle, Ax1 axis) in GetProcessBendAxis(5))
-        //{
-        //    AAxis aaxis = new(axis);
-        //    CreateSectors(angle, axis);
         #region Debug
-        //    DebugSectorAxis.Add(aaxis);
-        //}
         DebugSectorAxis.Add(new(BendingAxis));
         TEdge edge = InnerFatherEdge?.TopoEdge ?? OutterFatherEdge?.TopoEdge;
         Pnt local = BrepGeomtryTools.GetEdgeMidlePoint(edge);
@@ -1394,7 +1277,7 @@ public class ClosedHemNode : LeafNode
     {
         //+ 计算中性层半径
         //KRadius = kparam.GetKRadius(
-        //    bending.InnerFace.CircleRadius ?? throw new Exception("内圆柱面半径为空"),
+        //    bending.InnerFace.CircleRadius ?? throw new Exception($"主平面: {MainFace} 内圆柱面半径为空"),
         //    bending.Thickness
         //);
         BendingAngle = Math.PI;
@@ -1414,14 +1297,7 @@ public class ClosedHemNode : LeafNode
         //先平移再旋转
         UnfoldTransform = T.Multiplied(R);
         #endregion
-        //! 计算折弯过程中的扇形面
-        //foreach ((double angle, Ax1 axis) in GetProcessBendAxis(5))
-        //{
-        //    AAxis aaxis = new(axis);
-        //    CreateSectors(angle, axis);
         #region Debug
-        //    DebugSectorAxis.Add(aaxis);
-        //}
         DebugSectorAxis.Add(new(BendingAxis));
         TEdge edge = InnerFatherEdge?.TopoEdge ?? OutterFatherEdge?.TopoEdge;
         Pnt local = BrepGeomtryTools.GetEdgeMidlePoint(edge);
