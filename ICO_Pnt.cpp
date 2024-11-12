@@ -2,6 +2,7 @@
 #include <cmath>
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
+#include <Geom_CartesianPoint.hxx>
 //local
 #include "ICO_Trsf.h"
 

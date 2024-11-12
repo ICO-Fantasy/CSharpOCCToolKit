@@ -45,4 +45,11 @@ public static class DoubleExtensions
         double radians = degrees * (Math.PI / 180.0);
         return Math.Round(radians, digits); // 保留一位小数
     }
+
+    // 定义一个扩展方法，接受一个 double 类型的参数
+    public static double ToRadians(this double degrees)
+    {
+        // 将角度转换回弧度
+        return degrees * (Math.PI / 180.0);
+    }
 }

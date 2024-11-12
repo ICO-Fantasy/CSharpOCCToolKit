@@ -21,6 +21,7 @@ namespace gp {
 public ref class Ax2 :System::ICloneable {
 public:
 	Ax2();
+	Ax2(Pnt^ theLocation, Dir^ theZAxis);
 	Ax2(Pnt^ theLocation, Dir^ theZAxis, Dir^ theXAxis);
 	Ax2(gp_Ax2 theAx2);
 	Ax2(gp_Ax2* theAx2);
@@ -35,8 +36,8 @@ public:
 
 public:
 	property Pnt^ Location;
-	property Dir^ ZAxis;
-	property Dir^ XAxis;
+	property Dir^ ZDir;
+	property Dir^ XDir;
 };
 
 }

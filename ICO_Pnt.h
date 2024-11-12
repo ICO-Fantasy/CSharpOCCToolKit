@@ -1,7 +1,7 @@
 ﻿#pragma once
-
 class gp_Pnt;
 class gp_XYZ;
+class Geom_CartesianPoint;
 
 namespace OCCTK {
 namespace OCC {

@@ -5,6 +5,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
+ref class Circle;
 ref class Pnt;
 }
 namespace Topo {
@@ -25,8 +26,9 @@ namespace BRepBuilderAPI {
 public ref class MakeEdge {
 public:
 	MakeEdge();
-	MakeEdge(gp::Pnt^ P1, gp::Pnt^ P2);
-	MakeEdge(Topo::TVertex^ P1, Topo::TVertex^ P2);
+	MakeEdge(gp::Pnt^ p1, gp::Pnt^ p2);
+	MakeEdge(gp::Circle^ circle, gp::Pnt^ p1, gp::Pnt^ p2);
+	MakeEdge(Topo::TVertex^ p1, Topo::TVertex^ p2);
 	MakeEdge(Geom::Curve^ curve, double min, double max);
 public:
 	Topo::TShape^ Shape();
@@ -36,6 +38,7 @@ public:
 		return makeEdge->Edge();  // 隐式调用 Edge 方法
 	}
 	bool Error();
+	bool IsDone();
 private:
 	BRepBuilderAPI_MakeEdge* myMaker;
 protected:

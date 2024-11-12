@@ -11,6 +11,7 @@ Circle::Circle(Ax2^ pose, double radius) {
 	this->pose = pose;
 	Radius = radius;
 }
+
 Circle::Circle(gp_Circ Circle) {
 	pose = gcnew Ax2(Circle.Position());
 	Radius = Circle.Radius();

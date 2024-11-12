@@ -1,12 +1,14 @@
 ﻿#include "ICO_MakeEdge.h"
 #include <Standard_Failure.hxx>
 #include <BRepBuilderAPI_EdgeError.hxx>
+#include <gp_Circ.hxx>
 //Local
 #include "ICO_Topo_Shape.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Geom_Curve.h"
 #include "ICO_Topo_Vertex.h"
 #include "ICO_Pnt.h"
+#include "ICO_Circle.h"
 
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::Geom;
@@ -22,6 +24,10 @@ MakeEdge::MakeEdge() {
 
 MakeEdge::MakeEdge(Pnt^ p1, Pnt^ p2) {
 	myMaker = new BRepBuilderAPI_MakeEdge(p1->GetOCC(), p2->GetOCC());
+}
+
+MakeEdge::MakeEdge(gp::Circle^ circle, gp::Pnt^ p1, gp::Pnt^ p2) {
+	myMaker = new BRepBuilderAPI_MakeEdge(circle->GetOCC(), p1->GetOCC(), p2->GetOCC());
 }
 
 MakeEdge::MakeEdge(Topo::TVertex^ p1, Topo::TVertex^ p2) {
@@ -74,6 +80,10 @@ bool MakeEdge::Error() {
 		throw gcnew System::Exception(gcnew System::String("Line Through Identic Points"));
 	}
 	return false;
+}
+
+bool MakeEdge::IsDone() {
+	return myMaker->IsDone();
 }
 
 }

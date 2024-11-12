@@ -13,6 +13,7 @@ using OCCTK.OCC.AIS;
 using OCCViewForm;
 using TestWPF;
 using TestWPF.Bending;
+using TestWPF.PipeBending;
 using Application = System.Windows.Application;
 
 namespace TestWPF;
@@ -78,7 +79,9 @@ public partial class App : Application
         //! 简易夹具测试
         //MainWindow = new SimpleClamp();
         //! 折弯测试
-        MainWindow = new BendingTest();
+        //MainWindow = new BendingTest();
+        //! 弯管重心计算
+        MainWindow = new CenterOfGravity();
         MainWindow.Show();
 
         ShutdownMode = ShutdownMode.OnMainWindowClose;

@@ -366,14 +366,14 @@ public class BendingDS
         if (cylin1.CircleRadius < cylin2.CircleRadius)
         {
             InnerFace = cylin1;
-            OutterFace = cylin2;
+            OuterFace = cylin2;
         }
         else
         {
             InnerFace = cylin2;
-            OutterFace = cylin1;
+            OuterFace = cylin1;
         }
-        Thickness = Math.Round((double)OutterFace.CircleRadius - (double)InnerFace.CircleRadius, 1);
+        Thickness = Math.Round((double)OuterFace.CircleRadius - (double)InnerFace.CircleRadius, 1);
         if (otherFaces.Count < 2)
         {
             throw new Exception("扇形面不为2");
@@ -427,7 +427,7 @@ public class BendingDS
             .Average(); // 计算这两个值的平均值
     }
 
-    public List<Face> CylinderFaces => [InnerFace, OutterFace];
+    public List<Face> CylinderFaces => [InnerFace, OuterFace];
 
     //左右只是为了做区分，不具备实际的意义
     public List<Face> LeftSectorFaces { get; private set; }
@@ -437,7 +437,7 @@ public class BendingDS
         get => [.. LeftSectorFaces, .. RightSectorFaces];
     }
     public Face InnerFace { get; private set; }
-    public Face OutterFace { get; private set; }
+    public Face OuterFace { get; private set; }
     public double Angle { get; private set; }
     public BendingType Type { get; private set; }
     public List<Face> BendingFaces => [.. CylinderFaces, .. SectorFaces];

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#pragma once
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Axis.hxx>
 //Local

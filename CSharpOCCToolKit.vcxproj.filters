@@ -201,6 +201,12 @@
     <Filter Include="头文件\OCCProxy\OpenGL">
       <UniqueIdentifier>{15a2eaa4-096d-4129-97f0-4c8d8ec5a987}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\BRepOffsetAPI">
+      <UniqueIdentifier>{7ee0d8b8-6a44-4bd9-adb3-59c22a93503e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\BRepOffsetAPI">
+      <UniqueIdentifier>{b8114081-471b-40ec-971e-c60306cc2b9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ICO_StringExchange.cpp">
@@ -391,6 +397,12 @@
     </ClCompile>
     <ClCompile Include="ICO_OpenGl_GraphicDriver.cpp">
       <Filter>源文件\OCCProxy\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_AIS_Point.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="ICO_MakePipe.cpp">
+      <Filter>源文件\OCCProxy\BRepOffsetAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -633,6 +645,12 @@
     </ClInclude>
     <ClInclude Include="ICO_OpenGl_GraphicDriver.h">
       <Filter>头文件\OCCProxy\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_AIS_Point.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="ICO_MakePipe.h">
+      <Filter>头文件\OCCProxy\BRepOffsetAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

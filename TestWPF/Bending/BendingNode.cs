@@ -265,45 +265,45 @@ public class LeafNode : NodeDS
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
-            TVertex? leftOutterFatherPoint = null;
-            TVertex? rightOutterFatherPoint = null;
-            foreach (var outterEdge in Bending.OutterFace.Edges)
+            TVertex? leftOuterFatherPoint = null;
+            TVertex? rightOuterFatherPoint = null;
+            foreach (var outerEdge in Bending.OuterFace.Edges)
             {
                 //理论上只会有两根直线
                 if (e.Type != CurveType.Line)
                     continue;
-                List<TVertex> outterEdgePoints = [];
-                foreach (var v in new Explorer(outterEdge.TopoEdge, ShapeEnum.VERTEX))
+                List<TVertex> outerEdgePoints = [];
+                foreach (var v in new Explorer(outerEdge.TopoEdge, ShapeEnum.VERTEX))
                 {
-                    outterEdgePoints.Add(v.AsVertex());
+                    outerEdgePoints.Add(v.AsVertex());
                 }
-                if (outterEdgePoints.Count != 2)
+                if (outerEdgePoints.Count != 2)
                 {
                     throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
                 //找到那条直线
                 if (
                     (
-                        leftFatherFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[0]))
-                        && rightFatherFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[1]))
+                        leftFatherFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[0]))
+                        && rightFatherFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[1]))
                     )
                 )
                 {
-                    leftOutterFatherPoint = outterEdgePoints[0];
-                    rightOutterFatherPoint = outterEdgePoints[1];
+                    leftOuterFatherPoint = outerEdgePoints[0];
+                    rightOuterFatherPoint = outerEdgePoints[1];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
-                    OutterFatherEdge = outterEdge;
+                    OuterFatherEdge = outerEdge;
                     break;
                 }
                 else if (
-                    leftFatherFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[1]))
-                    && rightFatherFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[0]))
+                    leftFatherFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[1]))
+                    && rightFatherFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[0]))
                 )
                 {
-                    leftOutterFatherPoint = outterEdgePoints[1];
-                    rightOutterFatherPoint = outterEdgePoints[0];
+                    leftOuterFatherPoint = outerEdgePoints[1];
+                    rightOuterFatherPoint = outerEdgePoints[0];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
-                    OutterFatherEdge = outterEdge;
+                    OuterFatherEdge = outerEdge;
                     break;
                 }
             }
@@ -364,19 +364,19 @@ public class LeafNode : NodeDS
             }
 
             //+ 找到扇形面对后，找两端分别位于面对上的直线
-            TVertex? leftOutterChildPoint = null;
-            TVertex? rightOutterChildPoint = null;
-            foreach (var outterEdge in Bending.OutterFace.Edges)
+            TVertex? leftOuterChildPoint = null;
+            TVertex? rightOuterChildPoint = null;
+            foreach (var outerEdge in Bending.OuterFace.Edges)
             {
                 //理论上只会有两根直线
                 if (e.Type != CurveType.Line)
                     continue;
-                List<TVertex> outterEdgePoints = [];
-                foreach (var v in new Explorer(outterEdge.TopoEdge, ShapeEnum.VERTEX))
+                List<TVertex> outerEdgePoints = [];
+                foreach (var v in new Explorer(outerEdge.TopoEdge, ShapeEnum.VERTEX))
                 {
-                    outterEdgePoints.Add(v.AsVertex());
+                    outerEdgePoints.Add(v.AsVertex());
                 }
-                if (outterEdgePoints.Count != 2)
+                if (outerEdgePoints.Count != 2)
                 {
                     throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
@@ -384,30 +384,30 @@ public class LeafNode : NodeDS
                 //找到那条直线
                 if (
                     (
-                        leftChildFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[0]))
-                        && rightChildFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[1]))
+                        leftChildFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[0]))
+                        && rightChildFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[1]))
                     )
                 )
                 {
-                    if (outterEdge.Index == OutterFatherEdge.Index)
+                    if (outerEdge.Index == OuterFatherEdge.Index)
                         continue;
-                    leftOutterChildPoint = outterEdgePoints[0];
-                    rightOutterChildPoint = outterEdgePoints[1];
+                    leftOuterChildPoint = outerEdgePoints[0];
+                    rightOuterChildPoint = outerEdgePoints[1];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
-                    OutterChildEdge = outterEdge;
+                    OuterChildEdge = outerEdge;
                     break;
                 }
                 else if (
-                    leftChildFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[1]))
-                    && rightChildFace.TopoVertices.Any(v => v.IsEqual(outterEdgePoints[0]))
+                    leftChildFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[1]))
+                    && rightChildFace.TopoVertices.Any(v => v.IsEqual(outerEdgePoints[0]))
                 )
                 {
-                    if (outterEdge.Index == OutterFatherEdge.Index)
+                    if (outerEdge.Index == OuterFatherEdge.Index)
                         continue;
-                    leftOutterChildPoint = outterEdgePoints[1];
-                    rightOutterChildPoint = outterEdgePoints[0];
+                    leftOuterChildPoint = outerEdgePoints[1];
+                    rightOuterChildPoint = outerEdgePoints[0];
                     //此时还不确定是fater还是child（如果只有一对扇形面，则无法确定）
-                    OutterChildEdge = outterEdge;
+                    OuterChildEdge = outerEdge;
                     break;
                 }
             }
@@ -415,29 +415,29 @@ public class LeafNode : NodeDS
             #region 区分Fater和Child
             //按照预期顺序构建平面，失败则调整顺序
             if (
-                leftOutterFatherPoint == null
-                || leftOutterChildPoint == null
-                || rightOutterFatherPoint == null
-                || rightOutterChildPoint == null
+                leftOuterFatherPoint == null
+                || leftOuterChildPoint == null
+                || rightOuterFatherPoint == null
+                || rightOuterChildPoint == null
             )
             {
                 throw new Exception($"主平面: {MainFace} 没找到扇形面对应4个点");
             }
             var d = Parent.FaceSet.SelectMany(f => f.TopoVertices).Select(p => p).ToList();
-            if (d.Any(p => p == leftOutterFatherPoint))
+            if (d.Any(p => p == leftOuterFatherPoint))
             {
                 //todo 这里逻辑反了，不知道为什么
-                LeftOutterChildPoint = leftOutterFatherPoint.ToPnt();
-                LeftOutterFatherPoint = leftOutterChildPoint.ToPnt();
-                RightOutterFatherPoint = rightOutterChildPoint.ToPnt();
-                RightOutterChildPoint = rightOutterFatherPoint.ToPnt();
+                LeftOuterChildPoint = leftOuterFatherPoint.ToPnt();
+                LeftOuterFatherPoint = leftOuterChildPoint.ToPnt();
+                RightOuterFatherPoint = rightOuterChildPoint.ToPnt();
+                RightOuterChildPoint = rightOuterFatherPoint.ToPnt();
             }
             else
             {
-                LeftOutterChildPoint = leftOutterChildPoint.ToPnt();
-                LeftOutterFatherPoint = leftOutterFatherPoint.ToPnt();
-                RightOutterFatherPoint = rightOutterFatherPoint.ToPnt();
-                RightOutterChildPoint = rightOutterChildPoint.ToPnt();
+                LeftOuterChildPoint = leftOuterChildPoint.ToPnt();
+                LeftOuterFatherPoint = leftOuterFatherPoint.ToPnt();
+                RightOuterFatherPoint = rightOuterFatherPoint.ToPnt();
+                RightOuterChildPoint = rightOuterChildPoint.ToPnt();
             }
             #endregion
             #endregion
@@ -446,7 +446,7 @@ public class LeafNode : NodeDS
         //+ 如果没有，则主平面对应外圆柱
         if (InnerFatherEdge == null || InnerChildEdge == null)
         {
-            foreach (Edge e in Bending.OutterFace.Edges)
+            foreach (Edge e in Bending.OuterFace.Edges)
             {
                 //理论上只会有两根直线
                 if (e.Type != CurveType.Line)
@@ -456,7 +456,7 @@ public class LeafNode : NodeDS
                 {
                     if (e == pe)
                     {
-                        OutterFatherEdge = e;
+                        OuterFatherEdge = e;
                         break;
                     }
                 }
@@ -465,13 +465,13 @@ public class LeafNode : NodeDS
                 {
                     if (e == pe)
                     {
-                        OutterChildEdge = e;
+                        OuterChildEdge = e;
                         break;
                     }
                 }
 
                 //如果找到了两条线
-                if (OutterFatherEdge == null || OutterChildEdge == null)
+                if (OuterFatherEdge == null || OuterChildEdge == null)
                     continue;
                 #region 找剩余的两条线
                 #region 找到与 Father 对应的直线（平面可能由多个面构成）
@@ -479,12 +479,12 @@ public class LeafNode : NodeDS
                 Face? leftFatherFace = null;
                 Face? rightFatherFace = null;
                 //取出边的两个点
-                List<TVertex> outterFatherEdgePoints = [];
-                foreach (var v in new Explorer(OutterFatherEdge.TopoEdge, ShapeEnum.VERTEX))
+                List<TVertex> outerFatherEdgePoints = [];
+                foreach (var v in new Explorer(OuterFatherEdge.TopoEdge, ShapeEnum.VERTEX))
                 {
-                    outterFatherEdgePoints.Add(v.AsVertex());
+                    outerFatherEdgePoints.Add(v.AsVertex());
                 }
-                if (outterFatherEdgePoints.Count != 2)
+                if (outerFatherEdgePoints.Count != 2)
                 {
                     throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
@@ -492,37 +492,37 @@ public class LeafNode : NodeDS
                 //将直线两个点与面上的点进行比较，找出扇形面对
                 foreach (var face in Bending.LeftSectorFaces)
                 {
-                    if (face.TopoVertices.Any(e => e.IsEqual(outterFatherEdgePoints[0])))
+                    if (face.TopoVertices.Any(e => e.IsEqual(outerFatherEdgePoints[0])))
                     {
                         leftFatherFace = face;
-                        LeftOutterFatherPoint = outterFatherEdgePoints[0].ToPnt();
+                        LeftOuterFatherPoint = outerFatherEdgePoints[0].ToPnt();
                         break;
                     }
-                    else if (face.TopoVertices.Any(e => e.IsEqual(outterFatherEdgePoints[1])))
+                    else if (face.TopoVertices.Any(e => e.IsEqual(outerFatherEdgePoints[1])))
                     {
                         leftFatherFace = face;
-                        LeftOutterFatherPoint = outterFatherEdgePoints[1].ToPnt();
+                        LeftOuterFatherPoint = outerFatherEdgePoints[1].ToPnt();
                         break;
                     }
                 }
                 foreach (var face in Bending.RightSectorFaces)
                 {
-                    if (face.TopoVertices.Any(e => e.IsEqual(outterFatherEdgePoints[0])))
+                    if (face.TopoVertices.Any(e => e.IsEqual(outerFatherEdgePoints[0])))
                     {
                         rightFatherFace = face;
-                        RightOutterFatherPoint = outterFatherEdgePoints[0].ToPnt();
+                        RightOuterFatherPoint = outerFatherEdgePoints[0].ToPnt();
                         break;
                     }
-                    else if (face.TopoVertices.Any(e => e.IsEqual(outterFatherEdgePoints[1])))
+                    else if (face.TopoVertices.Any(e => e.IsEqual(outerFatherEdgePoints[1])))
                     {
                         rightFatherFace = face;
-                        RightOutterFatherPoint = outterFatherEdgePoints[1].ToPnt();
+                        RightOuterFatherPoint = outerFatherEdgePoints[1].ToPnt();
                         break;
                     }
                 }
                 if (leftFatherFace == null || rightFatherFace == null)
                 {
-                    throw new Exception($"没找到主平面: {MainFace} OutterFatherEdge 对应的扇形面对");
+                    throw new Exception($"没找到主平面: {MainFace} OuterFatherEdge 对应的扇形面对");
                 }
 
                 //+ 找到扇形面对后，找两端分别位于面对上的直线
@@ -578,12 +578,12 @@ public class LeafNode : NodeDS
                 Face? leftChildFace = null;
                 Face? rightChildFace = null;
                 //取出边的两个点
-                List<TVertex> outterChildEdgePoints = [];
-                foreach (var v in new Explorer(OutterChildEdge.TopoEdge, ShapeEnum.VERTEX))
+                List<TVertex> outerChildEdgePoints = [];
+                foreach (var v in new Explorer(OuterChildEdge.TopoEdge, ShapeEnum.VERTEX))
                 {
-                    outterChildEdgePoints.Add(v.AsVertex());
+                    outerChildEdgePoints.Add(v.AsVertex());
                 }
-                if (outterChildEdgePoints.Count != 2)
+                if (outerChildEdgePoints.Count != 2)
                 {
                     throw new Exception($"主平面: {MainFace} 构成边的点不为2");
                 }
@@ -591,31 +591,31 @@ public class LeafNode : NodeDS
                 //将直线两个点与面上的点进行比较，找出扇形面对
                 foreach (var face in Bending.LeftSectorFaces)
                 {
-                    if (face.TopoVertices.Any(e => e.IsEqual(outterChildEdgePoints[0])))
+                    if (face.TopoVertices.Any(e => e.IsEqual(outerChildEdgePoints[0])))
                     {
                         leftChildFace = face;
-                        LeftOutterChildPoint = outterChildEdgePoints[0].ToPnt();
+                        LeftOuterChildPoint = outerChildEdgePoints[0].ToPnt();
                         break;
                     }
-                    else if (face.TopoVertices.Any(e => e.IsEqual(outterChildEdgePoints[1])))
+                    else if (face.TopoVertices.Any(e => e.IsEqual(outerChildEdgePoints[1])))
                     {
                         leftChildFace = face;
-                        LeftOutterChildPoint = outterChildEdgePoints[1].ToPnt();
+                        LeftOuterChildPoint = outerChildEdgePoints[1].ToPnt();
                         break;
                     }
                 }
                 foreach (var face in Bending.RightSectorFaces)
                 {
-                    if (face.TopoVertices.Any(e => e.IsEqual(outterChildEdgePoints[0])))
+                    if (face.TopoVertices.Any(e => e.IsEqual(outerChildEdgePoints[0])))
                     {
                         rightChildFace = face;
-                        RightOutterChildPoint = outterChildEdgePoints[0].ToPnt();
+                        RightOuterChildPoint = outerChildEdgePoints[0].ToPnt();
                         break;
                     }
-                    else if (face.TopoVertices.Any(e => e.IsEqual(outterChildEdgePoints[1])))
+                    else if (face.TopoVertices.Any(e => e.IsEqual(outerChildEdgePoints[1])))
                     {
                         rightChildFace = face;
-                        RightOutterChildPoint = outterChildEdgePoints[1].ToPnt();
+                        RightOuterChildPoint = outerChildEdgePoints[1].ToPnt();
                         break;
                     }
                 }
@@ -705,7 +705,7 @@ public class LeafNode : NodeDS
                 #endregion
                 break;
             }
-            if (OutterFatherEdge == null || OutterChildEdge == null)
+            if (OuterFatherEdge == null || OuterChildEdge == null)
                 throw new ArgumentException($"没找到主平面: {MainFace} 相邻圆柱的两条直线");
         }
 
@@ -749,7 +749,7 @@ public class LeafNode : NodeDS
     /// <summary>
     /// 外圆柱面上靠近父节点的线段
     /// </summary>
-    protected Edge OutterFatherEdge;
+    protected Edge OuterFatherEdge;
 
     /// <summary>
     /// 一侧的折弯面对应的点（按照内侧父、内侧子、外侧子、外侧父存储）
@@ -765,12 +765,12 @@ public class LeafNode : NodeDS
         get => LeftPoints[1];
         set { LeftPoints[1] = value; }
     }
-    protected Pnt LeftOutterChildPoint
+    protected Pnt LeftOuterChildPoint
     {
         get => LeftPoints[2];
         set { LeftPoints[2] = value; }
     }
-    protected Pnt LeftOutterFatherPoint
+    protected Pnt LeftOuterFatherPoint
     {
         get => LeftPoints[3];
         set { LeftPoints[3] = value; }
@@ -784,7 +784,7 @@ public class LeafNode : NodeDS
     /// <summary>
     /// 外圆柱面上远离父节点的线段
     /// </summary>
-    protected Edge OutterChildEdge;
+    protected Edge OuterChildEdge;
 
     /// <summary>
     /// 另一侧的折弯面对应的点（按照内侧父、内侧子、外侧子、外侧父存储）
@@ -800,12 +800,12 @@ public class LeafNode : NodeDS
         get => RightPoints[1];
         set { RightPoints[1] = value; }
     }
-    protected Pnt RightOutterChildPoint
+    protected Pnt RightOuterChildPoint
     {
         get => RightPoints[2];
         set { RightPoints[2] = value; }
     }
-    protected Pnt RightOutterFatherPoint
+    protected Pnt RightOuterFatherPoint
     {
         get => RightPoints[3];
         set { RightPoints[3] = value; }
@@ -859,13 +859,13 @@ public class LeafNode : NodeDS
 
         #region 计算轴移动方向
 
-        Vec vec = new Vec(LeftOutterFatherPoint, LeftInnerFatherPoint).Normalized();
+        Vec vec = new Vec(LeftOuterFatherPoint, LeftInnerFatherPoint).Normalized();
         double l = Bending.Thickness * 1.5;
         if (Bending.Thickness == 0.0)
         {
             l = 10.0;
         }
-        AISSectorDir = new(new(LeftOutterFatherPoint, new Dir(vec)), l);
+        AISSectorDir = new(new(LeftOuterFatherPoint, new Dir(vec)), l);
         #endregion
         while (tempA < BendingAngle)
         {
@@ -888,8 +888,8 @@ public class LeafNode : NodeDS
         MakePolygon polygonBuilder =
             new(
                 LeftInnerFatherPoint,
-                LeftOutterFatherPoint,
-                RightOutterFatherPoint,
+                LeftOuterFatherPoint,
+                RightOuterFatherPoint,
                 RightInnerFatherPoint,
                 true
             );
@@ -1103,7 +1103,7 @@ public class VBendNode : LeafNode
         #endregion
         #region Debug
         DebugSectorAxis.Add(new(BendingAxis));
-        TEdge edge = InnerFatherEdge?.TopoEdge ?? OutterFatherEdge?.TopoEdge;
+        TEdge edge = InnerFatherEdge?.TopoEdge ?? OuterFatherEdge?.TopoEdge;
         Pnt local = BrepGeomtryTools.GetEdgeMidlePoint(edge);
         AISUnfoldingLocation = new(new MakeSphere(local, 1));
         AISShapes.Add(AISUnfoldingLocation);
@@ -1150,7 +1150,7 @@ public class ClosedHemNode : LeafNode
         #endregion
         #region Debug
         DebugSectorAxis.Add(new(BendingAxis));
-        TEdge edge = InnerFatherEdge?.TopoEdge ?? OutterFatherEdge?.TopoEdge;
+        TEdge edge = InnerFatherEdge?.TopoEdge ?? OuterFatherEdge?.TopoEdge;
         Pnt local = BrepGeomtryTools.GetEdgeMidlePoint(edge);
         AISUnfoldingLocation = new(new MakeSphere(local, 1));
         AISShapes.Add(AISUnfoldingLocation);

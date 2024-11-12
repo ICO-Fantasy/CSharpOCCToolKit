@@ -19,9 +19,9 @@ namespace gp {
 
 public ref class Circle :System::ICloneable {
 public:
-	Circle(Ax2^ pose, double radius);
 	Circle(gp_Circ circle);
 	Circle(gp_Circ* circle);
+	Circle(Ax2^ pose, double radius);
 	gp_Circ GetOCC();
 	virtual System::Object^ Clone();
 public:

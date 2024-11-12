@@ -252,7 +252,7 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     Click="InputWorkPiece_Button_Click"
-                    Content="导入" />
+                    Content="导入" Height="37" VerticalAlignment="Top" />
                 <Button
                     x:Name="Unfold_Button"
                     Grid.Row="0"

@@ -162,6 +162,7 @@ public partial class OCCCanvas : Form
         if (_ShowOriginTrihedron)
         {
             Display(_OriginTrihedron, update);
+            AISContext.SetSelectionMode(_OriginTrihedron, OCCTK.OCC.AIS.SelectionMode.None);
         }
         else
         {
