@@ -18,6 +18,7 @@ namespace BRepBuilderAPI {
 public ref class MakeWire {
 public:
 	MakeWire();
+	MakeWire(Topo::TEdge^ edge);
 	MakeWire(System::Collections::Generic::List<Topo::TEdge^>^ edges);
 public:
 	void Add(Topo::TEdge^ edge);

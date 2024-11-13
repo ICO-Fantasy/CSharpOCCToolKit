@@ -13,6 +13,7 @@ public class WorkSpaceTree { }
 
 public enum DOF
 {
+    None = -1,
     X,
     Y,
     Z,
@@ -235,6 +236,7 @@ public class Node
         get
         {
             Trsf T = new();
+            if (DOF == DOF.None) { }
             if (DOF == DOF.X)
             {
                 T.SetTranslation(new(CurrentValue, 0, 0));

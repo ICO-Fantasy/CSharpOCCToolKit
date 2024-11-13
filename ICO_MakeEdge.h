@@ -27,6 +27,7 @@ public ref class MakeEdge {
 public:
 	MakeEdge();
 	MakeEdge(gp::Pnt^ p1, gp::Pnt^ p2);
+	MakeEdge(gp::Circle^ circle);
 	MakeEdge(gp::Circle^ circle, gp::Pnt^ p1, gp::Pnt^ p2);
 	MakeEdge(Topo::TVertex^ p1, Topo::TVertex^ p2);
 	MakeEdge(Geom::Curve^ curve, double min, double max);

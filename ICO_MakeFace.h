@@ -5,6 +5,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Pln;
+ref class Circle;
 }
 namespace Topo {
 ref class TShape;
@@ -31,6 +32,8 @@ public:
 	static operator Topo::TFace ^ (MakeFace^ makeFace) {
 		return makeFace->Face();  // 隐式调用 Face 方法
 	}
+public:
+	void Add(Topo::TWire^ wire);
 	bool Error();
 private:
 	BRepBuilderAPI_MakeFace* myMaker;

@@ -11,7 +11,6 @@
     </OCC_LibTKReleaseWithDebugInfo>
     <OCC_IncludeTKReleaseWithDebugInfo>
     </OCC_IncludeTKReleaseWithDebugInfo>
-    <OCC_3rd_Freeimage_IncludePath>D:\OCC\7.7.0\third-part\freeimage-3.17.0-vc14-64\bin</OCC_3rd_Freeimage_IncludePath>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -37,9 +36,6 @@
     </BuildMacro>
     <BuildMacro Include="OCC_IncludeTKReleaseWithDebugInfo">
       <Value>$(OCC_IncludeTKReleaseWithDebugInfo)</Value>
-    </BuildMacro>
-    <BuildMacro Include="OCC_3rd_Freeimage_IncludePath">
-      <Value>$(OCC_3rd_Freeimage_IncludePath)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

@@ -24,6 +24,7 @@ public:
 public:
 	double Mass();
 	gp::Pnt^ CentreOfMass();
+	array<double, 2>^ MatrixOfInertia();
 private:
 	GProp_GProps* myGProps;
 protected:

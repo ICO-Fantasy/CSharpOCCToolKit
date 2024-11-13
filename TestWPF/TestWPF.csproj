@@ -8,6 +8,7 @@
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>True</UseWindowsForms>
 		<IncludeSymbols>False</IncludeSymbols>
+		<ApplicationIcon>INSOFWORKSPipeBending.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,6 +25,10 @@
 
 	<ItemGroup>
 	  <Compile Include="Configs\MouseActions.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="INSOFWORKSPipeBending.ico" />
 	</ItemGroup>
 
 	<ItemGroup>

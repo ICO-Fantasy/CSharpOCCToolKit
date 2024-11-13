@@ -26,6 +26,10 @@ MakeEdge::MakeEdge(Pnt^ p1, Pnt^ p2) {
 	myMaker = new BRepBuilderAPI_MakeEdge(p1->GetOCC(), p2->GetOCC());
 }
 
+MakeEdge::MakeEdge(gp::Circle^ circle) {
+	myMaker = new BRepBuilderAPI_MakeEdge(circle->GetOCC());
+}
+
 MakeEdge::MakeEdge(gp::Circle^ circle, gp::Pnt^ p1, gp::Pnt^ p2) {
 	myMaker = new BRepBuilderAPI_MakeEdge(circle->GetOCC(), p1->GetOCC(), p2->GetOCC());
 }

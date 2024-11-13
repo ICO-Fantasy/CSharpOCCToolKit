@@ -29,6 +29,7 @@ public:
 	//static void SurfaceProperties(Topo::TShape^ shape, GProp::GProps^% globalProperties) {
 	//	::BRepGProp::SurfaceProperties(shape->GetOCC(), globalProperties->GetOCC());
 	//};
+	static void VolumeProperties(Topo::TShape^ shape, GProp::GProps^% globalProperties);
 };
 
 }

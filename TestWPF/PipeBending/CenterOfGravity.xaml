@@ -12,22 +12,26 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="2" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid x:Name="Canvas_Grid" Grid.Column="0" />
-        <GridSplitter Width="2" Background="LightGray" />
+        <Label Grid.Column="1" Background="LightGray" />
         <Grid x:Name="PipeProperties_Grid" Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
+                <RowDefinition />
+                <RowDefinition Height="2" />
+                <RowDefinition />
             </Grid.RowDefinitions>
-            <Grid x:Name="PipeInfo_Grid" Grid.Row="0">
+            <Grid
+                x:Name="PipeInfo_Grid"
+                Grid.Row="0"
+                VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
                     <RowDefinition Height="30" />
                     <RowDefinition Height="30" />
-                    <RowDefinition Height="auto" />
+                    <RowDefinition />
                     <RowDefinition Height="150" />
                 </Grid.RowDefinitions>
                 <Label
@@ -53,131 +57,139 @@
                     <Label
                         x:Name="PipeCenter_Label"
                         Grid.Row="0"
-                        Content="重心：" />
-                    <Label Grid.Row="1" Content="X \ Y \ Z：" />
+                        Content="属性：" />
+                    <Label Grid.Row="1" Content="X \ Y \ Z（重心点）：" />
                     <Label x:Name="PipeCenterXYZ_Label" Grid.Row="2" />
-                    <Label Grid.Row="3" Content="α \ β \ γ：" />
+                    <Label Grid.Row="3" Content="α \ β \ γ（主旋转轴）：" />
                     <Label
                         x:Name="PipeCenterIJK_Label"
                         Grid.Row="4"
                         Content="" />
                 </Grid>
-                <TabControl Grid.Row="3">
+                <TabControl Grid.Row="3" VerticalAlignment="Stretch">
                     <TabItem Header="XYZR">
-                        <Grid x:Name="PipeXYZR_Grid">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30" />
-                            </Grid.RowDefinitions>
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Content="X" />
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="2"
-                                HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                Content="Y" />
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="4"
-                                HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                Content="Z" />
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="6"
-                                HorizontalAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                Content="R" />
-                            <GridSplitter
-                                Grid.RowSpan="99"
-                                Grid.Column="1"
-                                HorizontalAlignment="Stretch"
-                                Background="LightGray" />
-                            <GridSplitter
-                                Grid.RowSpan="99"
-                                Grid.Column="3"
-                                HorizontalAlignment="Stretch"
-                                Background="LightGray" />
-                            <GridSplitter
-                                Grid.RowSpan="99"
-                                Grid.Column="5"
-                                HorizontalAlignment="Stretch"
-                                Background="LightGray" />
-                        </Grid>
+                        <ScrollViewer>
+                            <Grid x:Name="PipeXYZR_Grid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                </Grid.RowDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="X" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    Content="Y" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="4"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    Content="Z" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="6"
+                                    HorizontalAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    Content="R" />
+                                <GridSplitter
+                                    Grid.RowSpan="99"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Stretch"
+                                    Background="LightGray" />
+                                <GridSplitter
+                                    Grid.RowSpan="99"
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Stretch"
+                                    Background="LightGray" />
+                                <GridSplitter
+                                    Grid.RowSpan="99"
+                                    Grid.Column="5"
+                                    HorizontalAlignment="Stretch"
+                                    Background="LightGray" />
+                            </Grid>
+                        </ScrollViewer>
                     </TabItem>
                     <TabItem Header="YBCR">
-                        <Grid x:Name="PipeYBCR_Grid">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30" />
-                            </Grid.RowDefinitions>
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Content="Y" />
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="2"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Content="B" />
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="4"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Content="C" />
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="6"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                Content="R" />
-                            <GridSplitter
-                                Grid.RowSpan="99"
-                                Grid.Column="1"
-                                HorizontalAlignment="Stretch"
-                                Background="LightGray" />
-                            <GridSplitter
-                                Grid.RowSpan="99"
-                                Grid.Column="3"
-                                HorizontalAlignment="Stretch"
-                                Background="LightGray" />
-                            <GridSplitter
-                                Grid.RowSpan="99"
-                                Grid.Column="5"
-                                HorizontalAlignment="Stretch"
-                                Background="LightGray" />
-                        </Grid>
+                        <ScrollViewer>
+                            <Grid x:Name="PipeYBCR_Grid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                </Grid.RowDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="Y" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="B" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="4"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="C" />
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="6"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Center"
+                                    Content="R" />
+                                <GridSplitter
+                                    Grid.RowSpan="99"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Stretch"
+                                    Background="LightGray" />
+                                <GridSplitter
+                                    Grid.RowSpan="99"
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Stretch"
+                                    Background="LightGray" />
+                                <GridSplitter
+                                    Grid.RowSpan="99"
+                                    Grid.Column="5"
+                                    HorizontalAlignment="Stretch"
+                                    Background="LightGray" />
+                            </Grid>
+                        </ScrollViewer>
                     </TabItem>
                 </TabControl>
             </Grid>
-            <Grid x:Name="InteractionButtons_Grid" Grid.Row="1">
+            <Label Grid.Row="1" Background="LightGray" />
+            <Grid
+                x:Name="InteractionButtons_Grid"
+                Grid.Row="2"
+                VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
+                    <RowDefinition />
                     <RowDefinition Height="40" />
                     <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
@@ -192,9 +204,11 @@
                 <ScrollViewer
                     x:Name="InputPipeValues_ScrollViewer"
                     Grid.Row="0"
+                    VerticalAlignment="Stretch"
                     d:Visibility="Visible"
                     Visibility="Collapsed">
                     <StackPanel>
+                        <Label HorizontalAlignment="Center" Content="带*为必填参数" />
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50" />
@@ -251,86 +265,101 @@
                                             MaxWidth="30" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition />
                                         <RowDefinition Height="30" />
-                                        <RowDefinition Height="auto" />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Label
+                                        Grid.Row="0"
+                                        Grid.ColumnSpan="99"
+                                        Content="输入XYZ，自动计算YBC" />
+                                    <Label
+                                        Grid.Row="1"
                                         Grid.Column="0"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="X" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="2"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="Y" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="4"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="Z" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="6"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="R" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="8"
                                         HorizontalAlignment="Center"
                                         Content="➕" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="9"
                                         HorizontalAlignment="Center"
                                         Content="➖" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="1"
                                         HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="3"
                                         HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="5"
                                         HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="7"
                                         HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="0"
                                         Height="30"
                                         Background="LightYellow" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="2"
                                         Height="30"
                                         Background="LightYellow" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="4"
                                         Height="30"
                                         Background="LightYellow" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="6"
                                         Height="30"
                                         Background="LightYellow" />
                                     <Button
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="8"
                                         Height="30"
                                         Click="AddXYZR_Button_Click"
                                         Content="➕"
                                         IsTabStop="False" />
                                     <Button
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="9"
                                         Height="30"
                                         Click="DeleteXYZR_Button_Click"
@@ -360,86 +389,101 @@
                                             MaxWidth="30" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition />
                                         <RowDefinition Height="30" />
-                                        <RowDefinition Height="auto" />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Label
+                                        Grid.Row="0"
+                                        Grid.ColumnSpan="99"
+                                        Content="输入YBC，自动计算XYZ" />
+                                    <Label
+                                        Grid.Row="1"
                                         Grid.Column="0"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="Y" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="2"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="B" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="4"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="C" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="6"
                                         HorizontalAlignment="Stretch"
                                         HorizontalContentAlignment="Center"
                                         Content="R" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="8"
                                         HorizontalAlignment="Center"
                                         Content="➕" />
                                     <Label
+                                        Grid.Row="1"
                                         Grid.Column="9"
                                         HorizontalAlignment="Center"
                                         Content="➖" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="1"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="3"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="5"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <GridSplitter
+                                        Grid.Row="1"
                                         Grid.RowSpan="99"
                                         Grid.Column="7"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
                                         Background="LightGray" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="0"
                                         Height="30"
                                         Background="LightYellow" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="2"
                                         Height="30"
                                         Background="LightYellow" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="4"
                                         Height="30"
                                         Background="LightYellow" />
                                     <TextBox
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="6"
                                         Height="30"
                                         Background="LightYellow" />
                                     <Button
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="8"
                                         Height="30"
                                         Click="AddXYZR_Button_Click"
                                         Content="➕"
                                         IsTabStop="False" />
                                     <Button
-                                        Grid.Row="1"
+                                        Grid.Row="2"
                                         Grid.Column="9"
                                         Height="30"
                                         Click="DeleteXYZR_Button_Click"
@@ -449,6 +493,11 @@
                                 </Grid>
                             </TabItem>
                         </TabControl>
+                        <Button
+                            x:Name="HideenPipeInput_Button"
+                            Height="30"
+                            Click="HideenPipeInput_Button_Click"
+                            Content="隐藏输入栏" />
                     </StackPanel>
                 </ScrollViewer>
                 <Button

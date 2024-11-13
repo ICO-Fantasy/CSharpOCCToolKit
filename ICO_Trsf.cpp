@@ -32,6 +32,42 @@ Trsf::Trsf(Ax2^ theAx2) {
 	myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2->GetOCC()));
 }
 
+Trsf::Trsf(array<double, 2>^ matrix) {
+	// 检查矩阵尺寸
+	if (matrix->GetLength(0) != 3 || matrix->GetLength(0) != 4) {
+		int rows = matrix->GetLength(0);
+		System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
+		throw gcnew System::Exception(str);
+	}
+	if (matrix->GetLength(1) != 4) {
+		int cols = matrix->GetLength(1);
+		System::String^ str = "输入矩阵为" + cols + "列，需要4行";
+		throw gcnew System::Exception(str);
+	}
+	myTrsf = new gp_Trsf();
+	myTrsf->SetValues(matrix[1, 1], matrix[1, 2], matrix[1, 3], matrix[1, 4],
+		matrix[2, 1], matrix[2, 2], matrix[2, 3], matrix[2, 4],
+		matrix[3, 1], matrix[3, 2], matrix[3, 3], matrix[3, 4]);
+}
+
+Trsf::Trsf(array<array<double>^>^ matrix) {
+	// 检查矩阵尺寸
+	if (matrix->Length != 3 || matrix->Length != 4) {
+		int rows = matrix->Length;
+		System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
+		throw gcnew System::Exception(str);
+	}
+	if (matrix[0]->Length != 4) {
+		int cols = matrix[0]->Length;
+		System::String^ str = "输入矩阵为" + cols + "列，需要4行";
+		throw gcnew System::Exception(str);
+	}
+	myTrsf = new gp_Trsf();
+	myTrsf->SetValues(matrix[1][1], matrix[1][2], matrix[1][3], matrix[1][4],
+		matrix[2][1], matrix[2][2], matrix[2][3], matrix[2][4],
+		matrix[3][1], matrix[3][2], matrix[3][3], matrix[3][4]);
+}
+
 Trsf::Trsf(Ax2^ fromAx2, Ax2^ toAx2) {
 	myTrsf = new gp_Trsf();
 	myTrsf->SetTransformation(gp_Ax3(toAx2->GetOCC()), gp_Ax3(fromAx2->GetOCC()));

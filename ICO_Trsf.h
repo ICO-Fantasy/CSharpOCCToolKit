@@ -24,6 +24,8 @@ public:
 	Trsf(gp_Trsf theT);
 	Trsf(gp_Trsf* theT);
 	Trsf(Ax2^ theAx2);
+	Trsf(array<double, 2>^ matrix);
+	Trsf(array<array<double>^>^ matrix);
 	Trsf(Ax2^ fromAx2, Ax2^ toAx2);
 	Trsf(Pnt^ fromPoint, Pnt^ toPoint);
 	gp_Trsf GetOCC();

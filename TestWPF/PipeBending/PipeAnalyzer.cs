@@ -49,11 +49,15 @@ public class PEdge
 
 public class PipeAnalyzer
 {
-    public PipeAnalyzer() { }
+    public PipeAnalyzer()
+    {
+        Pipe = new();
+    }
 
     public PipeAnalyzer(string stepFile)
     {
         FromStep(stepFile);
+        Pipe = new();
     }
 
     public void FromStep(string stepFile)
@@ -63,7 +67,7 @@ public class PipeAnalyzer
         Pipe.topoShape = Pipe.originSTEPShape;
     }
 
-    public Pipe Pipe { get; private set; } = new();
+    public Pipe Pipe { get; private set; }
 
     // 定义隐式转换运算符
     public static implicit operator Pipe(PipeAnalyzer ana)

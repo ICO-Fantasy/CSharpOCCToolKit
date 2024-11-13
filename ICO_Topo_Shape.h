@@ -57,6 +57,7 @@ public:
 	TEdge^ AsEdge();
 	TFace^ AsFace();
 public:
+	void Reverse();
 	void Move(gp::Trsf^ theT);
 	gp::Trsf^ Location();
 	void Location(gp::Ax2^ newOrigin);

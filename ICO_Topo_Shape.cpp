@@ -109,6 +109,13 @@ TFace^ TShape::AsFace() {
 }
 
 /// <summary>
+/// 反转形状反向
+/// </summary>
+void TShape::Reverse() {
+	myShape->Reverse();
+}
+
+/// <summary>
 /// 将 Shape 的 Location 右乘 T
 /// </summary>
 /// <param name="theT"></param>

@@ -9,8 +9,10 @@ using System.Windows.Controls;
 using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using Microsoft.Win32;
+using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.OCC.AIS;
+using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.Topo;
 using OCCViewForm;
 using TestWPF.Utils;
@@ -36,13 +38,15 @@ public partial class CenterOfGravity : Window
         OCCCanvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
         OCCCanvas.Show();
         OCCCanvas.ShowGraduatedTrihedron = false;
-        Pipe = new(OCCCanvas.AISContext);
+        Pipe = new();
+        //Pipe = new(OCCCanvas.AISContext);
     }
 
     private readonly OCCCanvas OCCCanvas;
 
     #region Pipe
     private Pipe Pipe { get; set; }
+    private AShape? STEPAISShape { get; set; }
 
     private void PopulateTabGrids(List<XYZR> xyzrList, List<YBCR> ybcrList)
     {
@@ -179,11 +183,11 @@ public partial class CenterOfGravity : Window
             //toOrigin.SetTranslation(AABB.CornerMin(), new());
             //InputWorkpiece = new Transform(inputWorkpiece, toOrigin);
             //EraseAll(false);
-            Pipe.originSTEPShape = inputWorkpiece;
+            STEPAISShape = new(inputWorkpiece);
             //UpdatePipeProperties();
-            AShape aShape = new(inputWorkpiece);
-            Display(aShape, false);
-            SetTransparency(aShape, 0.8, false);
+            Display(STEPAISShape, false);
+            SetTransparency(STEPAISShape, 0.8, false);
+            SetColor(STEPAISShape, ColorMap.Yellow, false);
             Update();
             FitAll();
         }
@@ -286,7 +290,14 @@ public partial class CenterOfGravity : Window
 
     private void InputPipeInfo_Button_Click(object sender, RoutedEventArgs e)
     {
+        Pipe = new();
         OCCCanvas.EraseAll(false);
+        if (STEPAISShape != null)
+        {
+            Display(STEPAISShape, false);
+            SetTransparency(STEPAISShape, 0.8, false);
+            SetColor(STEPAISShape, ColorMap.Yellow, false);
+        }
         //添加名称
         Pipe.Name = InputPipeInfo_Name.Text ?? "pipe";
         //添加管径
@@ -300,7 +311,7 @@ public partial class CenterOfGravity : Window
             return;
         }
         //添加管厚度
-        if (double.TryParse(InputPipeInfo_Diameter.Text, out double t))
+        if (double.TryParse(InputPipeInfo_Thickness.Text, out double t))
         {
             Pipe.Thickness = t;
         }
@@ -340,7 +351,19 @@ public partial class CenterOfGravity : Window
                         }
                     );
                 }
-                Pipe.XYZR = newXYZ;
+                try
+                {
+                    Pipe.XYZR = newXYZ;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"输入失败，请检查参数\n\n{ex}",
+                        "提示",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                }
             }
             else if (selectedTab.Header.ToString() == "YBCR")
             {
@@ -370,12 +393,51 @@ public partial class CenterOfGravity : Window
                         }
                     );
                 }
-                Pipe.YBCR = newYBC;
+                try
+                {
+                    Pipe.YBCR = newYBC;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"输入失败，请检查参数\n\n{ex}",
+                        "提示",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                }
             }
         #endregion
-            Pipe.makeWireFromYBC(); //debug
+            try
+            {
+                Display(Pipe, false);
+                SetColor(Pipe, ColorMap.Blue, false);
+                SetTransparency(Pipe, 0.5, false);
+                //显示重心
+                AShape centerPnt = new(new MakeSphere(Pipe.Center, 1));
+                AAxis rotationAxis = new(Pipe.Moment, 10);
+                Display(centerPnt, false);
+                SetColor(centerPnt, ColorMap.Red, false);
+                Display(rotationAxis, false);
+                SetColor(rotationAxis, ColorMap.Red, false);
+                PipeCenterXYZ_Label.Content =
+                    $"XYZ: ({Math.Round(Pipe.Center.X, 1)}, {Math.Round(Pipe.Center.Y, 1)}, {Math.Round(Pipe.Center.Z, 1)})";
+                PipeCenterIJK_Label.Content =
+                    $"x⃗y⃗z⃗: ({Math.Round(Pipe.Moment.Direction.X, 2)}, {Math.Round(Pipe.Moment.Direction.Y, 2)}, {Math.Round(Pipe.Moment.Direction.Z, 2)})";
+                try
+                {
+                    PipeCenterIJK_Label.FontFamily = new("Segoe UI Symbol");
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"显示失败\n{ex}", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
             // 调用更新方法
             UpdatePipeProperties();
+            FitAll();
+            Update();
         }
     }
 
@@ -384,7 +446,7 @@ public partial class CenterOfGravity : Window
     {
         List<List<UIElement>> rows = new();
 
-        for (int i = 1; i < grid.RowDefinitions.Count; i++) // 跳过标题行
+        for (int i = 2; i < grid.RowDefinitions.Count; i++) // 跳过标题行
         {
             List<UIElement> row = grid
                 .Children.Cast<UIElement>()
@@ -409,4 +471,11 @@ public partial class CenterOfGravity : Window
     }
 
     #endregion
+
+    private void HideenPipeInput_Button_Click(object sender, RoutedEventArgs e)
+    {
+        InputPipeValues_Button.Visibility = Visibility.Visible;
+        InputPipeValues_ScrollViewer.Visibility = Visibility.Collapsed;
+        InputPipeInfo_Button.Visibility = Visibility.Collapsed;
+    }
 }

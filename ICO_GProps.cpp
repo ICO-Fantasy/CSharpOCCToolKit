@@ -34,6 +34,21 @@ Pnt^ GProps::CentreOfMass() {
 	return gcnew Pnt(myGProps->CentreOfMass());
 }
 
+/// <summary>
+/// 3×3的惯性矩阵
+/// </summary>
+/// <returns></returns>
+array<double, 2>^ GProps::MatrixOfInertia() {
+	auto mat = myGProps->MatrixOfInertia();
+	array<double, 2>^ matrix = gcnew array<double, 2>(3, 3);
+	for (int i = 1; i < 4; i++) {
+		for (int j = 1; j < 4; j++) {
+			matrix[i - 1, j - 1] = mat.Value(i, j);
+		}
+	}
+	return matrix;
+}
+
 }
 }
 }

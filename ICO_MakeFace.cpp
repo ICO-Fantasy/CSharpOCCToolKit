@@ -50,6 +50,10 @@ TFace^ MakeFace::Face() {
 	}
 }
 
+void MakeFace::Add(Topo::TWire^ wire) {
+	myMaker->Add(wire->GetOCC());
+}
+
 bool MakeFace::Error() {
 	BRepBuilderAPI_FaceError state = myMaker->Error();
 	if (state == BRepBuilderAPI_FaceDone) {

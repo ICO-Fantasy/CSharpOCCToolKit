@@ -18,6 +18,10 @@ MakeWire::MakeWire() {
 	myMaker = new BRepBuilderAPI_MakeWire();
 }
 
+MakeWire::MakeWire(TEdge^ edge) {
+	myMaker = new BRepBuilderAPI_MakeWire(edge->GetOCC());
+}
+
 MakeWire::MakeWire(List<TEdge^>^ edges) {
 	myMaker = new BRepBuilderAPI_MakeWire();
 	for each (TEdge ^ edge in edges) {
