@@ -5,6 +5,7 @@ using log4net;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.OpenGL;
 using OCCTK.OCC.V3d;
+using OCCTK.Utils;
 using TestWPF;
 using Color = OCCTK.Extension.Color;
 using View = OCCTK.OCC.V3d.View;
@@ -15,8 +16,9 @@ public partial class OCCCanvas : Form
 {
     private static readonly ILog log = LogManager.GetLogger(typeof(App));
 
-    public OCCCanvas()
+    public OCCCanvas(ThreeDimensionContext context)
     {
+        ThreeDimensionContext = context;
         InitializeComponent();
         //! 删除From自带的边界
         FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -25,21 +27,16 @@ public partial class OCCCanvas : Form
         //! 设置自定义绘制和防止擦除背景，避免拖动画布时画面闪动
         SetStyle(ControlStyles.AllPaintingInWmPaint, true); // 防止擦除背景。
         SetStyle(ControlStyles.UserPaint, true); // 使用自定义的绘制。
-
-        //创建引擎
-        myGraphicDriver = new();
-        //创建视图对象
-        myViewer = new(myGraphicDriver);
-        //创建上下文管理器
-        myAISContext = new InteractiveContext(myViewer);
         //创建相机
-        ViewList.Add(myViewer.CreateView());
-        MainView?.SetWindow(this.Handle);
-        if (MainView == null)
+        View = context.Viewer.CreateView();
+        if (View == null)
         {
             //MessageBox.Show("图形初始化失败", "Error!");
             throw new Exception("图形初始化失败");
         }
+        View.SetWindow(this.Handle);
+        context.ViewList.Add(this);
+
         //创建操作器
         myManipulator = new();
         //创建选择框
@@ -49,15 +46,15 @@ public partial class OCCCanvas : Form
         //默认设置
         SetDefault();
 
-        MainView.Redraw();
-        MainView.MustBeResized();
+        View.Redraw();
+        View.MustBeResized();
     }
 
     #region 字段
 
-    private readonly GraphicDriver myGraphicDriver;
-    private readonly Viewer myViewer;
-    private readonly InteractiveContext myAISContext;
+    protected readonly ThreeDimensionContext ThreeDimensionContext;
+    protected Viewer Viewer => ThreeDimensionContext.Viewer;
+    protected InteractiveContext AISContext => ThreeDimensionContext.AISContext;
 
     /// <summary>
     /// 框选零宽度的最小值
@@ -75,32 +72,14 @@ public partial class OCCCanvas : Form
     public List<AShape> SelectedAISList = [];
 
     #region 视图立方
-
-    private ViewCube? _ViewCube;
-    private bool _ShowViewCube;
+    bool _ShowViewCube;
     public bool ShowViewCube
     {
         get { return _ShowViewCube; }
         set
         {
             _ShowViewCube = value;
-            DisplayViewCube(false);
-        }
-    }
-
-    private void DisplayViewCube(bool update)
-    {
-        _ViewCube ??= new(3.0);
-        if (_ShowViewCube)
-        {
-            Display(_ViewCube, update);
-        }
-        else
-        {
-            if (AISContext.IsDisplayed(_ViewCube))
-            {
-                Erase(_ViewCube, update);
-            }
+            ThreeDimensionContext.DisplayViewCube(value);
         }
     }
 
@@ -108,7 +87,6 @@ public partial class OCCCanvas : Form
 
     #region 视图坐标系
 
-    private Trihedron? _ViewTrihedron;
     private bool _ShowViewTrihedron;
     public bool ShowViewTrihedron
     {
@@ -116,27 +94,7 @@ public partial class OCCCanvas : Form
         set
         {
             _ShowViewTrihedron = value;
-            DisplayViewTrihedron(false);
-        }
-    }
-
-    private void DisplayViewTrihedron(bool update)
-    {
-        if (_ViewTrihedron == null)
-        {
-            _ViewTrihedron = new(100);
-            _ViewTrihedron.SetAspect(10, 10);
-        }
-        if (_ShowViewTrihedron)
-        {
-            Display(_ViewTrihedron, update);
-        }
-        else
-        {
-            if (AISContext.IsDisplayed(_ViewTrihedron))
-            {
-                Erase(_ViewTrihedron, update);
-            }
+            ThreeDimensionContext.DisplayViewTrihedron(value);
         }
     }
 
@@ -152,27 +110,13 @@ public partial class OCCCanvas : Form
         set
         {
             _ShowOriginTrihedron = value;
-            DisplayOriginTrihedron(false);
-        }
-    }
-
-    private void DisplayOriginTrihedron(bool update)
-    {
-        _OriginTrihedron ??= new(100);
-        if (_ShowOriginTrihedron)
-        {
-            Display(_OriginTrihedron, update);
-            AISContext.SetSelectionMode(_OriginTrihedron, OCCTK.OCC.AIS.SelectionMode.None);
-        }
-        else
-        {
-            Erase(_OriginTrihedron, update);
+            ThreeDimensionContext.DisplayOriginTrihedron(value);
         }
     }
 
     #endregion
 
-    #region 原点坐标系
+    #region 刻度坐标系
 
     private bool _ShowGraduatedTrihedron;
     public bool ShowGraduatedTrihedron
@@ -189,11 +133,11 @@ public partial class OCCCanvas : Form
     {
         if (_ShowOriginTrihedron)
         {
-            MainView.DisplayDefault_GraduatedTrihedron();
+            View?.DisplayDefault_GraduatedTrihedron();
         }
         else
         {
-            MainView.Hide_GraduatedTrihedron();
+            View?.Hide_GraduatedTrihedron();
         }
     }
 
@@ -218,24 +162,9 @@ public partial class OCCCanvas : Form
     public Manipulator Manipulator => myManipulator;
 
     /// <summary>
-    /// 画布对象(设置灯光等)
-    /// </summary>
-    public Viewer Viewer => myViewer;
-
-    /// <summary>
-    /// 视图列表
-    /// </summary>
-    public List<View> ViewList { get; set; } = [];
-
-    /// <summary>
     /// 主视图（第一个创建的视图）
     /// </summary>
-    public View? MainView => ViewList.Count > 0 ? ViewList[0] : null;
-
-    /// <summary>
-    /// DebugC++委托的交互对象管理器
-    /// </summary>
-    public InteractiveContext AISContext => myAISContext;
+    public View View { get; protected set; }
 
     #region 状态flag
 
@@ -247,11 +176,7 @@ public partial class OCCCanvas : Form
     public bool ShowGrid
     {
         get { return _ShowGrid; }
-        set
-        {
-            _ShowGrid = value;
-            //todo
-        }
+        set { _ShowGrid = value; }
     }
 
     /// <summary>
@@ -263,7 +188,7 @@ public partial class OCCCanvas : Form
     public OCCTK.OCC.AIS.SelectionMode CurrentSelectionMode
     {
         get { return _currentSelectionMode; }
-        private set
+        set
         {
             if (AISContext != null)
             {
@@ -325,9 +250,9 @@ public partial class OCCCanvas : Form
         {
             throw new Exception("AISContext is null");
         }
-        if (MainView == null)
+        if (View == null)
         {
-            throw new Exception("MainView is null");
+            throw new Exception("View is null");
         }
 
         //设置默认灯光
@@ -335,8 +260,9 @@ public partial class OCCCanvas : Form
         //设置交互默认值
         AISContext.SetDefault();
         //设置相机默认值
-        MainView.SetICORendering();
-        MainView.SetDefaultBGColor();
+        View.SetICORendering();
+        //设置默认背景颜色
+        View.SetDefaultBGColor();
         //设置选择模式
         CurrentSelectionMode = OCCTK.OCC.AIS.SelectionMode.Shape;
 
@@ -362,7 +288,7 @@ public partial class OCCCanvas : Form
         //显示视图坐标轴
         ShowViewTrihedron = false;
         //显示刻度坐标系
-        MainView.DisplayDefault_GraduatedTrihedron();
+        ShowGraduatedTrihedron = true;
 
         #endregion
 
@@ -402,22 +328,22 @@ public partial class OCCCanvas : Form
 
     private void OnPaint(object? sender, PaintEventArgs e)
     {
-        if (AISContext == null || MainView == null)
+        if (AISContext == null || View == null)
         {
             return;
         }
 
-        MainView.Redraw();
+        View.Redraw();
         AISContext.UpdateCurrentViewer();
     }
 
     private void OnSizeChanged(object? sender, EventArgs e)
     {
-        if (MainView == null)
+        if (View == null)
         {
             return;
         }
-        MainView.MustBeResized();
+        View.MustBeResized();
     }
 
     #endregion
@@ -428,7 +354,7 @@ public partial class OCCCanvas : Form
 
     public new void Update()
     {
-        MainView.Redraw();
+        View.Redraw();
         AISContext.UpdateCurrentViewer();
     }
 
@@ -437,7 +363,7 @@ public partial class OCCCanvas : Form
     /// </summary>
     public void FitAll()
     {
-        MainView.FitAll(0.01, true);
+        View.FitAll(0.01, true);
     }
 
     /// <summary>
@@ -445,7 +371,7 @@ public partial class OCCCanvas : Form
     /// </summary>
     public void SetViewOrientation()
     {
-        MainView.SetViewOrientation(CycleEnum(CurrentViewOrientation), true);
+        View.SetViewOrientation(CycleEnum(CurrentViewOrientation), true);
     }
 
     /// <summary>
@@ -455,7 +381,7 @@ public partial class OCCCanvas : Form
     public void SetViewOrientation(ViewOrientation theMode)
     {
         CurrentViewOrientation = theMode;
-        MainView.SetViewOrientation(theMode, true);
+        View.SetViewOrientation(theMode, true);
     }
 
     /// <summary>
@@ -463,7 +389,7 @@ public partial class OCCCanvas : Form
     /// </summary>
     public void Reset()
     {
-        MainView.Reset();
+        View.Reset();
     }
 
     /// <summary>
@@ -472,69 +398,9 @@ public partial class OCCCanvas : Form
     /// <param name="theMode"></param>
     public void SetHidden(bool toOpen)
     {
-        MainView.SetDegenerateMode(toOpen);
+        View.SetDegenerateMode(toOpen);
         DegenerateMode = toOpen;
     }
-
-    #endregion
-
-    #region 显示
-
-    public void Display(InteractiveObject theAIS, bool Toupdate = true)
-    {
-        AISContext.Display(theAIS, false);
-        //默认颜色为灰色
-        AISContext.SetColor(theAIS, new Color(125, 125, 125), Toupdate);
-    }
-
-    public void EraseSelected()
-    {
-        AISContext.EraseSelected();
-    }
-
-    public void Erase(InteractiveObject theAIS, bool Toupdate)
-    {
-        AISContext.Erase(theAIS, Toupdate);
-    }
-
-    public void EraseAll(bool Toupdate)
-    {
-        AISContext.EraseAll(false);
-        DisplayViewCube(false);
-        DisplayOriginTrihedron(false);
-        DisplayViewTrihedron(Toupdate);
-    }
-
-    public void Remove(InteractiveObject theAIS, bool Toupdate)
-    {
-        AISContext.Remove(theAIS, Toupdate);
-    }
-
-    #endregion
-
-    #region 对象交互
-
-    /// <summary>
-    /// 设置选择模式
-    /// </summary>
-    /// <param name="theMode"></param>
-    public void SetDefaultSelectionMode(OCCTK.OCC.AIS.SelectionMode theMode)
-    {
-        AISContext.SetDefaultSelectionMode(theMode);
-    }
-
-    /// <summary>
-    /// 获取选中的AIS对象
-    /// </summary>
-    /// <returns></returns>
-    public AShape GetSelectedShape()
-    {
-        return AISContext.SelectedAIS();
-    }
-
-    #endregion
-
-    #region 其它设置
 
     #endregion
 }

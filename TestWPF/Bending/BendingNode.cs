@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
+using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.BRepCheck;
@@ -13,6 +14,7 @@ using OCCTK.OCC.TopExp;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.TopoAbs;
 using OCCTK.Tool;
+using OCCTK.Utils;
 using TestWPF.Geometry.Tools;
 using Color = OCCTK.Extension.Color;
 using ColorMap = OCCTK.Extension.ColorMap;

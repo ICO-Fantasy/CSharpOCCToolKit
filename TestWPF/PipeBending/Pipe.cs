@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Design;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms.VisualStyles;
 using log4net;
+using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.BRepGProp;
 using OCCTK.OCC.BRepOffsetAPI;
-using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.GProp;
 using OCCTK.OCC.Topo;
-using TestWPF.Bending;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Input.Preview;
-using Windows.Devices.Radios;
-using Windows.Web.Syndication;
+using OCCTK.Utils;
 
 namespace TestWPF.PipeBending;
 

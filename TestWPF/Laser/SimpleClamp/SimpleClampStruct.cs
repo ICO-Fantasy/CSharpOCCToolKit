@@ -8,6 +8,7 @@ using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using TestWPF.Geometry.Tools;
+using TestWPF.Utils;
 
 namespace TestWPF.Laser.SimpleClamp;
 

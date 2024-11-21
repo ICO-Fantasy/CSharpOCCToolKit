@@ -14,8 +14,8 @@ using OCCTK.IO;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepPrimAPI;
 using OCCTK.OCC.Topo;
+using OCCTK.Utils;
 using OCCViewForm;
-using TestWPF.Utils;
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
 
@@ -31,7 +31,9 @@ public partial class CenterOfGravity : Window
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
-        OCCCanvas = new OCCCanvas();
+        App.Current.ContextManager.CreateContext();
+        ThreeDContext = App.Current.ContextManager.MainContext;
+        OCCCanvas = new OCCCanvas(ThreeDContext);
         OCCCanvas.ShowOriginTrihedron = true;
         aHost.Child = OCCCanvas;
         Canvas_Grid.Children.Add(aHost);
@@ -43,6 +45,8 @@ public partial class CenterOfGravity : Window
     }
 
     private readonly OCCCanvas OCCCanvas;
+    private readonly ThreeDimensionContext ThreeDContext;
+    private InteractiveContext AISContext => ThreeDContext.AISContext;
 
     #region Pipe
     private Pipe Pipe { get; set; }
@@ -137,12 +141,11 @@ public partial class CenterOfGravity : Window
     }
     #endregion
     #region 简化调用
-    private Action<InteractiveObject, bool> Display => OCCCanvas.Display;
-    private Action<InteractiveObject, Color, bool> SetColor => OCCCanvas.AISContext.SetColor;
-    private Action<InteractiveObject, double, bool> SetTransparency =>
-        OCCCanvas.AISContext.SetTransparency;
-    private Action<InteractiveObject, bool> Erase => OCCCanvas.Erase;
-    private Action<bool> EraseAll => OCCCanvas.EraseAll;
+    private Action<InteractiveObject, bool> Display => ThreeDContext.Display;
+    private Action<InteractiveObject, Color, bool> SetColor => AISContext.SetColor;
+    private Action<InteractiveObject, double, bool> SetTransparency => AISContext.SetTransparency;
+    private Action<InteractiveObject, bool> Erase => ThreeDContext.Erase;
+    private Action<bool> EraseAll => ThreeDContext.EraseAll;
     private Action Update => OCCCanvas.Update;
     private Action FitAll => OCCCanvas.FitAll;
     #endregion
@@ -291,7 +294,7 @@ public partial class CenterOfGravity : Window
     private void InputPipeInfo_Button_Click(object sender, RoutedEventArgs e)
     {
         Pipe = new();
-        OCCCanvas.EraseAll(false);
+        ThreeDContext.EraseAll(false);
         if (STEPAISShape != null)
         {
             Display(STEPAISShape, false);
@@ -414,7 +417,8 @@ public partial class CenterOfGravity : Window
                 SetColor(Pipe, ColorMap.Blue, false);
                 SetTransparency(Pipe, 0.5, false);
                 //显示重心
-                AShape centerPnt = new(new MakeSphere(Pipe.Center, 1));
+                //AShape centerPnt = new(new MakeSphere(Pipe.Center, 1));
+                var centerPnt = new APoint(Pipe.Center);
                 AAxis rotationAxis = new(Pipe.Moment, 10);
                 Display(centerPnt, false);
                 SetColor(centerPnt, ColorMap.Red, false);

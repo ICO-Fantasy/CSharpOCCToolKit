@@ -5,15 +5,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TestWPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:utils="clr-namespace:TestWPF.Utils"
+    xmlns:utils="clr-namespace:OCCTK.Utils"
     d:Background="LightGreen"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
 
-    <UserControl.DataContext>
+    <!--<UserControl.DataContext>
         <local:RobotPropertiesViewModel />
-    </UserControl.DataContext>
+    </UserControl.DataContext>-->
     <UserControl.Resources>
         <!--  注册转换器  -->
         <utils:RadianToDegreeConverter x:Key="RadianToDegreeConverter" />
@@ -28,11 +28,11 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <TextBlock
+        <!--<TextBlock
             Grid.Row="0"
             HorizontalAlignment="Center"
-            Text="{Binding Model.RobotData.Name, StringFormat='Robot: {0}', FallbackValue='Robot: 未加载'}" />
-        <Grid Grid.Row="1">
+            Text="{Binding Model.RobotData.Name, StringFormat='Robot: {0}', FallbackValue='Robot: 未加载'}" />-->
+        <!--<Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="1*" />
@@ -66,7 +66,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Text="{Binding Theta1, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                        Text="{Binding Theta1, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value: Nan'}" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -108,7 +108,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Text="{Binding Theta2, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                        Text="{Binding Theta2, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value: Nan'}" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -150,7 +150,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Text="{Binding Theta3, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                        Text="{Binding Theta3, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value: Nan'}" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -192,7 +192,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Text="{Binding Theta4, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                        Text="{Binding Theta4, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value: Nan'}" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -234,7 +234,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Text="{Binding Theta5, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                        Text="{Binding Theta5, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value: Nan'}" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -276,7 +276,7 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Text="{Binding Theta6, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value:----'}" />
+                        Text="{Binding Theta6, Converter={StaticResource RadianToDegreeConverter}, StringFormat='Value: {0}', FallbackValue='Value: Nan'}" />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
@@ -333,7 +333,6 @@
                 MinWidth="70"
                 Text="{Binding RValue, StringFormat='R: {0:F1}', FallbackValue='R: -'}"
                 TextAlignment="Left" />
-        </Grid>
-
+        </Grid>-->
     </Grid>
 </UserControl>

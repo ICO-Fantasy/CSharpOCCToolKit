@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "WMakeSimpleClamp.h"
 #include "MakeSimpleClamp.h"
-#include "ICO_StringExchange.h"
-#include "ICO_Trsf.h"
+#include "DataExchange\ICO_StringExchange.h"
+#include "OCCProxy\ICO_Trsf.h"
 #include <TopoDS_FrozenShape.hxx>
 using namespace System::Collections::Generic;
 using namespace OCCTK::OCC::gp;

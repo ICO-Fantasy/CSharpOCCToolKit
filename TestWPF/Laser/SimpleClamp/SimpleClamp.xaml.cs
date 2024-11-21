@@ -18,6 +18,7 @@ using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.Tool;
+using OCCTK.Utils;
 using OCCViewForm;
 using Windows.Media.Core;
 //设置别名
@@ -106,10 +107,9 @@ public partial class SimpleClamp : Window
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
-        Canvas = new OCCCanvas();
+        Canvas = new OCCCanvas(App.Current.ContextManager.MainContext);
         aHost.Child = Canvas;
         canvas_grid.Children.Add(aHost);
-        AISContext = Canvas.AISContext;
         Canvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
         Canvas.Show();
         //< TextBox Text = "{Binding BasePlate.BasePlateOffsetX, UpdateSourceTrigger=PropertyChanged}"
@@ -140,7 +140,8 @@ public partial class SimpleClamp : Window
     };
 
     private readonly OCCCanvas Canvas;
-    private readonly InteractiveContext AISContext;
+    private ThreeDimensionContext ThreeDContext => App.Current.ContextManager.MainContext;
+    private InteractiveContext AISContext => App.Current.ContextManager.MainContext?.AISContext;
 
     /// <summary>
     /// 创建的竖板列表，分为两部分储存
@@ -499,11 +500,11 @@ public partial class SimpleClamp : Window
 
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.EraseAll(false);
+        EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test1.stp"));
         BasePlate = null;
-        Canvas.Display(InputWorkpiece.AIS, true);
-        Canvas.FitAll();
+        Display(InputWorkpiece.AIS, true);
+        FitAll();
     }
 
     private void Test_input_test_2_Click(object sender, RoutedEventArgs e)
@@ -565,20 +566,20 @@ public partial class SimpleClamp : Window
 
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.EraseAll(false);
+        EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test4.stp"));
         BasePlate = null;
-        Canvas.Display(InputWorkpiece.AIS, true);
+        Display(InputWorkpiece.AIS, true);
         Canvas.FitAll();
     }
 
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.EraseAll(false);
+        EraseAll(false);
         InputWorkpiece = new(new STEPExchange("mods\\test5.stp"));
         BasePlate = null;
-        Canvas.Display(InputWorkpiece.AIS, true);
-        Canvas.FitAll();
+        Display(InputWorkpiece.AIS, true);
+        FitAll();
     }
 
     #endregion
@@ -587,31 +588,31 @@ public partial class SimpleClamp : Window
 
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Shape);
+        Canvas.CurrentSelectionMode = SelectionMode.Shape;
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Face);
+        Canvas.CurrentSelectionMode = SelectionMode.Face;
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Edge);
+        Canvas.CurrentSelectionMode = SelectionMode.Edge;
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Vertex);
+        Canvas.CurrentSelectionMode = SelectionMode.Vertex;
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void Select_Shell_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.SetDefaultSelectionMode(SelectionMode.Shell);
+        Canvas.CurrentSelectionMode = SelectionMode.Shell;
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 
@@ -1150,13 +1151,13 @@ public partial class SimpleClamp : Window
         //删除旧的板的显示
         if (CurrentPlate.AIS != null)
         {
-            Canvas.Remove(CurrentPlate.AIS, false);
+            ThreeDContext.Remove(CurrentPlate.AIS, false);
         }
         if (CurrentPlate.Pieces.Count() != 0)
         {
             foreach (var onePiece in CurrentPlate.Pieces)
             {
-                Canvas.Remove(onePiece.AIS, false);
+                ThreeDContext.Remove(onePiece.AIS, false);
             }
         }
         //替换为新的
@@ -1470,7 +1471,7 @@ public partial class SimpleClamp : Window
         {
             //! 必须先detach操作器，否则会因为AIS对象消失而出错
             Canvas.Manipulator.Detach();
-            Canvas.Remove(manipulatedObject, false);
+            ThreeDContext.Remove(manipulatedObject, false);
             InputWorkpiece.Transform();
             manipulatedObject = null;
             DisplayEraseInputWorkpiece(false);
@@ -1485,7 +1486,8 @@ public partial class SimpleClamp : Window
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Erase_Button_Click(object sender, RoutedEventArgs e) => Canvas.EraseSelected();
+    private void Erase_Button_Click(object sender, RoutedEventArgs e) =>
+        ThreeDContext.EraseSelected();
 
     /// <summary>
     /// 显示当前片
@@ -1865,11 +1867,11 @@ public partial class SimpleClamp : Window
     #region 视图显示
 
     //简化函数调用
-    private Action<InteractiveObject, bool> Display => Canvas.Display;
+    private Action<InteractiveObject, bool> Display => AISContext.Display;
     private Action<InteractiveObject, Color, bool> SetColor => AISContext.SetColor;
     private Action<InteractiveObject, double, bool> SetTransparency => AISContext.SetTransparency;
-    private Action<InteractiveObject, bool> Erase => Canvas.Erase;
-    private Action<bool> EraseAll => Canvas.EraseAll;
+    private Action<InteractiveObject, bool> Erase => AISContext.Erase;
+    private Action<bool> EraseAll => ThreeDContext.EraseAll;
     private Action Update => Canvas.Update;
     private Action FitAll => Canvas.FitAll;
 

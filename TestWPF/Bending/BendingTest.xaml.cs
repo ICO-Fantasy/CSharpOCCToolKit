@@ -18,8 +18,8 @@ using OCCTK.OCC.BRepBuilderAPI;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.OCC.TopoAbs;
+using OCCTK.Utils;
 using OCCViewForm;
-using TestWPF.Utils;
 //设置别名
 using Brushes = System.Windows.Media.Brushes;
 using Color = OCCTK.Extension.Color;
@@ -38,7 +38,9 @@ public partial class BendingTest : Window, IAISSelectionHandler
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
-        OCCCanvas = new OCCCanvas();
+        App.Current.ContextManager.CreateContext();
+        ThreeDContext = App.Current.ContextManager.MainContext;
+        OCCCanvas = new OCCCanvas(ThreeDContext);
         aHost.Child = OCCCanvas;
         Canvas_Grid.Children.Add(aHost);
         OCCCanvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -49,17 +51,18 @@ public partial class BendingTest : Window, IAISSelectionHandler
 
     #region 窗口属性和字段
 
+    private readonly ThreeDimensionContext ThreeDContext;
     private readonly OCCCanvas OCCCanvas;
-    private InteractiveContext Context => OCCCanvas.AISContext;
+    private InteractiveContext Context => ThreeDContext.AISContext;
     private bool _isBendingArrowVisible = false;
     private bool _isMainFaceNormalVisible = false;
 
     //简化函数调用
-    private Action<InteractiveObject, bool> Display => OCCCanvas.Display;
+    private Action<InteractiveObject, bool> Display => ThreeDContext.Display;
     private Action<InteractiveObject, Color, bool> SetColor => Context.SetColor;
     private Action<InteractiveObject, double, bool> SetTransparency => Context.SetTransparency;
-    private Action<InteractiveObject, bool> Erase => OCCCanvas.Erase;
-    private Action<bool> EraseAll => OCCCanvas.EraseAll;
+    private Action<InteractiveObject, bool> Erase => ThreeDContext.Erase;
+    private Action<bool> EraseAll => ThreeDContext.EraseAll;
     private Action Update => OCCCanvas.Update;
     private Action FitAll => OCCCanvas.FitAll;
 
@@ -537,34 +540,33 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #endregion
 
     #region 选择模式
-
     private void SelectShape_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Shape);
+        OCCCanvas.CurrentSelectionMode = SelectionMode.Shape;
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void SelectFace_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Face);
+        OCCCanvas.CurrentSelectionMode = SelectionMode.Face;
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void SelectEdge_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Edge);
+        OCCCanvas.CurrentSelectionMode = SelectionMode.Edge;
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void SelectVertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Vertex);
+        OCCCanvas.CurrentSelectionMode = SelectionMode.Vertex;
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void SelectShell_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.SetDefaultSelectionMode(SelectionMode.Shell);
+        OCCCanvas.CurrentSelectionMode = SelectionMode.Shell;
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 

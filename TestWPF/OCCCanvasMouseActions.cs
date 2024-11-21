@@ -226,6 +226,9 @@ public partial class OCCCanvas
     /// </summary>
     private readonly System.Windows.Forms.Timer cursorResetTimer;
 
+    /// <summary>
+    /// 当前三维交互动作
+    /// </summary>
     private Action3d _currentAction3d;
 
     /// <summary>
@@ -337,14 +340,14 @@ public partial class OCCCanvas
         AISContext.InitDetected();
         _DetectedAIS = AISContext.MoreDetected();
         //! 记录旋转开始点
-        MainView.StartRotation(mouseDownX, mouseDownY);
+        View?.StartRotation(mouseDownX, mouseDownY);
         //! 记录平移开始点
-        MainView.StartPan();
+        View?.StartPan();
         //! 记录变换开始点
         if (Manipulator.HasActiveMode())
         {
-            Manipulator.StartTransform(mouseDownX, mouseDownY, MainView);
-            //myManipulator.StartTransform(mouseDownX, mouseDownY, MainView);
+            Manipulator.StartTransform(mouseDownX, mouseDownY, View);
+            //myManipulator.StartTransform(mouseDownX, mouseDownY, View);
         }
     }
 
@@ -371,7 +374,7 @@ public partial class OCCCanvas
         //将鼠标位置发送给OCC交互上下文管理器，用于获取该位置的所选对象
         //! 单选等操作均需要基于该位置进行
         //! moveto的坐标是基于pix的，不需要做转换
-        AISContext.MoveTo(mouseCurrentX, mouseCurrentY, MainView);
+        AISContext.MoveTo(mouseCurrentX, mouseCurrentY, View);
     }
 
     #region Mouse Moved Action
@@ -382,17 +385,17 @@ public partial class OCCCanvas
 
     private void DynamicRotation()
     {
-        MainView.Rotation(mouseCurrentX, mouseCurrentY);
+        View?.Rotation(mouseCurrentX, mouseCurrentY);
     }
 
     private void DynamicPanning()
     {
-        MainView.Pan(mouseCurrentX - mouseDownX, -(mouseCurrentY - mouseDownY));
+        View?.Pan(mouseCurrentX - mouseDownX, -(mouseCurrentY - mouseDownY));
     }
 
     private void Manipulator_Translation()
     {
-        myManipulator.Transform(mouseCurrentX, mouseCurrentY, MainView);
+        myManipulator.Transform(mouseCurrentX, mouseCurrentY, View);
     }
 
     #endregion
@@ -434,7 +437,7 @@ public partial class OCCCanvas
                         Math.Min(mouseDownY, mouseUpY),
                         Math.Max(mouseDownX, mouseUpX),
                         Math.Max(mouseDownY, mouseUpY),
-                        MainView
+                        View
                     );
                 }
                 else
@@ -452,7 +455,7 @@ public partial class OCCCanvas
                         Math.Min(mouseDownY, mouseUpY),
                         Math.Max(mouseDownX, mouseUpX),
                         Math.Max(mouseDownY, mouseUpY),
-                        MainView
+                        View
                     );
                 }
                 else
@@ -466,7 +469,7 @@ public partial class OCCCanvas
                 AISContext.Erase(myBubberBand, true);
                 if (HasCheckbox())
                 {
-                    MainView.WindowFitAll(mouseDownX, mouseDownY, mouseCurrentX, mouseCurrentY);
+                    View?.WindowFitAll(mouseDownX, mouseDownY, mouseCurrentX, mouseCurrentY);
                 }
                 break;
             case Action3d.DynamicRotation:
@@ -495,7 +498,7 @@ public partial class OCCCanvas
         // 擦除选择框
         if (AISContext.IsDisplayed(myBubberBand))
         {
-            Erase(myBubberBand, true);
+            AISContext.Erase(myBubberBand, true);
         }
         _currentAction3d = Action3d.None;
         _manipulatorMode = null;
@@ -551,15 +554,15 @@ public partial class OCCCanvas
         }
         if (isMousePointScroll)
         {
-            MainView.StartZoomAtPoint(
+            View?.StartZoomAtPoint(
                 devicePixelRatioX * mouseCurrentX,
                 devicePixelRatioY * mouseCurrentY
             );
-            MainView.ZoomAtPoint(mouseCurrentX, mouseCurrentY, endX, endY);
+            View?.ZoomAtPoint(mouseCurrentX, mouseCurrentY, endX, endY);
         }
         else
         {
-            MainView.SetZoom(zoomFactor, true);
+            View?.SetZoom(zoomFactor, true);
         }
         // 启动计时器
         cursorResetTimer.Start();

@@ -52,7 +52,8 @@ public partial class App : Application
     public static new App Current => (App)Application.Current;
 
     //public WorkSpace workSpace;
-    public readonly OCCCanvas canva = Singleton<OCCCanvas>.Instance;
+    public readonly ThreeDimensionContextManager ContextManager =
+        Singleton<ThreeDimensionContextManager>.Instance;
 
     [STAThread]
     protected override void OnStartup(StartupEventArgs e)
@@ -74,14 +75,14 @@ public partial class App : Application
         CreateInstanceMutexes();
 
         // Start main window
-        //MainWindow = new RobotWindows();
+        MainWindow = new RobotWindows();
         //MainWindow = new CanvasTest();
         //! 简易夹具测试
         //MainWindow = new SimpleClamp();
         //! 折弯测试
         //MainWindow = new BendingTest();
         //! 弯管重心计算
-        MainWindow = new CenterOfGravity();
+        //MainWindow = new CenterOfGravity();
         MainWindow.Show();
 
         ShutdownMode = ShutdownMode.OnMainWindowClose;

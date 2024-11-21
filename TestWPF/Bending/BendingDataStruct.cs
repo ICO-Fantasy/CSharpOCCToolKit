@@ -337,7 +337,7 @@ public class Edge
         if (Type == CurveType.Circle)
         {
             var c = BE.Circle();
-            CircleCenter = c.Location();
+            CircleCenter = c.Pose.Location;
             CircleRadius = c.Radius;
         }
         var twoPnts = Geometry.Tools.BrepGeomtryTools.GetEdgeEndPoints(TopoEdge);

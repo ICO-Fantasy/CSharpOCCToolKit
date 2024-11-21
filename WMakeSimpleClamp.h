@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "MakeSimpleClamp.h"
-#include "ICO_Pnt.h"
-#include "ICO_Dir.h"
-#include "ICO_Topo_Shape.h"
-#include "ICO_AIS_Shape.h"
-#include "ICO_StringExchange.h"
+//local
+#include "OCCProxy\ICO_Pnt.h"
+#include "OCCProxy\ICO_Dir.h"
+#include "OCCProxy\ICO_Topo_Shape.h"
+#include "OCCProxy\ICO_AIS_Shape.h"
+#include "DataExchange\ICO_StringExchange.h"
 //包装C++类到托管类
 #include <NCollection_Haft.h> 
 

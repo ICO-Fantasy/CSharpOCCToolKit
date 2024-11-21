@@ -11,6 +11,7 @@
     </OCC_LibTKReleaseWithDebugInfo>
     <OCC_IncludeTKReleaseWithDebugInfo>
     </OCC_IncludeTKReleaseWithDebugInfo>
+    <Eigen_Path>D:\eigen-3.4.0</Eigen_Path>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -36,6 +37,9 @@
     </BuildMacro>
     <BuildMacro Include="OCC_IncludeTKReleaseWithDebugInfo">
       <Value>$(OCC_IncludeTKReleaseWithDebugInfo)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Eigen_Path">
+      <Value>$(Eigen_Path)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

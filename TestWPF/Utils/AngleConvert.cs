@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace TestWPF.Utils;
+namespace OCCTK.Utils;
 
 public class RadianToDegreeConverter : IValueConverter
 {
@@ -36,6 +36,13 @@ public static class DoubleExtensions
         // 将弧度转换为角度
         double degrees = radians * (180.0 / Math.PI);
         return Math.Round(degrees, digits); // 保留一位小数
+    }
+
+    // 定义一个扩展方法，接受一个 double 类型的参数
+    public static double ToDegrees(this double radians)
+    {
+        // 将弧度转换为角度
+        return radians * (180.0 / Math.PI);
     }
 
     // 定义一个扩展方法，接受一个 double 类型的参数
