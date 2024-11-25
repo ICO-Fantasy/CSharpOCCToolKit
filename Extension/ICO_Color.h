@@ -20,6 +20,9 @@ public:
 	Quantity_Color GetOCC() {
 		return Quantity_Color((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
 	};
+	virtual System::String^ ToString() override {
+		return "(" + R + ", " + G + ", " + B + ")";
+	};
 public:
 	// 定义一些常用的颜色
 	static Color Red() {

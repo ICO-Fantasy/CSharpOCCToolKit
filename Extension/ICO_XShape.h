@@ -1,18 +1,23 @@
 ﻿#pragma once
-#include "..\OCCProxy\ICO_Trsf.h"
+#include "ICO_Color.h"
+
 namespace OCCTK {
 namespace Extension {
 value struct Color;
 }
 namespace OCC {
+namespace AIS {
+ref class AShape;
+}
 namespace gp {
 ref class Trsf;
+ref class Ax2;
 }
 namespace Topo {
 ref class TShape;
-}
-namespace AIS {
-ref class AShape;
+ref class TEdge;
+ref class TVertex;
+ref class TFace;
 }
 }
 }
@@ -20,63 +25,34 @@ ref class AShape;
 namespace OCCTK {
 namespace Extension {
 
-public ref class XShapeNode {
-public:
-	XShapeNode() {
-		Name = nullptr;
-		Parent = nullptr;
-		Children = gcnew System::Collections::Generic::List<XShapeNode^>();
-		Layer = -1;
-		Transform = nullptr;
-		Transparence = 0.0;
-		TopoShape = nullptr;
-		AISShape = nullptr;
-		Color = nullptr;
-	}
-public:
-	property System::String^ Name;
-	property XShapeNode^ Parent;
-	property System::Collections::Generic::List<XShapeNode^>^ Children;
-	property int Layer;
-	property OCC::gp::Trsf^ Transform;
-	property OCC::gp::Trsf^ Location {OCC::gp::Trsf^ get() {
-		if (Parent != nullptr) {
-			return  Parent->Location->Multiplied(Transform);
-		}
-		else {
-			return Transform;
-		}
-	}}
-#pragma region 末端节点属性
-	property OCC::Topo::TShape^ TopoShape;
-	property OCC::AIS::AShape^ AISShape;
-	property Extension::Color^ Color;
-	property double Transparence;
-#pragma endregion
-};
-
 public ref class XShape {
 public:
-	XShape() {
-		Name = nullptr;
-		Color = nullptr;
-		Transparence = 0.0;
-		Location = nullptr;
-		Nodes = gcnew System::Collections::Generic::List<XShapeNode^>();
-		TopoShape = nullptr;
-		AISShape = nullptr;
-	}
+
+	XShape();
+	XShape(bool isShape);
 public:
+	property bool IsShape;
+	property bool IsAssembly {bool get() { return !IsShape; }};
 	property System::String^ Name;
-	property Color^ Color;
-	property double Transparence;
-	property OCC::gp::Trsf^ Location;
-	property System::Collections::Generic::List<XShapeNode^>^ Nodes;
+	property System::Nullable<Extension::Color> Color;
+	property System::String^ Material;
 	/// <summary>
-	/// 当只有一个TopoShape的时候，储存在TopoShape中，此时Nodes中应该为空
+	/// 透明度，范围(0-100)，默认值 -1
 	/// </summary>
-	property OCC::Topo::TShape^ TopoShape;
-	property OCC::AIS::AShape^ AISShape;
+	property double Transparence;
+	/// <summary>
+	/// 父节点
+	/// </summary>
+	property XShape^ Parent;
+	property System::Collections::Generic::List<XShape^>^ Children;
+	property int Layer;
+	property OCC::gp::Trsf^ Transform;
+	property OCC::gp::Trsf^ Location {OCC::gp::Trsf^ get(); }
+	property OCC::Topo::TShape^ TopoShape {OCC::Topo::TShape^ get() { return myTopo; } void set(OCC::Topo::TShape^ value); };
+	property OCC::AIS::AShape^ AISShape {OCC::AIS::AShape^ get(); };
+private:
+	OCC::Topo::TShape^ myTopo;
+	OCC::AIS::AShape^ myAIS;
 };
 
 }

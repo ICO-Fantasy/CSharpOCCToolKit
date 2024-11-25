@@ -1,5 +1,6 @@
 ﻿#include "ICO_TopExp_Explorer.h"
 #include <TopAbs_ShapeEnum.hxx>
+#include <TopExp_Explorer.hxx>
 //local
 #include "ICO_ShapeEnum.h"
 #include "ICO_Topo_Shape.h"

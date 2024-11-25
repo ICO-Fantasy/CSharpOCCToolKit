@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OCCTK.OCC.gp;
+using TestWPF.Robotics;
 using TestWPF.Utils;
 using Windows.Devices.Input.Preview;
 
@@ -70,9 +71,17 @@ public class AngleMatrix<T> : IEnumerable<T>
 
 public class Knot
 {
-    public Knot(Ax2 pose, double dx, double dy, double diffAngle, Dir dir)
+    public Knot(
+        Ax2 pose,
+        FanucRobotConfig robotConfig,
+        double dx,
+        double dy,
+        double diffAngle,
+        Dir dir
+    )
     {
         OriginPose = pose;
+        RobotConfig = robotConfig;
         diffAngleXY = (dx, dy);
         DiffAngle = diffAngle;
         Direction = dir;
@@ -109,4 +118,9 @@ public class Knot
     /// 逆解角度
     /// </summary>
     public (double, double, double, double, double, double) SixRAngle { get; set; }
+
+    /// <summary>
+    /// 机器人姿态
+    /// </summary>
+    public FanucRobotConfig RobotConfig { get; set; }
 }

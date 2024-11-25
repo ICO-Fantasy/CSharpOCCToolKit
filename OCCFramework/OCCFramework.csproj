@@ -10,15 +10,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="GeometryTools\**" />
+    <EmbeddedResource Remove="GeometryTools\**" />
+    <None Remove="GeometryTools\**" />
+    <Page Remove="GeometryTools\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CSharpOCCToolKit.vcxproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GeometryTools\" />
   </ItemGroup>
 
 </Project>

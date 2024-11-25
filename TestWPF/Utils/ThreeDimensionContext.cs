@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OCCTK.Extension;
 using OCCTK.OCC.AIS;
+using OCCTK.OCC.gp;
 using OCCTK.OCC.V3d;
 using OCCViewForm;
+using Windows.UI.Core;
 using Color = OCCTK.Extension.Color;
 
 namespace OCCTK.Utils;
@@ -96,6 +99,54 @@ public class ThreeDimensionContext
         AISContext.SetColor(theAIS, new Color(125, 125, 125), Toupdate);
     }
 
+    public void Display(XShape theAIS, bool Toupdate = true)
+    {
+        Trsf t = new Trsf();
+        if (theAIS.IsShape)
+        {
+            AISContext.Display(theAIS.AISShape, false);
+            if (theAIS.Color.HasValue)
+            {
+                AISContext.SetColor(theAIS.AISShape, (Color)theAIS.Color, Toupdate);
+            }
+            else
+            {
+                //默认颜色为灰色
+                AISContext.SetColor(theAIS.AISShape, new Color(125, 125, 125), Toupdate);
+            }
+        }
+        if (theAIS.IsAssembly)
+        {
+            t = new Trsf();
+            this.Display(theAIS, false, null);
+        }
+    }
+
+    public void Display(XShape theAIS, bool Toupdate, Color? color = null)
+    {
+        //! 颜色
+        Color? currentColor = null;
+        //子节点的颜色优先于父节点的颜色
+        if (theAIS.Color.HasValue)
+        {
+            currentColor = (Color)theAIS.Color;
+        }
+        else if (color != null)
+        {
+            currentColor = (Color)color;
+        }
+        //! 位置
+        theAIS.AISShape.SetLocalTransformation(theAIS.Location);
+        //! 材质
+        //! 展示
+        AISContext.Display(theAIS.AISShape, false);
+        AISContext.SetColor(theAIS.AISShape, currentColor ?? new Color(125, 125, 125), Toupdate);
+        foreach (var child in theAIS.Children)
+        {
+            this.Display(child, false, currentColor);
+        }
+    }
+
     public void Redisplay(InteractiveObject theAIS, bool Toupdate = true)
     {
         AISContext.Redisplay(theAIS, false);
@@ -126,6 +177,15 @@ public class ThreeDimensionContext
     public void Remove(InteractiveObject theAIS, bool Toupdate)
     {
         AISContext.Remove(theAIS, Toupdate);
+    }
+
+    public void Update()
+    {
+        foreach (var view in ViewList)
+        {
+            view.Update();
+        }
+        AISContext.UpdateCurrentViewer();
     }
 
     #endregion

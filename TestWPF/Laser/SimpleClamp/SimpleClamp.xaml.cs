@@ -454,7 +454,7 @@ public partial class SimpleClamp : Window
             string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
 
             EraseAll(false);
-            InputWorkpiece = new(new STEPExchange(selectedFilePath)); // 使用选择的文件路径
+            InputWorkpiece = new(new STEPExchange(selectedFilePath).Shape().TopoShape); // 使用选择的文件路径
             BasePlate = null;
             MiddleToDownPlates.Clear();
             MiddleToUpPlates.Clear();
@@ -501,7 +501,7 @@ public partial class SimpleClamp : Window
     private void Test_input_test_1_Click(object sender, RoutedEventArgs e)
     {
         EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test1.stp"));
+        InputWorkpiece = new(new STEPExchange("mods\\test1.stp").Shape().TopoShape);
         BasePlate = null;
         Display(InputWorkpiece.AIS, true);
         FitAll();
@@ -567,7 +567,7 @@ public partial class SimpleClamp : Window
     private void Test_input_test_4_Click(object sender, RoutedEventArgs e)
     {
         EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test4.stp"));
+        InputWorkpiece = new(new STEPExchange("mods\\test4.stp").Shape().TopoShape);
         BasePlate = null;
         Display(InputWorkpiece.AIS, true);
         Canvas.FitAll();
@@ -576,7 +576,7 @@ public partial class SimpleClamp : Window
     private void Test_input_test_5_Click(object sender, RoutedEventArgs e)
     {
         EraseAll(false);
-        InputWorkpiece = new(new STEPExchange("mods\\test5.stp"));
+        InputWorkpiece = new(new STEPExchange("mods\\test5.stp").Shape().TopoShape);
         BasePlate = null;
         Display(InputWorkpiece.AIS, true);
         FitAll();
@@ -1856,10 +1856,10 @@ public partial class SimpleClamp : Window
             }
         }
         STEPExchange exchanger3D = new(theMaker.Shape());
-        exchanger3D.SaveFile("mods\\test_output_3d.STEP");
+        exchanger3D.SaveSingleShape("mods\\test_output_3d.STEP");
         //保存排列后的板
         STEPExchange exchanger = new(CombinedFixtureBoard.Shape);
-        exchanger.SaveFile("mods\\test_output_Fixtured.STEP");
+        exchanger.SaveSingleShape("mods\\test_output_Fixtured.STEP");
     }
 
     #endregion
@@ -2286,7 +2286,7 @@ public partial class SimpleClamp : Window
 
     private void TestInput()
     {
-        InputWorkpiece = new(new STEPExchange("mods\\mytest.stp"));
+        InputWorkpiece = new(new STEPExchange("mods\\mytest.stp").Shape().TopoShape);
     }
 
     #endregion

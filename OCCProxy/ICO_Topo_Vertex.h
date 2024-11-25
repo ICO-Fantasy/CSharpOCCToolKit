@@ -1,14 +1,19 @@
 ﻿#pragma once
-//local
+#include <TopoDS_Vertex.hxx>
 #include "ICO_Topo_Shape.h"
+
 class TopoDS_Vertex;
 namespace OCCTK {
 namespace OCC {
+//namespace Topo {
+//ref class TShape;
+//}
 namespace gp {
 ref class Pnt;
 }
 }
 }
+
 namespace OCCTK {
 namespace OCC {
 namespace Topo {

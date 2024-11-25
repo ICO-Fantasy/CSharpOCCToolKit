@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include <TopAbs_ShapeEnum.hxx>
-//包装C++类到托管类
-#include <NCollection_Haft.h> 
 
 namespace OCCTK {
 namespace OCC {

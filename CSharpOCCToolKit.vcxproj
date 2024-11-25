@@ -157,6 +157,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DataExchange\ICO_OBJExchange.cpp" />
+    <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
+    <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp" />
+    <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp" />
+    <ClCompile Include="DataExchange\ICO_STLExchange.cpp" />
     <ClCompile Include="OCCProxy\ICO_AIS_Point.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepCheck_Analyzer.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepPrimAPI_MakeRevol.cpp" />
@@ -225,6 +229,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_OBJExchange.h" />
+    <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
+    <ClInclude Include="OCCProxy\ICO_Poly_Triangulation.h" />
+    <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h" />
+    <ClInclude Include="DataExchange\ICO_STLExchange.h" />
     <ClInclude Include="OCCProxy\ICO_AIS_Point.h" />
     <ClInclude Include="OCCProxy\ICO_BRepCheck_Analyzer.h" />
     <ClInclude Include="OCCProxy\ICO_BRepPrimAPI_MakeRevol.h" />

@@ -207,6 +207,12 @@
     <Filter Include="源文件\OCCProxy\BRepOffsetAPI">
       <UniqueIdentifier>{b8114081-471b-40ec-971e-c60306cc2b9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\Poly">
+      <UniqueIdentifier>{49721eab-9c33-40e2-afd1-631ff3383c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\Poly">
+      <UniqueIdentifier>{8d9efef5-51ae-411b-877e-f426efb75988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OCCProxy\ICO_InteractiveObject.cpp">
@@ -406,6 +412,18 @@
     </ClCompile>
     <ClCompile Include="DataExchange\ICO_OBJExchange.cpp">
       <Filter>源文件\DataExchange</Filter>
+    </ClCompile>
+    <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp">
+      <Filter>源文件\DataExchange</Filter>
+    </ClCompile>
+    <ClCompile Include="DataExchange\ICO_STLExchange.cpp">
+      <Filter>源文件\DataExchange</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp">
+      <Filter>源文件\OCCProxy\AIS</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp">
+      <Filter>源文件\OCCProxy\Poly</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -663,6 +681,18 @@
     </ClInclude>
     <ClInclude Include="DataExchange\ICO_OBJExchange.h">
       <Filter>头文件\DataExchange</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExchange\ICO_XCAFDoc.h">
+      <Filter>头文件\DataExchange</Filter>
+    </ClInclude>
+    <ClInclude Include="DataExchange\ICO_STLExchange.h">
+      <Filter>头文件\DataExchange</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h">
+      <Filter>头文件\OCCProxy\AIS</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_Poly_Triangulation.h">
+      <Filter>头文件\OCCProxy\Poly</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

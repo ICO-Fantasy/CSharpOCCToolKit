@@ -76,7 +76,6 @@ public:
 
 	void Display(Handle(AIS_InteractiveObject) theAISObject, bool theToUpdateViewer);
 	void Display(InteractiveObject^ theAISObject, bool theToUpdateViewer);
-	void Display(Extension::XShape^ theXShape, bool theToUpdateViewer);
 	void Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer);
 
 	void EraseAll(bool theToUpdateViewer);

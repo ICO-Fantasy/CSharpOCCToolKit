@@ -178,7 +178,7 @@ public partial class CenterOfGravity : Window
             //更新Label
             PipeName_Label.Content = $"管件名称：{System.IO.Path.GetFileName(selectedFilePath)}";
             ;
-            TShape inputWorkpiece = new STEPExchange(selectedFilePath); // 使用选择的文件路径
+            TShape inputWorkpiece = new STEPExchange(selectedFilePath).Shape().TopoShape; // 使用选择的文件路径
             //包围盒左下角点作为原点
             //BoundingBox bnd = new(inputWorkpiece);
             //var AABB = bnd.GetAABB();

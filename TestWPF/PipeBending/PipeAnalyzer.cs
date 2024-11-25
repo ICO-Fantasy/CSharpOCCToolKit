@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.OCC;
 using OCCTK.OCC.AIS;
@@ -63,7 +64,7 @@ public class PipeAnalyzer
     public void FromStep(string stepFile)
     {
         Pipe.STEPFilePath = stepFile;
-        Pipe.originSTEPShape = new STEPExchange(stepFile);
+        Pipe.originSTEPShape = new STEPExchange(stepFile).Shape().TopoShape;
         Pipe.topoShape = Pipe.originSTEPShape;
     }
 

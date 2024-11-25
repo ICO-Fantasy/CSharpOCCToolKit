@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <TopExp_Explorer.hxx>
 #include"ICO_ShapeEnum.h"
 
+class TopExp_Explorer;
 namespace OCCTK {
 namespace OCC {
 namespace Topo {
@@ -39,7 +39,7 @@ private:
 	}
 	// 实现 IEnumerator 嵌套类
 private:
-	ref class Enumerator : IEnumerator<Topo::TShape^> {
+	ref class Enumerator : System::Collections::Generic::IEnumerator<Topo::TShape^> {
 	private:
 		Explorer^ explorer;
 		bool started;
@@ -77,7 +77,7 @@ private:
 
 public:
 	// 实现 IEnumerable 接口的 GetEnumerator 方法
-	virtual IEnumerator<Topo::TShape^>^ GetEnumerator() {
+	virtual  System::Collections::Generic::IEnumerator<Topo::TShape^>^ GetEnumerator() {
 		return gcnew Enumerator(this);
 	}
 

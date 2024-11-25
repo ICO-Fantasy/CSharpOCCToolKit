@@ -1,6 +1,7 @@
 ﻿#include "ICO_BRepGProp.h"
 #include <BRepGProp.hxx>
 #include <GProp_GProps.hxx>
+#include <TopoDS_Shape.hxx>
 //local
 #include "ICO_Topo_Shape.h"
 #include "ICO_GProps.h"

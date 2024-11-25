@@ -3,7 +3,7 @@
 #include <Prs3d_DatumAspect.hxx>
 #include <Standard_Handle.hxx>
 //local
-#include "ICO_StringExchange.h"
+#include "..\DataExchange\ICO_StringExchange.h"
 
 namespace OCCTK {
 namespace OCC {

@@ -4,6 +4,7 @@
 #include <BRep_Tool.hxx>
 //local
 #include "ICO_Pnt.h"
+#include "ICO_Topo_Shape.h"
 #include "ICO_Exception.h"
 
 using namespace OCCTK::OCC::gp;

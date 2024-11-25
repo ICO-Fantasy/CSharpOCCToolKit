@@ -13,7 +13,6 @@
 #include "ICO_Viewer.h"
 #include "ICO_DisplayMode.h"
 #include "..\Extension\ICO_Color.h"
-#include "..\Extension\ICO_XShape.h"
 #include "ICO_Exception.h"
 
 using namespace OCCTK::OCC::V3d;
@@ -363,37 +362,6 @@ void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpda
 		myAISContext()->Display(theAISObject->GetOCC(), theToUpdateViewer);
 	}
 	CATCH_AND_THROW_OCC_EXCEPTIONS
-}
-
-static void DisplayXShapeNode(XShapeNode^ node, const Handle(AIS_InteractiveContext)& context) {
-	try {
-		if (node->AISShape != nullptr) {
-			context->Display(node->AISShape->GetOCC(), false);
-			context->SetColor(node->AISShape->GetOCC(), node->Color->GetOCC(), false);
-			context->SetTransparency(node->AISShape->GetOCC(), node->Transparence, false);
-		}
-		for each (XShapeNode ^ node in node->Children) {
-			DisplayXShapeNode(node, context);
-		}
-	}
-	CATCH_AND_THROW_OCC_EXCEPTIONS
-}
-
-void InteractiveContext::Display(Extension::XShape^ theXShape, bool theToUpdateViewer) {
-	if (myAISContext().IsNull()) return;
-	//显示单个
-	if (theXShape->AISShape != nullptr) {
-		myAISContext()->Display(theXShape->AISShape->GetOCC(), false);
-		myAISContext()->SetColor(theXShape->AISShape->GetOCC(), theXShape->Color->GetOCC(), false);
-		myAISContext()->SetTransparency(theXShape->AISShape->GetOCC(), theXShape->Transparence, false);
-	}
-	//显示组合体
-	else if (theXShape->Nodes->Count > 0) {
-		for each (XShapeNode ^ node in theXShape->Nodes) {
-			DisplayXShapeNode(node, myAISContext());
-		}
-	}
-	if (theToUpdateViewer) { myAISContext()->UpdateCurrentViewer(); }
 }
 
 /// <summary>

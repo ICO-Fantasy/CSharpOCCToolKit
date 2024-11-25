@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include <cstdint>
-#include <TopoDS_Shape.hxx>
-#include "ICO_ShapeEnum.h"
+#include <cstdint>//用来取int32的最大值
 #include "ICO_Orientation.h"
+#include "ICO_ShapeEnum.h"
 
+class TopoDS_Shape;
 namespace OCCTK {
 namespace OCC {
 namespace gp {

@@ -1,10 +1,9 @@
 ﻿#pragma once
-#include "..\Extension\ICO_XShape.h"
+
 namespace OCCTK {
 namespace Extension {
 value struct Color;
 ref class XShape;
-ref class XShapeNode;
 }
 namespace OCC {
 namespace Topo {
@@ -20,18 +19,16 @@ public ref class STEPExchange {
 public:
 	STEPExchange(OCC::Topo::TShape^ theShape);
 	STEPExchange(System::String^ filePath);
+	Extension::XShape^ Shape();
+	//! 隐式转换为 TShape
+	static operator Extension::XShape ^ (STEPExchange^ Ex) {
+		return Ex->Shape();
+	}
 public:
 	void ReadFile(System::String^ filePath);
-	Extension::XShape^ SingleShape();
-	Extension::XShape^ AssemblyShape();
-	//! 隐式转换为 TShape
-	static operator OCC::Topo::TShape ^ (STEPExchange^ Ex) {
-		return Ex->SingleShape()->TopoShape;
-	}
-	bool SaveFile(System::String^ filePath);
+	bool SaveSingleShape(System::String^ filePath);
 private:
-	Extension::XShape^ mySingleShape;
-	Extension::XShape^ myAssemblyShape;
+	Extension::XShape^ myShape;
 };
 
 

@@ -3,7 +3,7 @@
     "TestWPF": {
       "commandName": "Project",
       "nativeDebugging": true,
-      "hotReloadEnabled": false
+      "hotReloadEnabled": true
     }
   }
 }

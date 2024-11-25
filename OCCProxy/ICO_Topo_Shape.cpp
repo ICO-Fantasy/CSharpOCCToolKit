@@ -1,9 +1,11 @@
 ﻿#include "ICO_Topo_Shape.h"
-#include<TopAbs_ShapeEnum.hxx>
-#include<TopoDS.hxx>
-#include<TopoDS_Vertex.hxx>
 #include <Standard_TypeMismatch.hxx>
 #include <TopAbs_Orientation.hxx>
+#include<TopAbs_ShapeEnum.hxx>
+#include<TopoDS.hxx>
+#include<TopoDS_Shape.hxx>
+#include <TopLoc_Location.hxx>
+#include<TopoDS_Vertex.hxx>
 //local
 #include "ICO_Trsf.h"
 #include "ICO_Ax2.h"

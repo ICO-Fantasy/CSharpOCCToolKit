@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_Shape.hxx>
-//#include <TopoDS_Shape.hxx>
 //Local
 #include "ICO_InteractiveObject.h"
 

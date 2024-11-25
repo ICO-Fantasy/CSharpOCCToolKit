@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.TextFormatting;
+using MathNet.Numerics;
 using OCCTK.Extension;
 using OCCTK.OCC.gp;
+using TestWPF.Robotics;
 
 namespace TestWPF.Laser.Positioner;
 
@@ -19,6 +24,7 @@ public class PositionerFunctions
     /// <returns></returns>
     public static AngleMatrix<Knot> AngularDivision(
         Ax2 originAx2,
+        FanucRobotConfig robotConfig,
         double internalAngle,
         double boundary
     )
@@ -73,6 +79,7 @@ public class PositionerFunctions
                 {
                     result[angleX, angleY] = new(
                         originAx2,
+                        robotConfig,
                         angleX,
                         angleY,
                         angleWithOrigin,
@@ -82,21 +89,6 @@ public class PositionerFunctions
             }
         );
 
-        return result;
-    }
-
-    /// <summary>
-    /// testFunction
-    /// </summary>
-    public static Dictionary<double, double> TestFun(Pnt location, List<(Dir, double)> values)
-    {
-        Dictionary<double, double> result = [];
-        //新的点位
-
-        //新的姿态
-        //二轴解
-        //6R解
-        //偏离量
         return result;
     }
 
@@ -114,21 +106,53 @@ public class PositionerFunctions
         {
             foreach (var toKnot in toLayer)
             {
+                //判断是否有二轴解
+                //todo 二轴解算法
+                bool twoAxisDone = false;
+                if (!twoAxisDone)
+                {
+                    //无解则角度为无穷大
+                    fromKnot.AdjacencyMatrix[toKnot] = double.PositiveInfinity;
+                    continue;
+                }
+                //判断是否有六轴解
+                //todo 6R逆解算法
+                bool sixAxisDone = false;
+                if (!sixAxisDone)
+                {
+                    //无解则角度为无穷大
+                    fromKnot.AdjacencyMatrix[toKnot] = double.PositiveInfinity;
+                    continue;
+                }
+                //计算最终角度
                 double angleDistance = fromKnot.Direction.Angle(toKnot.Direction);
                 fromKnot.AdjacencyMatrix[toKnot] = angleDistance;
             }
         }
     }
 
-    public static List<Knot> TestFun2(List<Ax2> trajectory, double internalAngle, double boundary)
+    /// <summary>
+    /// 根据输入的轨迹计算最优轨迹
+    /// </summary>
+    /// <param name="trajectory"></param>
+    /// <param name="internalAngle"></param>
+    /// <param name="boundary"></param>
+    /// <returns></returns>
+    public static List<Knot> CalculateBestTrajectory(
+        List<(Ax2 pose, FanucRobotConfig config)> trajectory,
+        double internalAngle,
+        double boundary
+    )
     {
         List<Knot> result = [];
         List<AngleMatrix<Knot>> layers = [];
-        foreach (var ax2 in trajectory)
+        //按照传入的轨迹顺序构建轨迹层
+        foreach (var t in trajectory)
         {
-            layers.Add(AngularDivision(ax2, internalAngle, boundary));
+            layers.Add(AngularDivision(t.pose, t.config, internalAngle, boundary));
         }
 
+        #region 粗的分度
         //todo 先用粗的分度进行尝试
         //List<AngleMatrix<(double, Dir)>> coarseLayers = [];
         //foreach (var layer in layers)
@@ -148,12 +172,99 @@ public class PositionerFunctions
         //    }
         //    coarseLayers.Add(coarseAngleMatrix);
         //}
+        #endregion
+
+        //获取每个节点的距离邻接矩阵
+        for (int i = 0; i < layers.Count - 1; i++)
+        {
+            GetAdjacencyMatrixWithDir(layers[i], layers[i + 1]);
+        }
+        //获取所有路径，并记录路径长度（总的角度该变量）
+        OrderedDictionary odTrajectory = new();
+
+        var bestTrajectory = GetBsetTrajectory(layers.First());
 
         return result;
     }
 
-    public static void TestFun3()
+    public static List<Knot> GetBsetTrajectory(AngleMatrix<Knot> layer)
     {
+        List<List<Knot>> allTrajectory = new List<List<Knot>>();
+        foreach (var kont in layer)
+        {
+            allTrajectory.AddRange(GetTrajectoryDFS(kont));
+        }
+        List<Knot>? bsetTrajectory = null;
         double minAngle = double.PositiveInfinity;
+        foreach (var tra in allTrajectory)
+        {
+            double totalAngle = CalculateTrajectoryToltalAngularOffset(tra);
+            if (totalAngle < minAngle)
+            {
+                minAngle = totalAngle;
+                bsetTrajectory = tra;
+            }
+        }
+        if (bsetTrajectory != null)
+        {
+            return bsetTrajectory;
+        }
+        else
+        {
+            throw new Exception("未找到可行轨迹");
+        }
+    }
+
+    public static double CalculateTrajectoryToltalAngularOffset(List<Knot> trajectory)
+    {
+        double totalAngle = 0.0;
+        for (int i = 0; i < trajectory.Count - 1; i++)
+        {
+            totalAngle += trajectory[i].AdjacencyMatrix[trajectory[i + 1]];
+        }
+        return totalAngle;
+    }
+
+    /// <summary>
+    /// 深度遍历找到每一条轨迹
+    /// </summary>
+    /// <param name="knot"></param>
+    /// <returns></returns>
+    private static List<List<Knot>> GetTrajectoryDFS(Knot knot)
+    {
+        List<List<Knot>> allTrajectory = new List<List<Knot>>();
+
+        void NextSearch(Knot currentKnot, List<Knot> currentPath)
+        {
+            // 将当前节点加入路径
+            currentPath.Add(currentKnot);
+
+            // 如果当前节点没有邻接节点，将此路径加入结果
+            if (currentKnot.AdjacencyMatrix.Count == 0)
+            {
+                allTrajectory.Add(new List<Knot>(currentPath));
+                return;
+            }
+            // 遍历当前节点的邻接节点
+            foreach (var knotAndAngle in currentKnot.AdjacencyMatrix)
+            {
+                // 跳过无穷大距离的节点
+                if (knotAndAngle.Value == double.PositiveInfinity)
+                {
+                    continue;
+                }
+
+                // 创建一个新的路径副本，避免修改原路径
+                var newPath = new List<Knot>(currentPath);
+
+                // 递归搜索
+                NextSearch(knotAndAngle.Key, newPath);
+            }
+        }
+
+        // 初始调用
+        NextSearch(knot, new List<Knot>());
+
+        return allTrajectory;
     }
 }

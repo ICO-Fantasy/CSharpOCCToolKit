@@ -4,6 +4,7 @@
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Geom_Curve.h"
+#include "ICO_Topo_Shape.h"
 #include "ICO_Topo_Vertex.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Exception.h"

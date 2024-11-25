@@ -38,11 +38,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-		<PackageReference Include="DevExpress.Wpf.Core" Version="23.2.3" />
-		<PackageReference Include="devexpress.wpf.docking" Version="23.2.3" />
-		<PackageReference Include="devexpress.wpf.grid.core" Version="23.2.3" />
-		<PackageReference Include="devexpress.wpf.layoutcontrol" Version="23.2.3" />
-		<PackageReference Include="devexpress.wpf.ribbon" Version="23.2.3" />
 		<PackageReference Include="log4net" Version="3.0.0" />
 		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 		<PackageReference Include="MathNet.Spatial" Version="0.6.0" />

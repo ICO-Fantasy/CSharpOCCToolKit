@@ -594,7 +594,7 @@ public partial class BendingTest : Window, IAISSelectionHandler
             //更新Label
             InputWorkpiece_Label.Content = $"导入工件：{System.IO.Path.GetFileName(selectedFilePath)}";
             ;
-            TShape inputWorkpiece = new STEPExchange(selectedFilePath); // 使用选择的文件路径
+            TShape inputWorkpiece = new STEPExchange(selectedFilePath).Shape().TopoShape; // 使用选择的文件路径
             //包围盒左下角点作为原点
             BoundingBox bnd = new(inputWorkpiece);
             var AABB = bnd.GetAABB();

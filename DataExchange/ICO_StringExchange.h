@@ -9,6 +9,8 @@
 namespace OCCTK {
 namespace DataExchange {
 
+#pragma region CSharpe to C++
+
 // 将C#字符串转换为TCollection_AsciiString字符串
 inline TCollection_AsciiString ToAsciiString(System::String^ theString) {
 	if (theString == nullptr) {
@@ -27,6 +29,7 @@ inline TCollection_AsciiString ToAsciiString(System::String^ theString) {
 inline Standard_CString ToCString(System::String^ theString) {
 	return ToAsciiString(theString).ToCString();
 }
+
 // 转换中文字符为Unicode
 inline TCollection_ExtendedString ConvertChineseToUnicode(const char* chineseString) {
 	TCollection_ExtendedString unicodeString("");
@@ -52,6 +55,14 @@ inline TCollection_ExtendedString ConvertChineseToUnicode(System::String^ chines
 	return unicodeString;
 }
 
+// 转换中文字符为Unicode
+inline TCollection_ExtendedString ToExtendedString(System::String^ theString) {
+	return ConvertChineseToUnicode(theString);
+}
+#pragma endregion
+
+#pragma region C++ to CSharpe
+
 inline System::String^ WcharToString(const wchar_t* wcharString) {
 	size_t length = wcslen(wcharString);
 	if (length == 0) {
@@ -60,6 +71,12 @@ inline System::String^ WcharToString(const wchar_t* wcharString) {
 	System::IntPtr bfr = System::IntPtr(const_cast<wchar_t*>(wcharString));
 	return System::Runtime::InteropServices::Marshal::PtrToStringUni(bfr, length);
 }
+
+inline System::String^ CStringToString(const char* cString) {
+	return gcnew System::String(cString);
+}
+
+#pragma endregion
 
 }
 }

@@ -9,6 +9,64 @@ using MathNet.Spatial.Units;
 
 namespace TestWPF.Robotics;
 
+[Flags]
+public enum J5Cfg
+{
+    FLIP = 0,
+    NOFLIP = 1,
+}
+
+[Flags]
+public enum J4Cfg
+{
+    LEFT = 0,
+    RIGHT = 1,
+}
+
+[Flags]
+public enum J3Cfg
+{
+    UP = 0,
+    DOWN = 1,
+}
+
+[Flags]
+public enum J6Cfg
+{
+    FRONT = 0,
+    BACK = 1,
+}
+
+[Flags]
+public enum AxisCfg
+{
+    Zero = 0,
+    PLUS = 1,
+    MINUS = 3,
+}
+
+/// <summary>
+/// 逆解姿态
+/// </summary>
+public class FanucRobotConfig(
+    J5Cfg j5,
+    J3Cfg j3,
+    J6Cfg j6,
+    J4Cfg j4 = 0,
+    AxisCfg a1 = 0,
+    AxisCfg a2 = 0,
+    AxisCfg a3 = 0
+)
+{
+    public J5Cfg J5 = j5;
+    public J3Cfg J3 = j3;
+    public J6Cfg J6 = j6;
+    public J4Cfg J4 = j4;
+    public AxisCfg A1 = a1;
+    public AxisCfg A2 = a2;
+    public AxisCfg A3 = a3;
+}
+
 public class Kinematics
 {
     public static Matrix<double> DHParaToSO3(DHParameter DH)
