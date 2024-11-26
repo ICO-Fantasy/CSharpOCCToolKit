@@ -400,7 +400,7 @@ public class BendingDS
         LeftSectorFaces = leftTempt;
         RightSectorFaces = otherFaces.Where(f => !leftTempt.Contains(f)).ToList();
 
-        Normal = new(InnerFace.CircleCenter, InnerFace.CircleNormal);
+        Normal = new((Pnt)InnerFace.CircleCenter, (Dir)InnerFace.CircleNormal);
         Angle = InnerFace.CircleAngle ?? throw new Exception("(内)圆柱面角度为空");
         //todo 暂时只处理V弯和闭合压边两类
         if (Math.Abs(Math.PI - Angle) < 1e-4)

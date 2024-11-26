@@ -67,7 +67,7 @@ public partial class RobotWindows : Window
             ) // 设置初始目录为指定的路径
             //InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
         };
-
+        App.Current.ContextManager.MainContext.Display(new AAxis(new()), true);
         // 如果用户选择了文件并点击了“打开”按钮
         if (openFileDialog.ShowDialog() == true)
         {

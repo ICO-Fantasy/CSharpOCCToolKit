@@ -1023,7 +1023,7 @@ public class LeafNode : NodeDS
         //Bending.InnerFace.DebugShow(context, bendingColor);
         AISLabel.SetText(Order.ToString());
         AISLabel.SetFont("SimSun");
-        AISLabel.SetPosition(Bending.InnerFace.CircleCenter?.Transformed(Location));
+        AISLabel.SetPosition((Pnt)Bending.InnerFace.CircleCenter?.Transformed(Location));
         AISLabel.SetHeight(Bending.Thickness * 20);
         AISLabel.SetZLayer(ZLayerId.TopOSD);
         AISLabel.SetZoomable(false);
