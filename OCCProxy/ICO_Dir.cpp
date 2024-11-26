@@ -14,7 +14,8 @@ namespace gp {
 
 Dir::Dir(double theX, double theY, double theZ) {
 	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
-		throw gcnew System::ArgumentException("不能创建零向量");
+		System::String^ str = "创建了零向量(" + theX + ", " + theY + ", " + theZ + ")";
+		System::Diagnostics::Debug::WriteLine(str);
 	}
 	X = theX;
 	Y = theY;
@@ -31,7 +32,8 @@ Dir::Dir(Vec theDir) {
 
 Dir::Dir(Pnt fromPoint, Pnt toPoint) {
 	if (fromPoint.Distance(toPoint) < 1e-6) {
-		throw gcnew System::ArgumentException("不能创建零向量");
+		System::String^ str = "创建了零向量(" + (toPoint.X - fromPoint.X) + ", " + (toPoint.Y - fromPoint.Y) + ", " + (toPoint.Z - fromPoint.Z) + ")";
+		System::Diagnostics::Debug::WriteLine(str);
 	}
 	Pnt p = toPoint - fromPoint;
 	X = p.X;
@@ -108,15 +110,15 @@ Dir Dir::Reversed() {
 	return Dir(newX, newY, newZ);
 }
 
-void Dir::Transform(Trsf^ T) {
-	gp_Dir newD = GetOCC().Transformed(T->GetOCC());
+void Dir::Transform(Trsf T) {
+	gp_Dir newD = GetOCC().Transformed(T);
 	X = newD.X();
 	Y = newD.Y();
 	Z = newD.Z();
 }
 
-Dir Dir::Transformed(Trsf^ T) {
-	gp_Dir newD = GetOCC().Transformed(T->GetOCC());
+Dir Dir::Transformed(Trsf T) {
+	gp_Dir newD = GetOCC().Transformed(T);
 	return Dir(newD);
 }
 

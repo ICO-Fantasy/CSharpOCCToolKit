@@ -12,7 +12,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-ref class Trsf;
+value struct Trsf;
 
 public value struct Dir :System::ICloneable {
 public:
@@ -37,8 +37,8 @@ public:
 	double Dot(Dir other);
 	void Reverse();
 	Dir Reversed();
-	void Transform(Trsf^ T);
-	Dir Transformed(Trsf^ T);
+	void Transform(Trsf T);
+	Dir Transformed(Trsf T);
 public:
 	Vec ToVec(double factor);
 	Eigen::Vector3d ToVector3d();
@@ -46,6 +46,14 @@ public:
 	property double X;
 	property double Y;
 	property double Z;
+	// Deconstruct 方法
+	void Deconstruct([System::Runtime::InteropServices::Out] double% x,
+		[System::Runtime::InteropServices::Out] double% y,
+		[System::Runtime::InteropServices::Out] double% z) {
+		x = X;
+		y = Y;
+		z = Z;
+	}
 private:
 	void Normalize();
 };

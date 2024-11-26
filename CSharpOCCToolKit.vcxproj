@@ -230,6 +230,7 @@
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_OBJExchange.h" />
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
+    <ClInclude Include="OCCProxy\ICO_TrsfForm.h" />
     <ClInclude Include="OCCProxy\ICO_Poly_Triangulation.h" />
     <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h" />
     <ClInclude Include="DataExchange\ICO_STLExchange.h" />

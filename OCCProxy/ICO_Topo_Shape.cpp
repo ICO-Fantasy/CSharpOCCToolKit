@@ -121,8 +121,8 @@ void TShape::Reverse() {
 /// 将 Shape 的 Location 右乘 T
 /// </summary>
 /// <param name="theT"></param>
-void TShape::Move(gp::Trsf^ theT) {
-	gp_Trsf occT = theT->GetOCC();
+void TShape::Move(gp::Trsf theT) {
+	gp_Trsf occT = theT;
 	occT.SetScaleFactor(1.0);
 	myShape->Move(TopLoc_Location(occT));
 }
@@ -131,18 +131,18 @@ void TShape::Move(gp::Trsf^ theT) {
 /// 返回从世界原点到Shape原点的坐标变换
 /// </summary>
 /// <returns></returns>
-gp::Trsf^ TShape::Location() {
-	return gcnew gp::Trsf(myShape->Location().Transformation());
+gp::Trsf TShape::Location() {
+	return gp::Trsf(myShape->Location().Transformation());
 }
 
 void TShape::Location(gp::Ax2 newOrigin) {
-	auto t = gcnew gp::Trsf(newOrigin);
-	myShape->Location(TopLoc_Location(t->GetOCC()));
+	auto t = gp::Trsf(newOrigin);
+	myShape->Location(TopLoc_Location(t));
 }
 
 TShape^ TShape::Located(gp::Ax2 newOrigin) {
-	auto t = gcnew gp::Trsf(newOrigin);
-	return gcnew TShape(myShape->Located(TopLoc_Location(t->GetOCC())));
+	auto t = gp::Trsf(newOrigin);
+	return gcnew TShape(myShape->Located(TopLoc_Location(t)));
 }
 
 int TShape::HashCode(int upperBound) {

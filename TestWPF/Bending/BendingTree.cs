@@ -294,7 +294,10 @@ public class BendingTree
                             if (cylin2 == cylinStart)
                             {
                                 //两圆柱面需要有相同的圆心
-                                if (cylin1.CircleCenter?.Distance(cylin2.CircleCenter) > LINEAR_TOL)
+                                if (
+                                    cylin1.CircleCenter?.Distance((Pnt)cylin2.CircleCenter)
+                                    > LINEAR_TOL
+                                )
                                     continue;
                                 //半径不相等
                                 if (cylin1.CircleRadius == cylin2.CircleRadius)

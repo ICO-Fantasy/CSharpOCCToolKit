@@ -66,8 +66,8 @@ double Pnt::Distance(Pnt otherPnt) {
 	);
 }
 
-Pnt Pnt::Transformed(Trsf^ T) {
-	return Pnt(gp_Pnt(X, Y, Z).Transformed(T->GetOCC()));
+Pnt Pnt::Transformed(Trsf T) {
+	return Pnt(gp_Pnt(X, Y, Z).Transformed(T));
 }
 
 /// <summary>

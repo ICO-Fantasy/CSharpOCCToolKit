@@ -21,8 +21,8 @@ InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject)
 /// 设置自身的变换（从原始状态到当前显示状态的变换）
 /// </summary>
 /// <param name="trsf"></param>
-void InteractiveObject::SetLocalTransformation(gp::Trsf^ trsf) {
-	GetOCC()->SetLocalTransformation(trsf->GetOCC());
+void InteractiveObject::SetLocalTransformation(gp::Trsf trsf) {
+	GetOCC()->SetLocalTransformation(trsf);
 }
 
 void InteractiveObject::SetZLayer(Graphic3d::ZLayerId id) {
@@ -37,8 +37,8 @@ void InteractiveObject::SetZLayer(int Zlayerid) {
 /// 返回自身的变换（从原始状态到当前显示状态的变换）
 /// </summary>
 /// <returns></returns>
-gp::Trsf^ InteractiveObject::LocalTransformation() {
-	return gcnew gp::Trsf(GetOCC()->LocalTransformation());
+gp::Trsf InteractiveObject::LocalTransformation() {
+	return gp::Trsf(GetOCC()->LocalTransformation());
 }
 
 /// <summary>

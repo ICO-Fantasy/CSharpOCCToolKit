@@ -1,6 +1,7 @@
 ﻿#include "ICO_Quaternion.h"
 #include <gp_EulerSequence.hxx>
 #include <gp_Quaternion.hxx>
+#include <gp_Mat.hxx>
 #include <gp_Vec.hxx>
 //local
 #include "ICO_EulerSequence.h"
@@ -14,13 +15,6 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Quat::Quat() {
-	X = 0.0;
-	Y = 0.0;
-	Z = 0.0;
-	W = 1.0;
-}
-
 Quat::Quat(double theX, double theY, double theZ, double theW) {
 	X = theX;
 	Y = theY;
@@ -31,6 +25,20 @@ Quat::Quat(double theX, double theY, double theZ, double theW) {
 Quat::Quat(double alpha, double beta, double gamma, EulerSequence sequence) {
 	gp_Quaternion q = gp_Quaternion();
 	q.SetEulerAngles(gp_EulerSequence(sequence), alpha, beta, gamma);
+	X = q.X();
+	Y = q.Y();
+	Z = q.Z();
+	W = q.W();
+}
+
+Quat::Quat(SO3Matrix matrix) {
+	double a = matrix.Item1.Item1;
+	gp_Mat mat(
+		matrix.Item1.Item1, matrix.Item1.Item2, matrix.Item1.Item3,
+		matrix.Item2.Item1, matrix.Item2.Item2, matrix.Item2.Item3,
+		matrix.Item3.Item1, matrix.Item3.Item2, matrix.Item3.Item3
+	);
+	gp_Quaternion q = gp_Quaternion(mat);
 	X = q.X();
 	Y = q.Y();
 	Z = q.Z();
@@ -74,7 +82,7 @@ gp_Quaternion Quat::GetOCC() {
 }
 
 System::Object^ Quat::Clone() {
-	return gcnew Quat(X, Y, Z, W);
+	return Quat(X, Y, Z, W);
 }
 
 System::String^ Quat::ToString() {
@@ -85,6 +93,18 @@ System::Tuple<double, double, double>^ Quat::ToEuler(EulerSequence sequence) {
 	double a, b, c;
 	GetOCC().GetEulerAngles(gp_EulerSequence(sequence), a, b, c);
 	return gcnew System::Tuple<double, double, double> {a, b, c};
+}
+
+SO3Matrix Quat::GetMatrix() {
+	gp_Mat mat = GetOCC().GetMatrix();
+	return SO3Matrix(
+		System::ValueTuple<double, double, double>(
+			mat.Value(1, 1), mat.Value(2, 1), mat.Value(3, 1)),
+		System::ValueTuple<double, double, double>(
+			mat.Value(1, 2), mat.Value(2, 2), mat.Value(3, 2)),
+		System::ValueTuple<double, double, double>(
+			mat.Value(1, 3), mat.Value(2, 3), mat.Value(3, 3))
+	);
 }
 
 }

@@ -694,6 +694,9 @@
     <ClInclude Include="OCCProxy\ICO_Poly_Triangulation.h">
       <Filter>头文件\OCCProxy\Poly</Filter>
     </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_TrsfForm.h">
+      <Filter>头文件\OCCProxy\gp\enum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

@@ -108,7 +108,7 @@ public class Face
             {
                 GetNormal();
             }
-            return normal;
+            return (Ax1)normal;
         }
     }
     public AAxis? AISNormal;
@@ -119,7 +119,7 @@ public class Face
         {
             GetNormal();
         }
-        AISNormal = new(normal);
+        AISNormal = new((Ax1)normal);
         context.Display(AISNormal, false);
     }
 
@@ -208,9 +208,9 @@ public class Face
             v.Multiply(0.5);
             t.SetTranslation(v);
             CircleCenter = point1.Transformed(t);
-            CircleAixs.Location = CircleCenter;
+            CircleAixs = new((Pnt)CircleCenter, (Dir)CircleAixs?.Direction);
             CircleAngle = Math.PI * 2;
-            CircleNormal = new Dir(new Vec(point2, CircleCenter));
+            CircleNormal = new Dir(new Vec(point2, (Pnt)CircleCenter));
             return;
         }
         //三点定圆
@@ -232,9 +232,9 @@ public class Face
 
         #endregion
         CircleCenter = C.CircleCenter;
-        CircleAixs.Location = CircleCenter;
+        CircleAixs = new((Pnt)CircleCenter, (Dir)CircleAixs?.Direction);
         CircleAngle = C.Angle;
-        CircleNormal = new Dir(new Vec(point2, CircleCenter));
+        CircleNormal = new Dir(new Vec(point2, (Pnt)CircleCenter));
     }
 
     private void GetNormal()

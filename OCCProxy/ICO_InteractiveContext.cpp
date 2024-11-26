@@ -149,9 +149,9 @@ void InteractiveContext::SetDefaultSelectionMode(SelectionMode theMode) {
 /// <param name="theMode"></param>
 void InteractiveContext::SetSelectionMode(InteractiveObject^ theAISObject, SelectionMode theMode) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->Deactivate(theAISObject->GetOCC());
+	myAISContext()->Deactivate(theAISObject);
 	if ((int)theMode != -1) {
-		myAISContext()->Activate(theAISObject->GetOCC(), (int)theMode, true);
+		myAISContext()->Activate(theAISObject, (int)theMode, true);
 	}
 	myAISContext()->UpdateSelected(true);
 }
@@ -174,7 +174,7 @@ void InteractiveContext::Select(void) {
 void InteractiveContext::SelectAIS(InteractiveObject^ theAISObject, bool update) {
 	if (myAISContext().IsNull()) return;
 	myAISContext()->ClearSelected(Standard_True); // 清除当前选中的对象
-	myAISContext()->AddOrRemoveSelected(theAISObject->GetOCC(), update);// 选中AIS
+	myAISContext()->AddOrRemoveSelected(theAISObject, update);// 选中AIS
 }
 
 /// <summary>
@@ -359,7 +359,7 @@ void InteractiveContext::Display(Handle(AIS_InteractiveObject) theAISObject, boo
 void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	try {
-		myAISContext()->Display(theAISObject->GetOCC(), theToUpdateViewer);
+		myAISContext()->Display(theAISObject, theToUpdateViewer);
 	}
 	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
@@ -372,7 +372,7 @@ void InteractiveContext::Display(InteractiveObject^ theAISObject, bool theToUpda
 void InteractiveContext::Redisplay(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	try {
-		myAISContext()->Redisplay(theAISObject->GetOCC(), theToUpdateViewer);
+		myAISContext()->Redisplay(theAISObject, theToUpdateViewer);
 	}
 	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
@@ -394,7 +394,7 @@ void InteractiveContext::EraseAll(bool theToUpdateViewer) {
 void InteractiveContext::Erase(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
 	try {
-		myAISContext()->Erase(theAISObject->GetOCC(), theToUpdateViewer);
+		myAISContext()->Erase(theAISObject, theToUpdateViewer);
 	}
 	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
@@ -449,7 +449,7 @@ void InteractiveContext::Remove(Handle(AIS_InteractiveObject) theAISObject, bool
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::Remove(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->Remove(theAISObject->GetOCC(), theToUpdateViewer);
+	myAISContext()->Remove(theAISObject, theToUpdateViewer);
 }
 
 #pragma region 设置AIS
@@ -462,7 +462,7 @@ void InteractiveContext::Remove(InteractiveObject^ theAISObject, bool theToUpdat
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::SetColor(InteractiveObject^ theAISObject, Extension::Color theColor, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->SetColor(theAISObject->GetOCC(), theColor.GetOCC(), theToUpdateViewer);
+	myAISContext()->SetColor(theAISObject, theColor.GetOCC(), theToUpdateViewer);
 }
 
 /// <summary>
@@ -472,7 +472,7 @@ void InteractiveContext::SetColor(InteractiveObject^ theAISObject, Extension::Co
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::UnsetColor(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->UnsetColor(theAISObject->GetOCC(), theToUpdateViewer);
+	myAISContext()->UnsetColor(theAISObject, theToUpdateViewer);
 }
 
 /// <summary>
@@ -483,7 +483,7 @@ void InteractiveContext::UnsetColor(InteractiveObject^ theAISObject, bool theToU
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::SetTransparency(InteractiveObject^ theAISObject, double theTransparency, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->SetTransparency(theAISObject->GetOCC(), theTransparency, theToUpdateViewer);
+	myAISContext()->SetTransparency(theAISObject, theTransparency, theToUpdateViewer);
 }
 
 /// <summary>
@@ -493,7 +493,7 @@ void InteractiveContext::SetTransparency(InteractiveObject^ theAISObject, double
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::UnsetTransparency(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->UnsetTransparency(theAISObject->GetOCC(), theToUpdateViewer);
+	myAISContext()->UnsetTransparency(theAISObject, theToUpdateViewer);
 }
 
 /// <summary>
@@ -504,7 +504,7 @@ void InteractiveContext::UnsetTransparency(InteractiveObject^ theAISObject, bool
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::SetWidth(InteractiveObject^ theAISObject, double width, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->SetWidth(theAISObject->GetOCC(), width, theToUpdateViewer);
+	myAISContext()->SetWidth(theAISObject, width, theToUpdateViewer);
 }
 
 /// <summary>
@@ -514,7 +514,7 @@ void InteractiveContext::SetWidth(InteractiveObject^ theAISObject, double width,
 /// <param name="theToUpdateViewer"></param>
 void InteractiveContext::UnsetWidth(InteractiveObject^ theAISObject, bool theToUpdateViewer) {
 	if (myAISContext().IsNull()) return;
-	myAISContext()->UnsetWidth(theAISObject->GetOCC(), theToUpdateViewer);
+	myAISContext()->UnsetWidth(theAISObject, theToUpdateViewer);
 }
 
 /// <summary>
@@ -550,7 +550,7 @@ bool InteractiveContext::IsSelected(void) {
 /// <returns></returns>
 bool InteractiveContext::IsDisplayed(InteractiveObject^ theAISObject) {
 	if (myAISContext().IsNull()) return false;
-	return myAISContext()->IsDisplayed(theAISObject->GetOCC());
+	return myAISContext()->IsDisplayed(theAISObject);
 }
 
 }

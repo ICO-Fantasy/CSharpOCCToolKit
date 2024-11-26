@@ -63,8 +63,8 @@ void Manipulator::StartTransform(double theX, double theY, View^ theView) {
 //	myManipulator()->Transform(theX, theY, theView->GetOCC());
 //}
 
-Trsf^ Manipulator::Transform(double theX, double theY, View^ theView) {
-	Trsf^ T = gcnew Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
+Trsf Manipulator::Transform(double theX, double theY, View^ theView) {
+	Trsf T = Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
 	theView->Redraw();
 	return T;
 }
@@ -94,7 +94,7 @@ void Manipulator::Attach(AShape^ theAIS, bool adjustPosition, bool adjustSize, b
 }
 
 void Manipulator::Attach(InteractiveObject^ theAISObject) {
-	myManipulator()->Attach(theAISObject->GetOCC());
+	myManipulator()->Attach(theAISObject);
 	// 让操作器自动激活
 	myManipulator()->SetModeActivationOnDetection(true);
 }
@@ -104,7 +104,7 @@ void Manipulator::Attach(InteractiveObject^ theAISObject, bool adjustPosition, b
 	anOptions.SetAdjustPosition(adjustPosition);
 	anOptions.SetAdjustSize(!adjustSize);
 	anOptions.SetEnableModes(enableModes);
-	myManipulator()->Attach(theAISObject->GetOCC(), anOptions);
+	myManipulator()->Attach(theAISObject, anOptions);
 	// 让操作器自动激活
 	myManipulator()->SetModeActivationOnDetection(true);
 }

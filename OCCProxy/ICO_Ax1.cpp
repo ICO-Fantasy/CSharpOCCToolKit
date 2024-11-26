@@ -42,14 +42,14 @@ System::String^ Ax1::ToString() {
 	return "(" + Location.X.ToString("F1") + ", " + Location.Y.ToString("F1") + ", " + Location.Z.ToString("F1") + "), (" + Direction.X.ToString("F1") + ", " + Direction.Y.ToString("F1") + ", " + Direction.Z.ToString("F1") + ")";
 }
 
-void Ax1::Transform(Trsf^ theT) {
-	gp_Ax1 a = gp_Ax1(Location.GetOCC(), Direction).Transformed(theT->GetOCC());
+void Ax1::Transform(Trsf theT) {
+	gp_Ax1 a = gp_Ax1(Location.GetOCC(), Direction).Transformed(theT);
 	Location = Pnt(a.Location());
 	Direction = Dir(a.Direction());
 }
 
-Ax1 Ax1::Transformed(Trsf^ theT) {
-	return Ax1(gp_Ax1(Location.GetOCC(), Direction).Transformed(theT->GetOCC()));
+Ax1 Ax1::Transformed(Trsf theT) {
+	return Ax1(gp_Ax1(Location.GetOCC(), Direction).Transformed(theT));
 }
 
 void Ax1::Reverse() {

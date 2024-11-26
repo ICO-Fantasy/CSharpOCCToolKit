@@ -12,7 +12,8 @@ namespace gp {
 
 Vec::Vec(double theX, double theY, double theZ) {
 	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
-		throw gcnew System::ArgumentException("不能创建零向量");
+		System::String^ str = "创建了零向量(" + theX + ", " + theY + ", " + theZ + ")";
+		System::Diagnostics::Debug::WriteLine(str);
 	}
 	X = theX;
 	Y = theY;
@@ -21,7 +22,8 @@ Vec::Vec(double theX, double theY, double theZ) {
 
 Vec::Vec(Pnt fromPnt, Pnt toPnt) {
 	if (fromPnt.Distance(toPnt) < 1e-6) {
-		throw gcnew System::ArgumentException("不能创建零向量");
+		System::String^ str = "创建了零向量(" + (toPnt.X - fromPnt.X) + ", " + (toPnt.Y - fromPnt.Y) + ", " + (toPnt.Z - fromPnt.Z) + ")";
+		System::Diagnostics::Debug::WriteLine(str);
 	}
 	X = toPnt.X - fromPnt.X;
 	Y = toPnt.Y - fromPnt.Y;
@@ -35,6 +37,18 @@ Vec::Vec(gp_Vec theVec) {
 }
 
 Vec::Vec(gp_Vec* theVec) {
+	X = theVec->X();
+	Y = theVec->Y();
+	Z = theVec->Z();
+}
+
+Vec::Vec(gp_XYZ theVec) {
+	X = theVec.X();
+	Y = theVec.Y();
+	Z = theVec.Z();
+}
+
+Vec::Vec(gp_XYZ* theVec) {
 	X = theVec->X();
 	Y = theVec->Y();
 	Z = theVec->Z();
@@ -112,17 +126,17 @@ Vec Vec::CrossProduct(Vec other) {
 	return Crossed(other);
 }
 
-void Vec::Transform(Trsf^ T) {
+void Vec::Transform(Trsf T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
-	v.Transform(T->GetOCC());
+	v.Transform(T);
 	X = v.X();
 	Y = v.Y();
 	Z = v.Z();
 }
 
-Vec Vec::Transformed(Trsf^ T) {
+Vec Vec::Transformed(Trsf T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
-	v.Transform(T->GetOCC());
+	v.Transform(T);
 	return Vec(v.X(), v.Y(), v.Z());
 }
 

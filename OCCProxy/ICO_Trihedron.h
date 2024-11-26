@@ -20,7 +20,7 @@ private:
 public:
 	Trihedron(double axisSize);
 	Trihedron(AShape^ theAIS, double axisSize);
-	Trihedron(gp::Trsf^ theTrsf, double axisSize);
+	Trihedron(gp::Trsf theTrsf, double axisSize);
 	Handle(AIS_Trihedron) GetOCC() { return myTrihedron(); };
 public:
 	void SetArrowLength(double value);

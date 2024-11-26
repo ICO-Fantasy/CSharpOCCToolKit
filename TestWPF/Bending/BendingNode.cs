@@ -756,25 +756,25 @@ public class LeafNode : NodeDS
     /// <summary>
     /// 一侧的折弯面对应的点（按照内侧父、内侧子、外侧子、外侧父存储）
     /// </summary>
-    protected List<Pnt> LeftPoints = [null, null, null, null];
+    protected List<Pnt?> LeftPoints = [null, null, null, null];
     protected Pnt LeftInnerFatherPoint
     {
-        get => LeftPoints[0];
+        get => (Pnt)LeftPoints[0];
         set { LeftPoints[0] = value; }
     }
     protected Pnt LeftInnerChildPoint
     {
-        get => LeftPoints[1];
+        get => (Pnt)LeftPoints[1];
         set { LeftPoints[1] = value; }
     }
     protected Pnt LeftOuterChildPoint
     {
-        get => LeftPoints[2];
+        get => (Pnt)LeftPoints[2];
         set { LeftPoints[2] = value; }
     }
     protected Pnt LeftOuterFatherPoint
     {
-        get => LeftPoints[3];
+        get => (Pnt)LeftPoints[3];
         set { LeftPoints[3] = value; }
     }
 
@@ -791,25 +791,25 @@ public class LeafNode : NodeDS
     /// <summary>
     /// 另一侧的折弯面对应的点（按照内侧父、内侧子、外侧子、外侧父存储）
     /// </summary>
-    protected List<Pnt> RightPoints = [null, null, null, null];
+    protected List<Pnt?> RightPoints = [null, null, null, null];
     protected Pnt RightInnerFatherPoint
     {
-        get => RightPoints[0];
+        get => (Pnt)RightPoints[0];
         set { RightPoints[0] = value; }
     }
     protected Pnt RightInnerChildPoint
     {
-        get => RightPoints[1];
+        get => (Pnt)RightPoints[1];
         set { RightPoints[1] = value; }
     }
     protected Pnt RightOuterChildPoint
     {
-        get => RightPoints[2];
+        get => (Pnt)RightPoints[2];
         set { RightPoints[2] = value; }
     }
     protected Pnt RightOuterFatherPoint
     {
-        get => RightPoints[3];
+        get => (Pnt)RightPoints[3];
         set { RightPoints[3] = value; }
     }
 
@@ -990,14 +990,14 @@ public class LeafNode : NodeDS
         #region Debug
         for (int i = 0; i < LeftPoints.Count; i++)
         {
-            Pnt? pnt = LeftPoints[i];
+            Pnt pnt = (Pnt)LeftPoints[i];
             AShape DebugAISVertex = new(new MakeSphere(pnt, 1));
             Display(DebugAISVertex);
             context.SetColor(DebugAISVertex, ColorMap.Colors[i], false);
         }
         for (int i = 0; i < RightPoints.Count; i++)
         {
-            Pnt? pnt = RightPoints[i];
+            Pnt pnt = (Pnt)RightPoints[i];
             AShape DebugAISVertex = new(new MakeSphere(pnt, 1));
             Display(DebugAISVertex);
             context.SetColor(DebugAISVertex, ColorMap.Colors[i], false);

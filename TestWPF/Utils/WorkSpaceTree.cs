@@ -74,7 +74,11 @@ public class Node
     {
         get
         {
-            (double x, double y, double z) = offset.Translation;
+            (double x, double y, double z) = (
+                offset.Translation.X,
+                offset.Translation.Y,
+                offset.Translation.Z
+            );
             return new(x, y, z);
         }
     }
@@ -138,7 +142,11 @@ public class Node
     {
         get
         {
-            (double x, double y, double z) = pose.Translation;
+            (double x, double y, double z) = (
+                pose.Translation.X,
+                pose.Translation.X,
+                pose.Translation.X
+            );
             return new(x, y, z);
         }
     }

@@ -30,9 +30,9 @@ Trihedron::Trihedron(AShape^ theAIS, double axisSize) :InteractiveObject() {
 }
 
 // 根据变换创建坐标轴
-Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() {
+Trihedron::Trihedron(gp::Trsf theTrsf, double axisSize) :InteractiveObject() {
 	gp_Ax2 a = gp_Ax2();
-	a.Transform(theTrsf->GetOCC());
+	a.Transform(theTrsf);
 	NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(a));
 
 	ArrowLength = axisSize;

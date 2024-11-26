@@ -12,6 +12,8 @@ private:
 	Handle(Poly_Triangulation) myPT();
 public:
 	PTriangulation(const Handle(Poly_Triangulation) polyTriangulation);
+	//! 隐式转换为 Handle(Poly_Triangulation)
+	static operator Handle(Poly_Triangulation) (PTriangulation^ pt) { return pt->GetOCC(); }
 public:
 	Handle(Poly_Triangulation) GetOCC() { return myPT(); }
 };

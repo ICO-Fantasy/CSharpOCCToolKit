@@ -49,17 +49,17 @@ System::String^ Ax3::ToString() {
 	return str;
 }
 
-void Ax3::Transform(Trsf^ theT) {
+void Ax3::Transform(Trsf theT) {
 	gp_Ax3 ax3(Location, ZDir, XDir);
-	ax3.Transform(theT->GetOCC());
+	ax3.Transform(theT);
 	Location = Pnt(ax3.Location());
 	ZDir = Dir(ax3.Direction());
 	XDir = Dir(ax3.XDirection());
 }
 
-Ax3 Ax3::Transformed(Trsf^ theT) {
+Ax3 Ax3::Transformed(Trsf theT) {
 	gp_Ax3 ax3(Location, ZDir, XDir);
-	return Ax3(ax3.Transformed(theT->GetOCC()));
+	return Ax3(ax3.Transformed(theT));
 }
 Dir Ax3::YDir::get() {
 	return Dir(GetOCC().YDirection());
