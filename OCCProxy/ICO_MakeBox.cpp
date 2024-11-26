@@ -26,8 +26,8 @@ MakeBox::MakeBox(double dX, double dY, double dZ) {
 /// </summary>
 /// <param name="leftBottom"></param>
 /// <param name="rightTop"></param>
-MakeBox::MakeBox(Pnt^ leftBottom, Pnt^ rightTop) {
-	myMaker = new BRepPrimAPI_MakeBox(leftBottom->GetOCC(), rightTop->GetOCC());
+MakeBox::MakeBox(Pnt leftBottom, Pnt rightTop) {
+	myMaker = new BRepPrimAPI_MakeBox(leftBottom, rightTop);
 }
 
 /// <summary>

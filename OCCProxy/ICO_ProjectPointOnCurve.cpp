@@ -21,8 +21,8 @@ namespace GeomAPI {
 /// </summary>
 /// <param name="point"></param>
 /// <param name="curve"></param>
-ProjectPointOnCurve::ProjectPointOnCurve(gp::Pnt^ point, Geom::Curve^ curve) {
-	myPPC = new GeomAPI_ProjectPointOnCurve(point->GetOCC(), curve->GetOCC());
+ProjectPointOnCurve::ProjectPointOnCurve(gp::Pnt point, Geom::Curve^ curve) {
+	myPPC = new GeomAPI_ProjectPointOnCurve(point, curve);
 }
 
 /// <summary>
@@ -32,8 +32,8 @@ ProjectPointOnCurve::ProjectPointOnCurve(gp::Pnt^ point, Geom::Curve^ curve) {
 /// <param name="curve">曲线</param>
 /// <param name="inferior">下限</param>
 /// <param name="superior">上限</param>
-ProjectPointOnCurve::ProjectPointOnCurve(gp::Pnt^ point, Geom::Curve^ curve, double inferior, double superior) {
-	myPPC = new GeomAPI_ProjectPointOnCurve(point->GetOCC(), curve->GetOCC(), inferior, superior);
+ProjectPointOnCurve::ProjectPointOnCurve(gp::Pnt point, Geom::Curve^ curve, double inferior, double superior) {
+	myPPC = new GeomAPI_ProjectPointOnCurve(point, curve, inferior, superior);
 }
 
 GeomAPI_ProjectPointOnCurve ProjectPointOnCurve::GetOCC() {

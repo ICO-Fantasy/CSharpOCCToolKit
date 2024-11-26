@@ -3,7 +3,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 }
 namespace Topo {
 ref class TShape;

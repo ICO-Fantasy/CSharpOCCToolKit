@@ -4,7 +4,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 ref class Ax2;
 }
 namespace Topo {

@@ -4,7 +4,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 ref class Ax2;
 }
 namespace Topo {
@@ -20,7 +20,7 @@ namespace BRepPrimAPI {
 public ref class MakeSphere {
 public:
 	MakeSphere(double X, double Y, double Z, double R);
-	MakeSphere(gp::Pnt^ originPnt, double R);
+	MakeSphere(gp::Pnt originPnt, double R);
 	MakeSphere(gp::Ax2^ theAxis, double R);
 	Topo::TShape^ Shape();
 	//! 隐式转换为 TShape

@@ -20,16 +20,16 @@ AABB::AABB(Bnd_Box* box) {
 /// 返回左下角点 + Gap
 /// </summary>
 /// <returns></returns>
-Pnt^ AABB::CornerMin() {
-	return gcnew Pnt(myBox->CornerMin());
+Pnt AABB::CornerMin() {
+	return Pnt(myBox->CornerMin());
 }
 
 /// <summary>
 /// 返回右下角点 + Gap
 /// </summary>
 /// <returns></returns>
-Pnt^ AABB::CornerMax() {
-	return gcnew Pnt(myBox->CornerMax());
+Pnt AABB::CornerMax() {
+	return Pnt(myBox->CornerMax());
 }
 
 /// <summary>

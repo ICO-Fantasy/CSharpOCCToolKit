@@ -12,7 +12,7 @@ namespace Gprop {
 ref class GProps;
 }
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 ref class Vec;
 }
 }

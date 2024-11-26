@@ -36,8 +36,8 @@ Surface::Surface(TFace^ face) :BaseObject() {
 /// <param name="U"></param>
 /// <param name="V"></param>
 /// <returns></returns>
-Pnt^ Surface::Value(double U, double V) {
-	return gcnew Pnt(mySurface()->Value(U, V));
+Pnt Surface::Value(double U, double V) {
+	return Pnt(mySurface()->Value(U, V));
 }
 
 SurfaceType Surface::GetType() {

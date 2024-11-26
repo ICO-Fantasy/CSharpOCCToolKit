@@ -36,14 +36,14 @@ Dir::Dir(Vec^ theDir) {
 	Normalize();
 }
 
-Dir::Dir(Pnt^ fromPoint, Pnt^ toPoint) {
-	if (fromPoint->Distance(toPoint) < 1e-6) {
+Dir::Dir(Pnt fromPoint, Pnt toPoint) {
+	if (fromPoint.Distance(toPoint) < 1e-6) {
 		throw gcnew System::ArgumentException("不能创建零向量");
 	}
-	Pnt^ p = toPoint - fromPoint;
-	X = p->X;
-	Y = p->Y;
-	Z = p->Z;
+	Pnt p = toPoint - fromPoint;
+	X = p.X;
+	Y = p.Y;
+	Z = p.Z;
 	Normalize();
 }
 

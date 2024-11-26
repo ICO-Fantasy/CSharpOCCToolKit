@@ -22,8 +22,8 @@ namespace Laser {
 public ref class PlatePose {
 public:
 	PlatePose(SimpleClamp::PlatePose theOCCPose) { myDir() = theOCCPose; }
-	PlatePose(Pnt^ thePoint, Dir^ theDir) { myDir() = SimpleClamp::PlatePose(thePoint->GetOCC(), theDir->GetOCC()); }
-	property Pnt^ Location {Pnt^ get() { return gcnew Pnt(myDir().point); }};
+	PlatePose(Pnt thePoint, Dir^ theDir) { myDir() = SimpleClamp::PlatePose(thePoint, theDir->GetOCC()); }
+	property Pnt Location {Pnt get() { return Pnt(myDir().point); }};
 	property Dir^ Direction { Dir^ get() { return  gcnew Dir(myDir().dir); } };
 public:
 	SimpleClamp::PlatePose GetOCC() { return myDir(); };
@@ -118,8 +118,8 @@ public:
 	// 是否已烙印编号
 	property bool Numbered {bool get() { return numbered; } };
 	// debug
-	property Pnt^ Start {Pnt^ get() { return gcnew Pnt(myPlate().start); }};
-	property Pnt^ End {Pnt^ get() { return gcnew Pnt(myPlate().end); }};
+	property Pnt Start {Pnt get() { return Pnt(myPlate().start); }};
+	property Pnt End {Pnt get() { return Pnt(myPlate().end); }};
 
 public:
 	List<VerticalPiece^>^ Pieces = gcnew List<VerticalPiece^>();
@@ -166,7 +166,7 @@ public:
 
 	static BasePlate^ BrandNumberBasePlate(BasePlate^ theBasePlate, double hight);
 
-	//static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt^ thePoint);
+	//static void BrandNumber(VerticalPlate^% theVerticalPlate, double hight, int number, Wgp_Pnt thePoint);
 
 	static OCC::Topo::TShape^ DeployPlates(BasePlate^ BasePlate, List<VerticalPlate^>^ MiddleToDownPlates, List<VerticalPlate^>^ MiddleToUpPlatesates);
 

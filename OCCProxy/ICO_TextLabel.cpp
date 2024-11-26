@@ -40,8 +40,8 @@ void TextLabel::SetColor(int R, int G, int B) {
 	myShape()->SetColor((gcnew Extension::Color(R, G, B))->GetOCC());
 }
 
-void TextLabel::SetPosition(gp::Pnt^ position) {
-	myShape()->SetPosition(position->GetOCC());
+void TextLabel::SetPosition(Pnt position) {
+	myShape()->SetPosition(position);
 }
 
 void TextLabel::SetZoomable(bool zoomable) {

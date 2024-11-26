@@ -5,7 +5,7 @@ class GProp_GProps;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 }
 }
 }
@@ -23,7 +23,7 @@ public:
 	GProp_GProps GetOCC();
 public:
 	double Mass();
-	gp::Pnt^ CentreOfMass();
+	gp::Pnt CentreOfMass();
 	array<double, 2>^ MatrixOfInertia();
 private:
 	GProp_GProps* myGProps;

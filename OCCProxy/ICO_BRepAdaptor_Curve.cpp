@@ -40,8 +40,8 @@ Curve::Curve(TEdge^ edge, TFace^ face) :BaseObject() {
 /// </summary>
 /// <param name="UVValue"></param>
 /// <returns></returns>
-Pnt^ Curve::Value(double UVValue) {
-	return gcnew Pnt(myCure()->Value(UVValue));
+Pnt Curve::Value(double UVValue) {
+	return Pnt(myCure()->Value(UVValue));
 }
 
 /// <summary>

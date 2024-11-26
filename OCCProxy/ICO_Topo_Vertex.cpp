@@ -35,9 +35,9 @@ TopoDS_Vertex TVertex::GetOCC() {
 	return TopoDS::Vertex(*myShape);
 }
 
-gp::Pnt^ TVertex::ToPnt() {
+gp::Pnt TVertex::ToPnt() {
 	try {
-		return gcnew Pnt(BRep_Tool::Pnt(GetOCC()));
+		return Pnt(BRep_Tool::Pnt(GetOCC()));
 	}
 	CATCH_AND_THROW_OCC_EXCEPTIONS
 }

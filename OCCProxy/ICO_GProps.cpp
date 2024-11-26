@@ -30,8 +30,8 @@ double GProps::Mass() {
 	return myGProps->Mass();
 }
 
-Pnt^ GProps::CentreOfMass() {
-	return gcnew Pnt(myGProps->CentreOfMass());
+Pnt GProps::CentreOfMass() {
+	return Pnt(myGProps->CentreOfMass());
 }
 
 /// <summary>

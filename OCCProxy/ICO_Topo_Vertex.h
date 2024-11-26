@@ -9,7 +9,7 @@ namespace OCC {
 //ref class TShape;
 //}
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 }
 }
 }
@@ -26,7 +26,7 @@ public:
 	TVertex(TopoDS_Vertex* theVertex);
 	TopoDS_Vertex GetOCC();
 public:
-	gp::Pnt^ ToPnt();
+	gp::Pnt ToPnt();
 };
 
 }

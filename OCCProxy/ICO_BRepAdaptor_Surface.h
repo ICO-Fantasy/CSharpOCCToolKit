@@ -10,7 +10,7 @@ ref class TFace;
 ref class TFace;
 }
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 ref class Cylinder;
 }
 namespace GeomAbs {
@@ -30,7 +30,7 @@ public:
 	Surface();
 	Surface(Topo::TFace^ face);
 public:
-	gp::Pnt^ Value(double U, double V);
+	gp::Pnt Value(double U, double V);
 	GeomAbs::SurfaceType GetType();
 	gp::Cylinder^ Cylinder();
 	double FirstUParameter();

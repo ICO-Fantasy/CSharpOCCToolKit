@@ -5,7 +5,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
-ref class Pnt;
+value struct Pnt;
 }
 namespace Topo {
 ref class TShape;
@@ -26,11 +26,11 @@ namespace BRepBuilderAPI {
 public ref class MakePolygon {
 public:
 	MakePolygon();
-	MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2);
-	MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3);
-	MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3, bool close);
-	MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3, gp::Pnt^ p4);
-	MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3, gp::Pnt^ p4, bool close);
+	MakePolygon(gp::Pnt p1, gp::Pnt p2);
+	MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3);
+	MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3, bool close);
+	MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3, gp::Pnt p4);
+	MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3, gp::Pnt p4, bool close);
 public:
 	Topo::TShape^ Shape();
 	Topo::TEdge^ Edge();

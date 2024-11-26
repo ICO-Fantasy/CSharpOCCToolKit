@@ -17,8 +17,8 @@ MakeSphere::MakeSphere(double X, double Y, double Z, double R) {
 	myMaker = new BRepPrimAPI_MakeSphere(gp_Pnt(X, Y, Z), R);
 }
 
-MakeSphere::MakeSphere(Pnt^ originPnt, double R) {
-	myMaker = new BRepPrimAPI_MakeSphere(originPnt->GetOCC(), R);
+MakeSphere::MakeSphere(Pnt originPnt, double R) {
+	myMaker = new BRepPrimAPI_MakeSphere(originPnt, R);
 }
 
 MakeSphere::MakeSphere(Ax2^ theAxis, double R) {

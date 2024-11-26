@@ -7,7 +7,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Ax1;
-ref class Pnt;
+value struct Pnt;
 ref class Ax2;
 ref class Quat;
 ref class Vec;
@@ -28,12 +28,12 @@ public:
 	Trsf(array<double, 2>^ matrix);
 	Trsf(array<array<double>^>^ matrix);
 	Trsf(Ax2^ fromAx2, Ax2^ toAx2);
-	Trsf(Pnt^ fromPoint, Pnt^ toPoint);
+	Trsf(Pnt fromPoint, Pnt toPoint);
 	gp_Trsf GetOCC();
 	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
 public:
-	void SetTranslation(Pnt^ fromPoint, Pnt^ toPoint);
+	void SetTranslation(Pnt fromPoint, Pnt toPoint);
 	void SetTranslation(Vec^ vec);
 	void SetTranslationPart(Vec^ vec);
 	void SetRotationPart(Quat^ quat);

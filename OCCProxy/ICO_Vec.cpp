@@ -25,13 +25,13 @@ Vec::Vec(double theX, double theY, double theZ) {
 	Z = theZ;
 }
 
-Vec::Vec(Pnt^ fromPnt, Pnt^ toPnt) {
-	if (fromPnt->Distance(toPnt) < 1e-6) {
+Vec::Vec(Pnt fromPnt, Pnt toPnt) {
+	if (fromPnt.Distance(toPnt) < 1e-6) {
 		throw gcnew System::ArgumentException("不能创建零向量");
 	}
-	X = toPnt->X - fromPnt->X;
-	Y = toPnt->Y - fromPnt->Y;
-	Z = toPnt->Z - fromPnt->Z;
+	X = toPnt.X - fromPnt.X;
+	Y = toPnt.Y - fromPnt.Y;
+	Z = toPnt.Z - fromPnt.Z;
 }
 
 Vec::Vec(gp_Vec theVec) {

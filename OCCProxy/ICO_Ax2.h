@@ -1,12 +1,12 @@
 ﻿#pragma once
-
+//值类型作为构造函数成员需要完整定义
+#include "ICO_Pnt.h"
 //前向声明
 class gp_Ax2;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Ax1;
-ref class Pnt;
 ref class Trsf;
 ref class Dir;
 }
@@ -22,8 +22,8 @@ namespace gp {
 public ref class Ax2 :System::ICloneable {
 public:
 	Ax2();
-	Ax2(Pnt^ theLocation, Dir^ theZAxis);
-	Ax2(Pnt^ theLocation, Dir^ theZAxis, Dir^ theXAxis);
+	Ax2(Pnt theLocation, Dir^ theZAxis);
+	Ax2(Pnt theLocation, Dir^ theZAxis, Dir^ theXAxis);
 	Ax2(gp_Ax2 theAx2);
 	Ax2(gp_Ax2* theAx2);
 	Ax2(array<double, 2>^ matrix);
@@ -36,7 +36,7 @@ public:
 	Ax2^ Transformed(Trsf^ theT);
 
 public:
-	property Pnt^ Location;
+	property Pnt Location;
 	property Dir^ XDir;
 	property Dir^ YDir {Dir^ get(); }
 	property Dir^ ZDir;

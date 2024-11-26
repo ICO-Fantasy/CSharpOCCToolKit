@@ -4,7 +4,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 }
 }
 }
@@ -24,8 +24,8 @@ public:
 	property double YMax {double get() { return Get()[4]; }}
 	property double ZMax {double get() { return Get()[5]; }}
 	property double Gap {double get() { return myBox->GetGap(); } void set(double value) { myBox->SetGap(value); }}
-	gp::Pnt^ CornerMin();
-	gp::Pnt^ CornerMax();
+	gp::Pnt CornerMin();
+	gp::Pnt CornerMax();
 private:
 	array<double>^ Get();
 	Bnd_Box* myBox;

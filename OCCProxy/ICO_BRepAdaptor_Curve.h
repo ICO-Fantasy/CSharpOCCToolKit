@@ -11,7 +11,7 @@ ref class TEdge;
 ref class TFace;
 }
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 ref class Circle;
 }
 namespace GeomAbs {
@@ -32,7 +32,7 @@ public:
 	Curve(Topo::TEdge^ edge);
 	Curve(Topo::TEdge^ edge, Topo::TFace^ face);
 public:
-	gp::Pnt^ Value(double UVValue);
+	gp::Pnt Value(double UVValue);
 	double FirstParameter();
 	double LastParameter();
 	GeomAbs::CurveType GetType();

@@ -22,8 +22,8 @@ namespace BRep {
 /// </summary>
 /// <param name="vertex"></param>
 /// <returns></returns>
-gp::Pnt^ Tool::Pnt(TVertex^ vertex) {
-	return gcnew gp::Pnt(BRep_Tool::Pnt(vertex->GetOCC()));
+Pnt Tool::Pnt(TVertex^ vertex) {
+	return gp::Pnt(BRep_Tool::Pnt(vertex->GetOCC()));
 }
 
 /// <summary>

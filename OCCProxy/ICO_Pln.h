@@ -8,7 +8,7 @@ namespace gp {
 ref class Trsf;
 ref class Ax1;
 ref class Ax3;
-ref class Pnt;
+value struct Pnt;
 ref class Dir;
 }
 }
@@ -24,11 +24,11 @@ public:
 	Pln(gp_Pln pln);
 	Pln(gp_Pln* pln);
 	Pln(Ax3^ axis);
-	Pln(Pnt^ location, Dir^ direction);
+	Pln(Pnt location, Dir^ direction);
 	gp_Pln GetOCC();
 	virtual System::Object^ Clone();
 public:
-	double Distance(Pnt^ point);
+	double Distance(Pnt point);
 	System::ValueTuple<double, double, double, double> Coefficients();
 	property Ax1^ Axis {Ax1^ get(); };
 protected:

@@ -13,7 +13,7 @@ namespace OCC {
 namespace gp {
 ref class Trsf;
 ref class Ax2;
-ref class Pnt;
+value struct Pnt;
 }
 namespace Topo {
 ref class TShape;
@@ -40,7 +40,7 @@ public:
 	void SetText(System::String^ str);
 	void SetHeight(double hight);
 	void SetColor(int R, int G, int B);
-	void SetPosition(gp::Pnt^ position);
+	void SetPosition(gp::Pnt position);
 	void SetZoomable(bool zoomable);
 	void SetColor(Extension::Color^ color);
 	void SetTransparency(double theFactor);

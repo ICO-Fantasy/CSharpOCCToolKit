@@ -88,16 +88,16 @@ public partial class RobotWindows : Window
             //    fileNameWithoutExtension + ".xbf"
             //);
             //exchange.DocTest(selectedFilePath, docFilePath);
-            OBJExchange ex = new(selectedFilePath);
-            try
-            {
-                var shape = ex.Shape();
-                AShape ais = new(shape.TopoShape);
-                var context = App.Current.ContextManager.MainContext;
-                context.Display(ex, true);
-                context.Update();
-            }
-            catch { }
+            //OBJExchange ex = new(selectedFilePath);
+            //try
+            //{
+            //    var shape = ex.Shape();
+            //    AShape ais = new(shape.TopoShape);
+            //    var context = App.Current.ContextManager.MainContext;
+            //    context.Display(ex, true);
+            //    context.Update();
+            //}
+            //catch { }
         }
     }
 }

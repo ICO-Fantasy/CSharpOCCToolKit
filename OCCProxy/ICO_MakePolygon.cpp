@@ -18,22 +18,22 @@ MakePolygon::MakePolygon() {
 	myMaker = new BRepBuilderAPI_MakePolygon();
 }
 
-MakePolygon::MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2) {
-	myMaker = new BRepBuilderAPI_MakePolygon(p1->GetOCC(), p2->GetOCC());
+MakePolygon::MakePolygon(gp::Pnt p1, gp::Pnt p2) {
+	myMaker = new BRepBuilderAPI_MakePolygon(p1, p2);
 }
 
-MakePolygon::MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3) {
-	myMaker = new BRepBuilderAPI_MakePolygon(p1->GetOCC(), p2->GetOCC(), p3->GetOCC());
+MakePolygon::MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3) {
+	myMaker = new BRepBuilderAPI_MakePolygon(p1, p2, p3);
 }
-MakePolygon::MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3, bool close) {
-	myMaker = new BRepBuilderAPI_MakePolygon(p1->GetOCC(), p2->GetOCC(), p3->GetOCC(), close);
+MakePolygon::MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3, bool close) {
+	myMaker = new BRepBuilderAPI_MakePolygon(p1, p2, p3, close);
 }
 
-MakePolygon::MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3, gp::Pnt^ p4) {
-	myMaker = new BRepBuilderAPI_MakePolygon(p1->GetOCC(), p2->GetOCC(), p3->GetOCC(), p4->GetOCC());
+MakePolygon::MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3, gp::Pnt p4) {
+	myMaker = new BRepBuilderAPI_MakePolygon(p1, p2, p3, p4);
 }
-MakePolygon::MakePolygon(gp::Pnt^ p1, gp::Pnt^ p2, gp::Pnt^ p3, gp::Pnt^ p4, bool close) {
-	myMaker = new BRepBuilderAPI_MakePolygon(p1->GetOCC(), p2->GetOCC(), p3->GetOCC(), p4->GetOCC(), close);
+MakePolygon::MakePolygon(gp::Pnt p1, gp::Pnt p2, gp::Pnt p3, gp::Pnt p4, bool close) {
+	myMaker = new BRepBuilderAPI_MakePolygon(p1, p2, p3, p4, close);
 }
 
 Topo::TShape^ MakePolygon::Shape() {

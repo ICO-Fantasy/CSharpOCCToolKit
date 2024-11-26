@@ -12,12 +12,6 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Pnt::Pnt() {
-	X = 0.0;
-	Y = 0.0;
-	Z = 0.0;
-}
-
 Pnt::Pnt(double theX, double theY, double theZ) {
 	X = theX;
 	Y = theY;
@@ -30,20 +24,26 @@ Pnt::Pnt(gp_Pnt thePnt) {
 	Z = thePnt.Z();
 }
 
-Pnt::Pnt(gp_XYZ theXYZ) {
-	X = theXYZ.X();
-	Y = theXYZ.Y();
-	Z = theXYZ.Z();
-}
-
 Pnt::Pnt(gp_Pnt* thePnt) {
 	X = thePnt->X();
 	Y = thePnt->Y();
 	Z = thePnt->Z();
 }
 
+Pnt::Pnt(gp_XYZ theXYZ) {
+	X = theXYZ.X();
+	Y = theXYZ.Y();
+	Z = theXYZ.Z();
+}
+
+Pnt::Pnt(gp_XYZ* theXYZ) {
+	X = theXYZ->X();
+	Y = theXYZ->Y();
+	Z = theXYZ->Z();
+}
+
 Object^ Pnt::Clone() {
-	return gcnew Pnt(this->X, this->Y, this->Z);;
+	return Pnt(this->X, this->Y, this->Z);;
 }
 
 gp_Pnt Pnt::GetOCC() {
@@ -58,24 +58,49 @@ Eigen::Vector3d Pnt::ToVector3d() {
 	return Eigen::Vector3d(X, Y, Z);
 }
 
-Pnt^ Pnt::Add(Pnt^ other) {
-	return gcnew Pnt(X + other->X, Y + other->Y, Z + other->Z);
+#pragma region 重载操作符
+
+Pnt Pnt::operator + (Pnt Left, Pnt Right) {
+	return Pnt(
+		Left.X + Right.X,
+		Left.Y + Right.Y,
+		Left.Z + Right.Z);
 }
 
-Pnt^ Pnt::Minus(Pnt^ other) {
-	return gcnew Pnt(X - other->X, Y - other->Y, Z - other->Z);
+Pnt Pnt::operator - (Pnt Left, Pnt Right) {
+	return Pnt(
+		Left.X - Right.X,
+		Left.Y - Right.Y,
+		Left.Z - Right.Z);
 }
+//
+//Pnt Pnt::operator + (Pnt Left, Vec Right)
+//{
+//	return Left.Translated(Right);
+//}
+//
+//Pnt Pnt::operator - (Pnt Left, Vec Right)
+//{
+//	return Left.Translated(Right.Reversed());
+//}
+//
+//Pnt Pnt::operator * (Pnt Left, Trsf Right)
+//{
+//	return Left.Transformed(Right);
+//}
 
-double Pnt::Distance(Pnt^ otherPnt) {
+#pragma endregion
+
+double Pnt::Distance(Pnt otherPnt) {
 	return std::sqrt(
-		std::pow(otherPnt->X - X, 2) +
-		std::pow(otherPnt->Y - Y, 2) +
-		std::pow(otherPnt->Z - Z, 2)
+		std::pow(otherPnt.X - X, 2) +
+		std::pow(otherPnt.Y - Y, 2) +
+		std::pow(otherPnt.Z - Z, 2)
 	);
 }
 
-Pnt^ Pnt::Transformed(Trsf^ T) {
-	return gcnew Pnt(gp_Pnt(X, Y, Z).Transformed(T->GetOCC()));
+Pnt Pnt::Transformed(Trsf^ T) {
+	return Pnt(gp_Pnt(X, Y, Z).Transformed(T->GetOCC()));
 }
 
 /// <summary>
@@ -83,8 +108,8 @@ Pnt^ Pnt::Transformed(Trsf^ T) {
 /// </summary>
 /// <param name="value"></param>
 /// <returns></returns>
-Pnt^ Pnt::SetX(double value) {
-	return gcnew Pnt(gp_Pnt(value, Y, Z));
+Pnt Pnt::SetX(double value) {
+	return Pnt(gp_Pnt(value, Y, Z));
 }
 
 /// <summary>
@@ -92,8 +117,8 @@ Pnt^ Pnt::SetX(double value) {
 /// </summary>
 /// <param name="value"></param>
 /// <returns></returns>
-Pnt^ Pnt::SetY(double value) {
-	return gcnew Pnt(gp_Pnt(X, value, Z));
+Pnt Pnt::SetY(double value) {
+	return Pnt(gp_Pnt(X, value, Z));
 }
 
 /// <summary>
@@ -101,8 +126,8 @@ Pnt^ Pnt::SetY(double value) {
 /// </summary>
 /// <param name="value"></param>
 /// <returns></returns>
-Pnt^ Pnt::SetZ(double value) {
-	return gcnew Pnt(gp_Pnt(X, Y, value));
+Pnt Pnt::SetZ(double value) {
+	return Pnt(gp_Pnt(X, Y, value));
 }
 
 }

@@ -45,7 +45,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Model\" />
 	  <Folder Include="Utils\UserControl\" />
 	</ItemGroup>
 

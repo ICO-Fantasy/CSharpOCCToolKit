@@ -8,7 +8,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
-ref class Pnt;
+value struct Pnt;
 }
 }
 }
@@ -22,7 +22,7 @@ private:
 	Handle(AIS_Point) myPnt() { return Handle(AIS_Point)::DownCast(NativeHandle); }
 public:
 	APoint(const Handle(AIS_Point) aPnt) : InteractiveObject(aPnt) {};
-	APoint(gp::Pnt^ aPnt);
+	APoint(gp::Pnt aPnt);
 public:
 	void SetWidth(double width);
 public:

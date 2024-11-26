@@ -4,7 +4,7 @@ class GeomAPI_ProjectPointOnCurve;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 }
 namespace Geom {
 ref class Curve;
@@ -19,8 +19,8 @@ namespace GeomAPI {
 
 public ref class ProjectPointOnCurve {
 public:
-	ProjectPointOnCurve(gp::Pnt^ p, Geom::Curve^ curve);
-	ProjectPointOnCurve(gp::Pnt^ p, Geom::Curve^ curve, double inferior, double superior);
+	ProjectPointOnCurve(gp::Pnt p, Geom::Curve^ curve);
+	ProjectPointOnCurve(gp::Pnt p, Geom::Curve^ curve, double inferior, double superior);
 	GeomAPI_ProjectPointOnCurve GetOCC();
 public:
 	double LowerDistanceParameter();

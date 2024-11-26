@@ -4,7 +4,7 @@ class gp_Vec2d;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt2D;
+value struct Pnt2D;
 public ref class Vec2D :System::ICloneable {
 public:
 	Vec2D();

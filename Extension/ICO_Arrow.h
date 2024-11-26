@@ -32,7 +32,7 @@ public:
 	//self.Repaint()
 	//	return myStructure
 private:
-	OCC::gp::Pnt^ myStart;
+	OCC::gp::Pnt myStart;
 	OCC::gp::Vec^ myVec;
 	NCollection_Haft<Graphic3d_Structure> myStructure;
 };

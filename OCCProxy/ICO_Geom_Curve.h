@@ -19,6 +19,10 @@ private:
 public:
 	Curve(Handle(Geom_Curve) curve) :BaseObject(curve) {}
 	Handle(Geom_Curve) GetOCC();
+	//! 隐式转换为 Handle(Geom_Curve)
+	static operator Handle(Geom_Curve) (Curve^ p) {
+		return p->GetOCC();  // 隐式调用 GetOCC 方法
+	}
 };
 
 }

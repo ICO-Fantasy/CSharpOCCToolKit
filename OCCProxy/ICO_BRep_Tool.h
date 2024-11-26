@@ -3,7 +3,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
+value struct Pnt;
 }
 namespace Topo {
 ref class TShape;
@@ -24,7 +24,7 @@ public ref class Tool {
 private:
 	Tool() {};
 public:
-	static gp::Pnt^ Pnt(Topo::TVertex^ vertex);
+	static gp::Pnt Pnt(Topo::TVertex^ vertex);
 	static Geom::Curve^ Curve(Topo::TEdge^ edge, double% first, double% last);
 };
 

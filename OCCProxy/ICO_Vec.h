@@ -1,12 +1,12 @@
 ﻿#pragma once
 #include <cmath>
-
+//值类型作为构造函数成员需要完整定义
+#include "ICO_Pnt.h"
 //前向声明
 class gp_Vec;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pnt;
 ref class Trsf;
 }
 }
@@ -19,7 +19,7 @@ public ref class Vec :System::ICloneable {
 public:
 	Vec();
 	Vec(double theX, double theY, double theZ);
-	Vec(Pnt^ fromPnt, Pnt^ toPnt);
+	Vec(Pnt fromPnt, Pnt toPnt);
 	Vec(gp_Vec theVec);
 	Vec(gp_Vec* theVec);
 	gp_Vec GetOCC();

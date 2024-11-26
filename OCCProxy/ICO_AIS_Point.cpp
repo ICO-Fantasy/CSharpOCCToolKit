@@ -8,8 +8,8 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-APoint::APoint(gp::Pnt^ aPnt) {
-	Handle(Geom_Point) geomPoint = new Geom_CartesianPoint(aPnt->GetOCC());
+APoint::APoint(gp::Pnt aPnt) {
+	Handle(Geom_Point) geomPoint = new Geom_CartesianPoint(aPnt);
 	Handle(AIS_Point) pnt = new AIS_Point(geomPoint);
 	pnt->SetMarker(Aspect_TypeOfMarker::Aspect_TOM_O_PLUS);
 	NativeHandle = pnt;

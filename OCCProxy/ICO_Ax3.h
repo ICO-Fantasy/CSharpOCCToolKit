@@ -8,7 +8,7 @@ namespace OCC {
 namespace gp {
 ref class Trsf;
 ref class Ax1;
-ref class Pnt;
+value struct Pnt;
 ref class Dir;
 }
 }

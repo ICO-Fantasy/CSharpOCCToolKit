@@ -6,7 +6,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Vec;
-ref class Pnt;
+value struct Pnt;
 ref class Trsf;
 }
 }
@@ -21,7 +21,7 @@ public:
 	Dir();
 	Dir(double theX, double theY, double theZ);
 	Dir(Vec^ theDir);
-	Dir(Pnt^ fromPoint, Pnt^ toPoint);
+	Dir(Pnt fromPoint, Pnt toPoint);
 	Dir(gp_Dir theDir);
 	Dir(gp_Dir* theDir);
 	gp_Dir GetOCC();

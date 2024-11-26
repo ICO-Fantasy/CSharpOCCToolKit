@@ -29,8 +29,8 @@ Pln::Pln(Ax3^ axis) {
 	myPln = new gp_Pln(axis->GetOCC());
 }
 
-Pln::Pln(Pnt^ location, Dir^ direction) {
-	myPln = new gp_Pln(location->GetOCC(), direction->GetOCC());
+Pln::Pln(Pnt location, Dir^ direction) {
+	myPln = new gp_Pln(location, direction->GetOCC());
 }
 
 gp_Pln Pln::GetOCC() {
@@ -41,8 +41,8 @@ Object^ Pln::Clone() {
 	return gcnew Pln(myPln);
 }
 
-double Pln::Distance(Pnt^ point) {
-	return myPln->Distance(point->GetOCC());
+double Pln::Distance(Pnt point) {
+	return myPln->Distance(point);
 }
 
 System::ValueTuple<double, double, double, double> Pln::Coefficients() {

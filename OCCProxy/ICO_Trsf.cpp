@@ -76,9 +76,9 @@ Trsf::Trsf(Ax2^ fromAx2, Ax2^ toAx2) {
 	myTrsf->SetTransformation(gp_Ax3(toAx2->GetOCC()), gp_Ax3(fromAx2->GetOCC()));
 }
 
-Trsf::Trsf(Pnt^ fromPoint, Pnt^ toPoint) {
+Trsf::Trsf(Pnt fromPoint, Pnt toPoint) {
 	myTrsf = new gp_Trsf();
-	myTrsf->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
+	myTrsf->SetTranslation(fromPoint, toPoint);
 }
 
 gp_Trsf Trsf::GetOCC() {
@@ -104,8 +104,8 @@ System::String^ Trsf::ToString() {
 /// </summary>
 /// <param name="fromPoint"></param>
 /// <param name="toPoint"></param>
-void Trsf::SetTranslation(Pnt^ fromPoint, Pnt^ toPoint) {
-	myTrsf->SetTranslation(fromPoint->GetOCC(), toPoint->GetOCC());
+void Trsf::SetTranslation(Pnt fromPoint, Pnt toPoint) {
+	myTrsf->SetTranslation(fromPoint, toPoint);
 }
 
 /// <summary>
