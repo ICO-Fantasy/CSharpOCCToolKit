@@ -10,19 +10,14 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Vec2D::Vec2D() {
-	X = 1.0;
-	Y = 0.0;
-}
-
 Vec2D::Vec2D(double theX, double theY) {
 	X = theX;
 	Y = theY;
 }
 
-Vec2D::Vec2D(Pnt2D^ fromPnt, Pnt2D^ toPnt) {
-	X = toPnt->X - fromPnt->X;
-	Y = toPnt->Y - fromPnt->Y;
+Vec2D::Vec2D(Pnt2D fromPnt, Pnt2D toPnt) {
+	X = toPnt.X - fromPnt.X;
+	Y = toPnt.Y - fromPnt.Y;
 }
 
 Vec2D::Vec2D(gp_Vec2d theVec2D) {
@@ -40,7 +35,7 @@ gp_Vec2d Vec2D::GetOCC() {
 }
 
 Object^ Vec2D::Clone() {
-	return gcnew Vec2D(X, Y);
+	return Vec2D(X, Y);
 }
 
 System::String^ Vec2D::ToString() {
@@ -61,7 +56,7 @@ Vec2D^ Vec2D::Normalized() {
 	double m = std::sqrt(X * X + Y * Y);
 	double newX = X / m;
 	double newY = Y / m;
-	return gcnew Vec2D(newX, newY);
+	return Vec2D(newX, newY);
 }
 
 void Vec2D::Multiply(double value) {
@@ -72,7 +67,7 @@ void Vec2D::Multiply(double value) {
 Vec2D^ Vec2D::Multiplied(double value) {
 	double newX = X * value;
 	double newY = Y * value;
-	return gcnew Vec2D(newX, newY);
+	return Vec2D(newX, newY);
 }
 
 double Vec2D::Crossed(Vec2D^ other) {

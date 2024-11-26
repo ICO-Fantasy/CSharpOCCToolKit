@@ -1,23 +1,23 @@
 ﻿#pragma once
-#include <Eigen\Geometry>
+//#include <Eigen\Geometry>
+//在构造函数中使用的值对象需要直接引入
+#include "ICO_Pnt.h"
 
 //前向声明
 class gp_Trsf;
+namespace Eigen {
+typedef Isometry3d;
+}
+
 namespace OCCTK {
 namespace OCC {
 namespace gp {
+//前向声明
 ref class Ax1;
 value struct Pnt;
 ref class Ax2;
 ref class Quat;
-ref class Vec;
-}
-}
-}
-
-namespace OCCTK {
-namespace OCC {
-namespace gp {
+value struct Vec;
 
 public ref class Trsf :System::ICloneable {
 public:
@@ -34,8 +34,8 @@ public:
 	virtual System::String^ ToString() override;
 public:
 	void SetTranslation(Pnt fromPoint, Pnt toPoint);
-	void SetTranslation(Vec^ vec);
-	void SetTranslationPart(Vec^ vec);
+	void SetTranslation(Vec vec);
+	void SetTranslationPart(Vec vec);
 	void SetRotationPart(Quat^ quat);
 	void SetRotation(Quat^ quat);
 	void SetRotation(Ax1^ axis, double angle);

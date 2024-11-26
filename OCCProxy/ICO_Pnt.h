@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <Eigen/Dense>
-//在构造函数中使用的对象需要直接引入
+//在构造函数中使用的值对象需要直接引入
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
 
@@ -38,17 +38,11 @@ public:
 	virtual System::String^ ToString() override;
 	//! 隐式转换为 gp_Pnt
 	static operator gp_Pnt (Pnt p) { return p.GetOCC(); }
+	// 隐式转换为 Eigen::Vector3d
+	static operator Eigen::Vector3d(Pnt p) { return p.ToVector3d(); }
 public:
 	Eigen::Vector3d ToVector3d();
-#pragma region 重载操作符
-	static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right); }
-	static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right); }
-	static Pnt operator + (Pnt Left, Pnt Right);
-	static Pnt operator - (Pnt Left, Pnt Right);
-	//static Pnt operator + (Pnt Left, Vec Right);
-	//static Pnt operator - (Pnt Left, Vec Right);
-	//static Pnt operator * (Pnt Left, Trsf Right);
-#pragma endregion
+
 public:
 	double Distance(Pnt otherPnt);
 	Pnt Transformed(Trsf^ T);
@@ -59,6 +53,16 @@ public:
 	property double X;
 	property double Y;
 	property double Z;
+#pragma region 重载操作符
+	bool Equals(Pnt otherPnt, double tol);
+	static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, 1e-6); }//默认精度为1e-6
+	static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right, 1e-6); }//默认精度为1e-6
+	static Pnt operator + (Pnt Left, Pnt Right);
+	static Pnt operator - (Pnt Left, Pnt Right);
+	//static Pnt operator + (Pnt Left, Vec Right);
+	//static Pnt operator - (Pnt Left, Vec Right);
+	//static Pnt operator * (Pnt Left, Trsf Right);
+#pragma endregion
 };
 
 }

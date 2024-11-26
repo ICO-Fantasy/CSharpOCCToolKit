@@ -18,11 +18,11 @@ BRepGlobalProperties_Face::BRepGlobalProperties_Face(Topo::TFace^ face) {
 	myGPFace = new BRepGProp_Face(face->GetOCC());
 }
 
-Vec^ BRepGlobalProperties_Face::Normal(double U, double V) {
+Vec BRepGlobalProperties_Face::Normal(double U, double V) {
 	gp_Pnt theP = gp_Pnt();
 	gp_Vec theV = gp_Vec();
 	myGPFace->Normal(U, V, theP, theV);
-	return gcnew Vec(theV);
+	return Vec(theV);
 }
 }
 }

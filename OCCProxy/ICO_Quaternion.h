@@ -1,28 +1,24 @@
 ﻿#pragma once
-
+//在构造函数中使用的值对象需要直接引入
+#include "ICO_Vec.h"
 
 //前向声明
 class gp_Quaternion;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
+//前向声明
 enum class EulerSequence;
 ref class Ax1;
-ref class Vec;
-}
-}
-}
+value struct Vec;
 
-namespace OCCTK {
-namespace OCC {
-namespace gp {
 public ref class Quat :System::ICloneable {
 public:
 	Quat();
 	Quat(double theX, double theY, double theZ, double theW);
 	Quat(double alpha, double beta, double gamma, EulerSequence sequence);
 	Quat(Ax1^ axis, double angle);
-	Quat(Vec^ axis, double angle);
+	Quat(Vec vec, double angle);
 	Quat(gp_Quaternion theQuat);
 	Quat(gp_Quaternion* theQuat);
 	gp_Quaternion GetOCC();

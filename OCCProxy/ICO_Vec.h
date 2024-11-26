@@ -1,23 +1,21 @@
 ﻿#pragma once
 #include <cmath>
-//值类型作为构造函数成员需要完整定义
+//在构造函数中使用的值对象需要直接引入
+#include <gp_Vec.hxx>
 #include "ICO_Pnt.h"
 //前向声明
 class gp_Vec;
-namespace OCCTK {
-namespace OCC {
-namespace gp {
-ref class Trsf;
-}
-}
-}
 
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-public ref class Vec :System::ICloneable {
+//前向声明
+ref class Trsf;
+
+public value struct Vec :System::ICloneable {
 public:
-	Vec();
+	const static Vec XVec = Vec(1.0, 0.0, 0.0);
+public:
 	Vec(double theX, double theY, double theZ);
 	Vec(Pnt fromPnt, Pnt toPnt);
 	Vec(gp_Vec theVec);
@@ -25,39 +23,38 @@ public:
 	gp_Vec GetOCC();
 	virtual System::Object^ Clone();
 	virtual System::String^ ToString() override;
-#pragma region  重载操作符
-	// 重载 + 操作符
-	static Vec^ operator+(Vec^ a, Vec^ b) {
-		// 创建一个新的 Pnt 对象，表示相加的结果
-		return gcnew Vec(a->X + b->X, a->Y + b->Y, a->Z + b->Z);
-	}
-	// 重载 + 操作符
-	static Vec^ operator-(Vec^ a, Vec^ b) {
-		// 创建一个新的 Pnt 对象，表示相加的结果
-		return gcnew Vec(a->X - b->X, a->Y - b->Y, a->Z - b->Z);
-	}
-#pragma endregion
-
+	//! 隐式转换为 gp_Vec
+	static operator gp_Vec (Vec v) { return v.GetOCC(); }
 public:
-	bool IsParallel(Vec^ otherVec, double theAngularTolerance);
-	Vec^ Reversed();
+	bool IsParallel(Vec otherVec, double theAngularTolerance);
+	Vec Reversed();
 	void Normalize();
-	Vec^ Normalized();
+	Vec Normalized();
 	void Multiply(double value);
-	Vec^ Multiplied(double value);
-	double Dot(Vec^ other);
-	void Cross(Vec^ other);
-	Vec^ Crossed(Vec^ other);
-	Vec^ CrossProduct(Vec^ other);
+	Vec Multiplied(double value);
+	double Dot(Vec other);
+	void Cross(Vec other);
+	Vec Crossed(Vec other);
+	Vec CrossProduct(Vec other);
 	void Transform(Trsf^ T);
-	Vec^ Transformed(Trsf^ T);
+	Vec Transformed(Trsf^ T);
 	double Magnitude();
 public:
 	property double X;
 	property double Y;
 	property double Z;
 	property double Length {double get() { return std::sqrt(X * X + Y * Y + Z * Z); }};
-	//property double Z {double get() { return myBP().Z; }};
+#pragma region 重载操作符
+	bool Equals(Vec otherPnt, double tol);
+	static bool operator == (Vec Left, Vec Right) { return Left.Equals(Right, 0.0000174533); }//默认精度0.001度
+	static bool operator != (Vec Left, Vec Right) { return !Left.Equals(Right, 0.0000174533); }//默认精度0.001度
+	static Vec operator + (Vec Left, Vec Right);
+	static Vec operator - (Vec Left, Vec Right);
+	//点乘
+	static double operator * (Vec Left, Vec Right);
+	//叉乘
+	static Vec operator ^ (Vec Left, Vec Right);
+#pragma endregion
 };
 
 }

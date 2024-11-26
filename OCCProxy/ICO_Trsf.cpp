@@ -112,16 +112,16 @@ void Trsf::SetTranslation(Pnt fromPoint, Pnt toPoint) {
 /// 设置为平移变换
 /// </summary>
 /// <param name="vec"></param>
-void Trsf::SetTranslation(Vec^ vec) {
-	myTrsf->SetTranslation(vec->GetOCC());
+void Trsf::SetTranslation(Vec vec) {
+	myTrsf->SetTranslation(vec);
 }
 
 /// <summary>
 /// 设置变换的平移部分
 /// </summary>
 /// <param name="vec"></param>
-void Trsf::SetTranslationPart(Vec^ vec) {
-	myTrsf->SetTranslationPart(vec->GetOCC());
+void Trsf::SetTranslationPart(Vec vec) {
+	myTrsf->SetTranslationPart(vec);
 }
 
 /// <summary>

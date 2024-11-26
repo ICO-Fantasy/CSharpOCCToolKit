@@ -1,12 +1,12 @@
 ﻿#pragma once
 #include <Eigen/Dense>
+//在构造函数中使用的值对象需要直接引入
 #include <gp_Dir.hxx>
-
+#include "ICO_Pnt.h"
+#include "ICO_Vec.h"
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Vec;
-value struct Pnt;
 ref class Trsf;
 }
 }
@@ -20,7 +20,7 @@ public ref class Dir :System::ICloneable {
 public:
 	Dir();
 	Dir(double theX, double theY, double theZ);
-	Dir(Vec^ theDir);
+	Dir(Vec theDir);
 	Dir(Pnt fromPoint, Pnt toPoint);
 	Dir(gp_Dir theDir);
 	Dir(gp_Dir* theDir);
@@ -39,7 +39,7 @@ public:
 	void Transform(Trsf^ T);
 	Dir^ Transformed(Trsf^ T);
 public:
-	Vec^ ToVec(double factor);
+	Vec ToVec(double factor);
 	Eigen::Vector3d ToVector3d();
 public:
 	property double X;

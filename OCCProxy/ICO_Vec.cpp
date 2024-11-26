@@ -10,12 +10,6 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Vec::Vec() {
-	X = 1.0;
-	Y = 0.0;
-	Z = 0.0;
-}
-
 Vec::Vec(double theX, double theY, double theZ) {
 	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
 		throw gcnew System::ArgumentException("不能创建零向量");
@@ -51,22 +45,22 @@ gp_Vec Vec::GetOCC() {
 }
 
 Object^ Vec::Clone() {
-	return gcnew Vec(X, Y, Z);
+	return Vec(X, Y, Z);
 }
 
 System::String^ Vec::ToString() {
 	return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
 }
 
-bool Vec::IsParallel(Vec^ otherVec, double theAngularTolerance) {
-	return GetOCC().IsParallel(otherVec->GetOCC(), theAngularTolerance);
+bool Vec::IsParallel(Vec otherVec, double theAngularTolerance) {
+	return GetOCC().IsParallel(otherVec, theAngularTolerance);
 }
 
-Vec^ Vec::Reversed() {
+Vec Vec::Reversed() {
 	double newX = -X;
 	double newY = -Y;
 	double newZ = -Z;
-	return gcnew Vec(newX, newY, newZ);
+	return Vec(newX, newY, newZ);
 }
 
 void Vec::Normalize() {
@@ -76,12 +70,12 @@ void Vec::Normalize() {
 	Z = Z / m;
 }
 
-Vec^ Vec::Normalized() {
+Vec Vec::Normalized() {
 	double m = std::sqrt(X * X + Y * Y + Z * Z);
 	double newX = X / m;
 	double newY = Y / m;
 	double newZ = Z / m;
-	return gcnew Vec(newX, newY, newZ);
+	return Vec(newX, newY, newZ);
 }
 
 void Vec::Multiply(double value) {
@@ -90,31 +84,31 @@ void Vec::Multiply(double value) {
 	Z *= value;
 }
 
-Vec^ Vec::Multiplied(double value) {
+Vec Vec::Multiplied(double value) {
 	double newX = X * value;
 	double newY = Y * value;
 	double newZ = Z * value;
-	return gcnew Vec(newX, newY, newZ);
+	return Vec(newX, newY, newZ);
 }
 
-double Vec::Dot(Vec^ other) {
-	return  X * other->X + Y * other->Y + Z * other->Z;
+double Vec::Dot(Vec other) {
+	return  X * other.X + Y * other.Y + Z * other.Z;
 }
 
-void Vec::Cross(Vec^ other) {
-	X = (this->Y * other->Z) - (this->Z * other->Y);
-	Y = (this->Z * other->X) - (this->X * other->Z);
-	Z = (this->X * other->Y) - (this->Y * other->X);
+void Vec::Cross(Vec other) {
+	X = (this->Y * other.Z) - (this->Z * other.Y);
+	Y = (this->Z * other.X) - (this->X * other.Z);
+	Z = (this->X * other.Y) - (this->Y * other.X);
 }
 
-Vec^ Vec::Crossed(Vec^ other) {
-	double newX = (this->Y * other->Z) - (this->Z * other->Y);
-	double newY = (this->Z * other->X) - (this->X * other->Z);
-	double newZ = (this->X * other->Y) - (this->Y * other->X);
-	return gcnew Vec(newX, newY, newZ);
+Vec Vec::Crossed(Vec other) {
+	double newX = (this->Y * other.Z) - (this->Z * other.Y);
+	double newY = (this->Z * other.X) - (this->X * other.Z);
+	double newZ = (this->X * other.Y) - (this->Y * other.X);
+	return Vec(newX, newY, newZ);
 }
 
-Vec^ Vec::CrossProduct(Vec^ other) {
+Vec Vec::CrossProduct(Vec other) {
 	return Crossed(other);
 }
 
@@ -126,15 +120,58 @@ void Vec::Transform(Trsf^ T) {
 	Z = v.Z();
 }
 
-Vec^ Vec::Transformed(Trsf^ T) {
+Vec Vec::Transformed(Trsf^ T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
 	v.Transform(T->GetOCC());
-	return gcnew Vec(v.X(), v.Y(), v.Z());
+	return Vec(v.X(), v.Y(), v.Z());
 }
 
 double Vec::Magnitude() {
 	return std::sqrt(X * X + Y * Y + Z * Z);
 }
+#pragma region 重载操作符
+
+bool Vec::Equals(Vec otherVec, double tol) {
+	if (this->IsParallel(otherVec, tol)) {
+		return true;
+	}
+	return false;
+}
+
+Vec Vec::operator+(Vec Left, Vec Right) {
+	return Vec(
+		Left.X + Right.X,
+		Left.Y + Right.Y,
+		Left.Z + Right.Z);
+}
+Vec Vec::operator-(Vec Left, Vec Right) {
+	return Vec(
+		Left.X - Right.X,
+		Left.Y - Right.Y,
+		Left.Z - Right.Z);
+}
+
+/// <summary>
+/// 点乘
+/// </summary>
+/// <param name="Left"></param>
+/// <param name="Right"></param>
+/// <returns></returns>
+double Vec::operator*(Vec Left, Vec Right) {
+	return Left.Dot(Right);
+}
+
+/// <summary>
+/// 叉乘
+/// </summary>
+/// <param name="Left"></param>
+/// <param name="Right"></param>
+/// <returns></returns>
+Vec Vec::operator^(Vec Left, Vec Right) {
+	return Left.Crossed(Right);
+}
+
+#pragma endregion
 
 }
 }

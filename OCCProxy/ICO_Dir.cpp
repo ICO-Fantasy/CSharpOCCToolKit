@@ -29,10 +29,10 @@ Dir::Dir(double theX, double theY, double theZ) {
 	Normalize();
 }
 
-Dir::Dir(Vec^ theDir) {
-	X = theDir->X;
-	Y = theDir->Y;
-	Z = theDir->Z;
+Dir::Dir(Vec theDir) {
+	X = theDir.X;
+	Y = theDir.Y;
+	Z = theDir.Z;
 	Normalize();
 }
 
@@ -127,8 +127,8 @@ Dir^ Dir::Transformed(Trsf^ T) {
 	return gcnew Dir(newD);
 }
 
-Vec^ Dir::ToVec(double factor) {
-	return gcnew Vec(X * factor, Y * factor, Z * factor);
+Vec Dir::ToVec(double factor) {
+	return Vec(X * factor, Y * factor, Z * factor);
 }
 
 Eigen::Vector3d Dir::ToVector3d() {

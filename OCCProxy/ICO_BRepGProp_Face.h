@@ -1,10 +1,10 @@
 ﻿#pragma once
-#pragma once
-#include "ICO_GProps.h"
 
 class BRepGProp_Face;
+
 namespace OCCTK {
 namespace OCC {
+//前向声明
 namespace Topo {
 ref class TFace;
 }
@@ -13,21 +13,16 @@ ref class GProps;
 }
 namespace gp {
 value struct Pnt;
-ref class Vec;
-}
-}
+value struct Vec;
 }
 
-
-namespace OCCTK {
-namespace OCC {
 namespace BRepGProp {
 
 public ref class BRepGlobalProperties_Face {
 public:
 	BRepGlobalProperties_Face(Topo::TFace^ face);
 public:
-	gp::Vec^ Normal(double U, double V);
+	gp::Vec Normal(double U, double V);
 private:
 	BRepGProp_Face* myGPFace;
 protected:
