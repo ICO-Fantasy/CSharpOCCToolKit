@@ -12,7 +12,7 @@ value struct Color;
 namespace OCC {
 namespace gp {
 ref class Trsf;
-ref class Ax2;
+value struct Ax2;
 value struct Pnt;
 }
 namespace Topo {

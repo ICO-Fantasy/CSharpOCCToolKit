@@ -9,7 +9,7 @@ namespace OCC {
 namespace gp {
 //前向声明
 enum class EulerSequence;
-ref class Ax1;
+value struct Ax1;
 value struct Vec;
 
 public ref class Quat :System::ICloneable {
@@ -17,7 +17,7 @@ public:
 	Quat();
 	Quat(double theX, double theY, double theZ, double theW);
 	Quat(double alpha, double beta, double gamma, EulerSequence sequence);
-	Quat(Ax1^ axis, double angle);
+	Quat(Ax1 axis, double angle);
 	Quat(Vec vec, double angle);
 	Quat(gp_Quaternion theQuat);
 	Quat(gp_Quaternion* theQuat);

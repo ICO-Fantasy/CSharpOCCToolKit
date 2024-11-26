@@ -8,7 +8,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
-ref class Ax2;
+value struct Ax2;
 }
 namespace Topo {
 ref class TEdge;
@@ -60,8 +60,8 @@ public:
 	void Reverse();
 	void Move(gp::Trsf^ theT);
 	gp::Trsf^ Location();
-	void Location(gp::Ax2^ newOrigin);
-	TShape^ Located(gp::Ax2^ newOrigin);
+	void Location(gp::Ax2 newOrigin);
+	TShape^ Located(gp::Ax2 newOrigin);
 	property TopoAbs::Orientation Orientation {TopoAbs::Orientation get(); void set(TopoAbs::Orientation orientation); }
 protected:
 	TopoDS_Shape* myShape;

@@ -8,7 +8,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
-ref class Ax1;
+value struct Ax1;
 }
 }
 }
@@ -22,8 +22,8 @@ private:
 	Handle(AIS_Axis) myAxis() { return Handle(AIS_Axis)::DownCast(NativeHandle); }
 public:
 	AAxis(const Handle(AIS_Axis) aAISAxis) : InteractiveObject(aAISAxis) {};
-	AAxis(gp::Ax1^ aAxis);
-	AAxis(gp::Ax1^ aAxis, double len);
+	AAxis(gp::Ax1 aAxis);
+	AAxis(gp::Ax1 aAxis, double len);
 public:
 	void SetWidth(double size);
 	void UnsetWidth();

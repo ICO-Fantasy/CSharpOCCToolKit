@@ -11,7 +11,7 @@ ref class AShape;
 }
 namespace gp {
 ref class Trsf;
-ref class Ax2;
+value struct Ax2;
 }
 namespace Topo {
 ref class TShape;

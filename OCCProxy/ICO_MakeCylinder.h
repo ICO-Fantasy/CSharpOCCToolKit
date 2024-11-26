@@ -1,32 +1,26 @@
 ﻿#pragma once
-#include <BRepPrimAPI_MakeCylinder.hxx>
+//值类型作为构造函数成员需要完整定义
+#include "ICO_Ax2.h"
 
+class BRepPrimAPI_MakeCylinder;
 namespace OCCTK {
 namespace OCC {
-namespace gp {
-value struct Pnt;
-ref class Ax2;
-}
+//前向声明
 namespace Topo {
 ref class TShape;
 }
-}
-}
-
-namespace OCCTK {
-namespace OCC {
 namespace BRepPrimAPI {
 
 public ref class MakeCylinder {
 public:
 	MakeCylinder(double r, double h);
 	MakeCylinder(double r, double h, double angle);
-	MakeCylinder(gp::Ax2^ theAxis, double r, double h);
-	MakeCylinder(gp::Ax2^ theAxis, double r, double h, double angle);
+	MakeCylinder(gp::Ax2 theAxis, double r, double h);
+	MakeCylinder(gp::Ax2 theAxis, double r, double h, double angle);
 	Topo::TShape^ Shape();
 	//! 隐式转换为 TShape
-	static operator Topo::TShape ^ (MakeCylinder^ ms) {
-		return ms->Shape();  // 隐式调用 Shape 方法
+	static operator Topo::TShape ^ (MakeCylinder^ maker) {
+		return maker->Shape();  // 隐式调用 Shape 方法
 	}
 private:
 	BRepPrimAPI_MakeCylinder* myMaker;

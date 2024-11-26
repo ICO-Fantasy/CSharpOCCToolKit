@@ -13,26 +13,21 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Ax2::Ax2() {
-	Location = Pnt();
-	ZDir = Dir(0, 0, 1);
-	XDir = Dir(1, 0, 0);
-}
 /// <summary>
 /// X方向任意
 /// </summary>
-/// <param name="theLocation"></param>
+/// <param name="location"></param>
 /// <param name="theZAxis"></param>
-Ax2::Ax2(Pnt theLocation, Dir theZAxis) {
-	gp_Ax2 theAx2 = gp_Ax2(theLocation, theZAxis);
+Ax2::Ax2(Pnt location, Dir zAxis) {
+	gp_Ax2 theAx2 = gp_Ax2(location, zAxis);
 	Location = Pnt(theAx2.Location());
 	ZDir = Dir(theAx2.Direction());
 	XDir = Dir(theAx2.XDirection());
 }
 
-Ax2::Ax2(Pnt theLocation, Dir theZAxis, Dir theXAxis) {
-	Location = theLocation;
-	ZDir = theZAxis;
+Ax2::Ax2(Pnt location, Dir zAxis, Dir theXAxis) {
+	Location = location;
+	ZDir = zAxis;
 	XDir = theXAxis;
 }
 
@@ -92,7 +87,7 @@ gp_Ax2 Ax2::GetOCC() {
 }
 
 Object^ Ax2::Clone() {
-	return gcnew Ax2(Location, ZDir, XDir);
+	return Ax2(Location, ZDir, XDir);
 }
 
 System::String^ Ax2::ToString() {
@@ -108,24 +103,24 @@ void Ax2::Transform(Trsf^ theT) {
 }
 
 
-Ax2^ Ax2::Transformed(Trsf^ theT) {
-	return gcnew Ax2(GetOCC().Transformed(theT->GetOCC()));
+Ax2 Ax2::Transformed(Trsf^ theT) {
+	return Ax2(GetOCC().Transformed(theT->GetOCC()));
 }
 
 Dir Ax2::YDir::get() {
 	return Dir(GetOCC().YDirection());
 }
 
-Ax1^ Ax2::XAxis::get() {
-	return gcnew Ax1(Location, XDir);
+Ax1 Ax2::XAxis::get() {
+	return Ax1(Location, XDir);
 }
 
-Ax1^ Ax2::YAxis::get() {
-	return gcnew Ax1(Location, YDir);
+Ax1 Ax2::YAxis::get() {
+	return Ax1(Location, YDir);
 }
 
-Ax1^ Ax2::ZAxis::get() {
-	return gcnew Ax1(Location, ZDir);
+Ax1 Ax2::ZAxis::get() {
+	return Ax1(Location, ZDir);
 }
 
 }

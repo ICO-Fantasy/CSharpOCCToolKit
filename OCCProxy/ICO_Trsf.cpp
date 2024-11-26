@@ -30,9 +30,9 @@ Trsf::Trsf(gp_Trsf* theT) {
 	myTrsf = theT;
 }
 
-Trsf::Trsf(Ax2^ theAx2) {
+Trsf::Trsf(Ax2 theAx2) {
 	myTrsf = new gp_Trsf();
-	myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2->GetOCC()));
+	myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2));
 }
 
 Trsf::Trsf(array<double, 2>^ matrix) {
@@ -71,9 +71,9 @@ Trsf::Trsf(array<array<double>^>^ matrix) {
 		matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
 }
 
-Trsf::Trsf(Ax2^ fromAx2, Ax2^ toAx2) {
+Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
 	myTrsf = new gp_Trsf();
-	myTrsf->SetTransformation(gp_Ax3(toAx2->GetOCC()), gp_Ax3(fromAx2->GetOCC()));
+	myTrsf->SetTransformation(gp_Ax3(toAx2), gp_Ax3(fromAx2));
 }
 
 Trsf::Trsf(Pnt fromPoint, Pnt toPoint) {
@@ -146,8 +146,8 @@ void Trsf::SetRotation(Quat^ quat) {
 /// </summary>
 /// <param name="axis">旋转轴</param>
 /// <param name="angle">旋转角</param>
-void Trsf::SetRotation(Ax1^ axis, double angle) {
-	myTrsf->SetRotation(axis->GetOCC(), angle);
+void Trsf::SetRotation(Ax1 axis, double angle) {
+	myTrsf->SetRotation(axis, angle);
 }
 
 /// <summary>

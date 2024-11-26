@@ -6,7 +6,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Ax1;
+value struct Ax1;
 }
 namespace Topo {
 ref class TShape;
@@ -20,10 +20,10 @@ namespace BRepPrimAPI {
 
 public ref class MakeRevol {
 public:
-	MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis);
-	MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, bool copy);
-	MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, double angle);
-	MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, double angle, bool copy);
+	MakeRevol(Topo::TShape^ shape, gp::Ax1 axis);
+	MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, bool copy);
+	MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, double angle);
+	MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, double angle, bool copy);
 public:
 	Topo::TShape^ Shape();
 	//! 隐式转换为 TShape

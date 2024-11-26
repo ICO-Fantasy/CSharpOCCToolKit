@@ -37,9 +37,9 @@ Quat::Quat(double alpha, double beta, double gamma, EulerSequence sequence) {
 	W = q.W();
 }
 
-Quat::Quat(Ax1^ axis, double angle) {
+Quat::Quat(Ax1 axis, double angle) {
 	gp_Quaternion q = gp_Quaternion();
-	q.SetVectorAndAngle(axis->Direction.ToVec(1), angle);
+	q.SetVectorAndAngle(axis.Direction.ToVec(1), angle);
 	X = q.X();
 	Y = q.Y();
 	Z = q.Z();

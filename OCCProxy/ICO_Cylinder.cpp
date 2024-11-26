@@ -8,30 +8,30 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Cylinder::Cylinder(Ax3^ pose, double radius) {
+Cylinder::Cylinder(Ax3 pose, double radius) {
 	this->pose = pose;
 	this->radius = radius;
 }
 Cylinder::Cylinder(gp_Cylinder cylinder) {
-	pose = gcnew Ax3(cylinder.Position());
+	pose = Ax3(cylinder.Position());
 	radius = cylinder.Radius();
 }
 
 Cylinder::Cylinder(gp_Cylinder* cylinder) {
-	pose = gcnew Ax3(cylinder->Position());
+	pose = Ax3(cylinder->Position());
 	radius = cylinder->Radius();
 }
 
 gp_Cylinder Cylinder::GetOCC() {
-	return gp_Cylinder(pose->GetOCC(), radius);
+	return gp_Cylinder(pose.GetOCC(), radius);
 }
 
 System::Object^ Cylinder::Clone() {
 	return gcnew Cylinder(pose, radius);
 }
 
-Ax1^ Cylinder::Axis() {
-	return pose->Axis();
+Ax1 Cylinder::Axis() {
+	return pose.ZAxis;
 }
 
 double Cylinder::Radius() {

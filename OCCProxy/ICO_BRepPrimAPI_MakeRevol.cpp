@@ -15,8 +15,8 @@ namespace BRepPrimAPI {
 /// </summary>
 /// <param name="shape">基面</param>
 /// <param name="axis">旋转轴</param>
-MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis) {
-	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis->GetOCC());
+MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis) {
+	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis);
 }
 /// <summary>
 /// 构建回转体（整个圆周）
@@ -24,8 +24,8 @@ MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis) {
 /// <param name="shape">基面</param>
 /// <param name="axis">旋转轴</param>
 /// <param name="copy">是否复制基面</param>
-MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, bool copy) {
-	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis->GetOCC(), copy);
+MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, bool copy) {
+	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis, copy);
 }
 /// <summary>
 /// 构建回转体
@@ -33,8 +33,8 @@ MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, bool copy) {
 /// <param name="shape">基面</param>
 /// <param name="axis">旋转轴</param>
 /// <param name="angle">旋转角度</param>
-MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, double angle) {
-	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis->GetOCC(), angle);
+MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, double angle) {
+	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis, angle);
 }
 /// <summary>
 /// 构建回转体
@@ -43,8 +43,8 @@ MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, double angle) {
 /// <param name="axis">旋转轴</param>
 /// <param name="angle">旋转角度</param>
 /// <param name="copy">是否复制基面</param>
-MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1^ axis, double angle, bool copy) {
-	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis->GetOCC(), angle, copy);
+MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, double angle, bool copy) {
+	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis, angle, copy);
 }
 
 Topo::TShape^ MakeRevol::Shape() {

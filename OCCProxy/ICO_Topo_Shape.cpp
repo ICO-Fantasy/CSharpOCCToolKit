@@ -135,12 +135,12 @@ gp::Trsf^ TShape::Location() {
 	return gcnew gp::Trsf(myShape->Location().Transformation());
 }
 
-void TShape::Location(gp::Ax2^ newOrigin) {
+void TShape::Location(gp::Ax2 newOrigin) {
 	auto t = gcnew gp::Trsf(newOrigin);
 	myShape->Location(TopLoc_Location(t->GetOCC()));
 }
 
-TShape^ TShape::Located(gp::Ax2^ newOrigin) {
+TShape^ TShape::Located(gp::Ax2 newOrigin) {
 	auto t = gcnew gp::Trsf(newOrigin);
 	return gcnew TShape(myShape->Located(TopLoc_Location(t->GetOCC())));
 }

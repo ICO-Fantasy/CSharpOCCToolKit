@@ -40,11 +40,11 @@ MakeBox::MakeBox(Pnt leftBottom, Pnt rightTop) {
 /// <param name="rdX"></param>
 /// <param name="rdY"></param>
 /// <param name="rdZ"></param>
-MakeBox::MakeBox(Ax2^ axis, double ldX, double ldY, double ldZ, double rdX, double rdY, double rdZ) {
+MakeBox::MakeBox(Ax2 axis, double ldX, double ldY, double ldZ, double rdX, double rdY, double rdZ) {
 	double dX = rdX + ldX;
 	double dY = rdY + ldY;
 	double dZ = rdZ + ldZ;
-	gp_Ax2 newAix = axis->GetOCC();
+	gp_Ax2 newAix = axis;
 	gp_Vec vecX = gp_Vec(newAix.XDirection());
 	gp_Vec vecY = gp_Vec(newAix.YDirection());
 	gp_Vec vecZ = gp_Vec(newAix.Direction());

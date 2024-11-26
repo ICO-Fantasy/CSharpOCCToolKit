@@ -44,8 +44,8 @@ bool Manipulator::IsAttached() {
 	return myManipulator()->IsAttached();
 }
 
-Ax2^ Manipulator::Position() {
-	return gcnew Ax2(myManipulator()->Position());
+Ax2 Manipulator::Position() {
+	return Ax2(myManipulator()->Position());
 }
 
 InteractiveObject^ Manipulator::Object() {

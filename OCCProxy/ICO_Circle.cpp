@@ -7,23 +7,23 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Circle::Circle(Ax2^ pose, double radius) {
+Circle::Circle(Ax2 pose, double radius) {
 	Pose = pose;
 	Radius = radius;
 }
 
 Circle::Circle(gp_Circ Circle) {
-	Pose = gcnew Ax2(Circle.Position());
+	Pose = Ax2(Circle.Position());
 	Radius = Circle.Radius();
 }
 
 Circle::Circle(gp_Circ* Circle) {
-	Pose = gcnew Ax2(Circle->Position());
+	Pose = Ax2(Circle->Position());
 	Radius = Circle->Radius();
 }
 
 gp_Circ Circle::GetOCC() {
-	return gp_Circ(Pose->GetOCC(), Radius);
+	return gp_Circ(Pose, Radius);
 }
 
 System::Object^ Circle::Clone() {

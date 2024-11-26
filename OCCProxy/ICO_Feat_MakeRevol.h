@@ -6,7 +6,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 ref class Trsf;
-ref class Ax1;
+value struct Ax1;
 value struct Pnt;
 }
 namespace Topo {
@@ -29,7 +29,7 @@ namespace BRepFeat {
 public ref class MakeRevol {
 public:
 	MakeRevol();
-	MakeRevol(Topo::TShape^ sBase, Topo::TShape^ pBase, Topo::TFace^ skFace, gp::Ax1^ axis, int fuse, bool modify);
+	MakeRevol(Topo::TShape^ sBase, Topo::TShape^ pBase, Topo::TFace^ skFace, gp::Ax1 axis, int fuse, bool modify);
 public:
 	Topo::TShape^ Shape();
 	//! 隐式转换为 TShape

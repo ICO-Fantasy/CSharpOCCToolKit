@@ -1,32 +1,26 @@
 ﻿#pragma once
-#include <BRepPrimAPI_MakeSphere.hxx>
+//值类型作为构造函数成员需要完整定义
+#include "ICO_Pnt.h"
+#include "ICO_Ax2.h"
+//前向声明
+class BRepPrimAPI_MakeSphere;
 
 namespace OCCTK {
 namespace OCC {
-namespace gp {
-value struct Pnt;
-ref class Ax2;
-}
+//前向声明
 namespace Topo {
 ref class TShape;
 }
-}
-}
-
-namespace OCCTK {
-namespace OCC {
 namespace BRepPrimAPI {
 
 public ref class MakeSphere {
 public:
 	MakeSphere(double X, double Y, double Z, double R);
 	MakeSphere(gp::Pnt originPnt, double R);
-	MakeSphere(gp::Ax2^ theAxis, double R);
+	MakeSphere(gp::Ax2 theAxis, double R);
 	Topo::TShape^ Shape();
 	//! 隐式转换为 TShape
-	static operator Topo::TShape ^ (MakeSphere^ ms) {
-		return ms->Shape();  // 隐式调用 Shape 方法
-	}
+	static operator Topo::TShape ^ (MakeSphere^ maker) { return maker->Shape(); }
 private:
 	BRepPrimAPI_MakeSphere* myMaker;
 protected:

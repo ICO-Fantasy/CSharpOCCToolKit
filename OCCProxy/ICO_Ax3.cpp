@@ -1,4 +1,5 @@
 ﻿#include "ICO_Ax3.h"
+#include <gp_Ax3.hxx>
 //local
 #include "ICO_Trsf.h"
 #include "ICO_Ax1.h"
@@ -9,44 +10,71 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Ax3::Ax3() {
-	myAx3 = new gp_Ax3();
+Ax3::Ax3(Pnt location, Dir zAxis) {
+	gp_Ax3 ax3(location, zAxis);
+	Location = Pnt(ax3.Location());
+	ZDir = Dir(ax3.Direction());
+	XDir = Dir(ax3.XDirection());
+}
+
+Ax3::Ax3(Pnt location, Dir zAxis, Dir xAxis) {
+	Location = location;
+	ZDir = zAxis;
+	XDir = xAxis;
 }
 
 Ax3::Ax3(gp_Ax3 theAx3) {
-	myAx3 = new gp_Ax3(theAx3);
+	Location = Pnt(theAx3.Location());
+	ZDir = Dir(theAx3.Direction());
+	XDir = Dir(theAx3.XDirection());
 }
 
 Ax3::Ax3(gp_Ax3* theAx3) {
-	myAx3 = theAx3;
+	Location = Pnt(theAx3->Location());
+	ZDir = Dir(theAx3->Direction());
+	XDir = Dir(theAx3->XDirection());
 }
 
 gp_Ax3 Ax3::GetOCC() {
-	return *myAx3;
+	return gp_Ax3(Location, ZDir, XDir);
 }
 
 Object^ Ax3::Clone() {
-	return gcnew Ax3(myAx3);
+	return Ax3(Location, ZDir, XDir);
 }
 
 System::String^ Ax3::ToString() {
 	TCollection_AsciiString theString;
-	gp_Pnt p = myAx3->Location();
-	gp_Dir d = myAx3->Axis().Direction();
-	System::String^ str = "(" + p.X().ToString("F1") + ", " + p.Y().ToString("F1") + ", " + p.Z().ToString("F1") + "), (" + d.X().ToString("F1") + ", " + d.Y().ToString("F1") + ", " + d.Z().ToString("F1") + ")";
+	System::String^ str = "(" + Location.X.ToString("F1") + ", " + Location.Y.ToString("F1") + ", " + Location.Z.ToString("F1") + "), (" + ZDir.X.ToString("F1") + ", " + ZDir.Y.ToString("F1") + ", " + ZDir.Z.ToString("F1") + ")";
 	return str;
 }
 
 void Ax3::Transform(Trsf^ theT) {
-	myAx3->Transform(theT->GetOCC());
+	gp_Ax3 ax3(Location, ZDir, XDir);
+	ax3.Transform(theT->GetOCC());
+	Location = Pnt(ax3.Location());
+	ZDir = Dir(ax3.Direction());
+	XDir = Dir(ax3.XDirection());
 }
 
-Ax3^ Ax3::Transformed(Trsf^ theT) {
-	return gcnew Ax3(myAx3->Transformed(theT->GetOCC()));
+Ax3 Ax3::Transformed(Trsf^ theT) {
+	gp_Ax3 ax3(Location, ZDir, XDir);
+	return Ax3(ax3.Transformed(theT->GetOCC()));
+}
+Dir Ax3::YDir::get() {
+	return Dir(GetOCC().YDirection());
 }
 
-Ax1^ Ax3::Axis() {
-	return gcnew Ax1(myAx3->Axis());
+Ax1 Ax3::XAxis::get() {
+	return Ax1(Location, XDir);
+}
+
+Ax1 Ax3::YAxis::get() {
+	return Ax1(Location, YDir);
+}
+
+Ax1 Ax3::ZAxis::get() {
+	return Ax1(Location, ZDir);
 }
 
 }

@@ -37,14 +37,14 @@ MakeCylinder::MakeCylinder(double r, double h, double angle) {
 		myMaker = new BRepPrimAPI_MakeCylinder(r, h, angle);
 }
 
-MakeCylinder::MakeCylinder(gp::Ax2^ theAxis, double r, double h) {
+MakeCylinder::MakeCylinder(gp::Ax2 theAxis, double r, double h) {
 	CHECKRH(r, h)
-		myMaker = new BRepPrimAPI_MakeCylinder(theAxis->GetOCC(), r, h);
+		myMaker = new BRepPrimAPI_MakeCylinder(theAxis, r, h);
 }
 
-MakeCylinder::MakeCylinder(gp::Ax2^ theAxis, double r, double h, double angle) {
+MakeCylinder::MakeCylinder(gp::Ax2 theAxis, double r, double h, double angle) {
 	CHECKRH(r, h)
-		myMaker = new BRepPrimAPI_MakeCylinder(theAxis->GetOCC(), r, h, angle);
+		myMaker = new BRepPrimAPI_MakeCylinder(theAxis, r, h, angle);
 }
 
 TShape^ MakeCylinder::Shape() {

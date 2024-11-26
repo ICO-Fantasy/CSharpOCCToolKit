@@ -16,8 +16,8 @@ MakeRevol::MakeRevol() {
 	myMaker = new BRepFeat_MakeRevol();
 }
 
-MakeRevol::MakeRevol(Topo::TShape^ sBase, Topo::TShape^ pBase, Topo::TFace^ skFace, gp::Ax1^ axis, int fuse, bool modify) {
-	myMaker = new BRepFeat_MakeRevol(sBase->GetOCC(), pBase->GetOCC(), skFace->GetOCC(), axis->GetOCC(), fuse, modify);
+MakeRevol::MakeRevol(Topo::TShape^ sBase, Topo::TShape^ pBase, Topo::TFace^ skFace, gp::Ax1 axis, int fuse, bool modify) {
+	myMaker = new BRepFeat_MakeRevol(sBase->GetOCC(), pBase->GetOCC(), skFace->GetOCC(), axis, fuse, modify);
 }
 
 Topo::TShape^ MakeRevol::Shape() {

@@ -13,9 +13,9 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-ref class Ax1;
+value struct Ax1;
 value struct Pnt;
-ref class Ax2;
+value struct Ax2;
 ref class Quat;
 value struct Vec;
 
@@ -24,10 +24,10 @@ public:
 	Trsf();
 	Trsf(gp_Trsf theT);
 	Trsf(gp_Trsf* theT);
-	Trsf(Ax2^ theAx2);
+	Trsf(Ax2 theAx2);
 	Trsf(array<double, 2>^ matrix);
 	Trsf(array<array<double>^>^ matrix);
-	Trsf(Ax2^ fromAx2, Ax2^ toAx2);
+	Trsf(Ax2 fromAx2, Ax2 toAx2);
 	Trsf(Pnt fromPoint, Pnt toPoint);
 	gp_Trsf GetOCC();
 	virtual System::Object^ Clone();
@@ -38,7 +38,7 @@ public:
 	void SetTranslationPart(Vec vec);
 	void SetRotationPart(Quat^ quat);
 	void SetRotation(Quat^ quat);
-	void SetRotation(Ax1^ axis, double angle);
+	void SetRotation(Ax1 axis, double angle);
 	void PreMultiply(Trsf^ leftTrsf);
 	Trsf^ Multiplied(Trsf^ rightTrsf);
 	Trsf^ Inverted();

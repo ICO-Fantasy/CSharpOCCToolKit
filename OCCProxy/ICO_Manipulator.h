@@ -14,7 +14,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 value struct Pnt;
-ref class Ax2;
+value struct Ax2;
 ref class Trsf;
 }
 namespace Topo {
@@ -44,7 +44,7 @@ public:
 	ManipulatorMode ActiveMode();
 	ManipulatorAxisIndex ActiveAxisIndex();
 	bool IsAttached();
-	gp::Ax2^ Position();
+	gp::Ax2 Position();
 	InteractiveObject^ Object();
 
 #pragma region 变换

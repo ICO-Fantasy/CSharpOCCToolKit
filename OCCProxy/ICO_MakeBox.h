@@ -5,7 +5,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 value struct Pnt;
-ref class Ax2;
+value struct Ax2;
 }
 namespace Topo {
 ref class TShape;
@@ -21,7 +21,7 @@ public ref class MakeBox {
 public:
 	MakeBox(double X, double Y, double Z);
 	MakeBox(gp::Pnt leftBottom, gp::Pnt rightTop);
-	MakeBox(gp::Ax2^ axis, double ldX, double ldY, double ldZ, double rdX, double rdY, double rdZ);
+	MakeBox(gp::Ax2 axis, double ldX, double ldY, double ldZ, double rdX, double rdY, double rdZ);
 	Topo::TShape^ Shape();
 	//! 隐式转换为 TShape
 	static operator Topo::TShape ^ (MakeBox^ mb) {
