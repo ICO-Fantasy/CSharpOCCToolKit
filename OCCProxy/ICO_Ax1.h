@@ -34,8 +34,8 @@ public:
 	property Pnt Location;
 	property Dir Direction;
 	// Deconstruct 方法
-	void Deconstruct([System::Runtime::InteropServices::Out] Pnt% location,
-		[System::Runtime::InteropServices::Out] Dir% direction) {
+	void Deconstruct([System::Runtime::InteropServices::OutAttribute] Pnt% location,
+		[System::Runtime::InteropServices::OutAttribute] Dir% direction) {
 		location = Location;
 		direction = Direction;
 	}

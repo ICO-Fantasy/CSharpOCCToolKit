@@ -31,6 +31,12 @@ public:
 public:
 	property double X;
 	property double Y;
+	// Deconstruct 方法
+	void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
+		[System::Runtime::InteropServices::OutAttribute] double% y) {
+		x = X;
+		y = Y;
+	}
 };
 
 }

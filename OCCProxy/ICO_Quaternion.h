@@ -38,6 +38,16 @@ public:
 	property double Y;
 	property double Z;
 	property double W;
+	// Deconstruct 方法
+	void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
+		[System::Runtime::InteropServices::OutAttribute] double% y,
+		[System::Runtime::InteropServices::OutAttribute] double% z,
+		[System::Runtime::InteropServices::OutAttribute] double% w) {
+		x = X;
+		y = Y;
+		z = Z;
+		w = W;
+	}
 #pragma region 重载操作符
 
 #pragma endregion

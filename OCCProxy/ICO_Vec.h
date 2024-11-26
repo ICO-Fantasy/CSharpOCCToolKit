@@ -49,9 +49,9 @@ public:
 	property double Z;
 	property double Length {double get() { return std::sqrt(X * X + Y * Y + Z * Z); }};
 	// Deconstruct 方法
-	void Deconstruct([System::Runtime::InteropServices::Out] double% x,
-		[System::Runtime::InteropServices::Out] double% y,
-		[System::Runtime::InteropServices::Out] double% z) {
+	void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
+		[System::Runtime::InteropServices::OutAttribute] double% y,
+		[System::Runtime::InteropServices::OutAttribute] double% z) {
 		x = X;
 		y = Y;
 		z = Z;

@@ -142,11 +142,7 @@ public class Node
     {
         get
         {
-            (double x, double y, double z) = (
-                pose.Translation.X,
-                pose.Translation.X,
-                pose.Translation.X
-            );
+            (double x, double y, double z) = pose.Translation;
             return new(x, y, z);
         }
     }

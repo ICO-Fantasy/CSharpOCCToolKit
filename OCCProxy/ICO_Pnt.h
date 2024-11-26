@@ -53,6 +53,14 @@ public:
 	property double X;
 	property double Y;
 	property double Z;
+	// Deconstruct 方法
+	void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
+		[System::Runtime::InteropServices::OutAttribute] double% y,
+		[System::Runtime::InteropServices::OutAttribute] double% z) {
+		x = X;
+		y = Y;
+		z = Z;
+	}
 #pragma region 重载操作符
 	bool Equals(Pnt otherPnt, double tol);
 	static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, 1e-6); }//默认精度为1e-6
