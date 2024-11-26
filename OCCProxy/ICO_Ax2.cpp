@@ -15,22 +15,22 @@ namespace gp {
 
 Ax2::Ax2() {
 	Location = Pnt();
-	ZDir = gcnew Dir(0, 0, 1);
-	XDir = gcnew Dir(1, 0, 0);
+	ZDir = Dir(0, 0, 1);
+	XDir = Dir(1, 0, 0);
 }
 /// <summary>
 /// X方向任意
 /// </summary>
 /// <param name="theLocation"></param>
 /// <param name="theZAxis"></param>
-Ax2::Ax2(Pnt theLocation, Dir^ theZAxis) {
-	gp_Ax2 theAx2 = gp_Ax2(theLocation, theZAxis->GetOCC());
+Ax2::Ax2(Pnt theLocation, Dir theZAxis) {
+	gp_Ax2 theAx2 = gp_Ax2(theLocation, theZAxis);
 	Location = Pnt(theAx2.Location());
-	ZDir = gcnew Dir(theAx2.Direction());
-	XDir = gcnew Dir(theAx2.XDirection());
+	ZDir = Dir(theAx2.Direction());
+	XDir = Dir(theAx2.XDirection());
 }
 
-Ax2::Ax2(Pnt theLocation, Dir^ theZAxis, Dir^ theXAxis) {
+Ax2::Ax2(Pnt theLocation, Dir theZAxis, Dir theXAxis) {
 	Location = theLocation;
 	ZDir = theZAxis;
 	XDir = theXAxis;
@@ -38,14 +38,14 @@ Ax2::Ax2(Pnt theLocation, Dir^ theZAxis, Dir^ theXAxis) {
 
 Ax2::Ax2(gp_Ax2 theAx2) {
 	Location = Pnt(theAx2.Location());
-	ZDir = gcnew Dir(theAx2.Direction());
-	XDir = gcnew Dir(theAx2.XDirection());
+	ZDir = Dir(theAx2.Direction());
+	XDir = Dir(theAx2.XDirection());
 }
 
 Ax2::Ax2(gp_Ax2* theAx2) {
 	Location = Pnt(theAx2->Location());
-	ZDir = gcnew Dir(theAx2->Direction());
-	XDir = gcnew Dir(theAx2->XDirection());
+	ZDir = Dir(theAx2->Direction());
+	XDir = Dir(theAx2->XDirection());
 }
 
 Ax2::Ax2(array<double, 2>^ matrix) {
@@ -61,8 +61,8 @@ Ax2::Ax2(array<double, 2>^ matrix) {
 	);
 	newAx2.Transform(T);
 	Location = Pnt(newAx2.Location());
-	ZDir = gcnew Dir(newAx2.Direction());
-	XDir = gcnew Dir(newAx2.XDirection());
+	ZDir = Dir(newAx2.Direction());
+	XDir = Dir(newAx2.XDirection());
 }
 
 Ax2::Ax2(array<array<double>^>^ matrix) {
@@ -83,12 +83,12 @@ Ax2::Ax2(array<array<double>^>^ matrix) {
 	);
 	newAx2.Transform(T);
 	Location = Pnt(newAx2.Location());
-	ZDir = gcnew Dir(newAx2.Direction());
-	XDir = gcnew Dir(newAx2.XDirection());
+	ZDir = Dir(newAx2.Direction());
+	XDir = Dir(newAx2.XDirection());
 }
 
 gp_Ax2 Ax2::GetOCC() {
-	return gp_Ax2(Location, ZDir->GetOCC(), XDir->GetOCC());
+	return gp_Ax2(Location, ZDir, XDir);
 }
 
 Object^ Ax2::Clone() {
@@ -96,15 +96,15 @@ Object^ Ax2::Clone() {
 }
 
 System::String^ Ax2::ToString() {
-	System::String^ str = "(" + Location.ToString() + ") Z: (" + ZDir->ToString() + ")X: (" + XDir->ToString() + ")";
+	System::String^ str = "(" + Location.ToString() + ") Z: (" + ZDir.ToString() + ")X: (" + XDir.ToString() + ")";
 	return str;
 }
 
 void Ax2::Transform(Trsf^ theT) {
 	gp_Ax2 newAxis2 = GetOCC().Transformed(theT->GetOCC());
 	Location = Pnt(newAxis2.Location());
-	ZDir = gcnew Dir(newAxis2.Direction());
-	XDir = gcnew Dir(newAxis2.XDirection());
+	ZDir = Dir(newAxis2.Direction());
+	XDir = Dir(newAxis2.XDirection());
 }
 
 
@@ -112,8 +112,8 @@ Ax2^ Ax2::Transformed(Trsf^ theT) {
 	return gcnew Ax2(GetOCC().Transformed(theT->GetOCC()));
 }
 
-Dir^ Ax2::YDir::get() {
-	return gcnew Dir(GetOCC().YDirection());
+Dir Ax2::YDir::get() {
+	return Dir(GetOCC().YDirection());
 }
 
 Ax1^ Ax2::XAxis::get() {

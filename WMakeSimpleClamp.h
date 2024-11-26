@@ -22,9 +22,9 @@ namespace Laser {
 public ref class PlatePose {
 public:
 	PlatePose(SimpleClamp::PlatePose theOCCPose) { myDir() = theOCCPose; }
-	PlatePose(Pnt thePoint, Dir^ theDir) { myDir() = SimpleClamp::PlatePose(thePoint, theDir->GetOCC()); }
+	PlatePose(Pnt thePoint, Dir theDir) { myDir() = SimpleClamp::PlatePose(thePoint, theDir); }
 	property Pnt Location {Pnt get() { return Pnt(myDir().point); }};
-	property Dir^ Direction { Dir^ get() { return  gcnew Dir(myDir().dir); } };
+	property Dir Direction { Dir get() { return  Dir(myDir().dir); } };
 public:
 	SimpleClamp::PlatePose GetOCC() { return myDir(); };
 private:

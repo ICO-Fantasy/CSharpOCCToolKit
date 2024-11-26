@@ -9,7 +9,7 @@ namespace gp {
 ref class Trsf;
 ref class Ax1;
 value struct Pnt;
-ref class Dir;
+value struct Dir;
 }
 }
 }

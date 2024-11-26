@@ -12,13 +12,6 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Dir::Dir() {
-	X = 1.0;
-	Y = 0.0;
-	Z = 0.0;
-	Normalize();
-}
-
 Dir::Dir(double theX, double theY, double theZ) {
 	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
 		throw gcnew System::ArgumentException("不能创建零向量");
@@ -61,8 +54,8 @@ Dir::Dir(gp_Dir* theDir) {
 	Normalize();
 }
 
-bool Dir::IsParallel(Dir^ otherDir, double theAngularTolerance) {
-	return GetOCC().IsParallel(otherDir->GetOCC(), theAngularTolerance);
+bool Dir::IsParallel(Dir otherDir, double theAngularTolerance) {
+	return GetOCC().IsParallel(otherDir, theAngularTolerance);
 }
 
 /// <summary>
@@ -70,8 +63,8 @@ bool Dir::IsParallel(Dir^ otherDir, double theAngularTolerance) {
 /// </summary>
 /// <param name="otherDir"></param>
 /// <returns></returns>
-double Dir::Angle(Dir^ otherDir) {
-	return GetOCC().Angle(otherDir->GetOCC());
+double Dir::Angle(Dir otherDir) {
+	return GetOCC().Angle(otherDir);
 }
 
 /// <summary>
@@ -80,26 +73,26 @@ double Dir::Angle(Dir^ otherDir) {
 /// <param name="otherDir"></param>
 /// <param name="refDir"></param>
 /// <returns></returns>
-double Dir::AngleWithRef(Dir^ otherDir, Dir^ refDir) {
-	return GetOCC().AngleWithRef(otherDir->GetOCC(), refDir->GetOCC());
+double Dir::AngleWithRef(Dir otherDir, Dir refDir) {
+	return GetOCC().AngleWithRef(otherDir, refDir);
 }
 
-void Dir::Cross(Dir^ other) {
-	X = (this->Y * other->Z) - (this->Z * other->Y);
-	Y = (this->Z * other->X) - (this->X * other->Z);
-	Z = (this->X * other->Y) - (this->Y * other->X);
+void Dir::Cross(Dir other) {
+	X = (this->Y * other.Z) - (this->Z * other.Y);
+	Y = (this->Z * other.X) - (this->X * other.Z);
+	Z = (this->X * other.Y) - (this->Y * other.X);
 	Normalize();
 }
 
-Dir^ Dir::Crossed(Dir^ other) {
-	double crossX = (this->Y * other->Z) - (this->Z * other->Y);
-	double crossY = (this->Z * other->X) - (this->X * other->Z);
-	double crossZ = (this->X * other->Y) - (this->Y * other->X);
-	return gcnew Dir(crossX, crossY, crossZ);
+Dir Dir::Crossed(Dir other) {
+	double crossX = (this->Y * other.Z) - (this->Z * other.Y);
+	double crossY = (this->Z * other.X) - (this->X * other.Z);
+	double crossZ = (this->X * other.Y) - (this->Y * other.X);
+	return Dir(crossX, crossY, crossZ);
 }
 
-double Dir::Dot(Dir^ other) {
-	return GetOCC().Dot(other->GetOCC());
+double Dir::Dot(Dir other) {
+	return GetOCC().Dot(other);
 }
 
 void Dir::Reverse() {
@@ -108,11 +101,11 @@ void Dir::Reverse() {
 	Z = -Z;
 }
 
-Dir^ Dir::Reversed() {
+Dir Dir::Reversed() {
 	double newX = -X;
 	double newY = -Y;
 	double newZ = -Z;
-	return gcnew Dir(newX, newY, newZ);
+	return Dir(newX, newY, newZ);
 }
 
 void Dir::Transform(Trsf^ T) {
@@ -122,9 +115,9 @@ void Dir::Transform(Trsf^ T) {
 	Z = newD.Z();
 }
 
-Dir^ Dir::Transformed(Trsf^ T) {
+Dir Dir::Transformed(Trsf^ T) {
 	gp_Dir newD = GetOCC().Transformed(T->GetOCC());
-	return gcnew Dir(newD);
+	return Dir(newD);
 }
 
 Vec Dir::ToVec(double factor) {
@@ -147,7 +140,7 @@ gp_Dir Dir::GetOCC() {
 }
 
 Object^ Dir::Clone() {
-	return gcnew Dir(X, Y, Z);
+	return Dir(X, Y, Z);
 }
 
 System::String^ Dir::ToString() {

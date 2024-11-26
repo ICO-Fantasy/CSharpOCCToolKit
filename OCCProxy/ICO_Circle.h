@@ -8,7 +8,7 @@ namespace gp {
 ref class Trsf;
 ref class Ax2;
 value struct Pnt;
-ref class Dir;
+value struct Dir;
 }
 }
 }

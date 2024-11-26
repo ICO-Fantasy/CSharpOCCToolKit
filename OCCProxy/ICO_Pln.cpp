@@ -29,8 +29,8 @@ Pln::Pln(Ax3^ axis) {
 	myPln = new gp_Pln(axis->GetOCC());
 }
 
-Pln::Pln(Pnt location, Dir^ direction) {
-	myPln = new gp_Pln(location, direction->GetOCC());
+Pln::Pln(Pnt location, Dir direction) {
+	myPln = new gp_Pln(location, direction);
 }
 
 gp_Pln Pln::GetOCC() {

@@ -9,7 +9,7 @@ ref class Trsf;
 ref class Ax1;
 ref class Ax3;
 value struct Pnt;
-ref class Dir;
+value struct Dir;
 }
 }
 }
@@ -24,7 +24,7 @@ public:
 	Pln(gp_Pln pln);
 	Pln(gp_Pln* pln);
 	Pln(Ax3^ axis);
-	Pln(Pnt location, Dir^ direction);
+	Pln(Pnt location, Dir direction);
 	gp_Pln GetOCC();
 	virtual System::Object^ Clone();
 public:
