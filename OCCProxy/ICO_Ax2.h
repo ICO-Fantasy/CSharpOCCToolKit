@@ -3,8 +3,6 @@
 #include <gp_Ax2.hxx>
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
-//前向声明
-class gp_Ax2;
 
 namespace OCCTK {
 namespace OCC {
@@ -18,7 +16,7 @@ value struct Trsf;
 /// </summary>
 public value struct Ax2 :System::ICloneable {
 public:
-	const static Ax2 Origin = Ax2(Pnt(), Dir(0, 0, 1));
+	const static Ax2 Default = Ax2(::gp_Ax2());
 public:
 	Ax2(Pnt location, Dir zAxis);
 	Ax2(Pnt location, Dir zAxis, Dir XAxis);

@@ -1,10 +1,7 @@
 ﻿#pragma once
-#include <Eigen/Dense>
 //在构造函数中使用的值对象需要直接引入
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
-
-class Geom_CartesianPoint;
 
 namespace OCCTK {
 namespace OCC {
@@ -26,7 +23,7 @@ value struct Trsf;
 
 public value struct Pnt :System::ICloneable {
 public:
-	const static Pnt Origin = Pnt(0.0, 0.0, 0.0);
+	const static Pnt Default = Pnt(0.0, 0.0, 0.0);
 public:
 	Pnt(double theX, double theY, double theZ);
 	Pnt(gp_Pnt thePnt);
@@ -38,11 +35,6 @@ public:
 	virtual System::String^ ToString() override;
 	//! 隐式转换为 gp_Pnt
 	static operator gp_Pnt (Pnt p) { return p.GetOCC(); }
-	// 隐式转换为 Eigen::Vector3d
-	static operator Eigen::Vector3d(Pnt p) { return p.ToVector3d(); }
-public:
-	Eigen::Vector3d ToVector3d();
-
 public:
 	double Distance(Pnt otherPnt);
 	Pnt Transformed(Trsf T);

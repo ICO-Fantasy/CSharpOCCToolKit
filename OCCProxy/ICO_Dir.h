@@ -1,12 +1,8 @@
 ﻿#pragma once
-//#include <Eigen/Dense>
 //在构造函数中使用的值对象需要直接引入
 #include <gp_Dir.hxx>
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
-namespace Eigen {
-typedef Vector3d;
-}
 
 namespace OCCTK {
 namespace OCC {
@@ -16,7 +12,7 @@ value struct Trsf;
 
 public value struct Dir :System::ICloneable {
 public:
-	const static Dir XDir = Dir(1.0, 0.0, 0.0);
+	const static Dir Default = Dir(1.0, 0.0, 0.0);
 public:
 	Dir(double theX, double theY, double theZ);
 	Dir(Vec theDir);
@@ -41,7 +37,6 @@ public:
 	Dir Transformed(Trsf T);
 public:
 	Vec ToVec(double factor);
-	Eigen::Vector3d ToVector3d();
 public:
 	property double X;
 	property double Y;

@@ -54,10 +54,6 @@ System::String^ Pnt::ToString() {
 	return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
 }
 
-Eigen::Vector3d Pnt::ToVector3d() {
-	return Eigen::Vector3d(X, Y, Z);
-}
-
 double Pnt::Distance(Pnt otherPnt) {
 	return std::sqrt(
 		std::pow(otherPnt.X - X, 2) +

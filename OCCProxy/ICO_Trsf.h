@@ -1,15 +1,10 @@
 ﻿#pragma once
-//#include <Eigen\Geometry>
 //在构造函数中使用的值对象需要直接引入
 #include <gp_Trsf.hxx>
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
 #include "ICO_Ax2.h"
 #include "ICO_Quaternion.h"
-//前向声明
-namespace Eigen {
-typedef Isometry3d;
-}
 
 typedef System::ValueTuple<System::ValueTuple<double, double, double>,
 	System::ValueTuple<double, double, double>,
@@ -25,7 +20,7 @@ enum class TrsfForm;
 
 public value struct Trsf :System::ICloneable {
 public:
-	const static Trsf Motionless = Trsf(Vec(0, 0, 0), Quat());
+	const static Trsf Default = Trsf(::gp_Trsf());
 public:
 	Trsf(const gp_Trsf& theT);
 	Trsf(gp_Trsf* theT);

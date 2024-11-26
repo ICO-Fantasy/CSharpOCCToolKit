@@ -126,10 +126,6 @@ Vec Dir::ToVec(double factor) {
 	return Vec(X * factor, Y * factor, Z * factor);
 }
 
-Eigen::Vector3d Dir::ToVector3d() {
-	return Eigen::Vector3d(X, Y, Z);
-}
-
 void Dir::Normalize() {
 	double m = std::sqrt(X * X + Y * Y + Z * Z);
 	X = X / m;

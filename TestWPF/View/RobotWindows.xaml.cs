@@ -22,6 +22,7 @@ using OCCTK.Extension;
 using OCCTK.IO;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.BRepPrimAPI;
+using OCCTK.OCC.gp;
 using OCCTK.OCC.Topo;
 using OCCTK.Utils;
 using OCCViewForm;
@@ -67,7 +68,13 @@ public partial class RobotWindows : Window
             ) // 设置初始目录为指定的路径
             //InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
         };
-        App.Current.ContextManager.MainContext.Display(new AAxis(new()), true);
+        Pnt pnt = Pnt.Origin;
+        Vec vec = Vec.XVec;
+        Trsf trsf = Trsf.Motionless;
+        Dir dir = Dir.XDir;
+        Ax1 ax1 = Ax1.OriginXAxis;
+
+        App.Current.ContextManager.MainContext.Display(new AAxis(Ax1.OriginXAxis), true);
         // 如果用户选择了文件并点击了“打开”按钮
         if (openFileDialog.ShowDialog() == true)
         {

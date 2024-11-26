@@ -4,8 +4,6 @@
 #include "ICO_Ax1.h"
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
-//前向声明
-class gp_Ax3;
 
 namespace OCCTK {
 namespace OCC {
@@ -15,7 +13,7 @@ value struct Trsf;
 
 public value struct Ax3 :System::ICloneable {
 public:
-	const static Ax3 Origin = Ax3(Pnt(), Dir(), Dir());
+	const static Ax3 Default = Ax3(::gp_Ax3());
 public:
 	Ax3(Pnt location, Dir zAxis);
 	Ax3(Pnt location, Dir zAxis, Dir xAxis);

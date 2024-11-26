@@ -9,7 +9,7 @@ value struct Trsf;
 
 public value struct Pnt2D :System::ICloneable {
 public:
-	const static Pnt2D Origin = Pnt2D(0.0, 0.0);
+	const static Pnt2D Default = Pnt2D(0.0, 0.0);
 public:
 	Pnt2D(double theX, double theY);
 	Pnt2D(gp_Pnt2d thePnt);

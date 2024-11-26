@@ -15,7 +15,7 @@ value struct Trsf;
 
 public value struct Vec :System::ICloneable {
 public:
-	const static Vec XVec = Vec(1.0, 0.0, 0.0);
+	const static Vec Default = Vec(1.0, 0.0, 0.0);
 public:
 	Vec(double theX, double theY, double theZ);
 	Vec(Pnt fromPnt, Pnt toPnt);

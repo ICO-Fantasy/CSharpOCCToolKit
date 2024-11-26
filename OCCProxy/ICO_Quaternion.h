@@ -15,7 +15,7 @@ namespace gp {
 
 public value struct Quat :System::ICloneable {
 public:
-	const static Quat Motionless = Quat(0, 0, 0, 1);
+	const static Quat Default = Quat(0, 0, 0, 1);
 public:
 	Quat(double theX, double theY, double theZ, double theW);
 	Quat(double alpha, double beta, double gamma, EulerSequence sequence);

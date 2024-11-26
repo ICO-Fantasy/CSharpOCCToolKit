@@ -12,7 +12,7 @@ value struct Pnt2D;
 
 public value struct Vec2D :System::ICloneable {
 public:
-	const static Vec2D XVec = Vec2D(1.0, 0.0);
+	const static Vec2D Default = Vec2D(1.0, 0.0);
 public:
 	Vec2D(double theX, double theY);
 	Vec2D(Pnt2D fromPnt, Pnt2D toPnt);

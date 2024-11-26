@@ -12,7 +12,7 @@ value struct Trsf;
 
 public value struct Ax1 :System::ICloneable {
 public:
-	const static Ax1 OriginXAxis = Ax1(Pnt(), Dir());
+	const static Ax1 Default = Ax1(::gp_Ax1());
 public:
 	Ax1(Pnt location, Dir direction);
 	Ax1(Pnt fromPnt, Pnt toPnt);
