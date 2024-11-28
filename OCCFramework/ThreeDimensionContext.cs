@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using OCCTK.Extension;
+﻿using OCCTK.Extension;
 using OCCTK.OCC.AIS;
 using OCCTK.OCC.gp;
 using OCCTK.OCC.V3d;
-using OCCViewForm;
+using Color = OCCTK.Extension.Color;
+using SelectionMode = OCCTK.OCC.AIS.SelectionMode;
 
-namespace OCCTK.Utils;
+namespace OCCFramework;
 
 /// <summary>
 /// 三维显示上下文
@@ -142,12 +142,42 @@ public class ThreeDimensionContext
     #endregion
 
     #region 显示
+
+    public CanvasDisplayMode _currentDisplayMode;
+
     /// <summary>
     /// 当前显示模式
     /// </summary>
-    public DisplayMode CurrentDisplayMode { get; private set; }
+    public CanvasDisplayMode CurrentDisplayMode
+    {
+        get => _currentDisplayMode;
+        set
+        {
+            if (AISContext != null)
+            {
+                if (value == CanvasDisplayMode.Wireframe)
+                {
+                    AISContext.SetDisplayMode(DisplayMode.WireFrame);
+                    _currentDisplayMode = CanvasDisplayMode.Wireframe;
+                }
+                if (value == CanvasDisplayMode.Shading)
+                {
+                    AISContext.SetDisplayMode(DisplayMode.Shaded);
+                    _currentDisplayMode = CanvasDisplayMode.Shading;
+                }
+                if (value == CanvasDisplayMode.HLR)
+                {
+                    _currentDisplayMode |= CanvasDisplayMode.HLR;
+                }
+            }
+        }
+    }
 
     public OCCTK.OCC.AIS.SelectionMode _currentSelectionMode;
+
+    /// <summary>
+    /// 当前选择模式
+    /// </summary>
     public OCCTK.OCC.AIS.SelectionMode CurrentSelectionMode
     {
         get { return _currentSelectionMode; }

@@ -542,31 +542,26 @@ public partial class BendingTest : Window, IAISSelectionHandler
     #region 选择模式
     private void SelectShape_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.CurrentSelectionMode = SelectionMode.Shape;
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void SelectFace_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.CurrentSelectionMode = SelectionMode.Face;
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void SelectEdge_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.CurrentSelectionMode = SelectionMode.Edge;
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void SelectVertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.CurrentSelectionMode = SelectionMode.Vertex;
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void SelectShell_Button_Click(object sender, RoutedEventArgs e)
     {
-        OCCCanvas.CurrentSelectionMode = SelectionMode.Shell;
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 

@@ -8,7 +8,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-value struct Trsf;
+ref class Trsf;
 
 public value struct Dir :System::ICloneable {
 public:
@@ -33,8 +33,8 @@ public:
 	double Dot(Dir other);
 	void Reverse();
 	Dir Reversed();
-	void Transform(Trsf T);
-	Dir Transformed(Trsf T);
+	void Transform(Trsf^ T);
+	Dir Transformed(Trsf^ T);
 public:
 	Vec ToVec(double factor);
 public:

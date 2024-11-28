@@ -126,7 +126,7 @@ Vec Vec::CrossProduct(Vec other) {
 	return Crossed(other);
 }
 
-void Vec::Transform(Trsf T) {
+void Vec::Transform(Trsf^ T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
 	v.Transform(T);
 	X = v.X();
@@ -134,7 +134,7 @@ void Vec::Transform(Trsf T) {
 	Z = v.Z();
 }
 
-Vec Vec::Transformed(Trsf T) {
+Vec Vec::Transformed(Trsf^ T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
 	v.Transform(T);
 	return Vec(v.X(), v.Y(), v.Z());

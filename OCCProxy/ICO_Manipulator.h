@@ -15,7 +15,7 @@ namespace OCC {
 namespace gp {
 value struct Pnt;
 value struct Ax2;
-value struct Trsf;
+ref class Trsf;
 }
 namespace Topo {
 ref class TShape;
@@ -51,7 +51,7 @@ public:
 
 	void StartTransform(double theX, double theY, V3d::View^ theView);
 	//void Transform(double theX, double theY, View^ theView);
-	gp::Trsf Transform(double theX, double theY, V3d::View^ theView);
+	gp::Trsf^ Transform(double theX, double theY, V3d::View^ theView);
 	void StopTransform();
 	void StopTransform(bool thetoApply);
 

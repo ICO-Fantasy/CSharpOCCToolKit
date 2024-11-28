@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Spatial.Units;
+using OCCTK.OCC.gp;
 
 namespace TestWPF.Robotics;
+
+public static class SO3Extensions
+{
+    public static Trsf ToTrsf(this Matrix<double> so3)
+    {
+        return new Trsf(so3.ToArray());
+    }
+}
 
 [Flags]
 public enum J5Cfg

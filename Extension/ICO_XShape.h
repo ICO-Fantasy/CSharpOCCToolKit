@@ -10,7 +10,7 @@ namespace AIS {
 ref class AShape;
 }
 namespace gp {
-value struct Trsf;
+ref class Trsf;
 value struct Ax2;
 }
 namespace Topo {
@@ -48,8 +48,8 @@ public:
 	property XShape^ Parent;
 	property System::Collections::Generic::List<XShape^>^ Children;
 	property int Layer;
-	property OCC::gp::Trsf Transform;
-	property OCC::gp::Trsf Location {OCC::gp::Trsf get(); }
+	property OCC::gp::Trsf^ Transform;
+	property OCC::gp::Trsf^ Location {OCC::gp::Trsf^ get(); }
 	property OCC::Topo::TShape^ TopoShape {OCC::Topo::TShape^ get() { return myTopo; } void set(OCC::Topo::TShape^ value); };
 	property OCC::AIS::AShape^ AISShape {OCC::AIS::AShape^ get(); };
 private:

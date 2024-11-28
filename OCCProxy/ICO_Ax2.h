@@ -9,7 +9,7 @@ namespace OCC {
 namespace gp {
 //前向声明
 value struct Ax1;
-value struct Trsf;
+ref class Trsf;
 
 /// <summary>
 /// Z方向为主方向，X方向为另一个方向，Y方向自动定义
@@ -30,8 +30,8 @@ public:
 	//! 隐式转换为 gp_Ax2
 	static operator gp_Ax2 (Ax2 axis) { return axis.GetOCC(); }
 public:
-	void Transform(Trsf theT);
-	Ax2 Transformed(Trsf theT);
+	void Transform(Trsf^ theT);
+	Ax2 Transformed(Trsf^ theT);
 public:
 	property Pnt Location;
 	property Dir XDir;

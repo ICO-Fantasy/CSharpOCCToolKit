@@ -11,7 +11,7 @@ ref class AShape;
 ref class InteractiveContext;
 }
 namespace gp {
-value struct Trsf;
+ref class Trsf;
 }
 namespace Graphic3d {
 enum class ZLayerId;
@@ -34,10 +34,10 @@ public:
 	static operator Handle(AIS_InteractiveObject) (InteractiveObject^ ais) { return ais->GetOCC(); }
 public:
 	void RemoveSelf(bool update);
-	void SetLocalTransformation(gp::Trsf trsf);
+	void SetLocalTransformation(gp::Trsf^ trsf);
 	void SetZLayer(Graphic3d::ZLayerId id);
 	void SetZLayer(int Zlayerid);
-	gp::Trsf LocalTransformation();
+	gp::Trsf^ LocalTransformation();
 	bool IsShape();
 	bool HasInteractiveContext();
 	InteractiveContext^ GetContext();

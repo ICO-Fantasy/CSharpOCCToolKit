@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using log4net;
+﻿using log4net;
 using OCCTK.OCC.AIS;
-using OCCTK.OCC.OpenGL;
 using OCCTK.OCC.V3d;
-using OCCTK.Utils;
-using TestWPF;
-using Color = OCCTK.Extension.Color;
 using View = OCCTK.OCC.V3d.View;
 
-namespace OCCViewForm;
+namespace OCCFramework;
 
 public partial class OCCCanvas : Form
 {
-    private static readonly ILog log = LogManager.GetLogger(typeof(App));
+    private static readonly ILog log = LogManager.GetLogger(typeof(OCCCanvas));
 
     public OCCCanvas(ThreeDimensionContext context)
     {

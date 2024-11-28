@@ -8,8 +8,11 @@ namespace OCCFramework;
 
 public enum Action3d
 {
-    // Normal
-    Nothing,
+    // Confusions
+    LeftNone = -1,
+
+    // normal
+    None,
     SingleSelect,
     MultipleSelect,
     XORSelect,

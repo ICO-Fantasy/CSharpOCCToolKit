@@ -6,8 +6,7 @@ namespace OCCTK {
 namespace OCC {
 namespace BRepBuilderAPI {
 
-Transform::Transform(Topo::TShape^ theShape, gp::Trsf theTrsf) {
-	gp_Trsf theT = theTrsf;
+Transform::Transform(Topo::TShape^ theShape, gp::Trsf^ theTrsf) {
 	myT = new BRepBuilderAPI_Transform(theShape->GetOCC(), theTrsf);
 }
 

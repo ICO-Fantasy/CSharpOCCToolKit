@@ -28,7 +28,7 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) { return gcn
 BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
 	SimpleClamp::BasePlate theCPPBasePlate = SimpleClamp::MakeBasePlate(InputWorkpiece->GetOCC(), OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
 	// 设置移动
-	Trsf T = Trsf(Pnt(theCPPBasePlate.X, theCPPBasePlate.Y, theCPPBasePlate.Z), Pnt());
+	Trsf^ T = gcnew Trsf(Pnt(theCPPBasePlate.X, theCPPBasePlate.Y, theCPPBasePlate.Z), Pnt());
 	theCPPBasePlate.X = 0.0;
 	theCPPBasePlate.Y = 0.0;
 	theCPPBasePlate.Z = 0.0;

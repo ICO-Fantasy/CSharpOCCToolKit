@@ -5,7 +5,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-value struct Trsf;
+ref class Trsf;
 
 public value struct Pnt2D :System::ICloneable {
 public:
@@ -21,7 +21,7 @@ public:
 	static operator gp_Pnt2d (Pnt2D p) { return p.GetOCC(); }
 public:
 	double Distance(Pnt2D otherPnt);
-	Pnt2D Transformed(Trsf T);
+	Pnt2D Transformed(Trsf^ T);
 	Pnt2D SetX(double value);
 	Pnt2D SetY(double value);
 public:

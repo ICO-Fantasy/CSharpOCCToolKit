@@ -18,10 +18,18 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="log4net" Version="3.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CSharpOCCToolKit.vcxproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="OCCCanvas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="OCCCanvasMouseActions.cs" />
   </ItemGroup>
 
 </Project>

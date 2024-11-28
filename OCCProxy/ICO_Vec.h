@@ -11,7 +11,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-value struct Trsf;
+ref class Trsf;
 
 public value struct Vec :System::ICloneable {
 public:
@@ -40,8 +40,8 @@ public:
 	void Cross(Vec other);
 	Vec Crossed(Vec other);
 	Vec CrossProduct(Vec other);
-	void Transform(Trsf T);
-	Vec Transformed(Trsf T);
+	void Transform(Trsf^ T);
+	Vec Transformed(Trsf^ T);
 	double Magnitude();
 public:
 	property double X;

@@ -68,18 +68,14 @@ public partial class RobotWindows : Window
             ) // 设置初始目录为指定的路径
             //InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
         };
-        Pnt pnt = Pnt.Origin;
-        Vec vec = Vec.XVec;
-        Trsf trsf = Trsf.Motionless;
-        Dir dir = Dir.XDir;
-        Ax1 ax1 = Ax1.OriginXAxis;
 
-        App.Current.ContextManager.MainContext.Display(new AAxis(Ax1.OriginXAxis), true);
         // 如果用户选择了文件并点击了“打开”按钮
         if (openFileDialog.ShowDialog() == true)
         {
             string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
             //STEPExchange exchange = new STEPExchange(selectedFilePath); // 使用选择的文件路径
+            OCCTK.IO.OBJExchange ex = new(selectedFilePath);
+            App.Current.ContextManager.MainContext.Display(ex, true);
             //// 生成新的文件路径，修改后缀为 .xbf
             //// 获取文件目录
             //string directory =
@@ -89,7 +85,7 @@ public partial class RobotWindows : Window
             //string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(
             //    selectedFilePath
             //);
-            //// 组合成新路径
+            //// 组合成新路径01车
             //string docFilePath = System.IO.Path.Combine(
             //    directory,
             //    fileNameWithoutExtension + ".xbf"

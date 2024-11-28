@@ -63,8 +63,8 @@ void Manipulator::StartTransform(double theX, double theY, View^ theView) {
 //	myManipulator()->Transform(theX, theY, theView->GetOCC());
 //}
 
-Trsf Manipulator::Transform(double theX, double theY, View^ theView) {
-	Trsf T = Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
+Trsf^ Manipulator::Transform(double theX, double theY, View^ theView) {
+	Trsf^ T = gcnew Trsf(myManipulator()->Transform(theX, theY, theView->GetOCC()));
 	theView->Redraw();
 	return T;
 }

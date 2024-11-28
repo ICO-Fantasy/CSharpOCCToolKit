@@ -8,7 +8,7 @@ class TopoDS_Shape;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-value struct Trsf;
+ref class Trsf;
 value struct Ax2;
 }
 namespace Topo {

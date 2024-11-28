@@ -8,7 +8,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-value struct Trsf;
+ref class Trsf;
 
 public ref class Circle :System::ICloneable {
 public:

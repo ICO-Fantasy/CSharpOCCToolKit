@@ -74,11 +74,7 @@ public class Node
     {
         get
         {
-            (double x, double y, double z) = (
-                offset.Translation.X,
-                offset.Translation.Y,
-                offset.Translation.Z
-            );
+            (double x, double y, double z) = offset.Translation;
             return new(x, y, z);
         }
     }

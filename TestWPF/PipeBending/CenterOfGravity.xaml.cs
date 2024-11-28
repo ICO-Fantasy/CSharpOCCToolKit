@@ -34,7 +34,6 @@ public partial class CenterOfGravity : Window
         App.Current.ContextManager.CreateContext();
         ThreeDContext = App.Current.ContextManager.MainContext;
         OCCCanvas = new OCCCanvas(ThreeDContext);
-        OCCCanvas.ShowOriginTrihedron = true;
         aHost.Child = OCCCanvas;
         Canvas_Grid.Children.Add(aHost);
         OCCCanvas.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;

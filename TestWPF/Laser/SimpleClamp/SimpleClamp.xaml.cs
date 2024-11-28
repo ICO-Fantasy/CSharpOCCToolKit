@@ -588,31 +588,26 @@ public partial class SimpleClamp : Window
 
     private void Select_Shape_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.CurrentSelectionMode = SelectionMode.Shape;
         Debug.WriteLine(SelectionMode.Shape.ToString());
     }
 
     private void Select_Face_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.CurrentSelectionMode = SelectionMode.Face;
         Debug.WriteLine(SelectionMode.Face.ToString());
     }
 
     private void Select_Wire_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.CurrentSelectionMode = SelectionMode.Edge;
         Debug.WriteLine(SelectionMode.Edge.ToString());
     }
 
     private void Select_Vertex_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.CurrentSelectionMode = SelectionMode.Vertex;
         Debug.WriteLine(SelectionMode.Vertex.ToString());
     }
 
     private void Select_Shell_Button_Click(object sender, RoutedEventArgs e)
     {
-        Canvas.CurrentSelectionMode = SelectionMode.Shell;
         Debug.WriteLine(SelectionMode.Shell.ToString());
     }
 

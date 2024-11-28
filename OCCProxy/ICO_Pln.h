@@ -5,7 +5,7 @@ class gp_Pln;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-value struct Trsf;
+ref class Trsf;
 value struct Ax1;
 value struct Ax3;
 value struct Pnt;

@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace OCCFramework;
 
-public enum DisplayMode
+[Flags]
+public enum CanvasDisplayMode
 {
-    Wireframe,
-    Shading,
-    HLR
+    Wireframe = 0,
+    Shading = 1,
+    HLR = 2,
+    NoHLR = 3
 }
