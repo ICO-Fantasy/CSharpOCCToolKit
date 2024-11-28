@@ -148,13 +148,13 @@ void Trsf::SetRotation(Ax1 axis, double angle) {
 	myTrsf->SetRotation(axis, angle);
 }
 
-/// <summary>
-/// 左乘
-/// </summary>
-/// <param name="leftTrsf"></param>
-void Trsf::PreMultiply(Trsf^ leftTrsf) {
-	myTrsf->PreMultiply(leftTrsf->GetOCC());
-}
+///// <summary>
+///// 左乘
+///// </summary>
+///// <param name="leftTrsf"></param>
+//void Trsf::PreMultiply(Trsf^ leftTrsf) {
+//	myTrsf->PreMultiply(leftTrsf->GetOCC());
+//}
 
 /// <summary>
 /// 右乘

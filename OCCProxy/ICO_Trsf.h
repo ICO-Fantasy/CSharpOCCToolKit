@@ -37,7 +37,7 @@ public:
 	void SetRotationPart(Quat quat);
 	void SetRotation(Quat quat);
 	void SetRotation(Ax1 axis, double angle);
-	void PreMultiply(Trsf^ leftTrsf);
+	//void PreMultiply(Trsf^ leftTrsf);
 	Trsf^ Multiplied(Trsf^ rightTrsf);
 	Trsf^ Inverted();
 public:
@@ -46,9 +46,6 @@ public:
 #pragma region 重载操作符
 	static Trsf^ operator * (Trsf^ Left, Trsf^ Right);
 	static Trsf^ operator - (Trsf^ Left);
-	//static Pnt operator + (Pnt Left, Vec Right);
-	//static Pnt operator - (Pnt Left, Vec Right);
-	//static Pnt operator * (Pnt Left, Trsf Right);
 #pragma endregion
 private:
 	gp_Trsf* myTrsf;

@@ -28,12 +28,12 @@ public:
 	bool IsParallel(Dir otherDir, double theAngularTolerance);
 	double Angle(Dir otherDir);
 	double AngleWithRef(Dir otherDir, Dir refDir);
-	void Cross(Dir other);
+	//void Cross(Dir other);
 	Dir Crossed(Dir other);
 	double Dot(Dir other);
-	void Reverse();
+	//void Reverse();
 	Dir Reversed();
-	void Transform(Trsf^ T);
+	//void Transform(Trsf^ T);
 	Dir Transformed(Trsf^ T);
 public:
 	Vec ToVec(double factor);
@@ -49,6 +49,17 @@ public:
 		y = Y;
 		z = Z;
 	}
+#pragma region 重载操作符
+	bool Equals(Dir otherDir, double tol);
+	static bool operator == (Dir Left, Dir Right) { return Left.Equals(Right, 0.0000174533); }//默认精度0.001度
+	static bool operator != (Dir Left, Dir Right) { return !Left.Equals(Right, 0.0000174533); }//默认精度0.001度
+	static Dir operator + (Dir Left, Dir Right);
+	static Dir operator - (Dir Left, Dir Right);
+	//点乘
+	static double operator * (Dir Left, Dir Right);
+	//叉乘
+	static Dir operator ^ (Dir Left, Dir Right);
+#pragma endregion
 private:
 	void Normalize();
 };

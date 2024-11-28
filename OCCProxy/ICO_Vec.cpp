@@ -143,6 +143,7 @@ Vec Vec::Transformed(Trsf^ T) {
 double Vec::Magnitude() {
 	return std::sqrt(X * X + Y * Y + Z * Z);
 }
+
 #pragma region 重载操作符
 
 bool Vec::Equals(Vec otherVec, double tol) {

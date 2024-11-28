@@ -59,10 +59,10 @@ Vec2D^ Vec2D::Normalized() {
 	return Vec2D(newX, newY);
 }
 
-void Vec2D::Multiply(double value) {
-	X *= value;
-	Y *= value;
-}
+//void Vec2D::Multiply(double value) {
+//	X *= value;
+//	Y *= value;
+//}
 
 Vec2D^ Vec2D::Multiplied(double value) {
 	double newX = X * value;

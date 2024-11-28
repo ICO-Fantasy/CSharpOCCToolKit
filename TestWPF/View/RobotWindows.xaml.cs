@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -53,54 +54,97 @@ public partial class RobotWindows : Window
         DataContext = new RobotWindowsViewModel();
     }
 
+    //private async Task AnimateBoxesAsync(
+    //    List<Pnt> pnts,
+    //    AShape aisBox,
+    //    InteractiveContext aisContext
+    //)
+    //{
+    //    foreach (var pnt in pnts)
+    //    {
+    //        await Task.Run(() =>
+    //        {
+    //            Trsf t = new();
+    //            t.SetTranslation(new(new Pnt(), pnt));
+    //            aisBox.SetLocalTransformation(t);
+    //            if (aisContext.IsDisplayed(aisBox))
+    //            {
+    //                aisContext.Redisplay(aisBox, true);
+    //            }
+    //        });
+    //    }
+    //}
+
     private void Test_Test1_Button_Click(object sender, RoutedEventArgs e)
     {
+        //MakeBox box = new(10, 10, 10);
+        //AShape aisBox = new(box);
+        //ThreeDimensionContext context =
+        //    App.Current.ContextManager.MainContext ?? throw new Exception("2");
+        //InteractiveContext aisContext = context.AISContext;
+        //context.Display(aisBox);
+
+        //List<Pnt> pnts = new List<Pnt>()
+        //{
+        //    new(-1, 0, 0),
+        //    new(1, 0, 0),
+        //    new(2, 0, 0),
+        //    new(3, 0, 0),
+        //    new(4, 0, 0),
+        //    new(5, 0, 0),
+        //    new(5, 1, 0),
+        //    new(5, 2, 0),
+        //    new(5, 3, 0),
+        //    new(5, 4, 0),
+        //    new(5, 5, 0),
+        //};
+
         //OCCTK.IO.OBJExchange ex = new("D:\\Download\\output.obj");
         //App.Current.ContextManager.MainContext.Display(new AShape(ex), true);
 
-        // 创建文件选择对话框
-        OpenFileDialog openFileDialog = new OpenFileDialog
-        {
-            //Filter = "STEP Files (*.STEP;*.step;*.stp)|*.STEP;*.step;*.stp|All Files (*.*)|*.*", // 设置文件过滤器
-            InitialDirectory = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "D:\\Download"
-            ) // 设置初始目录为指定的路径
-            //InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
-        };
+        //// 创建文件选择对话框
+        //OpenFileDialog openFileDialog = new OpenFileDialog
+        //{
+        //    //Filter = "STEP Files (*.STEP;*.step;*.stp)|*.STEP;*.step;*.stp|All Files (*.*)|*.*", // 设置文件过滤器
+        //    InitialDirectory = System.IO.Path.Combine(
+        //        AppDomain.CurrentDomain.BaseDirectory,
+        //        "D:\\Download"
+        //    ) // 设置初始目录为指定的路径
+        //    //InitialDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mods") // 设置初始目录为指定的路径
+        //};
 
-        // 如果用户选择了文件并点击了“打开”按钮
-        if (openFileDialog.ShowDialog() == true)
-        {
-            string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
-            //STEPExchange exchange = new STEPExchange(selectedFilePath); // 使用选择的文件路径
-            OCCTK.IO.OBJExchange ex = new(selectedFilePath);
-            App.Current.ContextManager.MainContext.Display(ex, true);
-            //// 生成新的文件路径，修改后缀为 .xbf
-            //// 获取文件目录
-            //string directory =
-            //    System.IO.Path.GetDirectoryName(selectedFilePath)
-            //    ?? throw new Exception("文件目录获取失败");
-            //// 获取文件名（无扩展名）
-            //string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(
-            //    selectedFilePath
-            //);
-            //// 组合成新路径01车
-            //string docFilePath = System.IO.Path.Combine(
-            //    directory,
-            //    fileNameWithoutExtension + ".xbf"
-            //);
-            //exchange.DocTest(selectedFilePath, docFilePath);
-            //OBJExchange ex = new(selectedFilePath);
-            //try
-            //{
-            //    var shape = ex.Shape();
-            //    AShape ais = new(shape.TopoShape);
-            //    var context = App.Current.ContextManager.MainContext;
-            //    context.Display(ex, true);
-            //    context.Update();
-            //}
-            //catch { }
-        }
+        //// 如果用户选择了文件并点击了“打开”按钮
+        //if (openFileDialog.ShowDialog() == true)
+        //{
+        //    string selectedFilePath = openFileDialog.FileName; // 获取选择的文件路径
+        //    //STEPExchange exchange = new STEPExchange(selectedFilePath); // 使用选择的文件路径
+        //    OCCTK.IO.OBJExchange ex = new(selectedFilePath);
+        //    App.Current.ContextManager.MainContext.Display(ex, true);
+        //    //// 生成新的文件路径，修改后缀为 .xbf
+        //    //// 获取文件目录
+        //    //string directory =
+        //    //    System.IO.Path.GetDirectoryName(selectedFilePath)
+        //    //    ?? throw new Exception("文件目录获取失败");
+        //    //// 获取文件名（无扩展名）
+        //    //string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(
+        //    //    selectedFilePath
+        //    //);
+        //    //// 组合成新路径01车
+        //    //string docFilePath = System.IO.Path.Combine(
+        //    //    directory,
+        //    //    fileNameWithoutExtension + ".xbf"
+        //    //);
+        //    //exchange.DocTest(selectedFilePath, docFilePath);
+        //    //OBJExchange ex = new(selectedFilePath);
+        //    //try
+        //    //{
+        //    //    var shape = ex.Shape();
+        //    //    AShape ais = new(shape.TopoShape);
+        //    //    var context = App.Current.ContextManager.MainContext;
+        //    //    context.Display(ex, true);
+        //    //    context.Update();
+        //    //}
+        //    //catch { }
+        //}
     }
 }

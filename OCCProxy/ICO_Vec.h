@@ -57,7 +57,7 @@ public:
 		z = Z;
 	}
 #pragma region 重载操作符
-	bool Equals(Vec otherPnt, double tol);
+	bool Equals(Vec otherVec, double tol);
 	static bool operator == (Vec Left, Vec Right) { return Left.Equals(Right, 0.0000174533); }//默认精度0.001度
 	static bool operator != (Vec Left, Vec Right) { return !Left.Equals(Right, 0.0000174533); }//默认精度0.001度
 	static Vec operator + (Vec Left, Vec Right);

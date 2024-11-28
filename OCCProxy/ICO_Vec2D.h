@@ -25,7 +25,7 @@ public:
 	bool IsParallel(Vec2D^ otherVec, double theAngularTolerance);
 	void Normalize();
 	Vec2D^ Normalized();
-	void Multiply(double value);
+	//void Multiply(double value);
 	Vec2D^ Multiplied(double value);
 	double Crossed(Vec2D^ other);
 public:

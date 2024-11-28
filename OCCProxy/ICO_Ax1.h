@@ -24,9 +24,9 @@ public:
 	//! 隐式转换为 gp_Ax1
 	static operator gp_Ax1 (Ax1 axis) { return axis.GetOCC(); }
 public:
-	void Transform(Trsf^ theT);
+	//void Transform(Trsf^ theT);
 	Ax1 Transformed(Trsf^ theT);
-	void Reverse();
+	//void Reverse();
 	Ax1 Reversed();
 	bool IsCoaxial(Ax1 other, double AngularTOL, double LinearTOL);
 	bool IsCollinear(Ax1 other, double AngularTOL);

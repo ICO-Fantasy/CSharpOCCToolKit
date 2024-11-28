@@ -30,7 +30,7 @@ public:
 	//! 隐式转换为 gp_Ax2
 	static operator gp_Ax2 (Ax2 axis) { return axis.GetOCC(); }
 public:
-	void Transform(Trsf^ theT);
+	//void Transform(Trsf^ theT);
 	Ax2 Transformed(Trsf^ theT);
 public:
 	property Pnt Location;

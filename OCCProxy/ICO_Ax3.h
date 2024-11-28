@@ -25,7 +25,7 @@ public:
 	//! 隐式转换为 gp_Ax3
 	static operator gp_Ax3 (Ax3 axis) { return axis.GetOCC(); }
 public:
-	void Transform(Trsf^ theT);
+	//void Transform(Trsf^ theT);
 	Ax3 Transformed(Trsf^ theT);
 public:
 	property Pnt Location;
