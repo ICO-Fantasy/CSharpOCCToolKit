@@ -337,7 +337,7 @@ public class Pipe
             //移动Y距离
             Trsf tY = new();
             tY.SetTranslation(currentMoveAxis.XDir.ToVec(ybc.Y));
-            currentMoveAxis.Transform(tY);
+            currentMoveAxis = currentMoveAxis.Transformed(tY);
             if (ybc.R == 0)
             {
                 xyzr.Add(
@@ -362,7 +362,7 @@ public class Pipe
             //旋转B
             Trsf tB = new();
             tB.SetRotation(new(currentMoveAxis.Location, currentMoveAxis.XDir), ybc.B);
-            currentMoveAxis.Transform(tB);
+            currentMoveAxis = currentMoveAxis.Transformed(tB);
             //旋转轴是临时轴
             Trsf axisT = new();
             axisT.SetTranslation(
@@ -395,7 +395,7 @@ public class Pipe
             );
             Trsf tR = new();
             tR.SetRotation(bendingAxis, ybc.C);
-            currentMoveAxis.Transform(tR);
+            currentMoveAxis = currentMoveAxis.Transformed(tR);
         }
         //Context.UpdateCurrentViewer();
     }
@@ -418,27 +418,27 @@ public class Pipe
             //Y
             Trsf tY = new();
             tY.SetTranslation(currentAxis.XDir.ToVec(ybc.Y));
-            currentAxis.Transform(tY);
+            currentAxis = currentAxis.Transformed(tY);
             maker.Add(new MakeEdge(lastPnt, currentAxis.Location));
             if (ybc.R == 0.0)
                 continue;
             //B
             Trsf tB = new();
             tB.SetRotation(new(currentAxis.Location, currentAxis.XDir), ybc.B);
-            currentAxis.Transform(tB);
+            currentAxis = currentAxis.Transformed(tB);
             //bendingAxis
             Trsf tAxis = new();
             tAxis.SetTranslation(
                 currentAxis.XDir.Crossed(currentAxis.ZDir).Reversed().ToVec(ybc.R)
             );
             Ax1 rotationAxis = new Ax1(currentAxis.Location, currentAxis.ZDir);
-            rotationAxis.Transform(tAxis);
+            rotationAxis = rotationAxis.Transformed(tAxis);
             //CR
             lastPnt = (Pnt)currentAxis.Location.Clone();
             Trsf tC = new();
             tC.SetRotation(rotationAxis, ybc.C);
             Circle circle = new(new(rotationAxis.Location, rotationAxis.Direction), ybc.R);
-            currentAxis.Transform(tC);
+            currentAxis = currentAxis.Transformed(tC);
             MakeEdge e = new MakeEdge(circle, lastPnt, currentAxis.Location);
             e.Error(); //错误处理
             maker.Add(new MakeEdge(circle, lastPnt, currentAxis.Location));

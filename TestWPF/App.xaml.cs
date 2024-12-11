@@ -14,34 +14,10 @@ using OCCViewForm;
 using TestWPF;
 using TestWPF.Bending;
 using TestWPF.PipeBending;
+using TestWPF.Utils;
 using Application = System.Windows.Application;
 
 namespace TestWPF;
-
-public class Singleton<T>
-    where T : class, new()
-{
-    // 私有静态变量用于保存单例实例
-    private static T? _instance;
-    private static readonly object _lock = new();
-
-    // 私有构造函数，防止外部实例化
-    protected Singleton() { }
-
-    // 公共静态属性，用于访问单例实例
-    public static T Instance
-    {
-        get
-        {
-            // 确保线程安全
-            lock (_lock)
-            {
-                _instance ??= new T();
-                return _instance;
-            }
-        }
-    }
-}
 
 /// <summary>
 /// Execute logic for App.xaml
@@ -75,12 +51,12 @@ public partial class App : Application
         CreateInstanceMutexes();
 
         // Start main window
-        MainWindow = new RobotWindows();
+        //MainWindow = new RobotWindows();
         //MainWindow = new CanvasTest();
         //! 简易夹具测试
         //MainWindow = new SimpleClamp();
         //! 折弯测试
-        //MainWindow = new BendingTest();
+        MainWindow = new BendingTest();
         //! 弯管重心计算
         //MainWindow = new CenterOfGravity();
         MainWindow.Show();

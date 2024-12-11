@@ -94,7 +94,15 @@ System::Tuple<double, double, double>^ Quat::ToEuler(EulerSequence sequence) {
 	GetOCC().GetEulerAngles(gp_EulerSequence(sequence), a, b, c);
 	return gcnew System::Tuple<double, double, double> {a, b, c};
 }
+void Quat::SetEulerAngles(double alpha, double beta, double gamma, EulerSequence sequence) {
+	gp_Quaternion q = GetOCC();
+	q.SetEulerAngles(gp_EulerSequence(sequence), alpha, beta, gamma);
+	X = q.X();
+	Y = q.Y();
+	Z = q.Z();
+	W = q.W();
 
+}
 SO3Matrix Quat::GetMatrix() {
 	gp_Mat mat = GetOCC().GetMatrix();
 	return SO3Matrix(

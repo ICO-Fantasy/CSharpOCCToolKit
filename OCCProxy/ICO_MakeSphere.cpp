@@ -13,16 +13,33 @@ namespace OCCTK {
 namespace OCC {
 namespace BRepPrimAPI {
 
-MakeSphere::MakeSphere(double X, double Y, double Z, double R) {
-	myMaker = new BRepPrimAPI_MakeSphere(gp_Pnt(X, Y, Z), R);
+/// <summary>
+/// 在指定位置创建一个球体
+/// </summary>
+/// <param name="X"></param>
+/// <param name="Y"></param>
+/// <param name="Z"></param>
+/// <param name="r">半径</param>
+MakeSphere::MakeSphere(double X, double Y, double Z, double r) {
+	myMaker = new BRepPrimAPI_MakeSphere(gp_Pnt(X, Y, Z), r);
 }
 
-MakeSphere::MakeSphere(Pnt originPnt, double R) {
-	myMaker = new BRepPrimAPI_MakeSphere(originPnt, R);
+/// <summary>
+/// 在指定位置创建一个球体
+/// </summary>
+/// <param name="originPnt">圆心点</param>
+/// <param name="r">半径</param>
+MakeSphere::MakeSphere(Pnt originPnt, double r) {
+	myMaker = new BRepPrimAPI_MakeSphere(originPnt, r);
 }
 
-MakeSphere::MakeSphere(Ax2 theAxis, double R) {
-	myMaker = new BRepPrimAPI_MakeSphere(theAxis, R);
+/// <summary>
+/// 在指定位姿创建一个球体
+/// </summary>
+/// <param name="theAxis">圆心坐标</param>
+/// <param name="r">半径</param>
+MakeSphere::MakeSphere(Ax2 theAxis, double r) {
+	myMaker = new BRepPrimAPI_MakeSphere(theAxis, r);
 }
 
 TShape^ MakeSphere::Shape() {

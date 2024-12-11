@@ -153,7 +153,7 @@ public class LeafNode : NodeDS
         Dir RotDir = myDir.Transformed(rotT);
         if (RotDir.IsParallel(parentDir, 1e-2) && RotDir.Dot(parentDir) > 0)
         {
-            BendingAxis.Reverse();
+            BendingAxis = BendingAxis.Reversed();
         }
         #endregion
         #region 计算展开方向
@@ -162,7 +162,7 @@ public class LeafNode : NodeDS
         );
         if (UnfoldingDirection.Dot(bending.Normal.Direction) > 0)
         {
-            UnfoldingDirection.Reverse();
+            UnfoldingDirection = UnfoldingDirection.Reversed();
         }
 
         #endregion

@@ -107,6 +107,12 @@ public partial class SimpleClamp : Window
         InitializeComponent();
         // 创建 Windows Forms 控件和 WindowsFormsHost
         WindowsFormsHost aHost = new WindowsFormsHost();
+        // 创建 Windows Forms 控件和 WindowsFormsHost
+        //CanvasHost.Child = ((App)Application.Current).canva;
+        if (App.Current.ContextManager.MainContext == null)
+        {
+            var context = App.Current.ContextManager.CreateContext();
+        }
         Canvas = new OCCCanvas(App.Current.ContextManager.MainContext);
         aHost.Child = Canvas;
         canvas_grid.Children.Add(aHost);
