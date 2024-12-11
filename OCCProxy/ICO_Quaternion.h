@@ -30,7 +30,7 @@ public:
 	//! 隐式转换为 gp_Quaternion
 	static operator gp_Quaternion (Quat q) { return q.GetOCC(); }
 public:
-	System::Tuple<double, double, double>^ ToEuler(EulerSequence sequence);
+	System::ValueTuple<double, double, double> ToEuler(EulerSequence sequence);
 	SO3Matrix GetMatrix();
 
 public:

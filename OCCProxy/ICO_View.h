@@ -10,6 +10,17 @@
 using namespace OCCTK::Extension;
 
 namespace OCCTK {
+namespace Extension {
+ref class CameraOrientation;
+}
+namespace OCC {
+namespace Graphic3d {
+ref class Camera;
+}
+}
+}
+
+namespace OCCTK {
 namespace OCC {
 namespace V3d {
 
@@ -31,6 +42,7 @@ public:
 
 #pragma region 渲染
 
+	void Update();
 	void Redraw();
 	void MustBeResized();
 	void SetDegenerateMode(bool open);
@@ -57,9 +69,19 @@ public:
 	void StartRotation(int theX, int theY);
 	void Rotation(int theX, int theY);
 
-	void SetViewOrientation(ViewOrientation theOrientation, bool update);
-
 #pragma endregion
+#pragma region Camera
+	System::ValueTuple<double, double, double> GetProjection();
+	void SetViewOrientation(double theX, double theY, double theZ);
+	void SetViewOrientation(System::ValueTuple<double, double, double> projectionVec);
+	void SetViewOrientation(ViewOrientation theOrientation, bool update);
+	Graphic3d::Camera^ Camera();
+	void SetCamera(Graphic3d::Camera^ camera);
+
+	CameraOrientation^ CurrentViewOrientation();
+	void SetViewOrientation(CameraOrientation^ theOrientation, bool update);
+#pragma endregion
+
 
 	void DisplayDefault_GraduatedTrihedron();
 	void Hide_GraduatedTrihedron();
