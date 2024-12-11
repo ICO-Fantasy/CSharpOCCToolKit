@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="DataExchange\ICO_OBJExchange.cpp" />
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
+    <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp" />
     <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp" />
     <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp" />
     <ClCompile Include="DataExchange\ICO_STLExchange.cpp" />
@@ -230,6 +231,8 @@
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_OBJExchange.h" />
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
+    <ClInclude Include="Extension\ICO_CameraOrientation.h" />
+    <ClInclude Include="OCCProxy\ICO_Graphic3d_Camera.h" />
     <ClInclude Include="OCCProxy\ICO_TrsfForm.h" />
     <ClInclude Include="OCCProxy\ICO_Poly_Triangulation.h" />
     <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h" />

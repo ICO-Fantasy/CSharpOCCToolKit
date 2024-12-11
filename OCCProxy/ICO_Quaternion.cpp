@@ -89,10 +89,10 @@ System::String^ Quat::ToString() {
 	return "(" + X.ToString("F3") + "," + Y.ToString("F3") + "," + Z.ToString("F3") + "," + W.ToString("F3") + ")";
 }
 
-System::Tuple<double, double, double>^ Quat::ToEuler(EulerSequence sequence) {
+System::ValueTuple<double, double, double> Quat::ToEuler(EulerSequence sequence) {
 	double a, b, c;
 	GetOCC().GetEulerAngles(gp_EulerSequence(sequence), a, b, c);
-	return gcnew System::Tuple<double, double, double> {a, b, c};
+	return System::ValueTuple<double, double, double> {a, b, c};
 }
 void Quat::SetEulerAngles(double alpha, double beta, double gamma, EulerSequence sequence) {
 	gp_Quaternion q = GetOCC();

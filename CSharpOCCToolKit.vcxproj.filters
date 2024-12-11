@@ -213,6 +213,9 @@
     <Filter Include="源文件\OCCProxy\Poly">
       <UniqueIdentifier>{8d9efef5-51ae-411b-877e-f426efb75988}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\OCCProxy\Graphic3d">
+      <UniqueIdentifier>{4ec15908-d6a2-4508-b550-9ed26bd37540}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OCCProxy\ICO_InteractiveObject.cpp">
@@ -424,6 +427,9 @@
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp">
       <Filter>源文件\OCCProxy\Poly</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp">
+      <Filter>源文件\OCCProxy\Graphic3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -696,6 +702,12 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_TrsfForm.h">
       <Filter>头文件\OCCProxy\gp\enum</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_Graphic3d_Camera.h">
+      <Filter>头文件\OCCProxy\Graphic3d</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ICO_CameraOrientation.h">
+      <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

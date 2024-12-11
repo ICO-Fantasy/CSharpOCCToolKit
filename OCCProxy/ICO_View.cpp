@@ -1,5 +1,14 @@
 ﻿#include "ICO_View.h"
 #include <V3d_View.hxx>
+//local
+#include "ICO_Graphic3d_Camera.h"
+#include "ICO_Pnt.h"
+#include "ICO_Vec.h"
+#include "..\Extension\ICO_CameraOrientation.h"
+
+using namespace OCCTK::OCC::Graphic3d;
+using namespace OCCTK::OCC::gp;
+using namespace OCCTK::Extension;
 
 namespace OCCTK {
 namespace OCC {
@@ -113,11 +122,16 @@ double View::GetScale() {
 	return myView()->Scale();
 }
 
+void View::Update() {
+	if (myView().IsNull()) return;
+	myView()->Update();
+}
+
 /// <summary>
 /// 重绘
 /// </summary>
 void View::Redraw() {
-	if (myView().IsNull())  return;
+	if (myView().IsNull()) return;
 	myView()->Redraw();
 }
 
@@ -279,6 +293,34 @@ void View::Rotation(int theX, int theY) {
 	if (myView().IsNull())  return;
 	myView()->Rotation(theX, theY);
 }
+
+/// <summary>
+/// 返回投影向量。
+/// </summary>
+/// <returns></returns>
+System::ValueTuple<double, double, double> View::GetProjection() {
+	if (myView().IsNull())  return System::ValueTuple<double, double, double>(0.0, 0.0, 0.0);
+	double x, y, z;
+	myView()->Proj(x, y, z);
+	return System::ValueTuple<double, double, double>(x, y, z);
+}
+
+/// <summary>
+/// 设置投影向量
+/// </summary>
+/// <param name="theX"></param>
+/// <param name="theY"></param>
+/// <param name="theZ"></param>
+void View::SetViewOrientation(double theX, double theY, double theZ) {
+	if (myView().IsNull())  return;
+	myView()->SetProj(theX, theY, theZ);
+}
+
+void View::SetViewOrientation(System::ValueTuple<double, double, double> projectionVec) {
+	if (myView().IsNull())  return;
+	myView()->SetProj(projectionVec.Item1, projectionVec.Item2, projectionVec.Item3);
+}
+
 /// <summary>
 /// 设置视图方向
 /// </summary>
@@ -288,6 +330,65 @@ void View::SetViewOrientation(ViewOrientation theOrientation, bool update) {
 	if (myView().IsNull())  return;
 	myView()->SetProj(V3d_TypeOfOrientation((int)theOrientation), update);
 }
+
+/// <summary>
+/// 获取当前的相机对象
+/// </summary>
+/// <returns></returns>
+Camera^ View::Camera() {
+	if (myView().IsNull())  throw gcnew System::Exception("View对象为空，无法获取相机");
+	return gcnew Graphic3d::Camera(myView()->Camera());//返回的是当前相机对象的引用
+}
+
+/// <summary>
+/// 设置相机对象
+/// </summary>
+/// <param name="camera"></param>
+void View::SetCamera(Graphic3d::Camera^ camera) {
+	if (myView().IsNull())  return;
+	myView()->SetCamera(camera->GetOCC());
+}
+
+CameraOrientation^ View::CurrentViewOrientation() {
+	CameraOrientation^ params = gcnew CameraOrientation();
+
+	params->Scale = myView()->Scale();
+	params->Aspect = myView()->Camera()->Aspect();
+
+	double eyeX, eyeY, eyeZ;
+	myView()->Eye(eyeX, eyeY, eyeZ);
+	params->Eye = gcnew Pnt(eyeX, eyeY, eyeZ);
+
+	double atX, atY, atZ;
+	myView()->At(atX, atY, atZ);
+	params->ViewPoint = gcnew Pnt(atX, atY, atZ);
+
+	double upX, upY, upZ;
+	myView()->Up(upX, upY, upZ);
+	params->HightPoint = gcnew Pnt(upX, upY, upZ);
+
+	double projX, projY, projZ;
+	myView()->Proj(projX, projY, projZ);
+	params->Projection = gcnew Vec(projX, projY, projZ);
+
+	double width, hight;
+	myView()->Size(width, hight);
+	params->Size = System::ValueTuple<double, double>(width, hight);
+
+	return params;
+}
+
+void View::SetViewOrientation(CameraOrientation^ theOrientation, bool update) {
+	myView()->SetScale(theOrientation->Scale);
+	myView()->Camera()->SetAspect(theOrientation->Aspect);
+	myView()->SetEye(theOrientation->Eye->X, theOrientation->Eye->Y, theOrientation->Eye->Z);
+	myView()->SetAt(theOrientation->ViewPoint->X, theOrientation->ViewPoint->Y, theOrientation->ViewPoint->Z);
+	myView()->SetUp(theOrientation->HightPoint->X, theOrientation->HightPoint->Y, theOrientation->HightPoint->Z);
+	myView()->SetProj(theOrientation->Projection->X, theOrientation->Projection->Y, theOrientation->Projection->Z);
+	myView()->SetSize(theOrientation->Size.Item1 / theOrientation->Size.Item2);
+	if (update) { myView()->Update(); }
+}
+
 /// <summary>
 /// 显示带刻度的坐标轴
 /// </summary>
@@ -306,6 +407,9 @@ void View::DisplayDefault_GraduatedTrihedron() {
 	myView()->GraduatedTrihedronDisplay(GT);
 }
 
+/// <summary>
+/// 隐藏带刻度的坐标轴
+/// </summary>
 void View::Hide_GraduatedTrihedron() {
 	myView()->GraduatedTrihedronErase();
 }

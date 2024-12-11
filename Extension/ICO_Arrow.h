@@ -19,10 +19,10 @@ public:
 	Arrow() {
 		Prs3d_Arrow::Draw(
 			myStructure().CurrentGroup(),
-			myStarT,
-			gp_Dir(myVec->GetOCC()),
+			myStart.GetOCC(),
+			myVec.GetOCC(),
 			20 * M_PI / 180,
-			myVec->GetOCC().Magnitude()
+			myVec.GetOCC().Magnitude()
 		);
 	}
 	//		myStructure.Display()
