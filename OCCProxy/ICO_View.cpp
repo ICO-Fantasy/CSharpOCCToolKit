@@ -4,6 +4,7 @@
 #include "ICO_Graphic3d_Camera.h"
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
+#include "ICO_Dir.h"
 #include "..\Extension\ICO_CameraOrientation.h"
 
 using namespace OCCTK::OCC::Graphic3d;
@@ -354,6 +355,7 @@ CameraOrientation^ View::CurrentViewOrientation() {
 
 	params->Scale = myView()->Scale();
 	params->Aspect = myView()->Camera()->Aspect();
+	params->ViewDirection = gcnew Dir(myView()->Camera()->Direction());
 
 	double eyeX, eyeY, eyeZ;
 	myView()->Eye(eyeX, eyeY, eyeZ);
@@ -381,6 +383,7 @@ CameraOrientation^ View::CurrentViewOrientation() {
 void View::SetViewOrientation(CameraOrientation^ theOrientation, bool update) {
 	myView()->SetScale(theOrientation->Scale);
 	myView()->Camera()->SetAspect(theOrientation->Aspect);
+	myView()->Camera()->SetDirection(theOrientation->ViewDirection->GetOCC());
 	myView()->SetEye(theOrientation->Eye->X, theOrientation->Eye->Y, theOrientation->Eye->Z);
 	myView()->SetAt(theOrientation->ViewPoint->X, theOrientation->ViewPoint->Y, theOrientation->ViewPoint->Z);
 	myView()->SetUp(theOrientation->HightPoint->X, theOrientation->HightPoint->Y, theOrientation->HightPoint->Z);
