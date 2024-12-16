@@ -15,6 +15,7 @@ public:
 	const static Vec2D Default = Vec2D(1.0, 0.0);
 public:
 	Vec2D(double theX, double theY);
+	Vec2D(System::ValueTuple<double, double> theXY);
 	Vec2D(Pnt2D fromPnt, Pnt2D toPnt);
 	Vec2D(gp_Vec2d theVec);
 	Vec2D(gp_Vec2d* theVec);

@@ -15,6 +15,7 @@ public:
 	const static Dir Default = Dir(1.0, 0.0, 0.0);
 public:
 	Dir(double theX, double theY, double theZ);
+	Dir(System::ValueTuple<double, double, double> theXYZ);
 	Dir(Vec theDir);
 	Dir(Pnt fromPoint, Pnt toPoint);
 	Dir(gp_Dir theDir);

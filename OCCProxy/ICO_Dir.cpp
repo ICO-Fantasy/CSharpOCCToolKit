@@ -23,6 +23,17 @@ Dir::Dir(double theX, double theY, double theZ) {
 	Normalize();
 }
 
+Dir::Dir(System::ValueTuple<double, double, double> theXYZ) {
+	if (std::abs(theXYZ.Item1) < 1e-6 && std::abs(theXYZ.Item2) < 1e-6 && std::abs(theXYZ.Item3) < 1e-6) {
+		System::String^ str = "创建了零向量(" + theXYZ.Item1 + ", " + theXYZ.Item2 + ", " + theXYZ.Item3 + ")";
+		System::Diagnostics::Debug::WriteLine(str);
+	}
+	X = theXYZ.Item1;
+	Y = theXYZ.Item2;
+	Z = theXYZ.Item3;
+	Normalize();
+}
+
 Dir::Dir(Vec theDir) {
 	X = theDir.X;
 	Y = theDir.Y;
