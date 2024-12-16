@@ -32,16 +32,34 @@ MakeCylinder::MakeCylinder(double r, double h) {
 		myMaker = new BRepPrimAPI_MakeCylinder(r, h);
 }
 
+/// <summary>
+/// 在原点创建一个圆柱，并指定角度
+/// </summary>
+/// <param name="r">半径</param>
+/// <param name="h">高</param>
+/// <param name="angle">底面扇形角度</param>
 MakeCylinder::MakeCylinder(double r, double h, double angle) {
 	CHECKRH(r, h)
 		myMaker = new BRepPrimAPI_MakeCylinder(r, h, angle);
 }
 
+/// <summary>
+/// 在指定位姿创建一个圆柱
+/// </summary>
+/// <param name="theAxis">底面坐标系</param>
+/// <param name="r">半径</param>
+/// <param name="h">高</param>
 MakeCylinder::MakeCylinder(gp::Ax2 theAxis, double r, double h) {
 	CHECKRH(r, h)
 		myMaker = new BRepPrimAPI_MakeCylinder(theAxis, r, h);
 }
 
+/// <summary>
+/// 在指定位姿创建一个圆柱，并指定角度
+/// </summary>
+/// <param name="r">半径</param>
+/// <param name="h">高</param>
+/// <param name="angle">底面扇形角度</param>
 MakeCylinder::MakeCylinder(gp::Ax2 theAxis, double r, double h, double angle) {
 	CHECKRH(r, h)
 		myMaker = new BRepPrimAPI_MakeCylinder(theAxis, r, h, angle);

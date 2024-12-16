@@ -31,15 +31,15 @@ MakeBox::MakeBox(Pnt leftBottom, Pnt rightTop) {
 }
 
 /// <summary>
-/// 以axis为中心创建矩形
+/// 以位姿为中心创建矩形
 /// </summary>
-/// <param name="axis"></param>
-/// <param name="ldX"></param>
-/// <param name="ldY"></param>
-/// <param name="ldZ"></param>
-/// <param name="rdX"></param>
-/// <param name="rdY"></param>
-/// <param name="rdZ"></param>
+/// <param name="axis">中心位姿</param>
+/// <param name="ldX">-X</param>
+/// <param name="ldY">-Y</param>
+/// <param name="ldZ">-Z</param>
+/// <param name="rdX">X</param>
+/// <param name="rdY">Y</param>
+/// <param name="rdZ">Z</param>
 MakeBox::MakeBox(Ax2 axis, double ldX, double ldY, double ldZ, double rdX, double rdY, double rdZ) {
 	double dX = rdX + ldX;
 	double dY = rdY + ldY;

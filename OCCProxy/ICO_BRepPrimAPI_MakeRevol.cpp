@@ -10,6 +10,7 @@ using namespace OCCTK::OCC::gp;
 namespace OCCTK {
 namespace OCC {
 namespace BRepPrimAPI {
+
 /// <summary>
 /// 构建回转体（整个圆周）
 /// </summary>
@@ -18,6 +19,7 @@ namespace BRepPrimAPI {
 MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis) {
 	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis);
 }
+
 /// <summary>
 /// 构建回转体（整个圆周）
 /// </summary>
@@ -27,6 +29,7 @@ MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis) {
 MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, bool copy) {
 	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis, copy);
 }
+
 /// <summary>
 /// 构建回转体
 /// </summary>
@@ -36,6 +39,7 @@ MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, bool copy) {
 MakeRevol::MakeRevol(Topo::TShape^ shape, gp::Ax1 axis, double angle) {
 	myMaker = new BRepPrimAPI_MakeRevol(shape->GetOCC(), axis, angle);
 }
+
 /// <summary>
 /// 构建回转体
 /// </summary>

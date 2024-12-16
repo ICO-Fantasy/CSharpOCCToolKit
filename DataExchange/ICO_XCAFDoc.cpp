@@ -51,7 +51,7 @@ static System::String^ GetLabelName(TDF_Label label) {
 }
 
 static XShape^ GetShapeInfo(const TDF_Label& label, const Handle(TDocStd_Document)& doc) {
-	XShape^ result = gcnew XShape();
+	XShape^ result = gcnew XShape(true);
 	Handle(XCAFDoc_ShapeTool) shapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
 	Handle(XCAFDoc_ColorTool) colorTool = XCAFDoc_DocumentTool::ColorTool(doc->Main());
 	Handle(XCAFDoc_MaterialTool) matTool = XCAFDoc_DocumentTool::MaterialTool(doc->Main());
@@ -125,7 +125,7 @@ static XShape^ GetSubShape(const TDF_Label& label, const Handle(TDocStd_Document
 		TopLoc_Location loc = shapeTool->GetLocation(label);
 		gp_Trsf theT = loc.Transformation();
 		theT.PreMultiply(parentTrsf.Inverted());
-		Trsf^ curentT =gcnew Trsf(theT);
+		Trsf^ curentT = gcnew Trsf(theT);
 		shape->Transform = curentT;
 		System::Diagnostics::Debug::WriteLine(labelName + " 有 " + labels_Components.Length() + " 个部件");
 		for (size_t i = 1; i < labels_Components.Length() + 1; i++) {
