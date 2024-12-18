@@ -18,6 +18,7 @@ value struct Vec;
 public ref class Trsf :System::ICloneable {
 public:
 	Trsf();
+	Trsf(Trsf^ theT);
 	Trsf(gp_Trsf theT);
 	Trsf(gp_Trsf* theT);
 	Trsf(Ax2 theAx2);

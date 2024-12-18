@@ -20,6 +20,10 @@ Trsf::Trsf() {
 	myTrsf = new gp_Trsf();
 }
 
+Trsf::Trsf(Trsf^ theT) {
+	myTrsf = new gp_Trsf(theT);
+}
+
 Trsf::Trsf(const gp_Trsf theT) {
 	myTrsf = new gp_Trsf(theT);
 }
