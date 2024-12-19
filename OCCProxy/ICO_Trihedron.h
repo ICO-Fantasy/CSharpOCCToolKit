@@ -14,13 +14,13 @@ namespace OCCTK {
 namespace OCC {
 namespace AIS {
 
-public ref class Trihedron :public InteractiveObject {
+public ref class ATrihedron :public InteractiveObject {
 private:
 	Handle(AIS_Trihedron) myTrihedron() { return Handle(AIS_Trihedron)::DownCast(NativeHandle); }
 public:
-	Trihedron(double axisSize);
-	Trihedron(AShape^ theAIS, double axisSize);
-	Trihedron(gp::Trsf^ theTrsf, double axisSize);
+	ATrihedron(double axisSize);
+	ATrihedron(AShape^ theAIS, double axisSize);
+	ATrihedron(gp::Trsf^ theTrsf, double axisSize);
 	Handle(AIS_Trihedron) GetOCC() { return myTrihedron(); };
 public:
 	void SetArrowLength(double value);

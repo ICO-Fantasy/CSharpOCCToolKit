@@ -11,7 +11,7 @@ namespace AIS {
 
 
 //创建原点坐标轴
-Trihedron::Trihedron(double axisSize) :InteractiveObject() {
+ATrihedron::ATrihedron(double axisSize) :InteractiveObject() {
 	NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(gp_Ax2()));
 
 	ArrowLength = axisSize;
@@ -19,7 +19,7 @@ Trihedron::Trihedron(double axisSize) :InteractiveObject() {
 }
 
 // 根据对象创建坐标轴
-Trihedron::Trihedron(AShape^ theAIS, double axisSize) :InteractiveObject() {
+ATrihedron::ATrihedron(AShape^ theAIS, double axisSize) :InteractiveObject() {
 	gp_Trsf t = theAIS->GetOCC()->LocalTransformation();
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(t);
@@ -30,7 +30,7 @@ Trihedron::Trihedron(AShape^ theAIS, double axisSize) :InteractiveObject() {
 }
 
 // 根据变换创建坐标轴
-Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() {
+ATrihedron::ATrihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() {
 	gp_Ax2 a = gp_Ax2();
 	a.Transform(theTrsf);
 	NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(a));
@@ -39,28 +39,28 @@ Trihedron::Trihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() {
 	SetDefaultAxis();
 }
 
-void Trihedron::SetArrowLength(double value) {
+void ATrihedron::SetArrowLength(double value) {
 	ArrowLength = value;
 }
 
-void Trihedron::SetArrowWidth(double value) {
+void ATrihedron::SetArrowWidth(double value) {
 	ArrowWidth = value;
 }
 
-void Trihedron::SetArrowWidth(DatumParts axis, double value) {
+void ATrihedron::SetArrowWidth(DatumParts axis, double value) {
 	myTrihedron()->Attributes()->DatumAspect()->LineAspect(Prs3d_DatumParts(axis))->SetWidth(value);
 }
 
-void Trihedron::SetColor(DatumParts axis, Extension::Color^ color) {
+void ATrihedron::SetColor(DatumParts axis, Extension::Color^ color) {
 	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts(axis), color->GetOCC());
 }
 
-void Trihedron::SetAspect(int theX, int theY) {
+void ATrihedron::SetAspect(int theX, int theY) {
 	myTrihedron()->SetTransformPersistence(new Graphic3d_TransformPers(Graphic3d_TMF_2d, Aspect_TypeOfTriedronPosition::Aspect_TOTP_RIGHT_LOWER, Graphic3d_Vec2i(theY, theY)));
 }
 
 
-void Trihedron::SetDefaultAxis() {
+void ATrihedron::SetDefaultAxis() {
 	// 显示箭头
 	myTrihedron()->SetDrawArrows(true);
 	// 箭头长度
