@@ -23,15 +23,20 @@ public:
 	ATrihedron(gp::Trsf^ theTrsf, double axisSize);
 	Handle(AIS_Trihedron) GetOCC() { return myTrihedron(); };
 public:
-	void SetArrowLength(double value);
-	void SetArrowWidth(double value);
 	void SetArrowWidth(DatumParts axis, double value);
-	void SetColor(DatumParts axis, Extension::Color^ color);
+	void SetColor(DatumParts axis, Extension::Color color);
+	void SetDatumColor(DatumParts axis, Extension::Color color);
+	void SetArrowColor(DatumParts axis, Extension::Color color);
+	void SetTextColor(DatumParts axis, Extension::Color color);
 	void SetAspect(int theX, int theY);
+	property double ArrowLength {double get(); void set(double value); };
+	property double ArrowWidth {double get(); void set(double value); };
+	property bool DrawArrow {bool get(); void set(bool value); };
 private:
 	void SetDefaultAxis();
-	double ArrowLength = 100.0;
-	double ArrowWidth = 2.5;
+	bool MyDrawArrow = false;
+	double MyArrowLength = 100.0;
+	double MyArrowWidth = 2.5;
 };
 
 }
