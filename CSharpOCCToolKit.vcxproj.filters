@@ -431,6 +431,9 @@
     <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp">
       <Filter>源文件\OCCProxy\Graphic3d</Filter>
     </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp">
+      <Filter>源文件\OCCProxy\Graphic3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_StringExchange.h">
@@ -708,6 +711,9 @@
     </ClInclude>
     <ClInclude Include="Extension\ICO_CameraOrientation.h">
       <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h">
+      <Filter>头文件\OCCProxy\Graphic3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

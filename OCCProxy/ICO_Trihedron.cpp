@@ -79,8 +79,16 @@ void ATrihedron::SetColor(DatumParts axis, Extension::Color color) {
 /// <param name="axis"></param>
 /// <param name="color"></param>
 void ATrihedron::SetDatumColor(DatumParts axis, Extension::Color color) {
+	auto c = myTrihedron()->DatumPartColor(Prs3d_DatumParts(axis));
+	int d;
+	c.Color2argb(c, d);
+	System::Diagnostics::Debug::WriteLine(axis);
+	System::Diagnostics::Debug::WriteLine(d);
 	// 坐标轴颜色
 	myTrihedron()->SetDatumPartColor(Prs3d_DatumParts(axis), color);
+	c = myTrihedron()->DatumPartColor(Prs3d_DatumParts(axis));
+	c.Color2argb(c, d);
+	System::Diagnostics::Debug::WriteLine(d);
 }
 
 /// <summary>
@@ -109,10 +117,11 @@ void ATrihedron::SetTextColor(DatumParts axis, Extension::Color color) {
 /// <param name="theX"></param>
 /// <param name="theY"></param>
 void ATrihedron::SetAspect(int theX, int theY) {
-	myTrihedron()->SetTransformPersistence(new Graphic3d_TransformPers(Graphic3d_TMF_2d, Aspect_TypeOfTriedronPosition::Aspect_TOTP_RIGHT_LOWER, Graphic3d_Vec2i(theY, theY)));
+	myTrihedron()->SetTransformPersistence(new Graphic3d_TransformPers(Graphic3d_TransModeFlags::Graphic3d_TMF_TriedronPers, Aspect_TypeOfTriedronPosition::Aspect_TOTP_RIGHT_LOWER, Graphic3d_Vec2i(theY, theY)));
 }
 
 void ATrihedron::SetDefaultAxis() {
+	myTrihedron()->SetDatumDisplayMode(Prs3d_DatumMode::Prs3d_DM_Shaded);
 	// 显示箭头
 	myTrihedron()->SetDrawArrows(DrawArrow);
 	// 箭头长度

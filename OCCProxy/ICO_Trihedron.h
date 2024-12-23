@@ -29,12 +29,13 @@ public:
 	void SetArrowColor(DatumParts axis, Extension::Color color);
 	void SetTextColor(DatumParts axis, Extension::Color color);
 	void SetAspect(int theX, int theY);
+	//void SetTransformPersistence(Graphic3d_TransformPers transfromPers);
 	property double ArrowLength {double get(); void set(double value); };
 	property double ArrowWidth {double get(); void set(double value); };
 	property bool DrawArrow {bool get(); void set(bool value); };
 private:
 	void SetDefaultAxis();
-	bool MyDrawArrow = false;
+	bool MyDrawArrow = true;
 	double MyArrowLength = 100.0;
 	double MyArrowWidth = 2.5;
 };
