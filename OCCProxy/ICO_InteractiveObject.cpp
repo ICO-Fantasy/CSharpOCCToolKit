@@ -1,5 +1,4 @@
-﻿#include "ICO_AIS_Shape.h"
-#include "ICO_InteractiveObject.h"
+﻿#include "ICO_InteractiveObject.h"
 #include<AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
 #include <Graphic3d_ZLayerId.hxx>
@@ -14,7 +13,7 @@ namespace AIS {
 
 
 InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject) :
-	BaseObject(theAISObject) {
+    BaseObject(theAISObject) {
 }
 
 /// <summary>
@@ -22,15 +21,15 @@ InteractiveObject::InteractiveObject(Handle(AIS_InteractiveObject) theAISObject)
 /// </summary>
 /// <param name="trsf"></param>
 void InteractiveObject::SetLocalTransformation(gp::Trsf^ trsf) {
-	GetOCC()->SetLocalTransformation(trsf);
+    GetOCC()->SetLocalTransformation(trsf);
 }
 
 void InteractiveObject::SetZLayer(Graphic3d::ZLayerId id) {
-	GetOCC()->SetZLayer(Graphic3d_ZLayerId((int)id));
+    GetOCC()->SetZLayer(Graphic3d_ZLayerId((int)id));
 }
 
 void InteractiveObject::SetZLayer(int Zlayerid) {
-	GetOCC()->SetZLayer(Zlayerid);
+    GetOCC()->SetZLayer(Zlayerid);
 }
 
 /// <summary>
@@ -38,7 +37,7 @@ void InteractiveObject::SetZLayer(int Zlayerid) {
 /// </summary>
 /// <returns></returns>
 gp::Trsf^ InteractiveObject::LocalTransformation() {
-	return gcnew gp::Trsf(GetOCC()->LocalTransformation());
+    return gcnew gp::Trsf(GetOCC()->LocalTransformation());
 }
 
 /// <summary>
@@ -46,23 +45,26 @@ gp::Trsf^ InteractiveObject::LocalTransformation() {
 /// </summary>
 /// <returns></returns>
 bool InteractiveObject::IsShape() {
-	return GetOCC()->IsKind(STANDARD_TYPE(AIS_Shape));
+    return GetOCC()->IsKind(STANDARD_TYPE(AIS_Shape));
 }
 /// <summary>
 /// 从上下文中删除自身
 /// </summary>
 void InteractiveObject::RemoveSelf(bool update) {
-	Handle(AIS_InteractiveContext) theContext = myObj()->GetContext();
-	if (!theContext.IsNull()) {
-		theContext->Remove(myObj(), update);
-	}
+    if (!myObj()->HasInteractiveContext()) {
+        return;
+    }
+    Handle(AIS_InteractiveContext) theContext = myObj()->GetContext();
+    if (!theContext.IsNull()) {
+        theContext->Remove(myObj(), update);
+    }
 }
 /// <summary>
 /// 是否有交互上下文
 /// </summary>
 /// <returns></returns>
 bool InteractiveObject::HasInteractiveContext() {
-	return myObj()->HasInteractiveContext();
+    return myObj()->HasInteractiveContext();
 }
 
 /// <summary>
@@ -70,10 +72,10 @@ bool InteractiveObject::HasInteractiveContext() {
 /// </summary>
 /// <returns></returns>
 InteractiveContext^ InteractiveObject::GetContext() {
-	if (myObj()->HasInteractiveContext()) {
-		return gcnew InteractiveContext(myObj()->GetContext());
-	}
-	throw gcnew System::Exception("对象没有交互上下文");
+    if (myObj()->HasInteractiveContext()) {
+        return gcnew InteractiveContext(myObj()->GetContext());
+    }
+    throw gcnew System::Exception("对象没有交互上下文");
 }
 
 }

@@ -1,8 +1,5 @@
 ﻿#pragma once
 #include <V3d_View.hxx>
-#include <WNT_Window.hxx>
-//包装C++类到托管类
-#include <NCollection_Haft.h> 
 //local
 #include "..\Extension\ICO_Color.h"
 #include "ICO_BaseObject.h"
@@ -17,74 +14,69 @@ namespace OCC {
 namespace Graphic3d {
 ref class Camera;
 }
-}
-}
-
-namespace OCCTK {
-namespace OCC {
 namespace V3d {
 
 public ref class View :BaseObject {
 private:
-	Handle(V3d_View) myView() { return Handle(V3d_View)::DownCast(NativeHandle); };
+    Handle(V3d_View) myView() { return Handle(V3d_View)::DownCast(NativeHandle); };
 public:
-	View(const Handle(V3d_View)& theView);
-	View(const Handle(V3d_View)& theView, System::IntPtr theWnd);
-	Handle(V3d_View) GetOCC();
-	void SetWindow(System::IntPtr theWnd);
-	void Remove();
-	void SetDefault();
-	void SetDefaultRendering();
-	void SetICORendering();
-	void SetDefaultBGColor();
-	void SetBgGradientColors(Color C1, Color C2, bool update);
-	double GetScale();
+    View(const Handle(V3d_View)& theView);
+    View(const Handle(V3d_View)& theView, System::IntPtr theWnd);
+    Handle(V3d_View) GetOCC();
+    void SetWindow(System::IntPtr theWnd);
+    void Remove();
+    void SetDefault();
+    void SetDefaultRendering();
+    void SetICORendering();
+    void SetDefaultBGColor();
+    void SetBgGradientColors(Color C1, Color C2, bool update);
+    double GetScale();
 
 #pragma region 渲染
 
-	void Update();
-	void Redraw();
-	void MustBeResized();
-	void SetDegenerateMode(bool open);
+    void Update();
+    void Redraw();
+    void MustBeResized();
+    void SetDegenerateMode(bool open);
 
 #pragma endregion
 
 #pragma region 调整画面
 
-	void WindowFitAll(int theXmin, int theYmin, int theXmax, int theYmax);
-	void FitAll(double theMargin, bool update);
-	void ZFitAll(double theScaleFactor);
-	void Reset();
+    void WindowFitAll(int theXmin, int theYmin, int theXmax, int theYmax);
+    void FitAll(double theMargin, bool update);
+    void ZFitAll(double theScaleFactor);
+    void Reset();
 
-	void Place(int theX, int theY, float theZoomFactor);
-	void Zoom(int theX1, int theY1, int theX2, int theY2);
-	void SetZoom(double theZoomFactor, bool update);
-	void StartZoomAtPoint(double startX, double startY);
-	void ZoomAtPoint(double startX, double startY, double endX, double endY);
+    void Place(int theX, int theY, float theZoomFactor);
+    void Zoom(int theX1, int theY1, int theX2, int theY2);
+    void SetZoom(double theZoomFactor, bool update);
+    void StartZoomAtPoint(double startX, double startY);
+    void ZoomAtPoint(double startX, double startY, double endX, double endY);
 
-	//void Pan(int theX, int theY);
-	void StartPan();
-	void Pan(int theDX, int theDY);
+    //void Pan(int theX, int theY);
+    void StartPan();
+    void Pan(int theDX, int theDY);
 
-	void StartRotation(int theX, int theY);
-	void Rotation(int theX, int theY);
+    void StartRotation(int theX, int theY);
+    void Rotation(int theX, int theY);
 
 #pragma endregion
 #pragma region Camera
-	System::ValueTuple<double, double, double> GetProjection();
-	void SetViewOrientation(double theX, double theY, double theZ);
-	void SetViewOrientation(System::ValueTuple<double, double, double> projectionVec);
-	void SetViewOrientation(ViewOrientation theOrientation, bool update);
-	Graphic3d::Camera^ Camera();
-	void SetCamera(Graphic3d::Camera^ camera);
+    System::ValueTuple<double, double, double> GetProjection();
+    void SetViewOrientation(double theX, double theY, double theZ);
+    void SetViewOrientation(System::ValueTuple<double, double, double> projectionVec);
+    void SetViewOrientation(ViewOrientation theOrientation, bool update);
+    Graphic3d::Camera^ Camera();
+    void SetCamera(Graphic3d::Camera^ camera);
 
-	CameraOrientation^ CurrentViewOrientation();
-	void SetViewOrientation(CameraOrientation^ theOrientation, bool update);
+    CameraOrientation^ CurrentViewOrientation();
+    void SetViewOrientation(CameraOrientation^ theOrientation, bool update);
 #pragma endregion
 
 
-	void DisplayDefault_GraduatedTrihedron();
-	void Hide_GraduatedTrihedron();
+    void DisplayDefault_GraduatedTrihedron();
+    void Hide_GraduatedTrihedron();
 };
 
 }
