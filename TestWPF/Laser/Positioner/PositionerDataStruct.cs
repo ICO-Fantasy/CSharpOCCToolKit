@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OCCTK.OCC.gp;
 using TestWPF.Robotics;
-using TestWPF.Utils;
-using Windows.Devices.Input.Preview;
 
 namespace TestWPF.Laser.Positioner;
 

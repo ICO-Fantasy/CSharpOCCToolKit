@@ -54,9 +54,9 @@ public partial class App : Application
         //MainWindow = new RobotWindows();
         //MainWindow = new CanvasTest();
         //! 简易夹具测试
-        //MainWindow = new SimpleClamp();
+        MainWindow = new SimpleClamp();
         //! 折弯测试
-        MainWindow = new BendingTest();
+        //MainWindow = new BendingTest();
         //! 弯管重心计算
         //MainWindow = new CenterOfGravity();
         MainWindow.Show();

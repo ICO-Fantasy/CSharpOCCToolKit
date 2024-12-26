@@ -34,7 +34,7 @@ namespace TestWPF;
 /// <summary>
 /// RobotWindows.xaml 的交互逻辑
 /// </summary>
-public partial class RobotWindows : Window
+public partial class RobotWindows : Window, ICameraChangedHandler
 {
     public RobotWindows()
     {
@@ -45,13 +45,22 @@ public partial class RobotWindows : Window
         if (App.Current.ContextManager.MainContext == null)
         {
             var context = App.Current.ContextManager.CreateContext();
-            CanvasHost.Child = new OCCCanvas(context);
+            OCCCanvas = new OCCCanvas(context);
         }
         else
         {
-            CanvasHost.Child = new OCCCanvas(App.Current.ContextManager.MainContext);
+            OCCCanvas = new OCCCanvas(App.Current.ContextManager.MainContext);
         }
+        CanvasHost.Child = OCCCanvas;
         DataContext = new RobotWindowsViewModel();
+        OCCCanvas.OnCameraChangedEvent += OnCameraChanged;
+    }
+
+    private OCCCanvas OCCCanvas { get; }
+
+    public void OnCameraChanged()
+    {
+        UpdateBottom_StatusBar_Info();
     }
 
     //private async Task AnimateBoxesAsync(
@@ -146,5 +155,19 @@ public partial class RobotWindows : Window
         //    //}
         //    //catch { }
         //}
+    }
+
+    private void UpdateBottom_StatusBar_Info()
+    {
+        OCCTK.OCC.V3d.View view = App.Current.ContextManager.MainContext.ViewList[0].View;
+        if (view == null)
+        {
+            return;
+        }
+        CameraOrientation c = view.CurrentViewOrientation();
+        string data =
+            $"Scale: {c.Scale} | Eye: {c.Eye} | Prj: {c.Projection} | Aspect: {c.Aspect} | HightPoint: {c.HightPoint} | ScreenCenter: {c.ScreenCenter} | Size: {c.Size} | ViewPoint: {c.ViewPoint} ";
+        Last_StatusBar.Text = Bottom_StatusBar.Text;
+        Bottom_StatusBar.Text = data;
     }
 }

@@ -1,101 +1,119 @@
 ﻿<Window
-    x:Class="TestWPF.RobotWindows"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:TestWPF.ViewModel"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="RobotWindows"
-    Width="2400"
-    Height="1200"
-    WindowStartupLocation="CenterScreen"
-    mc:Ignorable="d">
-    <Window.DataContext>
-        <local:RobotWindowsViewModel />
-    </Window.DataContext>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
-        <!--  工具栏  -->
-        <Ribbon x:Name="MainWindow_Ribbon">
-            <!--  工作空间选项卡  -->
-            <RibbonTab x:Name="WorkSpace_RibbonTab" Header="工作空间">
-                <RibbonGroup x:Name="WorkSpace_Function_RibbonGroup" Header="功能">
-                    <!--  可扩展功能  -->
-                </RibbonGroup>
-            </RibbonTab>
+  x:Class="TestWPF.RobotWindows"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:TestWPF.ViewModel"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  Title="RobotWindows"
+  Width="2400"
+  Height="1200"
+  WindowStartupLocation="CenterScreen"
+  mc:Ignorable="d">
+  <Window.DataContext>
+    <local:RobotWindowsViewModel />
+  </Window.DataContext>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="auto" />
+      <RowDefinition />
+      <RowDefinition Height="auto" />
+      <RowDefinition Height="auto" />
+    </Grid.RowDefinitions>
+    <!--  工具栏  -->
+    <Ribbon x:Name="MainWindow_Ribbon">
+      <!--  工作空间选项卡  -->
+      <RibbonTab x:Name="WorkSpace_RibbonTab" Header="工作空间">
+        <RibbonGroup x:Name="WorkSpace_Function_RibbonGroup" Header="功能">
+          <!--  可扩展功能  -->
+        </RibbonGroup>
+        <!--  三维功能  -->
+        <RibbonGroup x:Name="ThreeD_RibbonGroup" Header="三维操作">
+          <Button Command="{Binding FrontViewCommand}" Content="前" />
+          <Button Command="{Binding BackViewCommand}" Content="后" />
+          <Button Command="{Binding TopViewCommand}" Content="上" />
+          <Button Command="{Binding BottomViewCommand}" Content="下" />
+          <Button Command="{Binding LeftViewCommand}" Content="左" />
+          <Button Command="{Binding RightViewCommand}" Content="右" />
+          <Button Command="{Binding AxoViewCommand}" Content="等轴测" />
+          <Button Command="{Binding ResetViewCommand}" Content="rest" />
+        </RibbonGroup>
+      </RibbonTab>
 
-            <!--  机器人选项卡  -->
-            <RibbonTab x:Name="Robot_RibbonTab" Header="机器人">
-                <RibbonGroup x:Name="Robot_Function_RibbonGroup" Header="机器人功能">
-                    <RibbonButton x:Name="Robot_NewRobot_Button" Label="新建机器人" />
-                    <RibbonButton x:Name="Robot_LoadRobot_Button" Label="加载机器人" />
-                    <RibbonButton x:Name="Robot_SaveRobot_Button" Label="保存机器人" />
-                </RibbonGroup>
-            </RibbonTab>
+      <!--  机器人选项卡  -->
+      <RibbonTab x:Name="Robot_RibbonTab" Header="机器人">
+        <RibbonGroup x:Name="Robot_Function_RibbonGroup" Header="机器人功能">
+          <RibbonButton x:Name="Robot_NewRobot_Button" Label="新建机器人" />
+          <RibbonButton x:Name="Robot_LoadRobot_Button" Label="加载机器人" />
+          <RibbonButton x:Name="Robot_SaveRobot_Button" Label="保存机器人" />
+        </RibbonGroup>
+      </RibbonTab>
 
-            <!--  测试选项卡  -->
-            <RibbonTab x:Name="Test_RibbonTab" Header="测试">
-                <RibbonGroup x:Name="Test_Function_RibbonGroup" Header="测试功能">
-                    <RibbonButton
-                        x:Name="Test_Test1_Button"
-                        Click="Test_Test1_Button_Click"
-                        Label="测试1" />
-                </RibbonGroup>
-            </RibbonTab>
-        </Ribbon>
-        <!--  主窗口界面  -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="200" />
-                <ColumnDefinition Width="2" />
-                <ColumnDefinition MinWidth="1000" />
-                <ColumnDefinition Width="2" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <TabControl Grid.Column="0" Background="LightBlue">
-                <TabItem Header="树结构">
-                    <TreeView x:Name="WorkSpace_TreeView" />
-                </TabItem>
-                <TabItem Header="表结构">
-                    <ListView x:Name="WorkSpace_ListView">
-                        <ListItem />
-                    </ListView>
-                </TabItem>
-            </TabControl>
-            <GridSplitter
-                Grid.Column="1"
-                HorizontalAlignment="Stretch"
-                Background="Red" />
-            <!--  canvas  -->
-            <WindowsFormsHost
-                x:Name="CanvasHost"
-                Grid.Column="2"
-                HorizontalAlignment="Stretch"
-                Background="LightBlue" />
-            <GridSplitter
-                Grid.Column="3"
-                HorizontalAlignment="Stretch"
-                Background="Red" />
-            <!--  属性栏  -->
-            <GroupBox
-                Grid.Column="4"
-                Margin="2"
-                Background="LightGreen"
-                FontSize="18"
-                FontWeight="Bold"
-                Header="属性栏">
-                <ScrollViewer x:Name="Properties_ScrollViewer" VerticalScrollBarVisibility="Auto" />
-            </GroupBox>
-        </Grid>
-        <!--  状态栏  -->
-        <StatusBar Grid.Row="2">
-            <StatusBarItem>
-                <TextBlock Text="value" />
-            </StatusBarItem>
-        </StatusBar>
+      <!--  测试选项卡  -->
+      <RibbonTab x:Name="Test_RibbonTab" Header="测试">
+        <RibbonGroup x:Name="Test_Function_RibbonGroup" Header="测试功能">
+          <RibbonButton
+            x:Name="Test_Test1_Button"
+            Click="Test_Test1_Button_Click"
+            Label="测试1" />
+        </RibbonGroup>
+      </RibbonTab>
+    </Ribbon>
+    <!--  主窗口界面  -->
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition MinWidth="200" />
+        <ColumnDefinition Width="2" />
+        <ColumnDefinition MinWidth="1000" />
+        <ColumnDefinition Width="2" />
+        <ColumnDefinition />
+      </Grid.ColumnDefinitions>
+      <TabControl Grid.Column="0" Background="LightBlue">
+        <TabItem Header="树结构">
+          <TreeView x:Name="WorkSpace_TreeView" />
+        </TabItem>
+        <TabItem Header="表结构">
+          <ListView x:Name="WorkSpace_ListView">
+            <ListItem />
+          </ListView>
+        </TabItem>
+      </TabControl>
+      <GridSplitter
+        Grid.Column="1"
+        HorizontalAlignment="Stretch"
+        Background="Red" />
+      <!--  canvas  -->
+      <WindowsFormsHost
+        x:Name="CanvasHost"
+        Grid.Column="2"
+        HorizontalAlignment="Stretch"
+        Background="LightBlue" />
+      <GridSplitter
+        Grid.Column="3"
+        HorizontalAlignment="Stretch"
+        Background="Red" />
+      <!--  属性栏  -->
+      <GroupBox
+        Grid.Column="4"
+        Margin="2"
+        Background="LightGreen"
+        FontSize="18"
+        FontWeight="Bold"
+        Header="属性栏">
+        <ScrollViewer x:Name="Properties_ScrollViewer" VerticalScrollBarVisibility="Auto" />
+      </GroupBox>
     </Grid>
+    <StatusBar Grid.Row="2">
+      <TextBlock
+        x:Name="Last_StatusBar"
+        Grid.Column="3"
+        Text="value" />
+    </StatusBar>
+    <!--  状态栏  -->
+    <StatusBar Grid.Row="3">
+      <StatusBarItem>
+        <TextBlock x:Name="Bottom_StatusBar" Text="value" />
+      </StatusBarItem>
+    </StatusBar>
+  </Grid>
 </Window>
