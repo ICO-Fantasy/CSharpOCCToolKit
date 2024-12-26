@@ -23,6 +23,9 @@ public:
     View(const Handle(V3d_View)& theView);
     View(const Handle(V3d_View)& theView, System::IntPtr theWnd);
     Handle(V3d_View) GetOCC();
+    //! 隐式转换为 V3d_View
+    static operator Handle(V3d_View) (View^ v) { return v->GetOCC(); }
+public:
     void SetWindow(System::IntPtr theWnd);
     void Remove();
     void SetDefault();
