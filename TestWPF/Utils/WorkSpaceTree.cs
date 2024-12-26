@@ -78,7 +78,7 @@ public class Node
             return new(x, y, z);
         }
     }
-    public Tuple<double, double, double> OffsetPosition
+    public (double, double, double) OffsetPosition
     {
         get { return offset.Rotation.ToEuler(EulerSequence.Intrinsic_XYZ); }
     }
@@ -157,7 +157,7 @@ public class Node
         get => Location.Z;
         set { pose.SetTranslationPart(new(new Pnt(), Location.SetZ(value))); }
     }
-    public Tuple<double, double, double> Position
+    public (double, double, double) Position
     {
         get { return pose.Rotation.ToEuler(EulerSequence.Intrinsic_XYZ); }
     }
