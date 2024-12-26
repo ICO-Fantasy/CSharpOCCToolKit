@@ -26,6 +26,7 @@ public enum class EulerSequence {
 	Intrinsic_YXZ = gp_EulerSequence::gp_Intrinsic_YXZ,
 	Intrinsic_ZXY = gp_EulerSequence::gp_Intrinsic_ZXY,
 	Intrinsic_ZYX = gp_EulerSequence::gp_Intrinsic_ZYX,
+	WPR = Intrinsic_XYZ,
 
 	// Proper Euler angles (using two different axes, first and third the same)
 	Extrinsic_XYX = gp_EulerSequence::gp_Extrinsic_XYX,

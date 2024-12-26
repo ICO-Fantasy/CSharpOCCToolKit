@@ -18,6 +18,12 @@ Pnt::Pnt(double theX, double theY, double theZ) {
 	Z = theZ;
 }
 
+Pnt::Pnt(System::ValueTuple<double, double, double> theXYZ) {
+	X = theXYZ.Item1;
+	Y = theXYZ.Item2;
+	Z = theXYZ.Item3;
+}
+
 Pnt::Pnt(gp_Pnt thePnt) {
 	X = thePnt.X();
 	Y = thePnt.Y();

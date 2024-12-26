@@ -35,6 +35,11 @@ XShape::XShape(bool isShape) {
 	TopoShape = nullptr;
 	Material = nullptr;
 }
+
+System::String^ XShape::ToString() {
+	return Name;
+}
+
 Trsf^ XShape::Location::get() {
 	if (Parent != nullptr) {
 		return  Parent->Location->Multiplied(Transform);

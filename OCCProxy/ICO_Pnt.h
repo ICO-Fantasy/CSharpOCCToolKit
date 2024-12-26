@@ -26,6 +26,7 @@ public:
 	const static Pnt Default = Pnt(0.0, 0.0, 0.0);
 public:
 	Pnt(double theX, double theY, double theZ);
+	Pnt(System::ValueTuple<double, double, double> theXYZ);
 	Pnt(gp_Pnt thePnt);
 	Pnt(gp_Pnt* thePnt);
 	Pnt(gp_XYZ theXYZ);

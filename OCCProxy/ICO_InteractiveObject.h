@@ -30,7 +30,7 @@ public:
 	InteractiveObject() :BaseObject() {}
 	InteractiveObject(Handle(AIS_InteractiveObject) theAISObject);
 	Handle(AIS_InteractiveObject) GetOCC() { return Handle(AIS_InteractiveObject)::DownCast(NativeHandle); };
-	//! 隐式转换为 gp_Trsf
+	//! 隐式转换为  Handle(AIS_InteractiveObject)
 	static operator Handle(AIS_InteractiveObject) (InteractiveObject^ ais) { return ais->GetOCC(); }
 public:
 	void RemoveSelf(bool update);

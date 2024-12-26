@@ -15,6 +15,11 @@ Vec2D::Vec2D(double theX, double theY) {
 	Y = theY;
 }
 
+Vec2D::Vec2D(System::ValueTuple<double, double> theXY) {
+	X = theXY.Item1;
+	Y = theXY.Item2;
+}
+
 Vec2D::Vec2D(Pnt2D fromPnt, Pnt2D toPnt) {
 	X = toPnt.X - fromPnt.X;
 	Y = toPnt.Y - fromPnt.Y;

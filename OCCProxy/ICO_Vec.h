@@ -18,6 +18,7 @@ public:
 	const static Vec Default = Vec(1.0, 0.0, 0.0);
 public:
 	Vec(double theX, double theY, double theZ);
+	Vec(System::ValueTuple<double, double, double> theXYZ);
 	Vec(Pnt fromPnt, Pnt toPnt);
 	Vec(gp_Vec theVec);
 	Vec(gp_Vec* theVec);

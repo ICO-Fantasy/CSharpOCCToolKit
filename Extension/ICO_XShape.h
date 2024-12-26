@@ -29,9 +29,9 @@ value struct Color;
 
 public ref class XShape {
 public:
-
 	XShape();
 	XShape(bool isShape);
+	virtual System::String^ ToString() override;
 public:
 	property bool IsShape;
 	property bool IsAssembly {bool get() { return !IsShape; }};
@@ -52,6 +52,7 @@ public:
 	property OCC::gp::Trsf^ Location {OCC::gp::Trsf^ get(); }
 	property OCC::Topo::TShape^ TopoShape {OCC::Topo::TShape^ get() { return myTopo; } void set(OCC::Topo::TShape^ value); };
 	property OCC::AIS::AShape^ AISShape {OCC::AIS::AShape^ get(); };
+
 private:
 	OCC::Topo::TShape^ myTopo;
 	OCC::AIS::AShape^ myAIS;
