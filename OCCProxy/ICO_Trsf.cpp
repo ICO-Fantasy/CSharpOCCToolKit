@@ -17,88 +17,88 @@ namespace OCC {
 namespace gp {
 
 Trsf::Trsf() {
-	myTrsf = new gp_Trsf();
+    myTrsf = new gp_Trsf();
 }
 
 Trsf::Trsf(Trsf^ theT) {
-	myTrsf = new gp_Trsf(theT);
+    myTrsf = new gp_Trsf(theT);
 }
 
 Trsf::Trsf(const gp_Trsf theT) {
-	myTrsf = new gp_Trsf(theT);
+    myTrsf = new gp_Trsf(theT);
 }
 
 Trsf::Trsf(gp_Trsf* theT) {
-	myTrsf = theT;
+    myTrsf = theT;
 }
 
 Trsf::Trsf(Ax2 theAx2) {
-	myTrsf = new gp_Trsf();
-	myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2));
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2));
 }
 
 Trsf::Trsf(array<double, 2>^ matrix) {
-	// 检查矩阵尺寸
-	if (matrix->GetLength(0) != 3 && matrix->GetLength(0) != 4) {
-		int rows = matrix->GetLength(0);
-		System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
-		throw gcnew System::Exception(str);
-	}
-	if (matrix->GetLength(1) != 4) {
-		int cols = matrix->GetLength(1);
-		System::String^ str = "输入矩阵为" + cols + "列，需要4行";
-		throw gcnew System::Exception(str);
-	}
-	myTrsf = new gp_Trsf();
-	myTrsf->SetValues(matrix[0, 0], matrix[0, 1], matrix[0, 2], matrix[0, 3],
-		matrix[1, 0], matrix[1, 1], matrix[1, 2], matrix[1, 3],
-		matrix[2, 0], matrix[2, 1], matrix[2, 2], matrix[2, 3]);
+    // 检查矩阵尺寸
+    if (matrix->GetLength(0) != 3 && matrix->GetLength(0) != 4) {
+        int rows = matrix->GetLength(0);
+        System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
+        throw gcnew System::Exception(str);
+    }
+    if (matrix->GetLength(1) != 4) {
+        int cols = matrix->GetLength(1);
+        System::String^ str = "输入矩阵为" + cols + "列，需要4行";
+        throw gcnew System::Exception(str);
+    }
+    myTrsf = new gp_Trsf();
+    myTrsf->SetValues(matrix[0, 0], matrix[0, 1], matrix[0, 2], matrix[0, 3],
+        matrix[1, 0], matrix[1, 1], matrix[1, 2], matrix[1, 3],
+        matrix[2, 0], matrix[2, 1], matrix[2, 2], matrix[2, 3]);
 }
 
 Trsf::Trsf(array<array<double>^>^ matrix) {
-	// 检查矩阵尺寸
-	if (matrix->Length != 3 && matrix->Length != 4) {
-		int rows = matrix->Length;
-		System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
-		throw gcnew System::Exception(str);
-	}
-	if (matrix[0]->Length != 4) {
-		int cols = matrix[0]->Length;
-		System::String^ str = "输入矩阵为" + cols + "列，需要4行";
-		throw gcnew System::Exception(str);
-	}
-	myTrsf = new gp_Trsf();
-	myTrsf->SetValues(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
-		matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
-		matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
+    // 检查矩阵尺寸
+    if (matrix->Length != 3 && matrix->Length != 4) {
+        int rows = matrix->Length;
+        System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
+        throw gcnew System::Exception(str);
+    }
+    if (matrix[0]->Length != 4) {
+        int cols = matrix[0]->Length;
+        System::String^ str = "输入矩阵为" + cols + "列，需要4行";
+        throw gcnew System::Exception(str);
+    }
+    myTrsf = new gp_Trsf();
+    myTrsf->SetValues(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+        matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+        matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
 }
 
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
-	myTrsf = new gp_Trsf();
-	myTrsf->SetTransformation(gp_Ax3(toAx2), gp_Ax3(fromAx2));
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTransformation(gp_Ax3(toAx2), gp_Ax3(fromAx2));
 }
 
 Trsf::Trsf(Pnt fromPoint, Pnt toPoint) {
-	myTrsf = new gp_Trsf();
-	myTrsf->SetTranslation(fromPoint, toPoint);
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTranslation(fromPoint, toPoint);
 }
 
 gp_Trsf Trsf::GetOCC() {
-	return *myTrsf;
+    return *myTrsf;
 }
 
 Object^ Trsf::Clone() {
-	return gcnew Trsf(myTrsf);
+    return gcnew Trsf(myTrsf);
 }
 
 System::String^ Trsf::ToString() {
-	TCollection_AsciiString theString;
-	gp_XYZ p = myTrsf->TranslationPart();
-	gp_Quaternion q = myTrsf->GetRotation();
-	double x, y, z;
-	q.GetEulerAngles(gp_Intrinsic_XYZ, x, y, z);
-	System::String^ str = "(" + p.X().ToString("F1") + ", " + p.Y().ToString("F1") + ", " + p.Z().ToString("F1") + "), Intrinsic_xyz:(" + (x / M_PI * 180.0).ToString("F1") + ", " + (y / M_PI * 180.0).ToString("F1") + ", " + (z / M_PI * 180.0).ToString("F1") + ")";
-	return str;
+    TCollection_AsciiString theString;
+    gp_XYZ p = myTrsf->TranslationPart();
+    gp_Quaternion q = myTrsf->GetRotation();
+    double x, y, z;
+    q.GetEulerAngles(gp_Intrinsic_XYZ, x, y, z);
+    System::String^ str = "(" + p.X().ToString("F1") + ", " + p.Y().ToString("F1") + ", " + p.Z().ToString("F1") + "), Intrinsic_xyz:(" + (x / M_PI * 180.0).ToString("F1") + ", " + (y / M_PI * 180.0).ToString("F1") + ", " + (z / M_PI * 180.0).ToString("F1") + ")";
+    return str;
 }
 
 /// <summary>
@@ -107,7 +107,7 @@ System::String^ Trsf::ToString() {
 /// <param name="fromPoint"></param>
 /// <param name="toPoint"></param>
 void Trsf::SetTranslation(Pnt fromPoint, Pnt toPoint) {
-	myTrsf->SetTranslation(fromPoint, toPoint);
+    myTrsf->SetTranslation(fromPoint, toPoint);
 }
 
 /// <summary>
@@ -115,7 +115,7 @@ void Trsf::SetTranslation(Pnt fromPoint, Pnt toPoint) {
 /// </summary>
 /// <param name="vec"></param>
 void Trsf::SetTranslation(Vec vec) {
-	myTrsf->SetTranslation(vec);
+    myTrsf->SetTranslation(vec);
 }
 
 /// <summary>
@@ -123,7 +123,7 @@ void Trsf::SetTranslation(Vec vec) {
 /// </summary>
 /// <param name="vec"></param>
 void Trsf::SetTranslationPart(Vec vec) {
-	myTrsf->SetTranslationPart(vec);
+    myTrsf->SetTranslationPart(vec);
 }
 
 /// <summary>
@@ -131,7 +131,7 @@ void Trsf::SetTranslationPart(Vec vec) {
 /// </summary>
 /// <param name="quat"></param>
 void Trsf::SetRotationPart(Quat quat) {
-	myTrsf->SetRotationPart(quat);
+    myTrsf->SetRotationPart(quat);
 }
 
 /// <summary>
@@ -140,7 +140,7 @@ void Trsf::SetRotationPart(Quat quat) {
 /// <param name="axis"></param>
 /// <param name="angle"></param>
 void Trsf::SetRotation(Quat quat) {
-	myTrsf->SetRotation(quat);
+    myTrsf->SetRotation(quat);
 }
 
 /// <summary>
@@ -149,7 +149,7 @@ void Trsf::SetRotation(Quat quat) {
 /// <param name="axis">旋转轴</param>
 /// <param name="angle">旋转角</param>
 void Trsf::SetRotation(Ax1 axis, double angle) {
-	myTrsf->SetRotation(axis, angle);
+    myTrsf->SetRotation(axis, angle);
 }
 
 ///// <summary>
@@ -166,7 +166,7 @@ void Trsf::SetRotation(Ax1 axis, double angle) {
 /// <param name="rightTrsf"></param>
 /// <returns></returns>
 Trsf^ Trsf::Multiplied(Trsf^ rightTrsf) {
-	return gcnew Trsf(myTrsf->Multiplied(rightTrsf->GetOCC()));
+    return gcnew Trsf(myTrsf->Multiplied(rightTrsf->GetOCC()));
 }
 
 /// <summary>
@@ -174,24 +174,24 @@ Trsf^ Trsf::Multiplied(Trsf^ rightTrsf) {
 /// </summary>
 /// <returns></returns>
 Trsf^ Trsf::Inverted() {
-	return gcnew Trsf(myTrsf->Inverted());
+    return gcnew Trsf(myTrsf->Inverted());
 }
 
 ValueTuple<double, double, double> Trsf::Translation::get() {
-	gp_XYZ xyz = myTrsf->TranslationPart();
-	return ValueTuple<double, double, double>(xyz.X(), xyz.Y(), xyz.Z());
+    gp_XYZ xyz = myTrsf->TranslationPart();
+    return ValueTuple<double, double, double>(xyz.X(), xyz.Y(), xyz.Z());
 }
 
 Quat Trsf::Rotation::get() {
-	return Quat(myTrsf->GetRotation());
+    return Quat(myTrsf->GetRotation());
 }
 
 Trsf^ Trsf::operator*(Trsf^ Left, Trsf^ Right) {
-	return Left->Multiplied(Right);
+    return Left->Multiplied(Right);
 }
 
 Trsf^ Trsf::operator-(Trsf^ Left) {
-	return Left->Inverted();
+    return Left->Inverted();
 }
 
 }

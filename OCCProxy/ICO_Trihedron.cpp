@@ -53,7 +53,7 @@ ATrihedron::ATrihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() 
 }
 
 /// <summary>
-/// 设置部分箭头的宽度
+/// 分轴设置箭头的宽度
 /// </summary>
 /// <param name="axis"></param>
 /// <param name="value"></param>
@@ -62,7 +62,7 @@ void ATrihedron::SetArrowWidth(DatumParts axis, double value) {
 }
 
 /// <summary>
-/// 设置部分箭头和文字的颜色
+/// 分轴设置箭头、轴和文字的颜色
 /// </summary>
 /// <param name="axis"></param>
 /// <param name="color"></param>

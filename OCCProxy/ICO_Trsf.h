@@ -17,53 +17,53 @@ value struct Vec;
 
 public ref class Trsf :System::ICloneable {
 public:
-	Trsf();
-	Trsf(Trsf^ theT);
-	Trsf(gp_Trsf theT);
-	Trsf(gp_Trsf* theT);
-	Trsf(Ax2 theAx2);
-	Trsf(array<double, 2>^ matrix);
-	Trsf(array<array<double>^>^ matrix);
-	Trsf(Ax2 fromAx2, Ax2 toAx2);
-	Trsf(Pnt fromPoint, Pnt toPoint);
-	gp_Trsf GetOCC();
-	virtual System::Object^ Clone();
-	virtual System::String^ ToString() override;
-	//! 隐式转换为 gp_Trsf
-	static operator gp_Trsf (Trsf^ t) { return t->GetOCC(); }
+    Trsf();
+    Trsf(Trsf^ theT);
+    Trsf(gp_Trsf theT);
+    Trsf(gp_Trsf* theT);
+    Trsf(Ax2 theAx2);
+    Trsf(array<double, 2>^ matrix);
+    Trsf(array<array<double>^>^ matrix);
+    Trsf(Ax2 fromAx2, Ax2 toAx2);
+    Trsf(Pnt fromPoint, Pnt toPoint);
+    gp_Trsf GetOCC();
+    virtual System::Object^ Clone();
+    virtual System::String^ ToString() override;
+    //! 隐式转换为 gp_Trsf
+    static operator gp_Trsf (Trsf^ t) { return t->GetOCC(); }
 public:
-	void SetTranslation(Pnt fromPoint, Pnt toPoint);
-	void SetTranslation(Vec vec);
-	void SetTranslationPart(Vec vec);
-	void SetRotationPart(Quat quat);
-	void SetRotation(Quat quat);
-	void SetRotation(Ax1 axis, double angle);
-	//void PreMultiply(Trsf^ leftTrsf);
-	Trsf^ Multiplied(Trsf^ rightTrsf);
-	Trsf^ Inverted();
+    void SetTranslation(Pnt fromPoint, Pnt toPoint);
+    void SetTranslation(Vec vec);
+    void SetTranslationPart(Vec vec);
+    void SetRotationPart(Quat quat);
+    void SetRotation(Quat quat);
+    void SetRotation(Ax1 axis, double angle);
+    //void PreMultiply(Trsf^ leftTrsf);
+    Trsf^ Multiplied(Trsf^ rightTrsf);
+    Trsf^ Inverted();
 public:
-	property System::ValueTuple<double, double, double> Translation {System::ValueTuple<double, double, double> get(); };
-	property Quat Rotation {Quat get(); };
+    property System::ValueTuple<double, double, double> Translation {System::ValueTuple<double, double, double> get(); };
+    property Quat Rotation {Quat get(); };
 #pragma region 重载操作符
-	static Trsf^ operator * (Trsf^ Left, Trsf^ Right);
-	static Trsf^ operator - (Trsf^ Left);
+    static Trsf^ operator * (Trsf^ Left, Trsf^ Right);
+    static Trsf^ operator - (Trsf^ Left);
 #pragma endregion
 private:
-	gp_Trsf* myTrsf;
+    gp_Trsf* myTrsf;
 protected:
-	// 析构函数用于清理非托管资源
-	!Trsf() {
-		if (myTrsf != 0) {
-			delete myTrsf;
-			myTrsf = 0;
-		}
-	}
+    // 析构函数用于清理非托管资源
+    !Trsf() {
+        if (myTrsf != 0) {
+            delete myTrsf;
+            myTrsf = 0;
+        }
+    }
 
-	// 终结器（finalizer）用于垃圾回收时的清理
-	~Trsf() {
-		// 调用析构函数来清理非托管资源
-		this->!Trsf();
-	}
+    // 终结器（finalizer）用于垃圾回收时的清理
+    ~Trsf() {
+        // 调用析构函数来清理非托管资源
+        this->!Trsf();
+    }
 };
 
 }
