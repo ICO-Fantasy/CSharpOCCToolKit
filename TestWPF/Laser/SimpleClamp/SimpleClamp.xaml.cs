@@ -120,6 +120,8 @@ public partial class SimpleClamp:Window {
 
 		TextChangeSetting( );
 		//! test
+		Canvas.View.SetBgGradientColors(Color.White, Color.White, true);
+		Canvas.ShowGraduatedTrihedron = false;
 		//TestInput();
 		//OCCFunctionTest();
 		DisplayEraseInputWorkpiece(true);
@@ -1292,17 +1294,19 @@ public partial class SimpleClamp:Window {
 	/// <param name="sender"></param>
 	/// <param name="e"></param>
 	private void Manipulator_Button_Click( object sender, RoutedEventArgs e ) {
-		if( InputWorkpiece == null ) {
-			return;
-		}
+		//if( InputWorkpiece == null ) {
+		//	return;
+		//}
 		if( manipulatedObject == null ) {
-			manipulatedObject = InputWorkpiece.AIS;
+			manipulatedObject = new ATrihedron(new Trsf( ), 10);
+			Display(manipulatedObject, true);
+			//manipulatedObject = InputWorkpiece.AIS;
 			Canvas.Attach(manipulatedObject);
 		} else {
 			//! 必须先detach操作器，否则会因为AIS对象消失而出错
 			Canvas.Detach( );
 			ThreeDContext.Remove(manipulatedObject, false);
-			InputWorkpiece.Transform( );
+			//InputWorkpiece.Transform( );
 			manipulatedObject = null;
 			DisplayEraseInputWorkpiece(false);
 		}
@@ -1687,7 +1691,8 @@ public partial class SimpleClamp:Window {
 			if( ShowInputWorkpiece ) {
 				Display(InputWorkpiece.AIS, false);
 				//AISContext.SetTransparency(InputWorkpiece.AIS, 0.9, false);
-				SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), update);
+				//SetColor(InputWorkpiece.AIS, new Color(125, 125, 125), update);
+				SetColor(InputWorkpiece.AIS, new Color("#459138"), update);
 			} else {
 				Erase(InputWorkpiece.AIS, update);
 			}

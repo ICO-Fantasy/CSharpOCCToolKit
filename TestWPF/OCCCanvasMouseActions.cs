@@ -1,21 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 using System.Windows.Forms;
 
-using OCCTK.Extension;
-using OCCTK.OCC;
 using OCCTK.OCC.AIS;
-using OCCTK.OCC.gp;
-using OCCTK.OCC.Topo;
 using OCCTK.OCC.V3d;
-
-using Color = OCCTK.Extension.Color;
 
 namespace OCCViewForm;
 

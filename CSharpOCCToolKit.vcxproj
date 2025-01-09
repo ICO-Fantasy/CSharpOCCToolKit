@@ -104,7 +104,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(Eigen_Path);$(OCC_IncludeTKDebug);$(OCC_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OCC_IncludeTKDebug);$(OCC_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ConformanceMode>true</ConformanceMode>
       <MinimalRebuild>false</MinimalRebuild>
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
