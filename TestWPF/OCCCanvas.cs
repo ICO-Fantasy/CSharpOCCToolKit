@@ -189,7 +189,7 @@ public partial class OCCCanvas:Form {
 		//显示网格
 		ShowGrid = false;
 		//显示刻度坐标系
-		ShowGraduatedTrihedron = true;
+		ShowGraduatedTrihedron = false;
 
 		#endregion
 

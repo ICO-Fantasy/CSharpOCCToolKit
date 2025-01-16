@@ -38,6 +38,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+		<PackageReference Include="devexpress.wpf.core" Version="23.2.3" />
 		<PackageReference Include="log4net" Version="3.0.3" />
 		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 		<PackageReference Include="MathNet.Spatial" Version="0.6.0" />

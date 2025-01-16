@@ -6,6 +6,8 @@
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
+#include "ICO_ImageDumpOptions.h"
+#include "ICO_PixMap.h"
 #include "..\Extension\ICO_CameraOrientation.h"
 
 using namespace OCCTK::OCC::Graphic3d;
@@ -391,6 +393,11 @@ void View::SetViewOrientation(CameraOrientation^ theOrientation, bool update) {
     myView()->SetProj(theOrientation->Projection->X, theOrientation->Projection->Y, theOrientation->Projection->Z);
     myView()->SetSize(theOrientation->Size.Item1 / theOrientation->Size.Item2);
     if (update) { myView()->Update(); }
+}
+
+bool View::ToPixMap(Image::PixMap^ pixmap, ImageDumpOptions options)
+{
+    return myView()->ToPixMap(pixmap->GetRef(), options);
 }
 
 /// <summary>

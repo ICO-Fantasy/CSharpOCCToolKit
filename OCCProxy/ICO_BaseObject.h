@@ -8,20 +8,16 @@ namespace OCC {
 
 public ref class BaseObject {
 public:
-	BaseObject() {
-		myHandle() = new Standard_Transient();
-	}
-	BaseObject(const Handle(Standard_Transient)& nativeHandle) {
-		myHandle() = nativeHandle;
-	}
-	bool IsNull() {
-		return myHandle().IsNull();
-	}
-	property Handle(Standard_Transient) NativeHandle {
-		Handle(Standard_Transient) get() { return myHandle(); } void set(Handle(Standard_Transient) handle) { myHandle() = handle; }
-	};
+    BaseObject() { myHandle() = new Standard_Transient(); }
+    BaseObject(const Handle(Standard_Transient)& nativeHandle) { myHandle() = nativeHandle; }
+    property Handle(Standard_Transient) NativeHandle {
+        Handle(Standard_Transient) get() { return myHandle(); }
+        void set(Handle(Standard_Transient) handle) { myHandle() = handle; }
+    };
+public:
+    bool IsNull() { return myHandle().IsNull(); }
 protected:
-	NCollection_Haft<Handle(Standard_Transient)> myHandle;
+    NCollection_Haft<Handle(Standard_Transient)> myHandle;
 };
 
 }

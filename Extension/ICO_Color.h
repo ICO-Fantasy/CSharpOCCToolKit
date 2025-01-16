@@ -19,6 +19,7 @@ public:
     virtual System::String^ ToString() override {
         return "(" + R + ", " + G + ", " + B + ")";
     };
+    property System::String^ Hex {System::String^ get(); void set(System::String^ value); }
 public:
     // 定义一些常用的颜色
     static property Color Red {Color get() { return Color(255, 0, 0); }}

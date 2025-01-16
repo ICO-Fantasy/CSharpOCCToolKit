@@ -35,5 +35,26 @@ Color::Color(System::String^ hex) {
     CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
+System::String^ Color::Hex::get()
+{
+    return gcnew System::String(GetOCC().ColorToHex(GetOCC()).ToCString());
+}
+
+void Color::Hex::set(System::String^ value)
+{
+    if (value == nullptr) {
+        throw gcnew System::ArgumentNullException("输入的值为空，hex");
+    }
+
+    try {
+        Quantity_Color Qcolor;
+        Qcolor.ColorFromHex(ToCString(value), Qcolor);
+        R = (int)(Qcolor.Red() * 255.0);
+        G = (int)(Qcolor.Green() * 255.0);
+        B = (int)(Qcolor.Blue() * 255.0);
+    }
+    CATCH_AND_THROW_OCC_EXCEPTIONS
+}
+
 }
 }

@@ -35,7 +35,7 @@ public class ThreeDimensionContext {
 		//设置交互默认值
 		AISContext.SetDefault( );
 		//显示视图立方
-		ShowViewCube = true;
+		ShowViewCube = false;
 		//显示原点坐标轴
 		ShowOriginTrihedron = false;
 		//显示视图坐标轴
