@@ -9,6 +9,8 @@
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
 #include "ICO_Quaternion.h"
+#include "ICO_Exception.h"
+#include "..\DataExchange\ICO_StringExchange.h"
 
 using namespace System;
 
@@ -75,7 +77,7 @@ Trsf::Trsf(array<array<double>^>^ matrix) {
 
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
     myTrsf = new gp_Trsf();
-    myTrsf->SetTransformation(gp_Ax3(toAx2), gp_Ax3(fromAx2));
+    myTrsf->SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
 }
 
 Trsf::Trsf(Pnt fromPoint, Pnt toPoint) {
@@ -100,6 +102,39 @@ System::String^ Trsf::ToString() {
     System::String^ str = "(" + p.X().ToString("F1") + ", " + p.Y().ToString("F1") + ", " + p.Z().ToString("F1") + "), Intrinsic_xyz:(" + (x / M_PI * 180.0).ToString("F1") + ", " + (y / M_PI * 180.0).ToString("F1") + ", " + (z / M_PI * 180.0).ToString("F1") + ")";
     return str;
 }
+
+void Trsf::GetObjectData(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context)
+{
+    if (info == nullptr) throw gcnew System::ArgumentNullException("info");
+    // 使用 gp_Trsf 的 DumpJson 方法获取 JSON 字符串
+    std::ostringstream oss;
+    GetOCC().DumpJson(oss);  // 假设 Trsf 是 gp_Trsf 类型
+
+    // 将 JSON 字符串存储到 SerializationInfo 中
+    info->AddValue("TrsfJson", gcnew System::String(oss.str().c_str()));
+}
+
+Trsf::Trsf(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context)
+{
+    if (info == nullptr) throw gcnew System::ArgumentNullException("info");
+    // 从 SerializationInfo 中获取 JSON 字符串
+    System::String^ json = (System::String^)info->GetValue("TrsfJson", System::String::typeid);
+    //auto jsonChar=DataExchange::ToAsciiString(json);
+    const char* jsonChar = (const char*)(System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(json)).ToPointer();
+
+    // 使用 InitFromJson 从字符串恢复 gp_Trsf 对象
+    Standard_SStream jsonStream(jsonChar);
+    int strPose = 1;
+    myTrsf = new gp_Trsf();
+    try {
+        myTrsf->InitFromJson(jsonStream, strPose);  // 假设 0 是起始位置
+    }
+    CATCH_AND_THROW_OCC_EXCEPTIONS
+
+        // 释放内存
+        System::Runtime::InteropServices::Marshal::FreeHGlobal(System::IntPtr((void*)jsonChar));
+}
+
 
 /// <summary>
 /// 设置平移

@@ -12,17 +12,17 @@ value struct Ax1;
 
 public ref class Cylinder :System::ICloneable {
 public:
-	Cylinder(Ax3 pose, double radius);
-	Cylinder(gp_Cylinder cylinder);
-	Cylinder(gp_Cylinder* cylinder);
-	gp_Cylinder GetOCC();
-	virtual System::Object^ Clone();
+    Cylinder(Ax3 pose, double radius);
+    Cylinder(gp_Cylinder cylinder);
+    Cylinder(gp_Cylinder* cylinder);
+    gp_Cylinder GetOCC();
+    virtual System::Object^ Clone();
 public:
-	Ax1 Axis();
-	double Radius();
+    Ax1 Axis();
+    double Radius();
 protected:
-	Ax3 pose;
-	double radius;
+    Ax3 pose;
+    double radius;
 };
 
 }

@@ -21,6 +21,13 @@ ref class PixMap;
 namespace V3d {
 value struct ImageDumpOptions;
 }
+namespace AIS {
+ref class InteractiveObject;
+ref class InteractiveContext;
+}
+namespace gp {
+ref class Trsf;
+}
 }
 }
 
@@ -93,6 +100,7 @@ public:
 #pragma region Record
 
     bool ToPixMap(Image::PixMap^ pixmap, ImageDumpOptions options);
+    void RecordTest(AIS::InteractiveContext^ context, AIS::InteractiveObject^ ais, System::String^ filePath, System::Collections::Generic::List<gp::Trsf^>^ trsfList, int x, int y);
 
 #pragma endregion
 
