@@ -158,10 +158,6 @@
   <ItemGroup>
     <ClCompile Include="DataExchange\ICO_OBJExchange.cpp" />
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
-    <ClCompile Include="OCCProxy\ICO_ImageDumpOptions.cpp" />
-    <ClCompile Include="OCCProxy\ICO_PixMap.cpp" />
-    <ClCompile Include="OCCProxy\ICO_VideoParams.cpp" />
-    <ClCompile Include="OCCProxy\ICO_VideoRecorder.cpp" />
     <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp" />
     <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp" />
     <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp" />
@@ -237,10 +233,6 @@
     <ClInclude Include="DataExchange\ICO_OBJExchange.h" />
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
     <ClInclude Include="Extension\ICO_CameraOrientation.h" />
-    <ClInclude Include="OCCProxy\ICO_ImageDumpOptions.h" />
-    <ClInclude Include="OCCProxy\ICO_PixMap.h" />
-    <ClInclude Include="OCCProxy\ICO_VideoParams.h" />
-    <ClInclude Include="OCCProxy\ICO_VideoRecorder.h" />
     <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h" />
     <ClInclude Include="OCCProxy\ICO_Graphic3d_Camera.h" />
     <ClInclude Include="OCCProxy\ICO_TrsfForm.h" />

@@ -4,23 +4,13 @@
 //local
 #include "ICO_Graphic3d_Camera.h"
 #include "ICO_Pnt.h"
-#include "ICO_Trsf.h"
-#include "ICO_InteractiveContext.h"
-#include "ICO_InteractiveObject.h"
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
-#include "ICO_ImageDumpOptions.h"
-#include "ICO_PixMap.h"
 #include "..\Extension\ICO_CameraOrientation.h"
-#include "..\DataExchange\ICO_StringExchange.h"
-#include <Image_VideoRecorder.hxx>
 
-using namespace System::Collections::Generic;
 using namespace OCCTK::OCC::Graphic3d;
 using namespace OCCTK::OCC::gp;
-using namespace OCCTK::OCC::AIS;
 using namespace OCCTK::Extension;
-using namespace OCCTK::DataExchange;
 
 namespace OCCTK {
 namespace OCC {
@@ -401,65 +391,6 @@ void View::SetViewOrientation(CameraOrientation^ theOrientation, bool update) {
     myView()->SetProj(theOrientation->Projection->X, theOrientation->Projection->Y, theOrientation->Projection->Z);
     myView()->SetSize(theOrientation->Size.Item1 / theOrientation->Size.Item2);
     if (update) { myView()->Update(); }
-}
-
-bool View::ToPixMap(Image::PixMap^ pixmap, ImageDumpOptions options)
-{
-    return myView()->ToPixMap(pixmap->GetRef(), options);
-}
-
-void View::RecordTest(InteractiveContext^ context, InteractiveObject^ ais, System::String^ filePath, List<Trsf^>^ trsfList, int x, int y)
-{
-    myView()->FitAll();
-    // 设置视频录制参数，例如视频格式、分辨率和帧率。
-    Image_VideoParams aRecParams;
-    aRecParams.Width = x;   // 视频的宽度，取自窗口大小。
-    aRecParams.Height = y;  // 视频的高度，取自窗口大小。
-    aRecParams.FpsNum = 24;            // 帧率的分子，表示每秒24帧。
-    //aRecParams.Format = "matroska";    // 视频文件格式，这里指定为 Matroska (.mkv) 格式。
-    //aRecParams.PixelFormat = "yuv420p"; // 像素格式，常用于视频编码以压缩存储。
-    //aRecParams.VideoCodec = "mjpeg";   // 视频编码器，这里使用 MJPEG（Motion JPEG）。
-
-    // 创建一个视频录制器对象，用于管理视频的录制过程。
-    Handle(Image_VideoRecorder) aRecorder = new Image_VideoRecorder();
-
-    // 打开视频录制器，指定输出文件名和录制参数。
-    System::Diagnostics::Debug::WriteLine(gcnew System::String("D:\\TEST\\test.mkv"));
-    if (!aRecorder->Open("D:\\TEST\\test.mkv", aRecParams))
-    {
-        throw gcnew System::Exception("文件打开失败");          // 如果打开失败，输出错误信息。
-    }
-
-    // 开始动画循环，录制动画为视频。
-    for (size_t aNbFrames = 0; aNbFrames < trsfList->Count; aNbFrames++)
-    {
-        // 计算当前帧的展示时间戳（PTS，Presentation Timestamp）。
-        double aPts = (double(aRecParams.FpsDen) / double(aRecParams.FpsNum))
-            * double(aNbFrames); // PTS = 时间间隔 × 帧数
-
-        // 更新动画到当前时间点。
-        ais->SetLocalTransformation(trsfList[aNbFrames]);
-        context->Redisplay(ais, true);
-        context->UpdateCurrentViewer();
-        // 转储当前帧内容为像素数据。
-        V3d_ImageDumpOptions aDumpParams;
-        aDumpParams.Width = aRecParams.Width;  // 帧的宽度，等于视频宽度。
-        aDumpParams.Height = aRecParams.Height; // 帧的高度，等于视频高度。
-        //aDumpParams.BufferType = Graphic3d_BT_RGBA; // 图像缓冲区类型为RGBA。
-        aDumpParams.ToAdjustAspect = true;      // 调整宽高比以匹配目标分辨率。
-
-        // 从视图中捕获当前帧的像素数据，并将其保存到视频录制器的缓冲区。
-        if (!myView()->ToPixMap(aRecorder->ChangeFrame(), aDumpParams))
-        {
-            throw gcnew System::Exception("图像捕获失败");          // 如果dump失败，输出错误信息。
-        }
-
-        // 将帧的像素数据沿Y轴翻转。
-        Image_PixMap::FlipY(aRecorder->ChangeFrame());
-
-        // 将当前帧推送到视频录制器以存入视频文件。
-        if (!aRecorder->PushFrame()) { throw gcnew System::Exception("推送失败"); } // 如果推送失败，退出循环。
-    }
 }
 
 /// <summary>

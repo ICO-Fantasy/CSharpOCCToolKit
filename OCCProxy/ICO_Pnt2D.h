@@ -7,33 +7,32 @@ namespace gp {
 //前向声明
 ref class Trsf;
 
-[System::Serializable]
 public value struct Pnt2D :System::ICloneable {
 public:
-    const static Pnt2D Default = Pnt2D(0.0, 0.0);
+	const static Pnt2D Default = Pnt2D(0.0, 0.0);
 public:
-    Pnt2D(double theX, double theY);
-    Pnt2D(gp_Pnt2d thePnt);
-    Pnt2D(gp_Pnt2d* thePnt);
-    virtual System::Object^ Clone();
-    virtual System::String^ ToString() override;
-    gp_Pnt2d GetOCC();
-    //! 隐式转换为 gp_Pnt2d
-    static operator gp_Pnt2d (Pnt2D p) { return p.GetOCC(); }
+	Pnt2D(double theX, double theY);
+	Pnt2D(gp_Pnt2d thePnt);
+	Pnt2D(gp_Pnt2d* thePnt);
+	virtual System::Object^ Clone();
+	virtual System::String^ ToString() override;
+	gp_Pnt2d GetOCC();
+	//! 隐式转换为 gp_Pnt2d
+	static operator gp_Pnt2d (Pnt2D p) { return p.GetOCC(); }
 public:
-    double Distance(Pnt2D otherPnt);
-    Pnt2D Transformed(Trsf^ T);
-    Pnt2D SetX(double value);
-    Pnt2D SetY(double value);
+	double Distance(Pnt2D otherPnt);
+	Pnt2D Transformed(Trsf^ T);
+	Pnt2D SetX(double value);
+	Pnt2D SetY(double value);
 public:
-    property double X;
-    property double Y;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y) {
-        x = X;
-        y = Y;
-    }
+	property double X;
+	property double Y;
+	// Deconstruct 方法
+	void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
+		[System::Runtime::InteropServices::OutAttribute] double% y) {
+		x = X;
+		y = Y;
+	}
 };
 
 }

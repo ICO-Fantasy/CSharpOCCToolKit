@@ -3,15 +3,16 @@
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+  xmlns:local="clr-namespace:TestWPF.ViewModel"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:model="clr-namespace:TestWPF.ViewModel"
   Title="RobotWindows"
   Width="2400"
   Height="1200"
-  d:DataContext="{d:DesignInstance Type=model:RobotWindowsViewModel}"
   WindowStartupLocation="CenterScreen"
   mc:Ignorable="d">
+  <Window.DataContext>
+    <local:RobotWindowsViewModel />
+  </Window.DataContext>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="auto" />
@@ -99,104 +100,7 @@
         FontSize="18"
         FontWeight="Bold"
         Header="属性栏">
-        <ScrollViewer x:Name="Properties_ScrollViewer" VerticalScrollBarVisibility="Auto">
-          <StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Label Content="背景颜色上：" />
-              <dxe:PopupColorEdit Color="{Binding BackgroundColorUp, Mode=TwoWay}" />
-              <Label Content="背景颜色下：" />
-              <dxe:PopupColorEdit Color="{Binding BackgroundColorDown, Mode=TwoWay}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Label Content="尺寸：" />
-              <TextBox MinWidth="50" Text="{Binding AxesSize}" />
-              <Label Content="坐标轴半径：" />
-              <TextBox MinWidth="50" Text="{Binding AxesRadius}" />
-              <Label Content="坐标轴锥体半径：" />
-              <TextBox MinWidth="50" Text="{Binding AxesConeRadius}" />
-              <Label Content="坐标轴圆球半径：" />
-              <TextBox MinWidth="50" Text="{Binding AxesSphereRadius}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <CheckBox
-                Margin="0,0,20,0"
-                Content="绘制边框"
-                IsChecked="{Binding EnableFaceBoundary}" />
-              <Label Content="边框颜色：" />
-              <dxe:PopupColorEdit Color="{Binding FaceBoundaryColor, Mode=TwoWay}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Label Content="字体：" />
-              <dxe:FontEdit
-                MinWidth="50"
-                FontFamily="{Binding Font}"
-                Text="{Binding Font}" />
-              <!--<TextBox MinWidth="50" Text="{Binding Font}" />-->
-              <Label Content="文字高度：" />
-              <TextBox MinWidth="50" Text="{Binding FontHeight}" />
-              <Label Content="文字颜色：" />
-              <dxe:PopupColorEdit Color="{Binding BoxTextColor, Mode=TwoWay}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Label Content="立方体颜色：" />
-              <dxe:PopupColorEdit Color="{Binding BoxColor, Mode=TwoWay}" />
-              <Label Content="立方体透明度：" />
-              <TextBox MinWidth="50" Text="{Binding Transparency}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Label Content="立方体平面间边的距离：" />
-              <TextBox MinWidth="50" Text="{Binding BoxFacetExtension}" />
-              <Label Content="面圆角比例：" />
-              <TextBox MinWidth="50" Text="{Binding BoxRoundRadius}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Label Content="立方体面到边间空隙：" />
-              <TextBox MinWidth="50" Text="{Binding BoxEdgeGap}" />
-            </StackPanel>
-            <GroupBox Header=" 轴">
-              <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                  <Label Content="轴：" />
-                  <ComboBox
-                    MinWidth="100"
-                    ItemsSource="{Binding AxisParts}"
-                    SelectedValue="{Binding Axis}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                  <Label Content="轴的颜色：" />
-                  <dxe:PopupColorEdit Color="{Binding AxisColor, Mode=TwoWay}" />
-                  <Label Content="轴的文字颜色：" />
-                  <dxe:PopupColorEdit Color="{Binding AxisTextColor, Mode=TwoWay}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                  <Label Content="轴文字高度：" />
-                  <TextBox MinWidth="50" Text="{Binding AxisTextHeight}" />
-                </StackPanel>
-              </StackPanel>
-            </GroupBox>
-            <GroupBox Header=" 标签">
-              <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                  <Label Content="立方体方向：" />
-                  <ComboBox
-                    MinWidth="100"
-                    ItemsSource="{Binding OrientationParts}"
-                    SelectedValue="{Binding Orientation}" />
-                  <Label Content="方向对应面的标签：" />
-                  <TextBox MinWidth="50" Text="{Binding BoxSideLabel}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                  <Label Content="X轴标签：" />
-                  <TextBox MinWidth="50" Text="{Binding XLabel}" />
-                  <Label Content="Y轴标签：" />
-                  <TextBox MinWidth="50" Text="{Binding YLabel}" />
-                  <Label Content="Z轴标签：" />
-                  <TextBox MinWidth="50" Text="{Binding ZLabel}" />
-                </StackPanel>
-              </StackPanel>
-            </GroupBox>
-          </StackPanel>
-        </ScrollViewer>
+        <ScrollViewer x:Name="Properties_ScrollViewer" VerticalScrollBarVisibility="Auto" />
       </GroupBox>
     </Grid>
     <StatusBar Grid.Row="2">

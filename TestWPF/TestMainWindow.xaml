@@ -12,7 +12,6 @@
   <Window.DataContext>
     <local:TestMainWindowViewModel />
   </Window.DataContext>
-
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="7*" />
@@ -22,7 +21,12 @@
     <Grid.RowDefinitions>
       <RowDefinition />
     </Grid.RowDefinitions>
-
+    <Rectangle
+      Grid.Column="0"
+      Width="1000"
+      Height="3"
+      Panel.ZIndex="999"
+      Fill="Red" />
     <Grid
       x:Name="canvas"
       Grid.Column="0"

@@ -216,12 +216,6 @@
     <Filter Include="源文件\OCCProxy\Graphic3d">
       <UniqueIdentifier>{4ec15908-d6a2-4508-b550-9ed26bd37540}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\OCCProxy\Image">
-      <UniqueIdentifier>{43f1fdb5-366d-48b0-9fa4-1e4e38c714f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\OCCProxy\Image">
-      <UniqueIdentifier>{504d8295-cfea-4836-83bb-ade114faf259}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OCCProxy\ICO_InteractiveObject.cpp">
@@ -439,18 +433,6 @@
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp">
       <Filter>源文件\OCCProxy\Graphic3d</Filter>
-    </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_VideoRecorder.cpp">
-      <Filter>源文件\OCCProxy\Image</Filter>
-    </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_VideoParams.cpp">
-      <Filter>源文件\OCCProxy\Image</Filter>
-    </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_PixMap.cpp">
-      <Filter>源文件\OCCProxy\Image</Filter>
-    </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_ImageDumpOptions.cpp">
-      <Filter>源文件\OCCProxy\V3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -732,18 +714,6 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h">
       <Filter>头文件\OCCProxy\Graphic3d</Filter>
-    </ClInclude>
-    <ClInclude Include="OCCProxy\ICO_VideoRecorder.h">
-      <Filter>头文件\OCCProxy\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="OCCProxy\ICO_VideoParams.h">
-      <Filter>头文件\OCCProxy\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="OCCProxy\ICO_PixMap.h">
-      <Filter>头文件\OCCProxy\Image</Filter>
-    </ClInclude>
-    <ClInclude Include="OCCProxy\ICO_ImageDumpOptions.h">
-      <Filter>头文件\OCCProxy\V3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

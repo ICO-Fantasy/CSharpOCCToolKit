@@ -6,7 +6,6 @@
 #include "ICO_ViewOrientation.h"
 using namespace OCCTK::Extension;
 
-//前向声明
 namespace OCCTK {
 namespace Extension {
 ref class CameraOrientation;
@@ -15,24 +14,6 @@ namespace OCC {
 namespace Graphic3d {
 ref class Camera;
 }
-namespace Image {
-ref class PixMap;
-}
-namespace V3d {
-value struct ImageDumpOptions;
-}
-namespace AIS {
-ref class InteractiveObject;
-ref class InteractiveContext;
-}
-namespace gp {
-ref class Trsf;
-}
-}
-}
-
-namespace OCCTK {
-namespace OCC {
 namespace V3d {
 
 public ref class View :BaseObject {
@@ -84,7 +65,6 @@ public:
     void Rotation(int theX, int theY);
 
 #pragma endregion
-
 #pragma region Camera
     System::ValueTuple<double, double, double> GetProjection();
     void SetViewOrientation(double theX, double theY, double theZ);
@@ -97,21 +77,9 @@ public:
     void SetViewOrientation(CameraOrientation^ theOrientation, bool update);
 #pragma endregion
 
-#pragma region Record
-
-    bool ToPixMap(Image::PixMap^ pixmap, ImageDumpOptions options);
-    void RecordTest(AIS::InteractiveContext^ context, AIS::InteractiveObject^ ais, System::String^ filePath, System::Collections::Generic::List<gp::Trsf^>^ trsfList, int x, int y);
-
-#pragma endregion
-
-
-#pragma region 控件
 
     void DisplayDefault_GraduatedTrihedron();
     void Hide_GraduatedTrihedron();
-
-#pragma endregion
-
 };
 
 }

@@ -15,7 +15,7 @@ value struct Ax2;
 value struct Quat;
 value struct Vec;
 
-public ref class Trsf :System::ICloneable, System::Runtime::Serialization::ISerializable {
+public ref class Trsf :System::ICloneable {
 public:
     Trsf();
     Trsf(Trsf^ theT);
@@ -31,11 +31,6 @@ public:
     virtual System::String^ ToString() override;
     //! 隐式转换为 gp_Trsf
     static operator gp_Trsf (Trsf^ t) { return t->GetOCC(); }
-public:
-    // ISerializable 方法：用于序列化
-    virtual void GetObjectData(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context);
-    // 用于反序列化的构造函数
-    Trsf(System::Runtime::Serialization::SerializationInfo^ info, System::Runtime::Serialization::StreamingContext context);
 public:
     void SetTranslation(Pnt fromPoint, Pnt toPoint);
     void SetTranslation(Vec vec);
