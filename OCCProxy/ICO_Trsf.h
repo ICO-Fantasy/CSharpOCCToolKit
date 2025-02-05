@@ -14,6 +14,7 @@ value struct Pnt;
 value struct Ax2;
 value struct Quat;
 value struct Vec;
+value struct XYZ;
 
 public ref class Trsf :System::ICloneable {
 public:
@@ -42,7 +43,7 @@ public:
     Trsf^ Multiplied(Trsf^ rightTrsf);
     Trsf^ Inverted();
 public:
-    property System::ValueTuple<double, double, double> Translation {System::ValueTuple<double, double, double> get(); };
+    property XYZ Translation {XYZ get(); };
     property Quat Rotation {Quat get(); };
 #pragma region 重载操作符
     static Trsf^ operator * (Trsf^ Left, Trsf^ Right);

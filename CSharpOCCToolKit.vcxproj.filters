@@ -434,6 +434,9 @@
     <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp">
       <Filter>源文件\OCCProxy\Graphic3d</Filter>
     </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_XYZ.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_StringExchange.h">
@@ -714,6 +717,9 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h">
       <Filter>头文件\OCCProxy\Graphic3d</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_XYZ.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

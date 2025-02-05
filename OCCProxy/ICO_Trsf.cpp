@@ -8,6 +8,7 @@
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
+#include "ICO_XYZ.h"
 #include "ICO_Quaternion.h"
 
 using namespace System;
@@ -177,9 +178,9 @@ Trsf^ Trsf::Inverted() {
     return gcnew Trsf(myTrsf->Inverted());
 }
 
-ValueTuple<double, double, double> Trsf::Translation::get() {
+XYZ Trsf::Translation::get() {
     gp_XYZ xyz = myTrsf->TranslationPart();
-    return ValueTuple<double, double, double>(xyz.X(), xyz.Y(), xyz.Z());
+    return XYZ(xyz);
 }
 
 Quat Trsf::Rotation::get() {
