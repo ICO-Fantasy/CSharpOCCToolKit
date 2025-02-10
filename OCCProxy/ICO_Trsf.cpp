@@ -89,7 +89,8 @@ gp_Trsf Trsf::GetOCC() {
 }
 
 Object^ Trsf::Clone() {
-    return gcnew Trsf(myTrsf);
+    gp_Trsf newTrsf = gp_Trsf(*myTrsf);
+    return gcnew Trsf(newTrsf);
 }
 
 System::String^ Trsf::ToString() {
