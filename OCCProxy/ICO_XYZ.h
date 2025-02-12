@@ -23,7 +23,8 @@ public:
     virtual System::String^ ToString() override;
     //! 隐式转换为 gp_XYZ
     static operator gp_XYZ (XYZ xyz) { return xyz.GetOCC(); }
-public:
+    //! 隐式转换为 ( x, y, z)
+    static operator System::ValueTuple<double, double, double>(XYZ xyz) { return System::ValueTuple<double, double, double>(xyz.X, xyz.Y, xyz.Z); }
 public:
     property double X;
     property double Y;

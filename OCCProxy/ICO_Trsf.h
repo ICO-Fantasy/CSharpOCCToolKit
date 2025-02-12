@@ -22,7 +22,6 @@ public:
     Trsf(Trsf^ theT);
     Trsf(gp_Trsf theT);
     Trsf(gp_Trsf* theT);
-    Trsf(Ax2 theAx2);
     Trsf(array<double, 2>^ matrix);
     Trsf(array<array<double>^>^ matrix);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
@@ -54,10 +53,8 @@ private:
 protected:
     // 析构函数用于清理非托管资源
     !Trsf() {
-        if (myTrsf != 0) {
-            delete myTrsf;
-            myTrsf = 0;
-        }
+        delete myTrsf;
+        myTrsf = nullptr;
     }
 
     // 终结器（finalizer）用于垃圾回收时的清理

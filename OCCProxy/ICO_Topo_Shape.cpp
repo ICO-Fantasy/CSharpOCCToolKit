@@ -14,6 +14,7 @@
 #include "ICO_Topo_Face.h"
 
 using namespace OCCTK::OCC::TopoAbs;
+using namespace OCCTK::OCC::gp;
 
 
 namespace OCCTK {
@@ -21,45 +22,45 @@ namespace OCC {
 namespace Topo {
 
 TShape::TShape() {
-	myShape = new TopoDS_Shape();
+    myShape = new TopoDS_Shape();
 }
 
 TShape::TShape(const TopoDS_Shape theShape) {
-	myShape = new TopoDS_Shape(theShape);
+    myShape = new TopoDS_Shape(theShape);
 }
 
 TShape::TShape(TopoDS_Shape* theShape) {
-	myShape = theShape;
+    myShape = theShape;
 }
 TShape::TShape(System::IntPtr theShapeIntPtr) {
-	// 将 IntPtr 转换为原生指针
-	TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(theShapeIntPtr.ToPointer());
-	myShape = pShape;
+    // 将 IntPtr 转换为原生指针
+    TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(theShapeIntPtr.ToPointer());
+    myShape = pShape;
 }
 
 bool TShape::IsEqual(TShape^ otherShape) {
-	return myShape->IsEqual(otherShape->GetOCC());
+    return myShape->IsEqual(otherShape->GetOCC());
 }
 
 bool TShape::Equals(System::Object^ obj) {
-	// 检查 obj 是否是同一类型
-	TShape^ other = dynamic_cast<TShape^>(obj);
-	if (other != nullptr) {
-		return IsEqual(other);
-	}
-	return false;
+    // 检查 obj 是否是同一类型
+    TShape^ other = dynamic_cast<TShape^>(obj);
+    if (other != nullptr) {
+        return IsEqual(other);
+    }
+    return false;
 }
 
 TopoDS_Shape TShape::GetOCC() {
-	return *myShape;
+    return *myShape;
 }
 
 System::IntPtr TShape::GetPtr() {
-	return System::IntPtr(myShape);
+    return System::IntPtr(myShape);
 }
 
 TopoAbs::ShapeEnum TShape::ShapeType() {
-	return TopoAbs::ShapeEnum(myShape->ShapeType());
+    return TopoAbs::ShapeEnum(myShape->ShapeType());
 }
 
 /// <summary>
@@ -67,15 +68,15 @@ TopoAbs::ShapeEnum TShape::ShapeType() {
 /// </summary>
 /// <returns></returns>
 TVertex^ TShape::AsVertex() {
-	if (myShape->ShapeType() != TopAbs_VERTEX) {
-		throw gcnew System::Exception("Shape Mismatch is not TVertex");
-	}
-	try {
-		return gcnew TVertex(TopoDS::Vertex(*myShape));
-	}
-	catch (Standard_TypeMismatch e) {
-		throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
-	}
+    if (myShape->ShapeType() != TopAbs_VERTEX) {
+        throw gcnew System::Exception("Shape Mismatch is not TVertex");
+    }
+    try {
+        return gcnew TVertex(TopoDS::Vertex(*myShape));
+    }
+    catch (Standard_TypeMismatch e) {
+        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+    }
 }
 
 /// <summary>
@@ -83,15 +84,15 @@ TVertex^ TShape::AsVertex() {
 /// </summary>
 /// <returns></returns>
 TEdge^ TShape::AsEdge() {
-	if (myShape->ShapeType() != TopAbs_EDGE) {
-		throw gcnew System::Exception("Shape Mismatch is not TEdge");
-	}
-	try {
-		return gcnew TEdge(TopoDS::Edge(*myShape));
-	}
-	catch (Standard_TypeMismatch e) {
-		throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
-	}
+    if (myShape->ShapeType() != TopAbs_EDGE) {
+        throw gcnew System::Exception("Shape Mismatch is not TEdge");
+    }
+    try {
+        return gcnew TEdge(TopoDS::Edge(*myShape));
+    }
+    catch (Standard_TypeMismatch e) {
+        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+    }
 }
 
 /// <summary>
@@ -99,22 +100,22 @@ TEdge^ TShape::AsEdge() {
 /// </summary>
 /// <returns></returns>
 TFace^ TShape::AsFace() {
-	if (myShape->ShapeType() != TopAbs_FACE) {
-		throw gcnew System::Exception("Shape Mismatch is not TFace");
-	}
-	try {
-		return gcnew TFace(TopoDS::Face(*myShape));
-	}
-	catch (Standard_TypeMismatch e) {
-		throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
-	}
+    if (myShape->ShapeType() != TopAbs_FACE) {
+        throw gcnew System::Exception("Shape Mismatch is not TFace");
+    }
+    try {
+        return gcnew TFace(TopoDS::Face(*myShape));
+    }
+    catch (Standard_TypeMismatch e) {
+        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+    }
 }
 
 /// <summary>
 /// 反转形状反向
 /// </summary>
 void TShape::Reverse() {
-	myShape->Reverse();
+    myShape->Reverse();
 }
 
 /// <summary>
@@ -122,9 +123,9 @@ void TShape::Reverse() {
 /// </summary>
 /// <param name="theT"></param>
 void TShape::Move(gp::Trsf^ theT) {
-	gp_Trsf occT = theT->GetOCC();
-	occT.SetScaleFactor(1.0);
-	myShape->Move(TopLoc_Location(occT));
+    gp_Trsf occT = theT->GetOCC();
+    occT.SetScaleFactor(1.0);
+    myShape->Move(TopLoc_Location(occT));
 }
 
 /// <summary>
@@ -132,30 +133,30 @@ void TShape::Move(gp::Trsf^ theT) {
 /// </summary>
 /// <returns></returns>
 gp::Trsf^ TShape::Location() {
-	return gcnew gp::Trsf(myShape->Location().Transformation());
+    return gcnew gp::Trsf(myShape->Location().Transformation());
 }
 
-void TShape::Location(gp::Ax2 newOrigin) {
-	auto t = gcnew gp::Trsf(newOrigin);
-	myShape->Location(TopLoc_Location(t));
+void TShape::Location(Ax2 newOrigin) {
+    auto t = gcnew Trsf(Ax2(), newOrigin);
+    myShape->Location(TopLoc_Location(t));
 }
 
-TShape^ TShape::Located(gp::Ax2 newOrigin) {
-	auto t = gcnew gp::Trsf(newOrigin);
-	return gcnew TShape(myShape->Located(TopLoc_Location(t)));
+TShape^ TShape::Located(Ax2 newOrigin) {
+    auto t = gcnew Trsf(Ax2(), newOrigin);
+    return gcnew TShape(myShape->Located(TopLoc_Location(t)));
 }
 
 int TShape::HashCode(int upperBound) {
-	return myShape->HashCode(upperBound);
+    return myShape->HashCode(upperBound);
 }
 
 
 TopoAbs::Orientation TShape::Orientation::get() {
-	return TopoAbs::Orientation(myShape->Orientation());
+    return TopoAbs::Orientation(myShape->Orientation());
 }
 
 void TShape::Orientation::set(TopoAbs::Orientation orientation) {
-	myShape->Orientation(TopAbs_Orientation(orientation));
+    myShape->Orientation(TopAbs_Orientation(orientation));
 }
 
 }

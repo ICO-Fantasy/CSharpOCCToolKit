@@ -7,9 +7,10 @@
 #include "ICO_Ax1.h"
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
-#include "ICO_Dir.h"
 #include "ICO_XYZ.h"
 #include "ICO_Quaternion.h"
+#include <TCollection_AsciiString.hxx>
+#include <gp_XYZ.hxx>
 
 using namespace System;
 
@@ -31,11 +32,6 @@ Trsf::Trsf(const gp_Trsf theT) {
 
 Trsf::Trsf(gp_Trsf* theT) {
     myTrsf = theT;
-}
-
-Trsf::Trsf(Ax2 theAx2) {
-    myTrsf = new gp_Trsf();
-    myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2));
 }
 
 Trsf::Trsf(array<double, 2>^ matrix) {
