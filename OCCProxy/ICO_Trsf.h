@@ -14,6 +14,7 @@ value struct Pnt;
 value struct Ax2;
 value struct Quat;
 value struct Vec;
+value struct WPR;
 value struct XYZ;
 
 public ref class Trsf :System::ICloneable {
@@ -24,6 +25,7 @@ public:
     Trsf(gp_Trsf* theT);
     Trsf(array<double, 2>^ matrix);
     Trsf(array<array<double>^>^ matrix);
+    Trsf(Vec translation, WPR rotation);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
     Trsf(Pnt fromPoint, Pnt toPoint);
     gp_Trsf GetOCC();

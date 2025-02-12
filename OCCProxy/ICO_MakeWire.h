@@ -28,10 +28,15 @@ public:
     static operator Topo::TWire ^ (MakeWire^ makeWire) {
         return makeWire->Wire();  // 隐式调用 Wire 方法
     }
+    //! 隐式转换为 TShape
+    static operator Topo::TShape ^ (MakeWire^ makeWire) {
+        return makeWire->Shape();  // 隐式调用 Wire 方法
+    }
+
     bool Error();
 private:
     BRepBuilderAPI_MakeWire* myMaker;
-protected:
+private:
     // 终结器（finalizer）用于垃圾回收时的清理
     !MakeWire() {
         delete myMaker;

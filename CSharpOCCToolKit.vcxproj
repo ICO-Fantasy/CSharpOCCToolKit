@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="DataExchange\ICO_OBJExchange.cpp" />
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
+    <ClCompile Include="Extension\ICO_WPR.cpp" />
     <ClCompile Include="OCCProxy\ICO_XYZ.cpp" />
     <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp" />
     <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="DataExchange\ICO_OBJExchange.h" />
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
     <ClInclude Include="Extension\ICO_CameraOrientation.h" />
+    <ClInclude Include="Extension\ICO_WPR.h" />
     <ClInclude Include="OCCProxy\ICO_XYZ.h" />
     <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h" />
     <ClInclude Include="OCCProxy\ICO_Graphic3d_Camera.h" />

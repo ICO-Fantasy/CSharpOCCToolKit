@@ -8,9 +8,11 @@
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
 #include "ICO_XYZ.h"
+#include "..\Extension\ICO_WPR.h"
 #include "ICO_Quaternion.h"
 #include <TCollection_AsciiString.hxx>
 #include <gp_XYZ.hxx>
+#include <gp_EulerSequence.hxx>
 
 using namespace System;
 
@@ -68,6 +70,15 @@ Trsf::Trsf(array<array<double>^>^ matrix) {
     myTrsf->SetValues(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
         matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
         matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
+}
+
+Trsf::Trsf(Vec translation, WPR rotation)
+{
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTranslationPart(translation);
+    gp_Quaternion quat;
+    quat.SetEulerAngles(gp_Intrinsic_XYZ, rotation.W, rotation.P, rotation.R);
+    myTrsf->SetRotationPart(quat);
 }
 
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
