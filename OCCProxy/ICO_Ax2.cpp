@@ -1,11 +1,13 @@
 ﻿#include "ICO_Ax2.h"
-#include <gp_Ax3.hxx>
 #include <gp_Ax2.hxx>
+#include <gp_Ax3.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
 #include "ICO_Ax1.h"
 #include "ICO_Trsf.h"
+#include "../Extension/ICO_WPR.h"
+#include "ICO_Vec.h"
 
 using namespace System;
 
@@ -31,12 +33,33 @@ Ax2::Ax2(Pnt location, Dir zAxis, Dir theXAxis) {
     XDir = theXAxis;
 }
 
-Ax2::Ax2(Ax2 fromAx2, Trsf^ transfrom)
-{
+Ax2::Ax2(Ax2 fromAx2, Trsf^ transfrom) {
     Ax2 toAx2 = fromAx2.Transformed(transfrom);
     Location = toAx2.Location;
     ZDir = toAx2.ZDir;
     XDir = toAx2.XDir;
+}
+
+/// <summary>
+/// 从原点应用变换创建Ax2
+/// </summary>
+/// <param name="transfrom"></param>
+Ax2::Ax2(Trsf^ transfrom)
+{
+    gp_Ax2 ax2;
+    ax2.Transform(transfrom);
+    Location = Pnt(ax2.Location());
+    ZDir = Dir(ax2.Direction());
+    XDir = Dir(ax2.XDirection());
+}
+
+Ax2::Ax2(Pnt location, WPR direction) {
+    gp_Ax2 ax2;
+    ax2.Transform(gcnew Trsf(Vec(Pnt(0, 0, 0), location), direction));
+
+    Location = Pnt(ax2.Location());
+    ZDir = Dir(ax2.Direction());
+    XDir = Dir(ax2.XDirection());
 }
 
 Ax2::Ax2(gp_Ax2 theAx2) {

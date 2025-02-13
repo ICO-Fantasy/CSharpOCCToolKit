@@ -27,6 +27,7 @@ public:
     Trsf(array<array<double>^>^ matrix);
     Trsf(Vec translation, WPR rotation);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
+    Trsf(Ax2 toAx2);
     Trsf(Pnt fromPoint, Pnt toPoint);
     gp_Trsf GetOCC();
     virtual System::Object^ Clone();

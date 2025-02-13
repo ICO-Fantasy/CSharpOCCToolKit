@@ -4,13 +4,13 @@
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
 #include "ICO_Trsf.h"
+#include "..\Extension\ICO_WPR.h"
 
 namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
 value struct Ax1;
-ref class Trsf;
 
 /// <summary>
 /// Z方向为主方向，X方向为另一个方向，Y方向自动定义
@@ -21,8 +21,10 @@ public:
 public:
     Ax2(Pnt location, Dir zAxis);
     Ax2(Pnt location, Dir zAxis, Dir XAxis);
+    Ax2(Pnt location, WPR direction);
     Ax2(gp_Ax2 theAx2);
     Ax2(Ax2 fromAx2, Trsf^ transfrom);
+    Ax2(Trsf^ transfrom);
     Ax2(gp_Ax2* theAx2);
     Ax2(array<double, 2>^ matrix);
     Ax2(array<array<double>^>^ matrix);

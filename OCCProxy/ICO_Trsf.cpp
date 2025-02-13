@@ -83,9 +83,24 @@ Trsf::Trsf(Vec translation, WPR rotation)
 
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
     myTrsf = new gp_Trsf();
-    myTrsf->SetTransformation(gp_Ax3(toAx2), gp_Ax3(fromAx2));
+    myTrsf->SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
 }
 
+/// <summary>
+/// 从原点变换到目标坐标系
+/// </summary>
+Trsf::Trsf(Ax2 toAx2)
+{
+
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(toAx2));
+}
+
+/// <summary>
+/// 设置从点到点的平移变换
+/// </summary>
+/// <param name="fromPoint"></param>
+/// <param name="toPoint"></param>
 Trsf::Trsf(Pnt fromPoint, Pnt toPoint) {
     myTrsf = new gp_Trsf();
     myTrsf->SetTranslation(fromPoint, toPoint);
