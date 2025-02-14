@@ -65,6 +65,14 @@ protected:
         // 调用析构函数来清理非托管资源
         this->!Trsf();
     }
+
+#pragma region 重载操作符
+
+    //bool Equals(Trsf other, double AngularTOL, double LinearTOL) {    }
+    //static bool operator == (Trsf Left, Trsf Right) { return Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
+    //static bool operator != (Trsf Left, Trsf Right) { return !Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
+
+#pragma endregion
 };
 
 }

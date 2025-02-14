@@ -5,6 +5,7 @@
 #include <gp_XYZ.hxx>
 #include "ICO_Pnt.h"
 #include "ICO_XYZ.h"
+#include "ICO_Precision.h"
 //前向声明
 class gp_Vec;
 
@@ -31,9 +32,8 @@ public:
     virtual System::String^ ToString() override;
     //! 隐式转换为 gp_Vec
     static operator gp_Vec (Vec v) { return v.GetOCC(); }
-
 public:
-    bool IsParallel(Vec otherVec, double theAngularTolerance);
+    bool IsParallel(Vec other, double theAngularTolerance);
     Vec Reversed();
     void Normalize();
     Vec Normalized();
@@ -59,17 +59,41 @@ public:
         y = Y;
         z = Z;
     }
+
 #pragma region 重载操作符
-    bool Equals(Vec otherVec, double tol);
-    static bool operator == (Vec Left, Vec Right) { return Left.Equals(Right, 0.0000174533); }//默认精度0.001度
-    static bool operator != (Vec Left, Vec Right) { return !Left.Equals(Right, 0.0000174533); }//默认精度0.001度
-    static Vec operator + (Vec Left, Vec Right);
-    static Vec operator - (Vec Left, Vec Right);
-    //点乘
-    static double operator * (Vec Left, Vec Right);
-    //叉乘
-    static Vec operator ^ (Vec Left, Vec Right);
+
+    bool Equals(Vec other, double angularTOL) {
+        return this->IsParallel(other, angularTOL);
+    }
+    static bool operator == (Vec left, Vec right) { return left.Equals(right, ANGULAR_TOL); }//默认精度
+    static bool operator != (Vec left, Vec right) { return !left.Equals(right, ANGULAR_TOL); }//默认精度
+    static Vec operator + (Vec left, Vec right) {
+        return Vec(
+            left.X + right.X,
+            left.Y + right.Y,
+            left.Z + right.Z);
+    }
+    static Vec operator - (Vec left, Vec right) {
+        return Vec(
+            left.X - right.X,
+            left.Y - right.Y,
+            left.Z - right.Z);
+    }
+    /// <summary>
+    /// 点乘
+    /// </summary>
+    static double operator * (Vec left, Vec right) {
+        return left.Dot(right);
+    }
+    /// <summary>
+    /// 叉乘
+    /// </summary>
+    static Vec operator ^ (Vec left, Vec right) {
+        return left.Crossed(right);
+    }
+
 #pragma endregion
+
 };
 
 }

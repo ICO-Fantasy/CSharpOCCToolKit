@@ -106,46 +106,6 @@ Pnt Pnt::SetZ(double value) {
     return Pnt(gp_Pnt(X, Y, value));
 }
 
-#pragma region 重载操作符
-
-bool Pnt::Equals(Pnt otherPnt, double tol) {
-    if (this->Distance(otherPnt) <= tol) {
-        return true;
-    }
-    return false;
-}
-
-Pnt Pnt::operator + (Pnt Left, Pnt Right) {
-    return Pnt(
-        Left.X + Right.X,
-        Left.Y + Right.Y,
-        Left.Z + Right.Z);
-}
-
-Pnt Pnt::operator - (Pnt Left, Pnt Right) {
-    return Pnt(
-        Left.X - Right.X,
-        Left.Y - Right.Y,
-        Left.Z - Right.Z);
-}
-//
-//Pnt Pnt::operator + (Pnt Left, Vec Right)
-//{
-//	return Left.Translated(Right);
-//}
-//
-//Pnt Pnt::operator - (Pnt Left, Vec Right)
-//{
-//	return Left.Translated(Right.Reversed());
-//}
-//
-//Pnt Pnt::operator * (Pnt Left, Trsf Right)
-//{
-//	return Left.Transformed(Right);
-//}
-
-#pragma endregion
-
 }
 }
 }

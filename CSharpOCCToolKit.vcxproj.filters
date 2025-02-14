@@ -440,6 +440,9 @@
     <ClCompile Include="Extension\ICO_WPR.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_Precision.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_StringExchange.h">
@@ -726,6 +729,9 @@
     </ClInclude>
     <ClInclude Include="Extension\ICO_WPR.h">
       <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_Precision.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

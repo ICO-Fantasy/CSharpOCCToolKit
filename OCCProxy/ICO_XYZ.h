@@ -37,6 +37,32 @@ public:
         y = Y;
         z = Z;
     }
+
+#pragma region 重载操作符
+
+    bool Equals(XYZ other) {
+        return (
+            X == X &&
+            Y == Y &&
+            Z == Z);
+    }
+    static bool operator == (XYZ left, XYZ right) { return left.Equals(right); }//无精度
+    static bool operator != (XYZ left, XYZ right) { return !left.Equals(right); }//无精度
+    static XYZ operator + (XYZ left, XYZ right) {
+        return XYZ(
+            left.X + right.X,
+            left.Y + right.Y,
+            left.Z + right.Z);
+    }
+    static XYZ operator - (XYZ left, XYZ right) {
+        return XYZ(
+            left.X - right.X,
+            left.Y - right.Y,
+            left.Z - right.Z);
+    }
+
+#pragma endregion
+
 };
 
 }

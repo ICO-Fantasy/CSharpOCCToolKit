@@ -161,50 +161,6 @@ double Vec::Magnitude() {
     return std::sqrt(X * X + Y * Y + Z * Z);
 }
 
-#pragma region 重载操作符
-
-bool Vec::Equals(Vec otherVec, double tol) {
-    if (this->IsParallel(otherVec, tol)) {
-        return true;
-    }
-    return false;
-}
-
-Vec Vec::operator+(Vec Left, Vec Right) {
-    return Vec(
-        Left.X + Right.X,
-        Left.Y + Right.Y,
-        Left.Z + Right.Z);
-}
-Vec Vec::operator-(Vec Left, Vec Right) {
-    return Vec(
-        Left.X - Right.X,
-        Left.Y - Right.Y,
-        Left.Z - Right.Z);
-}
-
-/// <summary>
-/// 点乘
-/// </summary>
-/// <param name="Left"></param>
-/// <param name="Right"></param>
-/// <returns></returns>
-double Vec::operator*(Vec Left, Vec Right) {
-    return Left.Dot(Right);
-}
-
-/// <summary>
-/// 叉乘
-/// </summary>
-/// <param name="Left"></param>
-/// <param name="Right"></param>
-/// <returns></returns>
-Vec Vec::operator^(Vec Left, Vec Right) {
-    return Left.Crossed(Right);
-}
-
-#pragma endregion
-
 }
 }
 }

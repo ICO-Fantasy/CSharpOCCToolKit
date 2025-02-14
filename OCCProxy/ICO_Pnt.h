@@ -3,6 +3,7 @@
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
 #include "ICO_XYZ.h"
+#include "ICO_Precision.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -56,16 +57,32 @@ public:
         y = Y;
         z = Z;
     }
+
 #pragma region 重载操作符
-    bool Equals(Pnt otherPnt, double tol);
-    static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, 1e-6); }//默认精度为1e-6
-    static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right, 1e-6); }//默认精度为1e-6
-    static Pnt operator + (Pnt Left, Pnt Right);
-    static Pnt operator - (Pnt Left, Pnt Right);
+
+    bool Equals(Pnt otherPnt, double tol) {
+        return this->Distance(otherPnt) <= tol;
+    }
+    static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, LINEAR_TOL); }//默认精度
+    static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right, LINEAR_TOL); }//默认精度
+    static Pnt operator + (Pnt Left, Pnt Right) {
+        return Pnt(
+            Left.X + Right.X,
+            Left.Y + Right.Y,
+            Left.Z + Right.Z);
+    }
+    static Pnt operator - (Pnt Left, Pnt Right) {
+        return Pnt(
+            Left.X - Right.X,
+            Left.Y - Right.Y,
+            Left.Z - Right.Z);
+    }
     //static Pnt operator + (Pnt Left, Vec Right);
     //static Pnt operator - (Pnt Left, Vec Right);
     //static Pnt operator * (Pnt Left, Trsf Right);
+
 #pragma endregion
+
 };
 
 }

@@ -1,6 +1,5 @@
 ﻿#include "ICO_Ax2.h"
 #include <gp_Ax2.hxx>
-#include <gp_Ax3.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
@@ -125,14 +124,6 @@ System::String^ Ax2::ToString() {
     System::String^ str = "(" + Location.ToString() + ") Z: (" + ZDir.ToString() + ")X: (" + XDir.ToString() + ")";
     return str;
 }
-
-//void Ax2::Transform(Trsf^ theT) {
-//	gp_Ax2 newAxis2 = GetOCC().Transformed(theT);
-//	Location = Pnt(newAxis2.Location());
-//	ZDir = Dir(newAxis2.Direction());
-//	XDir = Dir(newAxis2.XDirection());
-//}
-
 
 Ax2 Ax2::Transformed(Trsf^ theT) {
     return Ax2(GetOCC().Transformed(theT));

@@ -1,9 +1,10 @@
 ﻿#pragma once
-//值类型作为构造函数成员需要完整定义
+//构造函数成员需要完整定义
 #include <gp_Ax2.hxx>
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
 #include "ICO_Trsf.h"
+#include "ICO_Precision.h"
 #include "..\Extension\ICO_WPR.h"
 
 namespace OCCTK {
@@ -34,6 +35,12 @@ public:
     //! 隐式转换为 gp_Ax2
     static operator gp_Ax2 (Ax2 axis) { return axis.GetOCC(); }
 public:
+    bool operator==  (Ax2 other) {
+        return (Location == other.Location
+            && ZDir == other.ZDir
+            && XDir == other.XDir);
+    };
+public:
     //void Transform(Trsf^ theT);
     Ax2 Transformed(Trsf^ theT);
 public:
@@ -44,6 +51,19 @@ public:
     property Ax1 XAxis {Ax1 get(); }
     property Ax1 YAxis {Ax1 get(); }
     property Ax1 ZAxis {Ax1 get(); }
+
+#pragma region 重载操作符
+
+    bool Equals(Ax2 other, double AngularTOL, double LinearTOL) {
+        return other.Location.Equals(Location, LinearTOL) &&
+            other.XDir.Equals(XDir, AngularTOL) &&
+            other.ZDir.Equals(ZDir, AngularTOL);
+    }
+    static bool operator == (Ax2 Left, Ax2 Right) { return Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
+    static bool operator != (Ax2 Left, Ax2 Right) { return !Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
+
+#pragma endregion
+
 };
 
 }
