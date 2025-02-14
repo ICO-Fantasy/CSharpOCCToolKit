@@ -1,9 +1,6 @@
 ﻿#pragma once
 //在构造函数中使用的值对象需要直接引入
-#include "ICO_Pnt.h"
-
-//前向声明
-class gp_Trsf;
+#include <gp_Trsf.hxx>
 
 namespace OCCTK {
 namespace OCC {
