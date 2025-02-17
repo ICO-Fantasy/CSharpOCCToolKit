@@ -11,39 +11,33 @@ namespace OCC {
 namespace AIS {
 
 AShape::AShape(const Handle(AIS_InteractiveObject) aInteractive) : InteractiveObject(aInteractive) {
-	if (aInteractive->IsKind(STANDARD_TYPE(AIS_Shape))) {
-		Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(NativeHandle);
-	}
-	else {
-		throw gcnew System::Exception("InteractiveObject not an AIS_Shape");
-	}
+    if (aInteractive->IsKind(STANDARD_TYPE(AIS_Shape))) {
+        Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(NativeHandle);
+    }
+    else {
+        throw gcnew System::Exception("InteractiveObject not an AIS_Shape");
+    }
 }
 
 AShape::AShape(const TopoDS_Shape& aShape) : InteractiveObject() {
-	NativeHandle = new AIS_Shape(aShape);
+    NativeHandle = new AIS_Shape(aShape);
 }
 
 /// <summary>
-/// 传入TopoDS_Shape的指针（不要轻易使用指针构造方法）
+/// 传入Handle(AIS_Shape)的指针
 /// </summary>
 /// <param name="aShapePtr"></param>
+/// <remarks>
+/// !!! 不要轻易使用指针构造方法 !!!
+/// </remarks>
 AShape::AShape(System::IntPtr aShapePtr) : InteractiveObject() {
-	// 将 IntPtr 转换为原生指针
-	TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(aShapePtr.ToPointer());
-	// 创建新的 AIS_Shape 对象
-	NativeHandle = new AIS_Shape(*pShape);
+    // 将 IntPtr 转换为原生指针
+    Handle(AIS_Shape)* pShape = reinterpret_cast<Handle(AIS_Shape)*>(aShapePtr.ToPointer());
+    NativeHandle = *pShape;
 }
 
 AShape::AShape(Topo::TShape^ aShape) : InteractiveObject() {
-	NativeHandle = new AIS_Shape(aShape->GetOCC());
-}
-
-/// <summary>
-/// 获取指针 (不要轻易使用指针传递)
-/// </summary>
-/// <returns></returns>
-System::IntPtr AShape::GetIntPtr() {
-	return System::IntPtr(&*myShape());
+    NativeHandle = new AIS_Shape(aShape->GetOCC());
 }
 
 /// <summary>
@@ -51,7 +45,7 @@ System::IntPtr AShape::GetIntPtr() {
 /// </summary>
 /// <returns></returns>
 TShape^ AShape::Shape() {
-	return gcnew Topo::TShape(myShape()->Shape());
+    return gcnew Topo::TShape(myShape()->Shape());
 }
 
 /// <summary>
@@ -61,8 +55,8 @@ TShape^ AShape::Shape() {
 /// <param name="G"></param>
 /// <param name="B"></param>
 void AShape::SetColor(int R, int G, int B) {
-	Quantity_Color theColor((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
-	myShape()->SetColor(theColor);
+    Quantity_Color theColor((double)R / 255.0, (double)G / 255.0, (double)B / 255.0, Quantity_TOC_RGB);
+    myShape()->SetColor(theColor);
 }
 
 /// <summary>
@@ -70,11 +64,11 @@ void AShape::SetColor(int R, int G, int B) {
 /// </summary>
 /// <param name="theFactor"></param>
 void AShape::SetTransparency(double theFactor) {
-	myShape()->SetTransparency(theFactor);
+    myShape()->SetTransparency(theFactor);
 }
 
 void AShape::SetShape(Topo::TShape^ newShape) {
-	myShape()->SetShape(newShape->GetOCC());
+    myShape()->SetShape(newShape->GetOCC());
 }
 
 /// <summary>
@@ -83,12 +77,12 @@ void AShape::SetShape(Topo::TShape^ newShape) {
 /// <param name="obj"></param>
 /// <returns></returns>
 bool AShape::Equals(System::Object^ obj) {
-	// 检查 obj 是否是同一类型
-	AShape^ other = dynamic_cast<AShape^>(obj);
-	if (other != nullptr) {
-		return myShape()->Shape().IsEqual(other->GetOCC()->Shape());
-	}
-	return false;
+    // 检查 obj 是否是同一类型
+    AShape^ other = dynamic_cast<AShape^>(obj);
+    if (other != nullptr) {
+        return myShape()->Shape().IsEqual(other->GetOCC()->Shape());
+    }
+    return false;
 }
 
 }

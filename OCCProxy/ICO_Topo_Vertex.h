@@ -20,13 +20,12 @@ namespace Topo {
 
 public ref class TVertex :TShape {
 public:
-	TVertex();
-	TVertex(const TopoDS_Vertex theVertex);
-	TVertex(System::IntPtr theVertexIntPtr);
-	TVertex(TopoDS_Vertex* theVertex);
-	TopoDS_Vertex GetOCC();
+    TVertex();
+    TVertex(const TopoDS_Vertex theVertex);
+    TVertex(TopoDS_Vertex* theVertex);
+    TopoDS_Vertex GetOCC();
 public:
-	gp::Pnt ToPnt();
+    gp::Pnt ToPnt();
 };
 
 }

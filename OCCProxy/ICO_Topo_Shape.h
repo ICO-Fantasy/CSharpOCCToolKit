@@ -27,7 +27,6 @@ public:
     TShape();
     TShape(const TopoDS_Shape theShape);
     TShape(System::IntPtr theShapeIntPtr);
-    TShape(TopoDS_Shape* theShape);
     bool IsEqual(TShape^ otherShape);
 #pragma region 重载操作符
     // 重载 == 操作符
@@ -49,7 +48,6 @@ public:
     }
 #pragma endregion
     TopoDS_Shape GetOCC();
-    System::IntPtr GetPtr();
     int HashCode(int upperBound);
 public:
     TopoAbs::ShapeEnum ShapeType();

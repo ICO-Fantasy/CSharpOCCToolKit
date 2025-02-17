@@ -29,9 +29,13 @@ TShape::TShape(const TopoDS_Shape theShape) {
     myShape = new TopoDS_Shape(theShape);
 }
 
-TShape::TShape(TopoDS_Shape* theShape) {
-    myShape = theShape;
-}
+/// <summary>
+/// 使用 TopoDS_Shape 指针创建
+/// </summary>
+/// <param name="theEdgeIntPtr"></param>
+/// <remarks>
+/// !!! 不要轻易使用指针构造方法 !!!
+/// </remarks>
 TShape::TShape(System::IntPtr theShapeIntPtr) {
     // 将 IntPtr 转换为原生指针
     TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(theShapeIntPtr.ToPointer());
@@ -53,10 +57,6 @@ bool TShape::Equals(System::Object^ obj) {
 
 TopoDS_Shape TShape::GetOCC() {
     return *myShape;
-}
-
-System::IntPtr TShape::GetPtr() {
-    return System::IntPtr(myShape);
 }
 
 TopoAbs::ShapeEnum TShape::ShapeType() {
