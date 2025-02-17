@@ -31,7 +31,7 @@ System::Object^ XYZ::Clone()
 
 System::String^ XYZ::ToString()
 {
-    return System::String::Format("({0}, {1}, {2})", X, Y, Z);
+    return System::String::Format("{0}, {1}, {2}", X, Y, Z);
 }
 
 }
