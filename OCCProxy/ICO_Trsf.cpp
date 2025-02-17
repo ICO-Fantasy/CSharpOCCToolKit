@@ -81,6 +81,13 @@ Trsf::Trsf(Vec translation, WPR rotation)
     myTrsf->SetRotationPart(quat);
 }
 
+Trsf::Trsf(Vec translation, Quat rotation)
+{
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTranslationPart(translation);
+    myTrsf->SetRotationPart(rotation);
+}
+
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
     myTrsf = new gp_Trsf();
     myTrsf->SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
