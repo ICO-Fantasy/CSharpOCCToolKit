@@ -20,8 +20,6 @@ public:
     Trsf(Trsf^ theT);
     Trsf(gp_Trsf theT);
     Trsf(gp_Trsf* theT);
-    Trsf(array<double, 2>^ matrix);
-    Trsf(array<array<double>^>^ matrix);
     Trsf(Vec translation, WPR rotation);
     Trsf(Vec translation, Quat rotation);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
