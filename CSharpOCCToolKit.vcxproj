@@ -159,6 +159,7 @@
     <ClCompile Include="DataExchange\ICO_OBJExchange.cpp" />
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
     <ClCompile Include="Extension\ICO_WPR.cpp" />
+    <ClCompile Include="OCCProxy\ICO_SLERP.cpp" />
     <ClCompile Include="OCCProxy\ICO_Precision.cpp" />
     <ClCompile Include="OCCProxy\ICO_XYZ.cpp" />
     <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
     <ClInclude Include="Extension\ICO_CameraOrientation.h" />
     <ClInclude Include="Extension\ICO_WPR.h" />
+    <ClInclude Include="OCCProxy\ICO_SLERP.h" />
     <ClInclude Include="OCCProxy\ICO_Precision.h" />
     <ClInclude Include="OCCProxy\ICO_XYZ.h" />
     <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h" />

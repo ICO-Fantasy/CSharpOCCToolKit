@@ -443,6 +443,9 @@
     <ClCompile Include="OCCProxy\ICO_Precision.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_SLERP.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_StringExchange.h">
@@ -732,6 +735,9 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_Precision.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_SLERP.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
