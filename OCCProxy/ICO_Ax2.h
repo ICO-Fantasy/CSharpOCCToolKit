@@ -27,8 +27,6 @@ public:
     Ax2(Ax2 fromAx2, Trsf^ transfrom);
     Ax2(Trsf^ transfrom);
     Ax2(gp_Ax2* theAx2);
-    Ax2(array<double, 2>^ matrix);
-    Ax2(array<array<double>^>^ matrix);
     gp_Ax2 GetOCC();
     virtual System::Object^ Clone();
     virtual System::String^ ToString() override;

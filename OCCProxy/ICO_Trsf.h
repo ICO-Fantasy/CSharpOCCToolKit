@@ -23,6 +23,7 @@ public:
     Trsf(array<double, 2>^ matrix);
     Trsf(array<array<double>^>^ matrix);
     Trsf(Vec translation, WPR rotation);
+    Trsf(Vec translation, Quat rotation);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
     Trsf(Ax2 toAx2);
     Trsf(Pnt fromPoint, Pnt toPoint);
