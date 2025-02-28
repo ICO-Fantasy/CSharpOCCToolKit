@@ -87,25 +87,12 @@ Vec Vec::Reversed() {
 	return Vec(newX, newY, newZ);
 }
 
-void Vec::Normalize() {
-	double m = std::sqrt(X * X + Y * Y + Z * Z);
-	X = X / m;
-	Y = Y / m;
-	Z = Z / m;
-}
-
 Vec Vec::Normalized() {
 	double m = std::sqrt(X * X + Y * Y + Z * Z);
 	double newX = X / m;
 	double newY = Y / m;
 	double newZ = Z / m;
 	return Vec(newX, newY, newZ);
-}
-
-void Vec::Multiply(double value) {
-	X *= value;
-	Y *= value;
-	Z *= value;
 }
 
 Vec Vec::Multiplied(double value) {
@@ -119,12 +106,6 @@ double Vec::Dot(Vec other) {
 	return  X * other.X + Y * other.Y + Z * other.Z;
 }
 
-void Vec::Cross(Vec other) {
-	X = (this->Y * other.Z) - (this->Z * other.Y);
-	Y = (this->Z * other.X) - (this->X * other.Z);
-	Z = (this->X * other.Y) - (this->Y * other.X);
-}
-
 Vec Vec::Crossed(Vec other) {
 	double newX = (this->Y * other.Z) - (this->Z * other.Y);
 	double newY = (this->Z * other.X) - (this->X * other.Z);
@@ -136,14 +117,6 @@ Vec Vec::CrossProduct(Vec other) {
 	return Crossed(other);
 }
 
-void Vec::Transform(Trsf^ T) {
-	gp_Vec v = gp_Vec(X, Y, Z);
-	v.Transform(T);
-	X = v.X();
-	Y = v.Y();
-	Z = v.Z();
-}
-
 Vec Vec::Transformed(Trsf^ T) {
 	gp_Vec v = gp_Vec(X, Y, Z);
 	v.Transform(T);
@@ -152,6 +125,14 @@ Vec Vec::Transformed(Trsf^ T) {
 
 double Vec::Magnitude() {
 	return std::sqrt(X * X + Y * Y + Z * Z);
+}
+
+double Vec::Angle(Vec theOther) {
+	return GetOCC().Angle(theOther);
+}
+
+double Vec::AngleWithRef(Vec theOther,Vec theVRef) {
+	return GetOCC().AngleWithRef(theOther, theVRef);
 }
 
 #pragma region 重载操作符

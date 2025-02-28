@@ -77,6 +77,15 @@ Quat::Quat(gp_Quaternion* theQuat) {
 	W = theQuat->W();
 }
 
+Quat::Quat(Vec fromVec, Vec toVec) {
+	gp_Quaternion q = gp_Quaternion();
+	q.SetRotation(fromVec, toVec);
+	X = q.X();
+	Y = q.Y();
+	Z = q.Z();
+	W = q.W();
+}
+
 gp_Quaternion Quat::GetOCC() {
 	return gp_Quaternion(X, Y, Z, W);
 }
@@ -93,15 +102,6 @@ System::ValueTuple<double, double, double> Quat::ToEuler(EulerSequence sequence)
 	double a, b, c;
 	GetOCC().GetEulerAngles(gp_EulerSequence(sequence), a, b, c);
 	return System::ValueTuple<double, double, double> {a, b, c};
-}
-void Quat::SetEulerAngles(double alpha, double beta, double gamma, EulerSequence sequence) {
-	gp_Quaternion q = GetOCC();
-	q.SetEulerAngles(gp_EulerSequence(sequence), alpha, beta, gamma);
-	X = q.X();
-	Y = q.Y();
-	Z = q.Z();
-	W = q.W();
-
 }
 SO3Matrix Quat::GetMatrix() {
 	gp_Mat mat = GetOCC().GetMatrix();

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <BRepBuilderAPI_MakeWire.hxx>
+#include <TopTools_ListOfShape.hxx>
 
 namespace OCCTK {
 namespace OCC {
@@ -22,6 +23,9 @@ public:
 	MakeWire(System::Collections::Generic::List<Topo::TEdge^>^ edges);
 public:
 	void Add(Topo::TEdge^ edge);
+	void Add(Topo::TWire^ wire);
+	void Add(System::Collections::Generic::List<Topo::TEdge^>^ edges);
+	property bool IsDone {bool get(); }
 	Topo::TShape^ Shape();
 	Topo::TWire^ Wire();
 	//! 隐式转换为 TWire

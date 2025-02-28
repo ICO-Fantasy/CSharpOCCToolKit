@@ -33,17 +33,16 @@ public:
 public:
 	bool IsParallel(Vec otherVec, double theAngularTolerance);
 	Vec Reversed();
-	void Normalize();
 	Vec Normalized();
-	void Multiply(double value);
 	Vec Multiplied(double value);
 	double Dot(Vec other);
-	void Cross(Vec other);
 	Vec Crossed(Vec other);
 	Vec CrossProduct(Vec other);
-	void Transform(Trsf^ T);
 	Vec Transformed(Trsf^ T);
 	double Magnitude();
+	double Angle(Vec theOther);
+	double AngleWithRef(Vec theOther, Vec theVRef);
+
 public:
 	property double X;
 	property double Y;
