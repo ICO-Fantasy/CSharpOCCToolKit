@@ -13,62 +13,62 @@ namespace OCC {
 namespace gp {
 
 Dir::Dir(double theX, double theY, double theZ) {
-	if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
-		System::String^ str = "创建了零向量(" + theX + ", " + theY + ", " + theZ + ")";
-		System::Diagnostics::Debug::WriteLine(str);
-	}
-	X = theX;
-	Y = theY;
-	Z = theZ;
-	Normalize();
+    if (std::abs(theX) < 1e-6 && std::abs(theY) < 1e-6 && std::abs(theZ) < 1e-6) {
+        System::String^ str = "创建了零向量(" + theX + ", " + theY + ", " + theZ + ")";
+        System::Diagnostics::Debug::WriteLine(str);
+    }
+    X = theX;
+    Y = theY;
+    Z = theZ;
+    Normalize();
 }
 
 Dir::Dir(System::ValueTuple<double, double, double> theXYZ) {
-	if (std::abs(theXYZ.Item1) < 1e-6 && std::abs(theXYZ.Item2) < 1e-6 && std::abs(theXYZ.Item3) < 1e-6) {
-		System::String^ str = "创建了零向量(" + theXYZ.Item1 + ", " + theXYZ.Item2 + ", " + theXYZ.Item3 + ")";
-		System::Diagnostics::Debug::WriteLine(str);
-	}
-	X = theXYZ.Item1;
-	Y = theXYZ.Item2;
-	Z = theXYZ.Item3;
-	Normalize();
+    if (std::abs(theXYZ.Item1) < 1e-6 && std::abs(theXYZ.Item2) < 1e-6 && std::abs(theXYZ.Item3) < 1e-6) {
+        System::String^ str = "创建了零向量(" + theXYZ.Item1 + ", " + theXYZ.Item2 + ", " + theXYZ.Item3 + ")";
+        System::Diagnostics::Debug::WriteLine(str);
+    }
+    X = theXYZ.Item1;
+    Y = theXYZ.Item2;
+    Z = theXYZ.Item3;
+    Normalize();
 }
 
 Dir::Dir(Vec theDir) {
-	X = theDir.X;
-	Y = theDir.Y;
-	Z = theDir.Z;
-	Normalize();
+    X = theDir.X;
+    Y = theDir.Y;
+    Z = theDir.Z;
+    Normalize();
 }
 
 Dir::Dir(Pnt fromPoint, Pnt toPoint) {
-	if (fromPoint.Distance(toPoint) < 1e-6) {
-		System::String^ str = "创建了零向量(" + (toPoint.X - fromPoint.X) + ", " + (toPoint.Y - fromPoint.Y) + ", " + (toPoint.Z - fromPoint.Z) + ")";
-		System::Diagnostics::Debug::WriteLine(str);
-	}
-	Pnt p = toPoint - fromPoint;
-	X = p.X;
-	Y = p.Y;
-	Z = p.Z;
-	Normalize();
+    if (fromPoint.Distance(toPoint) < 1e-6) {
+        System::String^ str = "创建了零向量(" + (toPoint.X - fromPoint.X) + ", " + (toPoint.Y - fromPoint.Y) + ", " + (toPoint.Z - fromPoint.Z) + ")";
+        System::Diagnostics::Debug::WriteLine(str);
+    }
+    Pnt p = toPoint - fromPoint;
+    X = p.X;
+    Y = p.Y;
+    Z = p.Z;
+    Normalize();
 }
 
 Dir::Dir(gp_Dir theDir) {
-	X = theDir.X();
-	Y = theDir.Y();
-	Z = theDir.Z();
-	Normalize();
+    X = theDir.X();
+    Y = theDir.Y();
+    Z = theDir.Z();
+    Normalize();
 }
 
 Dir::Dir(gp_Dir* theDir) {
-	X = theDir->X();
-	Y = theDir->Y();
-	Z = theDir->Z();
-	Normalize();
+    X = theDir->X();
+    Y = theDir->Y();
+    Z = theDir->Z();
+    Normalize();
 }
 
 bool Dir::IsParallel(Dir otherDir, double theAngularTolerance) {
-	return GetOCC().IsParallel(otherDir, theAngularTolerance);
+    return GetOCC().IsParallel(otherDir, theAngularTolerance);
 }
 
 /// <summary>
@@ -77,7 +77,7 @@ bool Dir::IsParallel(Dir otherDir, double theAngularTolerance) {
 /// <param name="otherDir"></param>
 /// <returns></returns>
 double Dir::Angle(Dir otherDir) {
-	return GetOCC().Angle(otherDir);
+    return GetOCC().Angle(otherDir);
 }
 
 /// <summary>
@@ -87,7 +87,7 @@ double Dir::Angle(Dir otherDir) {
 /// <param name="refDir"></param>
 /// <returns></returns>
 double Dir::AngleWithRef(Dir otherDir, Dir refDir) {
-	return GetOCC().AngleWithRef(otherDir, refDir);
+    return GetOCC().AngleWithRef(otherDir, refDir);
 }
 
 //void Dir::Cross(Dir other) {
@@ -98,14 +98,14 @@ double Dir::AngleWithRef(Dir otherDir, Dir refDir) {
 //}
 
 Dir Dir::Crossed(Dir other) {
-	double crossX = (this->Y * other.Z) - (this->Z * other.Y);
-	double crossY = (this->Z * other.X) - (this->X * other.Z);
-	double crossZ = (this->X * other.Y) - (this->Y * other.X);
-	return Dir(crossX, crossY, crossZ);
+    double crossX = (this->Y * other.Z) - (this->Z * other.Y);
+    double crossY = (this->Z * other.X) - (this->X * other.Z);
+    double crossZ = (this->X * other.Y) - (this->Y * other.X);
+    return Dir(crossX, crossY, crossZ);
 }
 
 double Dir::Dot(Dir other) {
-	return GetOCC().Dot(other);
+    return GetOCC().Dot(other);
 }
 
 //void Dir::Reverse() {
@@ -115,10 +115,10 @@ double Dir::Dot(Dir other) {
 //}
 
 Dir Dir::Reversed() {
-	double newX = -X;
-	double newY = -Y;
-	double newZ = -Z;
-	return Dir(newX, newY, newZ);
+    double newX = -X;
+    double newY = -Y;
+    double newZ = -Z;
+    return Dir(newX, newY, newZ);
 }
 
 //void Dir::Transform(Trsf^ T) {
@@ -129,74 +129,32 @@ Dir Dir::Reversed() {
 //}
 
 Dir Dir::Transformed(Trsf^ T) {
-	gp_Dir newD = GetOCC().Transformed(T);
-	return Dir(newD);
+    gp_Dir newD = GetOCC().Transformed(T);
+    return Dir(newD);
 }
 
 Vec Dir::ToVec(double factor) {
-	return Vec(X * factor, Y * factor, Z * factor);
+    return Vec(X * factor, Y * factor, Z * factor);
 }
 
 gp_Dir Dir::GetOCC() {
-	return gp_Dir(X, Y, Z);
+    return gp_Dir(X, Y, Z);
 }
 
 Object^ Dir::Clone() {
-	return Dir(X, Y, Z);
+    return Dir(X, Y, Z);
 }
 
 System::String^ Dir::ToString() {
-	return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
-}
-#pragma region 重载操作符
-
-bool Dir::Equals(Dir otherDir, double tol) {
-	if (this->IsParallel(otherDir, tol)) {
-		return true;
-	}
-	return false;
+    return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
 }
 
-Dir Dir::operator+(Dir Left, Dir Right) {
-	return Dir(
-		Left.X + Right.X,
-		Left.Y + Right.Y,
-		Left.Z + Right.Z);
-}
-Dir Dir::operator-(Dir Left, Dir Right) {
-	return Dir(
-		Left.X - Right.X,
-		Left.Y - Right.Y,
-		Left.Z - Right.Z);
-}
-
-/// <summary>
-/// 点乘
-/// </summary>
-/// <param name="Left"></param>
-/// <param name="Right"></param>
-/// <returns></returns>
-double Dir::operator*(Dir Left, Dir Right) {
-	return Left.Dot(Right);
-}
-
-/// <summary>
-/// 叉乘
-/// </summary>
-/// <param name="Left"></param>
-/// <param name="Right"></param>
-/// <returns></returns>
-Dir Dir::operator^(Dir Left, Dir Right) {
-	return Left.Crossed(Right);
-}
-
-#pragma endregion
-
+//私有函数，用于归一化向量
 void Dir::Normalize() {
-	double m = std::sqrt(X * X + Y * Y + Z * Z);
-	X = X / m;
-	Y = Y / m;
-	Z = Z / m;
+    double m = std::sqrt(X * X + Y * Y + Z * Z);
+    X = X / m;
+    Y = Y / m;
+    Z = Z / m;
 }
 
 }

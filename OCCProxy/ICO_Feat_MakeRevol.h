@@ -28,30 +28,28 @@ namespace BRepFeat {
 
 public ref class MakeRevol {
 public:
-	MakeRevol();
-	MakeRevol(Topo::TShape^ sBase, Topo::TShape^ pBase, Topo::TFace^ skFace, gp::Ax1 axis, int fuse, bool modify);
+    MakeRevol();
+    MakeRevol(Topo::TShape^ sBase, Topo::TShape^ pBase, Topo::TFace^ skFace, gp::Ax1 axis, int fuse, bool modify);
 public:
-	Topo::TShape^ Shape();
-	//! 隐式转换为 TShape
-	static operator Topo::TShape ^ (MakeRevol^ makeRevol) {
-		return makeRevol->Shape();  // 隐式调用 Edge 方法
-	}
+    Topo::TShape^ Shape();
+    //! 隐式转换为 TShape
+    static operator Topo::TShape ^ (MakeRevol^ makeRevol) {
+        return makeRevol->Shape();  // 隐式调用 Edge 方法
+    }
 private:
-	BRepFeat_MakeRevol* myMaker;
+    BRepFeat_MakeRevol* myMaker;
 protected:
-	// 析构函数用于清理非托管资源
-	!MakeRevol() {
-		if (myMaker != 0) {
-			delete myMaker;
-			myMaker = 0;
-		}
-	}
+    // 析构函数用于清理非托管资源
+    !MakeRevol() {
+        delete myMaker;
+        myMaker = nullptr;
+    }
 
-	// 终结器（finalizer）用于垃圾回收时的清理
-	~MakeRevol() {
-		// 调用析构函数来清理非托管资源
-		this->!MakeRevol();
-	}
+    // 终结器（finalizer）用于垃圾回收时的清理
+    ~MakeRevol() {
+        // 调用析构函数来清理非托管资源
+        this->!MakeRevol();
+    }
 };
 
 }

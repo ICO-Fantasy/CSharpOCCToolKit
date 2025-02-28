@@ -1,9 +1,6 @@
 ﻿#pragma once
 //在构造函数中使用的值对象需要直接引入
-#include "ICO_Pnt.h"
-
-//前向声明
-class gp_Trsf;
+#include <gp_Trsf.hxx>
 
 namespace OCCTK {
 namespace OCC {
@@ -14,6 +11,8 @@ value struct Pnt;
 value struct Ax2;
 value struct Quat;
 value struct Vec;
+value struct WPR;
+value struct XYZ;
 
 public ref class Trsf :System::ICloneable {
 public:
@@ -21,10 +20,11 @@ public:
     Trsf(Trsf^ theT);
     Trsf(gp_Trsf theT);
     Trsf(gp_Trsf* theT);
-    Trsf(Ax2 theAx2);
     Trsf(array<double, 2>^ matrix);
     Trsf(array<array<double>^>^ matrix);
+    Trsf(Vec translation, WPR rotation);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
+    Trsf(Ax2 toAx2);
     Trsf(Pnt fromPoint, Pnt toPoint);
     gp_Trsf GetOCC();
     virtual System::Object^ Clone();
@@ -42,7 +42,7 @@ public:
     Trsf^ Multiplied(Trsf^ rightTrsf);
     Trsf^ Inverted();
 public:
-    property System::ValueTuple<double, double, double> Translation {System::ValueTuple<double, double, double> get(); };
+    property XYZ Translation {XYZ get(); };
     property Quat Rotation {Quat get(); };
 #pragma region 重载操作符
     static Trsf^ operator * (Trsf^ Left, Trsf^ Right);
@@ -53,10 +53,8 @@ private:
 protected:
     // 析构函数用于清理非托管资源
     !Trsf() {
-        if (myTrsf != 0) {
-            delete myTrsf;
-            myTrsf = 0;
-        }
+        delete myTrsf;
+        myTrsf = nullptr;
     }
 
     // 终结器（finalizer）用于垃圾回收时的清理
@@ -64,6 +62,14 @@ protected:
         // 调用析构函数来清理非托管资源
         this->!Trsf();
     }
+
+#pragma region 重载操作符
+
+    //bool Equals(Trsf other, double AngularTOL, double LinearTOL) {    }
+    //static bool operator == (Trsf Left, Trsf Right) { return Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
+    //static bool operator != (Trsf Left, Trsf Right) { return !Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
+
+#pragma endregion
 };
 
 }

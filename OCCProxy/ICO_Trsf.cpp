@@ -7,8 +7,12 @@
 #include "ICO_Ax1.h"
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
-#include "ICO_Dir.h"
+#include "ICO_XYZ.h"
+#include "..\Extension\ICO_WPR.h"
 #include "ICO_Quaternion.h"
+#include <TCollection_AsciiString.hxx>
+#include <gp_XYZ.hxx>
+#include <gp_EulerSequence.hxx>
 
 using namespace System;
 
@@ -30,11 +34,6 @@ Trsf::Trsf(const gp_Trsf theT) {
 
 Trsf::Trsf(gp_Trsf* theT) {
     myTrsf = theT;
-}
-
-Trsf::Trsf(Ax2 theAx2) {
-    myTrsf = new gp_Trsf();
-    myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(theAx2));
 }
 
 Trsf::Trsf(array<double, 2>^ matrix) {
@@ -73,11 +72,35 @@ Trsf::Trsf(array<array<double>^>^ matrix) {
         matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
 }
 
-Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
+Trsf::Trsf(Vec translation, WPR rotation)
+{
     myTrsf = new gp_Trsf();
-    myTrsf->SetTransformation(gp_Ax3(toAx2), gp_Ax3(fromAx2));
+    myTrsf->SetTranslationPart(translation);
+    gp_Quaternion quat;
+    quat.SetEulerAngles(gp_Intrinsic_XYZ, rotation.W, rotation.P, rotation.R);
+    myTrsf->SetRotationPart(quat);
 }
 
+Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
+}
+
+/// <summary>
+/// 从原点变换到目标坐标系
+/// </summary>
+Trsf::Trsf(Ax2 toAx2)
+{
+
+    myTrsf = new gp_Trsf();
+    myTrsf->SetTransformation(gp_Ax3(), gp_Ax3(toAx2));
+}
+
+/// <summary>
+/// 设置从点到点的平移变换
+/// </summary>
+/// <param name="fromPoint"></param>
+/// <param name="toPoint"></param>
 Trsf::Trsf(Pnt fromPoint, Pnt toPoint) {
     myTrsf = new gp_Trsf();
     myTrsf->SetTranslation(fromPoint, toPoint);
@@ -88,7 +111,8 @@ gp_Trsf Trsf::GetOCC() {
 }
 
 Object^ Trsf::Clone() {
-    return gcnew Trsf(myTrsf);
+    gp_Trsf newTrsf = gp_Trsf(*myTrsf);
+    return gcnew Trsf(newTrsf);
 }
 
 System::String^ Trsf::ToString() {
@@ -177,9 +201,9 @@ Trsf^ Trsf::Inverted() {
     return gcnew Trsf(myTrsf->Inverted());
 }
 
-ValueTuple<double, double, double> Trsf::Translation::get() {
+XYZ Trsf::Translation::get() {
     gp_XYZ xyz = myTrsf->TranslationPart();
-    return ValueTuple<double, double, double>(xyz.X(), xyz.Y(), xyz.Z());
+    return XYZ(xyz);
 }
 
 Quat Trsf::Rotation::get() {

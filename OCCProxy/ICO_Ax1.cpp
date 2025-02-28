@@ -11,35 +11,35 @@ namespace OCC {
 namespace gp {
 
 Ax1::Ax1(Pnt location, Dir direction) {
-	Location = location;
-	Direction = direction;
+    Location = location;
+    Direction = direction;
 }
 
 Ax1::Ax1(Pnt fromPnt, Pnt toPnt) {
-	Location = fromPnt;
-	Direction = Dir(fromPnt, toPnt);
+    Location = fromPnt;
+    Direction = Dir(fromPnt, toPnt);
 }
 
 Ax1::Ax1(gp_Ax1 theAx1) {
-	Location = Pnt(theAx1.Location());
-	Direction = Dir(theAx1.Direction());
+    Location = Pnt(theAx1.Location());
+    Direction = Dir(theAx1.Direction());
 }
 
 Ax1::Ax1(gp_Ax1* theAx1) {
-	Location = Pnt(theAx1->Location());
-	Direction = Dir(theAx1->Direction());
+    Location = Pnt(theAx1->Location());
+    Direction = Dir(theAx1->Direction());
 }
 
 gp_Ax1 Ax1::GetOCC() {
-	return gp_Ax1(Location.GetOCC(), Direction);
+    return gp_Ax1(Location.GetOCC(), Direction);
 }
 
 System::Object^ Ax1::Clone() {
-	return Ax1(Location, Direction);
+    return Ax1(Location, Direction);
 }
 
 System::String^ Ax1::ToString() {
-	return "(" + Location.X.ToString("F1") + ", " + Location.Y.ToString("F1") + ", " + Location.Z.ToString("F1") + "), (" + Direction.X.ToString("F1") + ", " + Direction.Y.ToString("F1") + ", " + Direction.Z.ToString("F1") + ")";
+    return "(" + Location.X.ToString("F1") + ", " + Location.Y.ToString("F1") + ", " + Location.Z.ToString("F1") + "), (" + Direction.X.ToString("F1") + ", " + Direction.Y.ToString("F1") + ", " + Direction.Z.ToString("F1") + ")";
 }
 
 //void Ax1::Transform(Trsf^ theT) {
@@ -49,7 +49,7 @@ System::String^ Ax1::ToString() {
 //}
 
 Ax1 Ax1::Transformed(Trsf^ theT) {
-	return Ax1(gp_Ax1(Location.GetOCC(), Direction).Transformed(theT));
+    return Ax1(gp_Ax1(Location.GetOCC(), Direction).Transformed(theT));
 }
 
 //void Ax1::Reverse() {
@@ -57,7 +57,7 @@ Ax1 Ax1::Transformed(Trsf^ theT) {
 //}
 
 Ax1 Ax1::Reversed() {
-	return Ax1(Location, Direction.Reversed());
+    return Ax1(Location, Direction.Reversed());
 }
 
 /// <summary>
@@ -68,7 +68,7 @@ Ax1 Ax1::Reversed() {
 /// <param name="LinearTOL"></param>
 /// <returns></returns>
 bool Ax1::IsCoaxial(Ax1 other, double AngularTOL, double LinearTOL) {
-	return GetOCC().IsCoaxial(other, AngularTOL, LinearTOL);
+    return GetOCC().IsCoaxial(other, AngularTOL, LinearTOL);
 }
 
 /// <summary>
@@ -78,13 +78,13 @@ bool Ax1::IsCoaxial(Ax1 other, double AngularTOL, double LinearTOL) {
 /// <param name="AngularTOL"></param>
 /// <returns></returns>
 bool Ax1::IsCollinear(Ax1 other, double AngularTOL) {
-	if (Location.Distance(other.Location) > 1e-4) {
-		Dir tempDir = Dir(Location, other.Location);
-		if (!tempDir.IsParallel(Direction, AngularTOL)) {
-			return false;
-		}
-	}
-	return Direction.IsParallel(other.Direction, AngularTOL);
+    if (Location.Distance(other.Location) > 1e-4) {
+        Dir tempDir = Dir(Location, other.Location);
+        if (!tempDir.IsParallel(Direction, AngularTOL)) {
+            return false;
+        }
+    }
+    return Direction.IsParallel(other.Direction, AngularTOL);
 }
 
 }

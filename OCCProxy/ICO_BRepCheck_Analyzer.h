@@ -14,27 +14,25 @@ namespace BRepCheck {
 
 public ref class Analyzer {
 public:
-	Analyzer(Topo::TShape^ shape);
-	Analyzer(Topo::TShape^ shape, bool GeomControls, bool isParallel);
-	//Analyzer(Topo::TShape^ shape, bool GeomControls, bool isParallel, bool isExact);
+    Analyzer(Topo::TShape^ shape);
+    Analyzer(Topo::TShape^ shape, bool GeomControls, bool isParallel);
+    //Analyzer(Topo::TShape^ shape, bool GeomControls, bool isParallel, bool isExact);
 public:
-	bool IsValid();
+    bool IsValid();
 private:
-	BRepCheck_Analyzer* myAna;
+    BRepCheck_Analyzer* myAna;
 protected:
-	// 析构函数用于清理非托管资源
-	!Analyzer() {
-		if (myAna != 0) {
-			delete myAna;
-			myAna = 0;
-		}
-	}
+    // 析构函数用于清理非托管资源
+    !Analyzer() {
+        delete myAna;
+        myAna = nullptr;
+    }
 
-	// 终结器（finalizer）用于垃圾回收时的清理
-	~Analyzer() {
-		// 调用析构函数来清理非托管资源
-		this->!Analyzer();
-	}
+    // 终结器（finalizer）用于垃圾回收时的清理
+    ~Analyzer() {
+        // 调用析构函数来清理非托管资源
+        this->!Analyzer();
+    }
 };
 
 }
