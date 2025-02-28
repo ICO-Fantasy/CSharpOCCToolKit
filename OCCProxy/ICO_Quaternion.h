@@ -4,6 +4,7 @@
 #include "ICO_Vec.h"
 #include "ICO_Ax1.h"
 #include "ICO_EulerSequence.h"
+#include "..\\Extension\ICO_WPR.h"
 
 typedef System::ValueTuple<System::ValueTuple<double, double, double>,
 	System::ValueTuple<double, double, double>,
@@ -20,6 +21,7 @@ public:
 	Quat(double theX, double theY, double theZ, double theW);
 	Quat(double alpha, double beta, double gamma, EulerSequence sequence);
 	Quat(SO3Matrix matrix);
+	Quat(WPR rotation);
 	Quat(Ax1 axis, double angle);
 	Quat(Vec vec, double angle);
 	Quat(gp_Quaternion theQuat);

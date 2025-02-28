@@ -1,13 +1,14 @@
 ﻿#include "ICO_Quaternion.h"
 #include <gp_EulerSequence.hxx>
-#include <gp_Quaternion.hxx>
 #include <gp_Mat.hxx>
+#include <gp_Quaternion.hxx>
 #include <gp_Vec.hxx>
 //local
 #include "ICO_EulerSequence.h"
 #include "ICO_Ax1.h"
 #include "ICO_Dir.h"
 #include "ICO_Vec.h"
+#include "../Extension/ICO_WPR.h"
 
 using namespace System;
 
@@ -45,9 +46,20 @@ Quat::Quat(SO3Matrix matrix) {
 	W = q.W();
 }
 
+Quat::Quat(WPR rotation) {
+	gp_Quaternion q ;
+	q.SetEulerAngles(gp_EulerSequence::gp_Intrinsic_XYZ, rotation.W, rotation.P, rotation.R);
+
+	X = q.X();
+	Y = q.Y();
+	Z = q.Z();
+	W = q.W();
+}
+
 Quat::Quat(Ax1 axis, double angle) {
 	gp_Quaternion q = gp_Quaternion();
 	q.SetVectorAndAngle(axis.Direction.ToVec(1), angle);
+
 	X = q.X();
 	Y = q.Y();
 	Z = q.Z();

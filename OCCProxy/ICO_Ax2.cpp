@@ -15,10 +15,11 @@ namespace OCC {
 namespace gp {
 
 /// <summary>
-/// X方向任意
+/// 
 /// </summary>
 /// <param name="location"></param>
 /// <param name="theZAxis"></param>
+/// <remarks>X方向为任意轴</remarks>
 Ax2::Ax2(Pnt location, Dir zAxis) {
     gp_Ax2 theAx2 = gp_Ax2(location, zAxis);
     Location = Pnt(theAx2.Location());
@@ -32,45 +33,10 @@ Ax2::Ax2(Pnt location, Dir zAxis, Dir theXAxis) {
     XDir = theXAxis;
 }
 
-Ax2::Ax2(Ax2 fromAx2, Trsf^ transfrom) {
-    Ax2 toAx2 = fromAx2.Transformed(transfrom);
-    Location = toAx2.Location;
-    ZDir = toAx2.ZDir;
-    XDir = toAx2.XDir;
-}
-
-/// <summary>
-/// 从原点应用变换创建Ax2
-/// </summary>
-/// <param name="transfrom"></param>
-Ax2::Ax2(Trsf^ transfrom)
-{
-    gp_Ax2 ax2;
-    ax2.Transform(transfrom);
-    Location = Pnt(ax2.Location());
-    ZDir = Dir(ax2.Direction());
-    XDir = Dir(ax2.XDirection());
-}
-
-Ax2::Ax2(Pnt location, WPR direction) {
-    gp_Ax2 ax2;
-    ax2.Transform(gcnew Trsf(Vec(Pnt(0, 0, 0), location), direction));
-
-    Location = Pnt(ax2.Location());
-    ZDir = Dir(ax2.Direction());
-    XDir = Dir(ax2.XDirection());
-}
-
 Ax2::Ax2(gp_Ax2 theAx2) {
     Location = Pnt(theAx2.Location());
     ZDir = Dir(theAx2.Direction());
     XDir = Dir(theAx2.XDirection());
-}
-
-Ax2::Ax2(gp_Ax2* theAx2) {
-    Location = Pnt(theAx2->Location());
-    ZDir = Dir(theAx2->Direction());
-    XDir = Dir(theAx2->XDirection());
 }
 
 Ax2::Ax2(array<double, 2>^ matrix) {
@@ -125,7 +91,7 @@ System::String^ Ax2::ToString() {
     return str;
 }
 
-Ax2 Ax2::Transformed(Trsf^ theT) {
+Ax2 Ax2::Transformed(Trsf theT) {
     return Ax2(GetOCC().Transformed(theT));
 }
 

@@ -59,9 +59,9 @@ public partial class App:Application {
 		//MainWindow = new CanvasTest();
 		//MainWindow = new TestMainWindow( );
 		//! 简易夹具测试
-		MainWindow = new SimpleClamp( );
+		//MainWindow = new SimpleClamp( );
 		//! 折弯测试
-		//MainWindow = new BendingTest();
+		MainWindow = new BendingTest( );
 		//! 弯管重心计算
 		//MainWindow = new CenterOfGravity();
 		MainWindow.Show( );

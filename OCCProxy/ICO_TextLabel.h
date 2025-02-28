@@ -11,7 +11,7 @@ value struct Color;
 }
 namespace OCC {
 namespace gp {
-ref class Trsf;
+value struct Trsf;
 value struct Ax2;
 value struct Pnt;
 }

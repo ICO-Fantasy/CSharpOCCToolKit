@@ -10,7 +10,7 @@ namespace OCC {
 namespace gp {
 
 //前向声明
-ref class Trsf;
+value struct Trsf;
 // 转为OCC结构
 //#define STRUCT_PIN(value, managed, native)
 //pin_ptr<managed> value##_pinptr(&value);
@@ -41,7 +41,7 @@ public:
     static operator gp_Pnt (Pnt p) { return p.GetOCC(); }
 public:
     double Distance(Pnt otherPnt);
-    Pnt Transformed(Trsf^ T);
+    Pnt Transformed(Trsf T);
     Pnt SetX(double value);
     Pnt SetY(double value);
     Pnt SetZ(double value);

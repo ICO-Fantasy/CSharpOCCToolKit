@@ -43,7 +43,7 @@ ATrihedron::ATrihedron(AShape^ theAIS, double axisSize) :InteractiveObject() {
 /// </summary>
 /// <param name="theTrsf"></param>
 /// <param name="axisSize"></param>
-ATrihedron::ATrihedron(gp::Trsf^ theTrsf, double axisSize) :InteractiveObject() {
+ATrihedron::ATrihedron(gp::Trsf theTrsf, double axisSize) :InteractiveObject() {
     gp_Ax2 a = gp_Ax2();
     a.Transform(theTrsf);
     NativeHandle = new AIS_Trihedron(new Geom_Axis2Placement(a));

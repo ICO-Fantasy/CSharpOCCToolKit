@@ -18,7 +18,7 @@ private:
 public:
     ATrihedron(double axisSize);
     ATrihedron(AShape^ theAIS, double axisSize);
-    ATrihedron(gp::Trsf^ theTrsf, double axisSize);
+    ATrihedron(gp::Trsf theTrsf, double axisSize);
     Handle(AIS_Trihedron) GetOCC() { return myTrihedron(); };
 public:
     void SetArrowWidth(DatumParts axis, double value);

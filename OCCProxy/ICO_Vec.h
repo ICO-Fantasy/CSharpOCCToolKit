@@ -11,7 +11,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
-ref class Trsf;
+value struct Trsf;
 
 public value struct Vec :System::ICloneable {
 public:
@@ -38,7 +38,7 @@ public:
 	double Dot(Vec other);
 	Vec Crossed(Vec other);
 	Vec CrossProduct(Vec other);
-	Vec Transformed(Trsf^ T);
+	Vec Transformed(Trsf T);
 	double Magnitude();
 	double Angle(Vec theOther);
 	double AngleWithRef(Vec theOther, Vec theVRef);

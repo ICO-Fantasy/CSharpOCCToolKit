@@ -1,8 +1,10 @@
 ﻿#pragma once
-#include "WMakeSimpleClamp.h"
-#include "MakeSimpleClamp.h"
 #include "DataExchange\ICO_StringExchange.h"
-#include "OCCProxy\ICO_Trsf.h"
+#include "MakeSimpleClamp.h"
+#include "OCCProxy/ICO_Pnt.h"
+#include "OCCProxy/ICO_Vec.h"
+#include "OCCProxy/ICO_Trsf.h"
+#include "WMakeSimpleClamp.h"
 #include <TopoDS_FrozenShape.hxx>
 using namespace System::Collections::Generic;
 using namespace OCCTK::OCC::gp;
@@ -28,7 +30,7 @@ static auto getDelegate(OCCTK::SimpleClamp::VerticalPlate cppPlate) { return gcn
 BasePlate^ SimpleClampMaker::MakeBasePlate_NoInteract(TShape^ InputWorkpiece, double OffsetZ, double BasePlateOffsetX, double BasePlateOffsetY) {
 	SimpleClamp::BasePlate theCPPBasePlate = SimpleClamp::MakeBasePlate(InputWorkpiece->GetOCC(), OffsetZ, BasePlateOffsetX, BasePlateOffsetY);
 	// 设置移动
-	Trsf^ T = gcnew Trsf(Pnt(theCPPBasePlate.X, theCPPBasePlate.Y, theCPPBasePlate.Z), Pnt());
+	Trsf T = Trsf(Vec(Pnt(theCPPBasePlate.X, theCPPBasePlate.Y, theCPPBasePlate.Z), Pnt()));
 	theCPPBasePlate.X = 0.0;
 	theCPPBasePlate.Y = 0.0;
 	theCPPBasePlate.Z = 0.0;

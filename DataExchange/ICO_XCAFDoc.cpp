@@ -125,7 +125,7 @@ static XShape^ GetSubShape(const TDF_Label& label, const Handle(TDocStd_Document
 		TopLoc_Location loc = shapeTool->GetLocation(label);
 		gp_Trsf theT = loc.Transformation();
 		theT.PreMultiply(parentTrsf.Inverted());
-		Trsf^ curentT = gcnew Trsf(theT);
+		Trsf curentT =Trsf(theT);
 		shape->Transform = curentT;
 		System::Diagnostics::Debug::WriteLine(labelName + " 有 " + labels_Components.Length() + " 个部件");
 		for (size_t i = 1; i < labels_Components.Length() + 1; i++) {
@@ -145,7 +145,7 @@ static XShape^ GetSubShape(const TDF_Label& label, const Handle(TDocStd_Document
 		gp_Trsf theT = loc.Transformation();
 		theT.PreMultiply(parentTrsf.Inverted());
 		XShape^ shape = GetReference(label_ReferredShape, doc);
-		shape->Transform = gcnew Trsf(theT);
+		shape->Transform = Trsf(theT);
 		return shape;
 	}
 	else if (shapeTool->IsSimpleShape(label)) {
