@@ -260,12 +260,12 @@ public partial class OCCCanvas {
 		Keys modifiers = ModifierKeys;
 		mouseCurrentX = e.X;
 		mouseCurrentY = e.Y;
-		log.Debug($"Before ActiveMode: {myManipulator.ActiveMode( )}");
+		//log.Debug($"Before ActiveMode: {myManipulator.ActiveMode( )}");
 		//AISContext.InitDetected( );
 		//触发事件（OCC的Y值零点与WPF相反）
 		OnMouseMovedEvent?.Invoke(e.X, Height - e.Y);
 		if( mouseButtons == MouseButtons.Left ) {
-			log.Debug($"OnMouseMove ActiveMode: {myManipulator.ActiveMode( )}");
+			//log.Debug($"OnMouseMove ActiveMode: {myManipulator.ActiveMode( )}");
 			if( myManipulator.HasActiveMode( ) ) {
 				myManipulator.Transform(mouseCurrentX, mouseCurrentY, View);
 				CurrentMovingAction3d = Action3d.Manipulator_Translation;

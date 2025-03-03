@@ -45,7 +45,7 @@ public:
 	property double OffsetY {double get() { return myBP().offsetY; } void set(double value) { myBP().offsetY = value; }};
 	property OCC::AIS::AShape^ AIS {OCC::AIS::AShape^ get() { if (myAIS == nullptr) { myAIS = gcnew OCC::AIS::AShape(Shape); } return myAIS; }};
 public:
-	Trsf^ Translation;
+	Trsf Translation;
 	void UpdateAIS() {
 		if (myAIS != nullptr) {
 			myAIS->RemoveSelf(false);

@@ -7,7 +7,7 @@ class TopoDS_Shape;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Trsf;
+value struct Trsf;
 value struct Ax2;
 }
 namespace Topo {
@@ -56,8 +56,8 @@ public:
     TFace^ AsFace();
 public:
     void Reverse();
-    void Move(gp::Trsf^ theT);
-    gp::Trsf^ Location();
+    void Move(gp::Trsf theT);
+    gp::Trsf Location();
     void Location(gp::Ax2 newOrigin);
     TShape^ Located(gp::Ax2 newOrigin);
     property TopoAbs::Orientation Orientation {TopoAbs::Orientation get(); void set(TopoAbs::Orientation orientation); }

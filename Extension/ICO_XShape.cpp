@@ -18,7 +18,7 @@ XShape::XShape() {
 		Parent = nullptr;
 		Children = gcnew System::Collections::Generic::List<XShape^>();
 		Layer = -1;
-		Transform = gcnew Trsf();
+		Transform = Trsf::Default;
 		TopoShape = nullptr;
 		Material = nullptr;
 	}
@@ -31,7 +31,7 @@ XShape::XShape(bool isShape) {
 	Parent = nullptr;
 	Children = gcnew System::Collections::Generic::List<XShape^>();
 	Layer = -1;
-	Transform = gcnew Trsf();
+	Transform = Trsf::Default;
 	TopoShape = nullptr;
 	Material = nullptr;
 }
@@ -40,9 +40,9 @@ System::String^ XShape::ToString() {
 	return Name;
 }
 
-Trsf^ XShape::Location::get() {
+Trsf XShape::Location::get() {
 	if (Parent != nullptr) {
-		return  Parent->Location->Multiplied(Transform);
+		return  Parent->Location.Multiplied(Transform);
 	}
 	else {
 		return Transform;

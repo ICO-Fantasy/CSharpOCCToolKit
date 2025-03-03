@@ -121,14 +121,14 @@ Dir Dir::Reversed() {
     return Dir(newX, newY, newZ);
 }
 
-//void Dir::Transform(Trsf^ T) {
+//void Dir::Transform(Trsf T) {
 //	gp_Dir newD = GetOCC().Transformed(T);
 //	X = newD.X();
 //	Y = newD.Y();
 //	Z = newD.Z();
 //}
 
-Dir Dir::Transformed(Trsf^ T) {
+Dir Dir::Transformed(Trsf T) {
     gp_Dir newD = GetOCC().Transformed(T);
     return Dir(newD);
 }

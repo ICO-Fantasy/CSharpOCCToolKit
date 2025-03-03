@@ -5,6 +5,7 @@
 #include "ICO_Topo_Shape.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Topo_Wire.h"
+#include "ICO_Exception.h"
 
 using namespace OCCTK::OCC::Topo;
 using namespace OCCTK::OCC::gp;
@@ -37,28 +38,37 @@ void MakeWire::Add(TEdge^ edge) {
 	try {
 		myMaker->Add(edge->GetOCC());
 	}
-	catch (Standard_Failure e) {
-		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
-	}
+	CATCH_AND_THROW_OCC_EXCEPTIONS
+}
 
+void MakeWire::Add(TWire^ wire) {
+	try {
+		myMaker->Add(wire->GetOCC());
+	}
+	CATCH_AND_THROW_OCC_EXCEPTIONS
+}
+
+void MakeWire::Add(List<TEdge^>^ edges) {
+	try {
+		for each (TEdge ^ edge in edges) {
+			myMaker->Add(edge->GetOCC());
+		}
+	}
+	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
 TShape^ MakeWire::Shape() {
 	try {
 		return gcnew TShape(myMaker->Shape());
 	}
-	catch (Standard_Failure e) {
-		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
-	}
+	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
 TWire^ MakeWire::Wire() {
 	try {
 		return gcnew TWire(myMaker->Wire());
 	}
-	catch (Standard_Failure e) {
-		throw gcnew System::Exception(gcnew System::String(e.GetMessageString()));
-	}
+	CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
 bool MakeWire::Error() {
@@ -88,6 +98,11 @@ bool MakeWire::Error() {
 	return false;
 }
 
+
+bool MakeWire::IsDone::get()
+{
+	return myMaker->IsDone();
+}
 
 }
 }

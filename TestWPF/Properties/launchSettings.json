@@ -2,8 +2,8 @@
   "profiles": {
     "TestWPF": {
       "commandName": "Project",
-      "nativeDebugging": false,
-      "hotReloadEnabled": true
+      "nativeDebugging": true,
+      "hotReloadEnabled": false
     }
   }
 }

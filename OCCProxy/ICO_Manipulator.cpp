@@ -100,8 +100,8 @@ void Manipulator::StartTransform(double theX, double theY, View^ theView) {
 /// <param name="theY"></param>
 /// <param name="theView"></param>
 /// <returns>从开始点到当前点发生的变换</returns>
-Trsf^ Manipulator::Transform(double theX, double theY, View^ theView) {
-    Trsf^ t = gcnew Trsf(myManipulator()->Transform(theX, theY, theView));
+Trsf Manipulator::Transform(double theX, double theY, View^ theView) {
+    Trsf t = Trsf(myManipulator()->Transform(theX, theY, theView));
     theView->Redraw();
     return t;
 }

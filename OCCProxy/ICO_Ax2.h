@@ -3,15 +3,14 @@
 #include <gp_Ax2.hxx>
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
-#include "ICO_Trsf.h"
 #include "ICO_Precision.h"
-#include "..\Extension\ICO_WPR.h"
 
 namespace OCCTK {
 namespace OCC {
 namespace gp {
 //前向声明
 value struct Ax1;
+value struct Trsf;
 
 /// <summary>
 /// Z方向为主方向，X方向为另一个方向，Y方向自动定义
@@ -20,13 +19,11 @@ public value struct Ax2 :System::ICloneable {
 public:
     const static Ax2 Default = Ax2(::gp_Ax2());
 public:
+    Ax2(gp_Ax2 theAx2);
     Ax2(Pnt location, Dir zAxis);
     Ax2(Pnt location, Dir zAxis, Dir XAxis);
-    Ax2(Pnt location, WPR direction);
-    Ax2(gp_Ax2 theAx2);
-    Ax2(Ax2 fromAx2, Trsf^ transfrom);
-    Ax2(Trsf^ transfrom);
-    Ax2(gp_Ax2* theAx2);
+    Ax2(array<double, 2>^ matrix);
+    Ax2(array<array<double>^>^ matrix);
     gp_Ax2 GetOCC();
     virtual System::Object^ Clone();
     virtual System::String^ ToString() override;
@@ -39,8 +36,8 @@ public:
             && XDir == other.XDir);
     };
 public:
-    //void Transform(Trsf^ theT);
-    Ax2 Transformed(Trsf^ theT);
+    //void Transform(Trsf theT);
+    Ax2 Transformed(Trsf theT);
 public:
     property Pnt Location;
     property Dir XDir;

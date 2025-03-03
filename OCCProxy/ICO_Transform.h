@@ -5,7 +5,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Trsf;
+value struct Trsf;
 }
 namespace Topo {
 ref class TShape;
@@ -19,7 +19,7 @@ namespace BRepBuilderAPI {
 
 public ref class Transform {
 public:
-    Transform(Topo::TShape^ theShape, gp::Trsf^ theTrsf);
+    Transform(Topo::TShape^ theShape, gp::Trsf theTrsf);
 public:
     Topo::TShape^ Shape();
     //! 隐式转换为 TShape

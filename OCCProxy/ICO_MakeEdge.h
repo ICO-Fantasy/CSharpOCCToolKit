@@ -4,7 +4,7 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Trsf;
+value struct Trsf;
 ref class Circle;
 value struct Pnt;
 }
