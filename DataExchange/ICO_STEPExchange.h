@@ -25,8 +25,9 @@ public:
 		return Ex->Shape();
 	}
 public:
+	bool SaveToSingleShape(System::String^ filePath);
+private:
 	void ReadFile(System::String^ filePath);
-	bool SaveSingleShape(System::String^ filePath);
 private:
 	Extension::XShape^ myShape;
 };

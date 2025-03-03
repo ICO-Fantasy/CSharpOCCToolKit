@@ -31,6 +31,11 @@ public:
 	Curve();
 	Curve(Topo::TEdge^ edge);
 	Curve(Topo::TEdge^ edge, Topo::TFace^ face);
+	Handle(BRepAdaptor_Curve) GetOCC() {return myCure();}
+	//! 隐式转换为 Handle(BRepAdaptor_Curve)
+	static operator Handle(BRepAdaptor_Curve) (Curve^ c) { return c->GetOCC(); }
+	//! 隐式转换为 Handle(BRepAdaptor_Curve)
+	static operator BRepAdaptor_Curve (Curve^ c) { return *c->GetOCC(); }
 public:
 	gp::Pnt Value(double UVValue);
 	double FirstParameter();

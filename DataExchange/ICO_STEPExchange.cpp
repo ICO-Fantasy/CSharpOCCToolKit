@@ -22,14 +22,20 @@ namespace OCCTK {
 namespace IO {
 
 /// <summary>
-/// 储存单个的TShape
+/// 加载单个的TShape
 /// </summary>
 /// <param name="theShape"></param>
 STEPExchange::STEPExchange(TShape^ theShape) {
+	myShape = gcnew XShape();
 	myShape->TopoShape = theShape;
 }
 
+/// <summary>
+/// 读取文件并转换为XShape
+/// </summary>
+/// <param name="filePath"></param>
 STEPExchange::STEPExchange(String^ filePath) {
+	myShape = gcnew XShape();
 	ReadFile(filePath);
 }
 
@@ -74,7 +80,7 @@ Extension::XShape^ STEPExchange::Shape() {
 /// </summary>
 /// <param name="filePath"></param>
 /// <returns></returns>
-bool STEPExchange::SaveSingleShape(String^ filePath) {
+bool STEPExchange::SaveToSingleShape(String^ filePath) {
 	TopoDS_Shape theoccShape = myShape->TopoShape->GetOCC();
 	TCollection_AsciiString cPath = DataExchange::ToAsciiString(filePath);
 

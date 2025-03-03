@@ -216,6 +216,12 @@
     <Filter Include="源文件\OCCProxy\Graphic3d">
       <UniqueIdentifier>{4ec15908-d6a2-4508-b550-9ed26bd37540}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\GCPnts">
+      <UniqueIdentifier>{b4b992d3-b1d1-4da9-bb4a-49fc0e308d8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\GCPnts">
+      <UniqueIdentifier>{f1aeb6d4-0658-45f6-9190-aef8e00a3b86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OCCProxy\ICO_InteractiveObject.cpp">
@@ -445,6 +451,12 @@
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_SLERP.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_GCPnts_AbscissaPoint.cpp">
+      <Filter>源文件\OCCProxy\GCPnts</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_GCPnts_UniformAbscissa.cpp">
+      <Filter>源文件\OCCProxy\GCPnts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -738,6 +750,12 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_SLERP.h">
       <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_GCPnts_UniformAbscissa.h">
+      <Filter>头文件\OCCProxy\GCPnts</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_GCPnts_AbscissaPoint.h">
+      <Filter>头文件\OCCProxy\GCPnts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
