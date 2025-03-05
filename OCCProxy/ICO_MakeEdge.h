@@ -5,7 +5,7 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 value struct Trsf;
-ref class Circle;
+value struct Circle;
 value struct Pnt;
 }
 namespace Topo {

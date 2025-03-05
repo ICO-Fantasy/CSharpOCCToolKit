@@ -1,6 +1,6 @@
 ﻿#include "ICO_Vec2D.h"
-#include <gp_Vec2d.hxx>
 #include <cmath>
+#include <gp_Vec2d.hxx>
 //local
 #include"ICO_Pnt2D.h"
 
@@ -11,28 +11,23 @@ namespace OCC {
 namespace gp {
 
 Vec2D::Vec2D(double theX, double theY) {
-    X = theX;
-    Y = theY;
+    x = theX;
+    y = theY;
 }
 
 Vec2D::Vec2D(System::ValueTuple<double, double> theXY) {
-    X = theXY.Item1;
-    Y = theXY.Item2;
+    x = theXY.Item1;
+    y = theXY.Item2;
 }
 
 Vec2D::Vec2D(Pnt2D fromPnt, Pnt2D toPnt) {
-    X = toPnt.X - fromPnt.X;
-    Y = toPnt.Y - fromPnt.Y;
+    x = toPnt.X - fromPnt.X;
+    y = toPnt.Y - fromPnt.Y;
 }
 
 Vec2D::Vec2D(gp_Vec2d theVec2D) {
-    X = theVec2D.X();
-    Y = theVec2D.Y();
-}
-
-Vec2D::Vec2D(gp_Vec2d* theVec2D) {
-    X = theVec2D->X();
-    Y = theVec2D->Y();
+    x = theVec2D.X();
+    y = theVec2D.Y();
 }
 
 gp_Vec2d Vec2D::GetOCC() {

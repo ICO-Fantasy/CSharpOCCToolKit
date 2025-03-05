@@ -1,5 +1,5 @@
-﻿#include <gp_Dir.hxx>
-#include <cmath>
+﻿#include <cmath>
+#include <gp_Dir.hxx>
 //Local
 #include "ICO_Dir.h"
 #include "ICO_Pnt.h"
@@ -17,9 +17,9 @@ Dir::Dir(double theX, double theY, double theZ) {
         System::String^ str = "创建了零向量(" + theX + ", " + theY + ", " + theZ + ")";
         System::Diagnostics::Debug::WriteLine(str);
     }
-    X = theX;
-    Y = theY;
-    Z = theZ;
+    x = theX;
+    y = theY;
+    z = theZ;
     Normalize();
 }
 
@@ -28,16 +28,16 @@ Dir::Dir(System::ValueTuple<double, double, double> theXYZ) {
         System::String^ str = "创建了零向量(" + theXYZ.Item1 + ", " + theXYZ.Item2 + ", " + theXYZ.Item3 + ")";
         System::Diagnostics::Debug::WriteLine(str);
     }
-    X = theXYZ.Item1;
-    Y = theXYZ.Item2;
-    Z = theXYZ.Item3;
+    x = theXYZ.Item1;
+    y = theXYZ.Item2;
+    z = theXYZ.Item3;
     Normalize();
 }
 
 Dir::Dir(Vec theDir) {
-    X = theDir.X;
-    Y = theDir.Y;
-    Z = theDir.Z;
+    x = theDir.X;
+    y = theDir.Y;
+    z = theDir.Z;
     Normalize();
 }
 
@@ -47,23 +47,16 @@ Dir::Dir(Pnt fromPoint, Pnt toPoint) {
         System::Diagnostics::Debug::WriteLine(str);
     }
     Pnt p = toPoint - fromPoint;
-    X = p.X;
-    Y = p.Y;
-    Z = p.Z;
+    x = p.X;
+    y = p.Y;
+    z = p.Z;
     Normalize();
 }
 
 Dir::Dir(gp_Dir theDir) {
-    X = theDir.X();
-    Y = theDir.Y();
-    Z = theDir.Z();
-    Normalize();
-}
-
-Dir::Dir(gp_Dir* theDir) {
-    X = theDir->X();
-    Y = theDir->Y();
-    Z = theDir->Z();
+    x = theDir.X();
+    y = theDir.Y();
+    z = theDir.Z();
     Normalize();
 }
 
@@ -138,6 +131,11 @@ Vec Dir::ToVec(double factor) {
 }
 
 gp_Dir Dir::GetOCC() {
+    //! default构造的 Dir为 (0, 0, 0) 需要处理
+    if (X == 0 && Y == 0 && Z == 0)
+    {
+        z = 1;
+    }
     return gp_Dir(X, Y, Z);
 }
 
@@ -152,9 +150,9 @@ System::String^ Dir::ToString() {
 //私有函数，用于归一化向量
 void Dir::Normalize() {
     double m = std::sqrt(X * X + Y * Y + Z * Z);
-    X = X / m;
-    Y = Y / m;
-    Z = Z / m;
+    x = X / m;
+    y = Y / m;
+    z = Z / m;
 }
 
 }

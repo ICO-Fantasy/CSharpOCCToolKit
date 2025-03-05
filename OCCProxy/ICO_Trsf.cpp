@@ -22,9 +22,7 @@ namespace OCC {
 namespace gp {
 
 Trsf::Trsf(const gp_Trsf theT) {
-    Translation = Vec(theT.TranslationPart());
-    Rotation= Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    Init(theT);
 }
 
 Trsf::Trsf(array<double, 2>^ matrix) {
@@ -44,10 +42,7 @@ Trsf::Trsf(array<double, 2>^ matrix) {
     theT.SetValues(matrix[0, 0], matrix[0, 1], matrix[0, 2], matrix[0, 3],
         matrix[1, 0], matrix[1, 1], matrix[1, 2], matrix[1, 3],
         matrix[2, 0], matrix[2, 1], matrix[2, 2], matrix[2, 3]);
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    Init(theT);
 }
 
 Trsf::Trsf(array<array<double>^>^ matrix) {
@@ -67,24 +62,21 @@ Trsf::Trsf(array<array<double>^>^ matrix) {
     theT.SetValues(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
         matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
         matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    Init(theT);
 }
 
 Trsf::Trsf(Vec translation, Quat rotation)
 {
-    Translation = translation;
-    Rotation = rotation;
-    Scale = 1;
+    translation = translation;
+    rotation = rotation;
+    scale = 1;
 }
 
-Trsf::Trsf(Vec translation, Quat rotation,double scale)
+Trsf::Trsf(Vec translation, Quat rotation, double scale)
 {
-    Translation = translation;
-    Rotation = rotation;
-    Scale = scale;
+    translation = translation;
+    rotation = rotation;
+    scale = scale;
 }
 
 /// <summary>
@@ -95,10 +87,7 @@ Trsf::Trsf(Vec translation, Quat rotation,double scale)
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
     gp_Trsf theT;
     theT.SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    Init(theT);
 }
 
 /// <summary>
@@ -108,10 +97,7 @@ Trsf::Trsf(Ax2 toAx2)
 {
     gp_Trsf theT;
     theT.SetTransformation(gp_Ax3(), gp_Ax3(toAx2));
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    Init(theT);
 }
 
 /// <summary>
@@ -119,35 +105,37 @@ Trsf::Trsf(Ax2 toAx2)
 /// </summary>
 Trsf::Trsf(Vec translation)
 {
-    Translation = translation;
-    Rotation = Quat::Default;
-    Scale = 1;
+    translation = translation;
+    rotation = Quat::Default;
+    scale = 1;
 }
 
 /// <summary>
-/// 设置旋转变换
+/// 只有旋转的变换
 /// </summary>
+/// <param name="rotation">旋转部分</param>
 Trsf::Trsf(Quat rotation)
 {
-    Translation = Vec::Default;
-    Rotation = rotation;
-    Scale = 1;
+    translation = Vec::Default;
+    rotation = rotation;
+    scale = 1;
 }
 
 gp_Trsf Trsf::GetOCC() {
     gp_Trsf t;
     t.SetTranslationPart(Translation);
     t.SetRotationPart(Rotation);
-    if (Scale==0)
+    //! default 构造的Trsf会出现错误
+    if (Scale == 0)
     {
-        Scale = 1;
+        scale = 1;
     }
     t.SetScaleFactor(Scale);
     return t;
 }
 
 Object^ Trsf::Clone() {
-    return Trsf(Translation,Rotation,Scale);
+    return Trsf(Translation, Rotation, Scale);
 }
 
 System::String^ Trsf::ToString() {
@@ -174,7 +162,7 @@ System::String^ Trsf::ToString() {
 /// <param name="rightTrsf"></param>
 /// <returns></returns>
 Trsf Trsf::Multiplied(Trsf rightTrsf) {
-        return Trsf(GetOCC().Multiplied(rightTrsf.GetOCC()));
+    return Trsf(GetOCC().Multiplied(rightTrsf.GetOCC()));
 }
 
 /// <summary>
@@ -183,6 +171,12 @@ Trsf Trsf::Multiplied(Trsf rightTrsf) {
 /// <returns></returns>
 Trsf Trsf::Inverted() {
     return Trsf(GetOCC().Inverted());
+}
+
+void Trsf::Init(gp_Trsf t) {
+    translation = Vec(t.TranslationPart());
+    rotation = Quat(t.GetRotation());
+    scale = t.ScaleFactor();
 }
 
 }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 //在构造函数中使用的值对象需要直接引入
-#include <gp_Vec2d.hxx>
 #include "ICO_Precision.h"
+#include <gp_Vec2d.hxx>
 
 //前向声明
 class gp_Vec2d;
@@ -20,7 +20,6 @@ public:
     Vec2D(System::ValueTuple<double, double> theXY);
     Vec2D(Pnt2D fromPnt, Pnt2D toPnt);
     Vec2D(gp_Vec2d theVec);
-    Vec2D(gp_Vec2d* theVec);
     gp_Vec2d GetOCC();
     virtual System::Object^ Clone();
     virtual System::String^ ToString() override;
@@ -32,15 +31,12 @@ public:
     Vec2D Multiplied(double value);
     double Dot(Vec2D other);
     double Crossed(Vec2D other);
+private:
+    double x;
+    double y;
 public:
-    property double X;
-    property double Y;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y) {
-        x = X;
-        y = Y;
-    }
+    property double X {double get() { return x; }};
+    property double Y {double get() { return y; }};
 
 #pragma region 重载操作符
 

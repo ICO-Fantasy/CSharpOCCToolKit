@@ -9,34 +9,22 @@ namespace OCC {
 namespace gp {
 
 Cylinder::Cylinder(Ax3 pose, double radius) {
-	this->pose = pose;
-	this->radius = radius;
+    this->pose = pose;
+    this->radius = radius;
 }
 Cylinder::Cylinder(gp_Cylinder cylinder) {
-	pose = Ax3(cylinder.Position());
-	radius = cylinder.Radius();
-}
-
-Cylinder::Cylinder(gp_Cylinder* cylinder) {
-	pose = Ax3(cylinder->Position());
-	radius = cylinder->Radius();
+    pose = Ax3(cylinder.Position());
+    radius = cylinder.Radius();
 }
 
 gp_Cylinder Cylinder::GetOCC() {
-	return gp_Cylinder(pose.GetOCC(), radius);
+    return gp_Cylinder(pose.GetOCC(), radius);
 }
 
 System::Object^ Cylinder::Clone() {
-	return gcnew Cylinder(pose, radius);
+    return gcnew Cylinder(pose, radius);
 }
 
-Ax1 Cylinder::Axis() {
-	return pose.ZAxis;
-}
-
-double Cylinder::Radius() {
-	return radius;
-}
 
 
 }

@@ -1,9 +1,9 @@
 ﻿#pragma once
 //在构造函数中使用的值对象需要直接引入
-#include <gp_Trsf.hxx>
 #include "ICO_Ax2.h"
 #include "ICO_Quaternion.h"
 #include "ICO_Vec.h"
+#include <gp_Trsf.hxx>
 
 namespace OCCTK {
 namespace OCC {
@@ -12,13 +12,13 @@ namespace gp {
 //+ Trsf并非gp_Trsf的完整实现，不包含镜像的变换类型
 public value struct Trsf :System::ICloneable {
 public:
-    const static Trsf Default = Trsf(Vec::Default,Quat::Default);
+    const static Trsf Default = Trsf(Vec::Default, Quat::Default);
 public:
     Trsf(gp_Trsf theT);
     Trsf(array<double, 2>^ matrix);
     Trsf(array<array<double>^>^ matrix);
     Trsf(Vec translation, Quat rotation);
-    Trsf(Vec translation, Quat rotation,double scalce);
+    Trsf(Vec translation, Quat rotation, double scalce);
     Trsf(Ax2 fromAx2, Ax2 toAx2);
     Trsf(Ax2 toAx2);
     Trsf(Vec translation);
@@ -31,10 +31,15 @@ public:
 public:
     Trsf Multiplied(Trsf rightTrsf);
     Trsf Inverted();
+private:
+    Vec translation;
+    Quat rotation;
+    double scale;
+#pragma region 重载操作符
 public:
-    property Vec Translation ;
-    property Quat Rotation;
-    property double Scale ;
+    property Vec Translation {Vec get() { return translation; }}
+    property Quat Rotation {Quat get() { return rotation; }}
+    property double Scale {double get() { return scale; }}
 #pragma region 重载操作符
 
     static Trsf operator * (Trsf Left, Trsf Right) {
@@ -49,7 +54,8 @@ public:
     //static bool operator != (Trsf Left, Trsf Right) { return !Left.Equals(Right, ANGULAR_TOL, LINEAR_TOL); }//默认精度
 
 #pragma endregion
-
+private:
+    void Init(gp_Trsf t);
 };
 
 }

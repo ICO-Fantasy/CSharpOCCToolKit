@@ -1,9 +1,11 @@
 ﻿#pragma once
 //构造函数成员需要完整定义
-#include <gp_Ax2.hxx>
-#include "ICO_Pnt.h"
 #include "ICO_Dir.h"
+#include "ICO_Pnt.h"
 #include "ICO_Precision.h"
+#include <gp_Ax2.hxx>
+#include <gp_Ax3.hxx>
+#include <gp_Trsf.hxx>
 
 namespace OCCTK {
 namespace OCC {
@@ -20,6 +22,7 @@ public:
     const static Ax2 Default = Ax2(::gp_Ax2());
 public:
     Ax2(gp_Ax2 theAx2);
+    Ax2(gp_Ax3 theAx3);
     Ax2(Pnt location, Dir zAxis);
     Ax2(Pnt location, Dir zAxis, Dir XAxis);
     Ax2(array<double, 2>^ matrix);
@@ -30,19 +33,16 @@ public:
     //! 隐式转换为 gp_Ax2
     static operator gp_Ax2 (Ax2 axis) { return axis.GetOCC(); }
 public:
-    bool operator==  (Ax2 other) {
-        return (Location == other.Location
-            && ZDir == other.ZDir
-            && XDir == other.XDir);
-    };
-public:
-    //void Transform(Trsf theT);
     Ax2 Transformed(Trsf theT);
+private:
+    Pnt location;
+    Dir zDir;
+    Dir xDir;
 public:
-    property Pnt Location;
-    property Dir XDir;
+    property Pnt Location {Pnt get() { return location; }};
+    property Dir XDir {Dir get() { return xDir; }};
     property Dir YDir {Dir get(); }
-    property Dir ZDir;
+    property Dir ZDir {Dir get() { return zDir; }};
     property Ax1 XAxis {Ax1 get(); }
     property Ax1 YAxis {Ax1 get(); }
     property Ax1 ZAxis {Ax1 get(); }

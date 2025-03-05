@@ -10,16 +10,18 @@ namespace gp {
 //前向声明
 value struct Trsf;
 
-public ref class Circle :System::ICloneable {
+public value struct Circle :System::ICloneable {
 public:
-	Circle(gp_Circ circle);
-	Circle(gp_Circ* circle);
-	Circle(Ax2 pose, double radius);
-	gp_Circ GetOCC();
-	virtual System::Object^ Clone();
+    Circle(gp_Circ circle);
+    Circle(Ax2 pose, double radius);
+    gp_Circ GetOCC();
+    virtual System::Object^ Clone();
+private:
+    Ax2 pose;
+    double radius;
 public:
-	property Ax2 Pose;
-	property double Radius;
+    property Ax2 Pose {Ax2 get() { return pose; }}
+    property double Radius {double get() { return radius; }}
 };
 
 }

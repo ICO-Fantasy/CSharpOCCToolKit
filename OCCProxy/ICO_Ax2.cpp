@@ -1,5 +1,6 @@
 ﻿#include "ICO_Ax2.h"
 #include <gp_Ax2.hxx>
+#include <gp_Ax3.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Dir.h"
@@ -22,21 +23,29 @@ namespace gp {
 /// <remarks>X方向为任意轴</remarks>
 Ax2::Ax2(Pnt location, Dir zAxis) {
     gp_Ax2 theAx2 = gp_Ax2(location, zAxis);
-    Location = Pnt(theAx2.Location());
-    ZDir = Dir(theAx2.Direction());
-    XDir = Dir(theAx2.XDirection());
+    location = Pnt(theAx2.Location());
+    zDir = Dir(theAx2.Direction());
+    xDir = Dir(theAx2.XDirection());
 }
 
 Ax2::Ax2(Pnt location, Dir zAxis, Dir theXAxis) {
-    Location = location;
-    ZDir = zAxis;
-    XDir = theXAxis;
+    location = location;
+    zDir = zAxis;
+    xDir = theXAxis;
 }
 
 Ax2::Ax2(gp_Ax2 theAx2) {
-    Location = Pnt(theAx2.Location());
-    ZDir = Dir(theAx2.Direction());
-    XDir = Dir(theAx2.XDirection());
+    location = Pnt(theAx2.Location());
+    zDir = Dir(theAx2.Direction());
+    xDir = Dir(theAx2.XDirection());
+}
+
+Ax2::Ax2(gp_Ax3 theAx3)
+{
+    gp_Ax2 theAx2 = theAx3.Ax2();
+    location = Pnt(theAx2.Location());
+    zDir = Dir(theAx2.Direction());
+    xDir = Dir(theAx2.XDirection());
 }
 
 Ax2::Ax2(array<double, 2>^ matrix) {
@@ -51,9 +60,9 @@ Ax2::Ax2(array<double, 2>^ matrix) {
         matrix[2, 0], matrix[2, 1], matrix[2, 2], matrix[2, 3]
     );
     newAx2.Transform(T);
-    Location = Pnt(newAx2.Location());
-    ZDir = Dir(newAx2.Direction());
-    XDir = Dir(newAx2.XDirection());
+    location = Pnt(newAx2.Location());
+    zDir = Dir(newAx2.Direction());
+    xDir = Dir(newAx2.XDirection());
 }
 
 Ax2::Ax2(array<array<double>^>^ matrix) {
@@ -73,9 +82,9 @@ Ax2::Ax2(array<array<double>^>^ matrix) {
         matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]
     );
     newAx2.Transform(T);
-    Location = Pnt(newAx2.Location());
-    ZDir = Dir(newAx2.Direction());
-    XDir = Dir(newAx2.XDirection());
+    location = Pnt(newAx2.Location());
+    zDir = Dir(newAx2.Direction());
+    xDir = Dir(newAx2.XDirection());
 }
 
 gp_Ax2 Ax2::GetOCC() {

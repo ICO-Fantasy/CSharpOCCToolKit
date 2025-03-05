@@ -1,9 +1,9 @@
 ﻿#pragma once
 //在构造函数中使用的值对象需要直接引入
+#include "ICO_Precision.h"
+#include "ICO_XYZ.h"
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
-#include "ICO_XYZ.h"
-#include "ICO_Precision.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -30,9 +30,7 @@ public:
     Pnt(double theX, double theY, double theZ);
     Pnt(System::ValueTuple<double, double, double> theXYZ);
     Pnt(gp_Pnt thePnt);
-    Pnt(gp_Pnt* thePnt);
     Pnt(gp_XYZ theXYZ);
-    Pnt(gp_XYZ* theXYZ);
     Pnt(XYZ theXYZ);
     gp_Pnt GetOCC();
     virtual System::Object^ Clone();
@@ -45,18 +43,14 @@ public:
     Pnt SetX(double value);
     Pnt SetY(double value);
     Pnt SetZ(double value);
+private:
+    double x;
+    double y;
+    double z;
 public:
-    property double X;
-    property double Y;
-    property double Z;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y,
-        [System::Runtime::InteropServices::OutAttribute] double% z) {
-        x = X;
-        y = Y;
-        z = Z;
-    }
+    property double X {double get() { return x; }};
+    property double Y {double get() { return y; }};
+    property double Z {double get() { return z; }};
 
 #pragma region 重载操作符
 

@@ -25,18 +25,14 @@ public:
     static operator gp_XYZ (XYZ xyz) { return xyz.GetOCC(); }
     //! 隐式转换为 ( x, y, z)
     static operator System::ValueTuple<double, double, double>(XYZ xyz) { return System::ValueTuple<double, double, double>(xyz.X, xyz.Y, xyz.Z); }
+private:
+    double x;
+    double y;
+    double z;
 public:
-    property double X;
-    property double Y;
-    property double Z;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y,
-        [System::Runtime::InteropServices::OutAttribute] double% z) {
-        x = X;
-        y = Y;
-        z = Z;
-    }
+    property double X {double get() { return x; }};
+    property double Y {double get() { return y; }};
+    property double Z {double get() { return z; }};
 
 #pragma region 重载操作符
 

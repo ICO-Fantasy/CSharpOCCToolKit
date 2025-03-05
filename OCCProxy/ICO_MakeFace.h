@@ -4,8 +4,8 @@ class BRepBuilderAPI_MakeFace;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
-ref class Pln;
-ref class Circle;
+value struct Pln;
+value struct Circle;
 }
 namespace Topo {
 ref class TShape;
@@ -23,8 +23,8 @@ public ref class MakeFace {
 public:
     MakeFace();
     MakeFace(Topo::TWire^ wire);
-    MakeFace(gp::Pln^ plane);
-    MakeFace(gp::Pln^ plane, double Umin, double Umax, double Vmin, double Vmax);
+    MakeFace(gp::Pln plane);
+    MakeFace(gp::Pln plane, double Umin, double Umax, double Vmin, double Vmax);
 public:
     Topo::TShape^ Shape();
     Topo::TFace^ Face();

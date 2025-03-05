@@ -3,6 +3,7 @@
 //local
 #include "ICO_Trsf.h"
 #include "ICO_Ax1.h"
+#include "ICO_Ax2.h"
 #include "ICO_Ax3.h"
 #include "ICO_Dir.h"
 #include "ICO_pnt.h"
@@ -13,45 +14,40 @@ namespace OCCTK {
 namespace OCC {
 namespace gp {
 
-Pln::Pln() {
-	myPln = new gp_Pln();
-}
-
 Pln::Pln(gp_Pln pln) {
-	myPln = new gp_Pln(pln);
+    position = Ax2(pln.Position());
 }
 
-Pln::Pln(gp_Pln* pln) {
-	myPln = pln;
+Pln::Pln(Ax2 pose) {
+    position = pose;
 }
 
-Pln::Pln(Ax3 axis) {
-	myPln = new gp_Pln(axis);
+Pln::Pln(Ax3 pose) {
+    position = Ax2(pose);
 }
 
 Pln::Pln(Pnt location, Dir direction) {
-	myPln = new gp_Pln(location, direction);
+    position = Ax2(location, direction);
 }
 
 gp_Pln Pln::GetOCC() {
-	return *myPln;
+    return gp_Pln(Ax3(position));
 }
 
 Object^ Pln::Clone() {
-	return gcnew Pln(myPln);
+    return Pln(GetOCC());
 }
 
 double Pln::Distance(Pnt point) {
-	return myPln->Distance(point);
+    return GetOCC().Distance(point);
 }
 
 System::ValueTuple<double, double, double, double> Pln::Coefficients() {
-	double a, b, c, d;
-	myPln->Coefficients(a, b, c, d);
-	return System::ValueTuple<double, double, double, double>(a, b, c, d);
+    //theA * X + theB * Y + theC * Z + theD = 0.
+    double a, b, c, d;
+    GetOCC().Coefficients(a, b, c, d);
+    return System::ValueTuple<double, double, double, double>(a, b, c, d);
 }
-
-Ax1 Pln::Axis::get() { return Ax1(myPln->Axis()); }
 
 }
 }
