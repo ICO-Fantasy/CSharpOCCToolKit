@@ -1,7 +1,7 @@
 ﻿#include "ICO_Topo_Vertex.h"
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Vertex.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Topo_Shape.h"
@@ -15,6 +15,11 @@ namespace Topo {
 
 TVertex::TVertex() {
     myShape = new TopoDS_Vertex();
+}
+
+TVertex::TVertex(TVertex^ vertex)
+{
+    myShape = vertex->myShape;
 }
 
 TVertex::TVertex(const TopoDS_Vertex theVertex) {

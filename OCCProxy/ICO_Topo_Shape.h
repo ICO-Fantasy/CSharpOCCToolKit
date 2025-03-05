@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <cstdint>//用来取int32的最大值
 #include "ICO_Orientation.h"
 #include "ICO_ShapeEnum.h"
+#include <cstdint>//用来取int32的最大值
 
 class TopoDS_Shape;
 namespace OCCTK {
@@ -25,6 +25,7 @@ namespace Topo {
 public ref class TShape {
 public:
     TShape();
+    TShape(TShape^ shape);
     TShape(const TopoDS_Shape theShape);
     TShape(System::IntPtr theShapeIntPtr);
     bool IsEqual(TShape^ otherShape);

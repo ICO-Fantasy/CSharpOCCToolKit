@@ -10,6 +10,7 @@ namespace Topo {
 public ref class TWire :TShape {
 public:
     TWire();
+    TWire(TWire^ wire);
     TWire(const TopoDS_Wire theWire);
     TWire(TopoDS_Wire* theWire);
     TopoDS_Wire GetOCC();

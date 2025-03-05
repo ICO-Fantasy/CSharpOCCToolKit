@@ -10,6 +10,7 @@ namespace Topo {
 public ref class TEdge :TShape {
 public:
     TEdge();
+    TEdge(TEdge^ edge);
     TEdge(const TopoDS_Edge theEdge);
     TopoDS_Edge GetOCC();
 };

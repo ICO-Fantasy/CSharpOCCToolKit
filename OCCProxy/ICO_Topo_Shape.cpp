@@ -2,9 +2,9 @@
 #include <Standard_TypeMismatch.hxx>
 #include <TopAbs_Orientation.hxx>
 #include<TopAbs_ShapeEnum.hxx>
+#include <TopLoc_Location.hxx>
 #include<TopoDS.hxx>
 #include<TopoDS_Shape.hxx>
-#include <TopLoc_Location.hxx>
 #include<TopoDS_Vertex.hxx>
 //local
 #include "ICO_Trsf.h"
@@ -23,6 +23,11 @@ namespace Topo {
 
 TShape::TShape() {
     myShape = new TopoDS_Shape();
+}
+
+TShape::TShape(TShape^ shape)
+{
+    myShape = shape->myShape;
 }
 
 TShape::TShape(const TopoDS_Shape theShape) {
