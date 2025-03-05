@@ -32,6 +32,12 @@ private:
 public:
     property double X {double get() { return x; }};
     property double Y {double get() { return y; }};
+    // 解构赋值
+    void Deconstruct([System::Runtime::InteropServices::Out] double% x,
+        [System::Runtime::InteropServices::Out] double% y) {
+        x = X;
+        y = Y;
+    }
 
 #pragma region 重载操作符
 

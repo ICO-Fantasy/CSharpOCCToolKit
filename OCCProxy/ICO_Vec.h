@@ -54,6 +54,14 @@ public:
     property double X {double get() { return x; }};
     property double Y {double get() { return y; }};
     property double Z {double get() { return z; }};
+    // 解构赋值
+    void Deconstruct([System::Runtime::InteropServices::Out] double% x,
+        [System::Runtime::InteropServices::Out] double% y,
+        [System::Runtime::InteropServices::Out] double% z) {
+        x = X;
+        y = Y;
+        z = Z;
+    }
 #pragma region 重载操作符
     bool Equals(Vec otherVec, double tol);
     static bool operator == (Vec Left, Vec Right) { return Left.Equals(Right, 0.0000174533); }//默认精度0.001度
