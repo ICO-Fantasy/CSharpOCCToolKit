@@ -42,6 +42,7 @@ public:
     double LastParameter();
     GeomAbs::CurveType GetType();
     gp::Circle Circle();
+    property GeomAbs::CurveType Type {GeomAbs::CurveType get() { return GetType(); }}
 };
 
 }

@@ -11,7 +11,7 @@ TWire::TWire() {
 
 TWire::TWire(TWire^ wire)
 {
-    myShape = wire->myShape;
+    myShape = new TopoDS_Shape(*wire->myShape);
 }
 
 TWire::TWire(const TopoDS_Wire theWire) {

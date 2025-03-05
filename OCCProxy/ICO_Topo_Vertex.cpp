@@ -19,7 +19,7 @@ TVertex::TVertex() {
 
 TVertex::TVertex(TVertex^ vertex)
 {
-    myShape = vertex->myShape;
+    myShape = new TopoDS_Shape(*vertex->myShape);
 }
 
 TVertex::TVertex(const TopoDS_Vertex theVertex) {

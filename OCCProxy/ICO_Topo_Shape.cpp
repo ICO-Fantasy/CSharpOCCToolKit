@@ -27,7 +27,7 @@ TShape::TShape() {
 
 TShape::TShape(TShape^ shape)
 {
-    myShape = shape->myShape;
+    myShape = new TopoDS_Shape(*shape->myShape);
 }
 
 TShape::TShape(const TopoDS_Shape theShape) {

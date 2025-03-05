@@ -11,7 +11,7 @@ TFace::TFace() {
 
 TFace::TFace(TFace^ face)
 {
-    myShape = face->myShape;
+    myShape = new TopoDS_Shape(*face->myShape);
 }
 
 TFace::TFace(const TopoDS_Face theFace) {

@@ -11,7 +11,7 @@ TEdge::TEdge() {
 
 TEdge::TEdge(TEdge^ edge)
 {
-    myShape = edge->myShape;
+    myShape = new TopoDS_Shape(*edge->myShape);
 }
 
 TEdge::TEdge(const TopoDS_Edge theEdge) {
