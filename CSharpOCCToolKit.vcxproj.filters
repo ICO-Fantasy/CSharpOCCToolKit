@@ -239,7 +239,7 @@
     <ClCompile Include="OCCProxy\ICO_Topo_Shape.cpp">
       <Filter>源文件\OCCProxy\TopoDS</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_STEPExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_STEPExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_Manipulator.cpp">
@@ -275,7 +275,7 @@
     <ClCompile Include="OCCProxy\ICO_MakeDir.cpp">
       <Filter>源文件\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_BrepExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_BrepExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_BndBox.cpp">
@@ -419,7 +419,7 @@
     <ClCompile Include="OCCProxy\ICO_MakeCylinder.cpp">
       <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_OBJExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_OBJExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp">
@@ -478,7 +478,7 @@
     <ClInclude Include="OCCProxy\ICO_Topo_Shape.h">
       <Filter>头文件\OCCProxy\TopoDS</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_STEPExchange.h">
+    <ClInclude Include="DataExchange\ICO_STEPExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_Manipulator.h">
@@ -514,7 +514,7 @@
     <ClInclude Include="OCCProxy\ICO_MakeDir.h">
       <Filter>头文件\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_BrepExchange.h">
+    <ClInclude Include="DataExchange\ICO_BrepExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_BndBox.h">
@@ -712,13 +712,13 @@
     <ClInclude Include="OCCProxy\ICO_MakeCylinder.h">
       <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_OBJExchange.h">
+    <ClInclude Include="DataExchange\ICO_OBJExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_STLExchange.h">
+    <ClInclude Include="DataExchange\ICO_STLExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h">
