@@ -23,7 +23,6 @@ public:
     TVertex();
     TVertex(TVertex^ vertex);
     TVertex(const TopoDS_Vertex theVertex);
-    TVertex(TopoDS_Vertex* theVertex);
     TopoDS_Vertex GetOCC();
 public:
     gp::Pnt ToPnt();

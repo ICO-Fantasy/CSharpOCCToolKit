@@ -12,7 +12,6 @@ public:
     TFace(TFace^ face);
     TFace(const TopoDS_Face theFace);
     TFace(System::IntPtr theFaceIntPtr);
-    TFace(TopoDS_Face* theFace);
     TopoDS_Face GetOCC();
 };
 

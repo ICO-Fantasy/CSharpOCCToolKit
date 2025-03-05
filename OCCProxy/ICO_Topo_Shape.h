@@ -29,25 +29,6 @@ public:
     TShape(const TopoDS_Shape theShape);
     TShape(System::IntPtr theShapeIntPtr);
     bool IsEqual(TShape^ otherShape);
-#pragma region 重载操作符
-    // 重载 == 操作符
-    static bool operator ==(TShape^ left, TShape^ right) {
-        // 检查是否有任何一个对象为 null
-        if (Object::ReferenceEquals(left, nullptr) || Object::ReferenceEquals(right, nullptr))
-            return Object::ReferenceEquals(left, right);
-        return left->IsEqual(right);
-    }
-    // 为了确保兼容，同时重写 Equals
-    virtual bool Equals(System::Object^ obj) override;
-    // 重写 GetHashCode
-    virtual int GetHashCode() override {
-        return HashCode(INT32_MAX);
-    }
-    // 重载 != 操作符
-    static bool operator !=(TShape^ left, TShape^ right) {
-        return !(left == right); // 利用重载的 == 操作符
-    }
-#pragma endregion
     TopoDS_Shape GetOCC();
     int HashCode(int upperBound);
 public:
@@ -76,6 +57,26 @@ protected:
         // 调用析构函数来清理非托管资源
         this->!TShape();
     }
+public:
+#pragma region 重载操作符
+    // 重载 == 操作符
+    static bool operator ==(TShape^ left, TShape^ right) {
+        // 检查是否有任何一个对象为 null
+        if (Object::ReferenceEquals(left, nullptr) || Object::ReferenceEquals(right, nullptr))
+            return Object::ReferenceEquals(left, right);
+        return left->IsEqual(right);
+    }
+    // 为了确保兼容，同时重写 Equals
+    virtual bool Equals(System::Object^ obj) override;
+    // 重写 GetHashCode
+    virtual int GetHashCode() override {
+        return HashCode(INT32_MAX);
+    }
+    // 重载 != 操作符
+    static bool operator !=(TShape^ left, TShape^ right) {
+        return !(left == right); // 利用重载的 == 操作符
+    }
+#pragma endregion
 };
 
 }

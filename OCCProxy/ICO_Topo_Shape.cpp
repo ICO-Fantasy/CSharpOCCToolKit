@@ -27,7 +27,7 @@ TShape::TShape() {
 
 TShape::TShape(TShape^ shape)
 {
-    myShape = new TopoDS_Shape(*shape->myShape);
+    myShape = new TopoDS_Shape(shape->GetOCC());
 }
 
 TShape::TShape(const TopoDS_Shape theShape) {
@@ -74,13 +74,13 @@ TopoAbs::ShapeEnum TShape::ShapeType() {
 /// <returns></returns>
 TVertex^ TShape::AsVertex() {
     if (myShape->ShapeType() != TopAbs_VERTEX) {
-        throw gcnew System::Exception("Shape Mismatch is not TVertex");
+        throw gcnew System::Exception("转换失败，Shape 类型不为 TVertex");
     }
     try {
         return gcnew TVertex(TopoDS::Vertex(*myShape));
     }
     catch (Standard_TypeMismatch e) {
-        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+        throw gcnew System::Exception(System::String::Format("类型转换错误: \"{0}\"", (char)e.GetMessageString()));
     }
 }
 
@@ -90,13 +90,13 @@ TVertex^ TShape::AsVertex() {
 /// <returns></returns>
 TEdge^ TShape::AsEdge() {
     if (myShape->ShapeType() != TopAbs_EDGE) {
-        throw gcnew System::Exception("Shape Mismatch is not TEdge");
+        throw gcnew System::Exception("转换失败，Shape 类型不为 TEdge");
     }
     try {
         return gcnew TEdge(TopoDS::Edge(*myShape));
     }
     catch (Standard_TypeMismatch e) {
-        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+        throw gcnew System::Exception(System::String::Format("类型转换错误: \"{0}\"", (char)e.GetMessageString()));
     }
 }
 
@@ -106,13 +106,13 @@ TEdge^ TShape::AsEdge() {
 /// <returns></returns>
 TFace^ TShape::AsFace() {
     if (myShape->ShapeType() != TopAbs_FACE) {
-        throw gcnew System::Exception("Shape Mismatch is not TFace");
+        throw gcnew System::Exception("转换失败，Shape 类型不为 TFace");
     }
     try {
         return gcnew TFace(TopoDS::Face(*myShape));
     }
     catch (Standard_TypeMismatch e) {
-        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+        throw gcnew System::Exception(System::String::Format("类型转换错误: \"{0}\"", (char)e.GetMessageString()));
     }
 }
 

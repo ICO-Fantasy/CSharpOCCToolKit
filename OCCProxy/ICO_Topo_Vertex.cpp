@@ -19,15 +19,11 @@ TVertex::TVertex() {
 
 TVertex::TVertex(TVertex^ vertex)
 {
-    myShape = new TopoDS_Shape(*vertex->myShape);
+    myShape = new TopoDS_Vertex(vertex->GetOCC());
 }
 
 TVertex::TVertex(const TopoDS_Vertex theVertex) {
     myShape = new TopoDS_Vertex(theVertex);
-}
-
-TVertex::TVertex(TopoDS_Vertex* theVertex) {
-    myShape = theVertex;
 }
 
 TopoDS_Vertex TVertex::GetOCC() {
