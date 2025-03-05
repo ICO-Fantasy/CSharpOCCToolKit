@@ -10,7 +10,8 @@ namespace OCCTK::OCC::GCPnts {
 public ref class UniformAbscissa
 {
 public:
-    UniformAbscissa(BRepAdaptor::Curve^ curve, double abscissa,double tol);
+    UniformAbscissa(BRepAdaptor::Curve^ curve, double abscissa, double tol);
+    UniformAbscissa(BRepAdaptor::Curve^ curve, int numberPoints, double tol);
 public:
     double Parameter(int index);
     double Abscissa();

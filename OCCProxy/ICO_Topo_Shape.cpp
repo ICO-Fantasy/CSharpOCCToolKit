@@ -5,13 +5,13 @@
 #include <TopLoc_Location.hxx>
 #include<TopoDS.hxx>
 #include<TopoDS_Shape.hxx>
-#include<TopoDS_Vertex.hxx>
 //local
 #include "ICO_Trsf.h"
 #include "ICO_Ax2.h"
 #include "ICO_Topo_Vertex.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Topo_Face.h"
+#include "ICO_Orientation.h"
 
 using namespace OCCTK::OCC::TopoAbs;
 using namespace OCCTK::OCC::gp;

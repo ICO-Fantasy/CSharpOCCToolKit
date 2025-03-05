@@ -65,6 +65,10 @@ public:
     bool Equals(Pnt otherPnt, double tol) {
         return this->Distance(otherPnt) <= tol;
     }
+
+    /// <summary>
+    /// 使用默认精度进行比较
+    /// </summary>
     static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, LINEAR_TOL); }//默认精度
     static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right, LINEAR_TOL); }//默认精度
     static Pnt operator + (Pnt Left, Pnt Right) {
