@@ -21,7 +21,6 @@ namespace Topo {
 public ref class TVertex :TShape {
 public:
     TVertex();
-    TVertex(TVertex^ vertex);
     TVertex(const TopoDS_Vertex theVertex);
     TopoDS_Vertex GetOCC();
 public:

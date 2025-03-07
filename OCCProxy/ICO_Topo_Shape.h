@@ -25,7 +25,6 @@ namespace Topo {
 public ref class TShape {
 public:
     TShape();
-    TShape(TShape^ shape);
     TShape(const TopoDS_Shape theShape);
     TShape(System::IntPtr theShapeIntPtr);
     bool IsEqual(TShape^ otherShape);
@@ -48,6 +47,7 @@ protected:
 protected:
     // 析构函数用于清理非托管资源
     !TShape() {
+        //System::Console::WriteLine("TShape 析构" + DebugID.ToString());
         delete myShape;
         myShape = nullptr;
     }

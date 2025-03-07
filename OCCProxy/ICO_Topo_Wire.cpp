@@ -9,11 +9,6 @@ TWire::TWire() {
     myShape = new TopoDS_Wire();
 }
 
-TWire::TWire(TWire^ wire)
-{
-    myShape = new TopoDS_Wire(wire->GetOCC());
-}
-
 TWire::TWire(const TopoDS_Wire theWire) {
     myShape = new TopoDS_Wire(theWire);
 }

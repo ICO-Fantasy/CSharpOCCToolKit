@@ -25,11 +25,6 @@ TShape::TShape() {
     myShape = new TopoDS_Shape();
 }
 
-TShape::TShape(TShape^ shape)
-{
-    myShape = new TopoDS_Shape(shape->GetOCC());
-}
-
 TShape::TShape(const TopoDS_Shape theShape) {
     myShape = new TopoDS_Shape(theShape);
 }

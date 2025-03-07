@@ -17,11 +17,6 @@ TVertex::TVertex() {
     myShape = new TopoDS_Vertex();
 }
 
-TVertex::TVertex(TVertex^ vertex)
-{
-    myShape = new TopoDS_Vertex(vertex->GetOCC());
-}
-
 TVertex::TVertex(const TopoDS_Vertex theVertex) {
     myShape = new TopoDS_Vertex(theVertex);
 }

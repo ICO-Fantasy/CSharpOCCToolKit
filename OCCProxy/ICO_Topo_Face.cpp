@@ -9,10 +9,10 @@ TFace::TFace() {
     myShape = new TopoDS_Face();
 }
 
-TFace::TFace(TFace^ face)
-{
-    myShape = new TopoDS_Face(face->GetOCC());
-}
+//TFace::TFace(TFace% face)
+//{
+//    myShape = new TopoDS_Shape(*(face.myShape));
+//}
 
 TFace::TFace(const TopoDS_Face theFace) {
     myShape = new TopoDS_Face(theFace);
