@@ -29,11 +29,11 @@ public:
     bool IsCoaxial(Ax1 other, double AngularTOL, double LinearTOL);
     bool IsCollinear(Ax1 other, double AngularTOL);
 private:
-    Pnt location;
-    Dir direction;
+    Pnt myLocation;
+    Dir myDirection;
 public:
-    property Pnt Location { Pnt get() { return location; } };
-    property Dir Direction {Dir get() { return direction; } };
+    property Pnt Location { Pnt get() { return myLocation; } };
+    property Dir Direction {Dir get() { return myDirection; } };
 
 #pragma region 重载操作符
 

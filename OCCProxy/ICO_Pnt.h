@@ -66,11 +66,11 @@ public:
         return this->Distance(otherPnt) <= tol;
     }
 
-    /// <summary>
     /// 使用默认精度进行比较
-    /// </summary>
     static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, LINEAR_TOL); }//默认精度
     static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right, LINEAR_TOL); }//默认精度
+
+    //支持点的组合操作
     static Pnt operator + (Pnt Left, Pnt Right) {
         return Pnt(
             Left.X + Right.X,
@@ -85,7 +85,10 @@ public:
     }
     //static Pnt operator + (Pnt Left, Vec Right);
     //static Pnt operator - (Pnt Left, Vec Right);
-    //static Pnt operator * (Pnt Left, Trsf Right);
+    
+    //支持点缩放操作(基于原点)
+    static Pnt operator * (Pnt pnt, double factor);
+    static Pnt operator / (Pnt pnt, double factor);
 
 #pragma endregion
 

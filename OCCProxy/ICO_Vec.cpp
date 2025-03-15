@@ -3,6 +3,7 @@
 //local
 #include"ICO_Pnt.h"
 #include"ICO_Trsf.h"
+#include "ICO_XYZ.h"
 #include <gp_XYZ.hxx>
 
 using namespace System;
@@ -68,6 +69,11 @@ Object^ Vec::Clone() {
 
 System::String^ Vec::ToString() {
     return X.ToString("F3") + ", " + Y.ToString("F3") + ", " + Z.ToString("F3");
+}
+
+Vec::operator XYZ(Vec v)
+{
+    return XYZ(v.X, v.Y, v.Z); 
 }
 
 bool Vec::IsParallel(Vec otherVec, double theAngularTolerance) {
@@ -165,6 +171,16 @@ double Vec::operator*(Vec Left, Vec Right) {
 /// <returns></returns>
 Vec Vec::operator^(Vec Left, Vec Right) {
     return Left.Crossed(Right);
+}
+
+Vec Vec::operator*(Vec vec, double factor)
+{
+    return Vec(vec.X*factor, vec.Y * factor, vec.Z * factor);
+}
+
+Vec Vec::operator/(Vec vec, double factor)
+{
+    return Vec(vec.X*factor, vec.Y * factor, vec.Z * factor);
 }
 
 #pragma endregion

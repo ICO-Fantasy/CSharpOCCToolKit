@@ -102,12 +102,6 @@
     <Filter Include="源文件\OCCProxy\BRep">
       <UniqueIdentifier>{987df178-31e1-487a-a1fb-1695ffa3c13c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\OCCProxy\TopExp">
-      <UniqueIdentifier>{8240fe3f-d45d-4447-91b5-cdb6d1e62969}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\OCCProxy\TopExp">
-      <UniqueIdentifier>{8c71453b-f78c-42bb-bda3-263cb701a80e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\OCCProxy\BRepAlgoAPI">
       <UniqueIdentifier>{f891ec7e-f59b-4f30-ae47-a623a1ceb904}</UniqueIdentifier>
     </Filter>
@@ -326,9 +320,6 @@
     <ClCompile Include="OCCProxy\ICO_BRep_Tool.cpp">
       <Filter>源文件\OCCProxy\BRep</Filter>
     </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_TopExp_Explorer.cpp">
-      <Filter>源文件\OCCProxy\TopExp</Filter>
-    </ClCompile>
     <ClCompile Include="OCCProxy\ICO_MakeWire.cpp">
       <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClCompile>
@@ -425,7 +416,7 @@
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_STLExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_STLExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp">
@@ -592,9 +583,6 @@
     <ClInclude Include="OCCProxy\ICO_BRep_Tool.h">
       <Filter>头文件\OCCProxy\BRep</Filter>
     </ClInclude>
-    <ClInclude Include="OCCProxy\ICO_TopExp_Explorer.h">
-      <Filter>头文件\OCCProxy\TopExp</Filter>
-    </ClInclude>
     <ClInclude Include="OCCProxy\ICO_MakeWire.h">
       <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
     </ClInclude>
@@ -756,6 +744,12 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_GCPnts_AbscissaPoint.h">
       <Filter>头文件\OCCProxy\GCPnts</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_Aspect_TypeOfMarker.h">
+      <Filter>头文件\OCCProxy\Aspect</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ICO_TopExp_Explorer.h">
+      <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

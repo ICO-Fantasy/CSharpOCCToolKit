@@ -4,6 +4,7 @@
 #include <gp_Vec.hxx>
 #include <gp_XYZ.hxx>
 #include "ICO_Pnt.h"
+
 //前向声明
 class gp_Vec;
 
@@ -12,6 +13,7 @@ namespace OCC {
 namespace gp {
 //前向声明
 value struct Trsf;
+value struct XYZ;
 
 public value struct Vec :System::ICloneable {
 public:
@@ -27,6 +29,8 @@ public:
     virtual System::String^ ToString() override;
     //! 隐式转换为 gp_Vec
     static operator gp_Vec (Vec v) { return v.GetOCC(); }
+    //! 隐式转换为 XYZ
+    static operator XYZ (Vec v);
 
 public:
     bool IsParallel(Vec otherVec, double theAngularTolerance);
@@ -66,12 +70,16 @@ public:
     bool Equals(Vec otherVec, double tol);
     static bool operator == (Vec Left, Vec Right) { return Left.Equals(Right, 0.0000174533); }//默认精度0.001度
     static bool operator != (Vec Left, Vec Right) { return !Left.Equals(Right, 0.0000174533); }//默认精度0.001度
+    //向量的叠加
     static Vec operator + (Vec Left, Vec Right);
     static Vec operator - (Vec Left, Vec Right);
     //点乘
     static double operator * (Vec Left, Vec Right);
     //叉乘
     static Vec operator ^ (Vec Left, Vec Right);
+    //向量的缩放
+    static Vec operator * (Vec vec, double factor);
+    static Vec operator / (Vec vec, double factor);
 #pragma endregion
 };
 

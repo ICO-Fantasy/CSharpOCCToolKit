@@ -94,6 +94,15 @@ Pnt Pnt::SetZ(double value) {
     return Pnt(gp_Pnt(X, Y, value));
 }
 
+Pnt Pnt::operator*(Pnt pnt, double factor)
+{
+    return Pnt(pnt.X * factor, pnt.Y * factor, pnt.Z * factor);
+}
+Pnt Pnt::operator/(Pnt pnt, double factor)
+{
+    return Pnt(pnt.X / factor, pnt.Y / factor, pnt.Z / factor);
+}
+
 }
 }
 }

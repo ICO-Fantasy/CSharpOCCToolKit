@@ -40,12 +40,6 @@ Quat::Quat(SO3Matrix matrix) {
     Init(q);
 }
 
-Quat::Quat(WPR rotation) {
-    gp_Quaternion q;
-    q.SetEulerAngles(gp_EulerSequence::gp_Intrinsic_XYZ, rotation.W, rotation.P, rotation.R);
-    Init(q);
-}
-
 Quat::Quat(Ax1 axis, double angle) {
     gp_Quaternion q = gp_Quaternion();
     q.SetVectorAndAngle(axis.Direction.ToVec(1), angle);
@@ -85,11 +79,21 @@ System::String^ Quat::ToString() {
     return "(" + X.ToString("F3") + "," + Y.ToString("F3") + "," + Z.ToString("F3") + "," + W.ToString("F3") + ")";
 }
 
+Quat::operator WPR(Quat q)
+{
+    double a, b, c;
+    a = b = c = 0;
+    q.GetOCC().GetEulerAngles(gp_EulerSequence::gp_Extrinsic_XYZ, a, b, c);
+    return WPR(a / M_PI * 180, b / M_PI * 180, c / M_PI * 180);
+}
+
 System::ValueTuple<double, double, double> Quat::ToEuler(EulerSequence sequence) {
     double a, b, c;
+    a = b = c = 0;
     GetOCC().GetEulerAngles(gp_EulerSequence(sequence), a, b, c);
     return System::ValueTuple<double, double, double> {a, b, c};
 }
+
 
 SO3Matrix Quat::GetMatrix() {
     gp_Mat mat = GetOCC().GetMatrix();

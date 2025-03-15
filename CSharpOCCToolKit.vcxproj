@@ -168,7 +168,7 @@
     <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp" />
     <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp" />
     <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp" />
-    <ClCompile Include="DataExchange\ICO_STLExchange.cpp" />
+    <ClCompile Include="DataExchange\ICO_STLExchanger.cpp" />
     <ClCompile Include="OCCProxy\ICO_AIS_Point.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepCheck_Analyzer.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepPrimAPI_MakeRevol.cpp" />
@@ -206,7 +206,6 @@
     <ClCompile Include="OCCProxy\ICO_RubberBand.cpp" />
     <ClCompile Include="OCCProxy\ICO_Splitter.cpp" />
     <ClCompile Include="OCCProxy\ICO_TextLabel.cpp" />
-    <ClCompile Include="OCCProxy\ICO_TopExp_Explorer.cpp" />
     <ClCompile Include="OCCProxy\ICO_Topo_Edge.cpp" />
     <ClCompile Include="OCCProxy\ICO_Topo_Face.cpp" />
     <ClCompile Include="OCCProxy\ICO_Topo_Vertex.cpp" />
@@ -240,6 +239,7 @@
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
     <ClInclude Include="Extension\ICO_CameraOrientation.h" />
     <ClInclude Include="Extension\ICO_WPR.h" />
+    <ClInclude Include="OCCProxy\ICO_Aspect_TypeOfMarker.h" />
     <ClInclude Include="OCCProxy\ICO_GCPnts_AbscissaPoint.h" />
     <ClInclude Include="OCCProxy\ICO_GCPnts_UniformAbscissa.h" />
     <ClInclude Include="OCCProxy\ICO_SLERP.h" />
@@ -291,7 +291,7 @@
     <ClInclude Include="OCCProxy\ICO_RubberBand.h" />
     <ClInclude Include="OCCProxy\ICO_Splitter.h" />
     <ClInclude Include="OCCProxy\ICO_TextLabel.h" />
-    <ClInclude Include="OCCProxy\ICO_TopExp_Explorer.h" />
+    <ClInclude Include="Extension\ICO_TopExp_Explorer.h" />
     <ClInclude Include="OCCProxy\ICO_Topo_Edge.h" />
     <ClInclude Include="OCCProxy\ICO_Topo_Face.h" />
     <ClInclude Include="OCCProxy\ICO_Topo_Vertex.h" />

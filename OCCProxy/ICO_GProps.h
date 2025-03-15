@@ -19,7 +19,6 @@ public ref class GProps {
 public:
     GProps();
     GProps(GProp_GProps g);
-    GProps(GProp_GProps* intptr);
     GProp_GProps GetOCC();
 public:
     double Mass();

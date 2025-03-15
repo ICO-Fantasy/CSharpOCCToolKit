@@ -11,18 +11,18 @@ namespace OCC {
 namespace gp {
 
 Ax1::Ax1(Pnt location, Dir direction) {
-    location = location;
-    direction = direction;
+    myLocation = location;
+    myDirection = direction;
 }
 
 Ax1::Ax1(Pnt fromPnt, Pnt toPnt) {
-    location = fromPnt;
-    direction = Dir(fromPnt, toPnt);
+    myLocation = fromPnt;
+    myDirection = Dir(fromPnt, toPnt);
 }
 
 Ax1::Ax1(gp_Ax1 theAx1) {
-    location = Pnt(theAx1.Location());
-    direction = Dir(theAx1.Direction());
+    myLocation = Pnt(theAx1.Location());
+    myDirection = Dir(theAx1.Direction());
 }
 
 gp_Ax1 Ax1::GetOCC() {

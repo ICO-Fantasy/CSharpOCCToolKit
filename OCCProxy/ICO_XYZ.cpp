@@ -7,16 +7,16 @@ namespace gp {
 
 XYZ::XYZ(double x, double y, double z)
 {
-    x = x;
-    y = y;
-    z = z;
+    myX = x;
+    myY = y;
+    myZ = z;
 }
 
 XYZ::XYZ(gp_XYZ xyz)
 {
-    x = xyz.X();
-    y = xyz.Y();
-    z = xyz.Z();
+    myX = xyz.X();
+    myY = xyz.Y();
+    myZ = xyz.Z();
 }
 
 gp_XYZ XYZ::GetOCC()

@@ -21,7 +21,6 @@ public:
     Quat(double theX, double theY, double theZ, double theW);
     Quat(double alpha, double beta, double gamma, EulerSequence sequence);
     Quat(SO3Matrix matrix);
-    Quat(WPR rotation);
     Quat(Ax1 axis, double angle);
     Quat(Vec vec, double angle);
     Quat(gp_Quaternion theQuat);
@@ -31,6 +30,8 @@ public:
     virtual System::String^ ToString() override;
     //! 隐式转换为 gp_Quaternion
     static operator gp_Quaternion (Quat q) { return q.GetOCC(); }
+    //! 隐式转换为 WPR
+    static operator WPR (Quat q);
 public:
     System::ValueTuple<double, double, double> ToEuler(EulerSequence sequence);
     SO3Matrix GetMatrix();
