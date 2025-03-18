@@ -12,6 +12,10 @@ public:
     TFace(const TopoDS_Face theFace);
     TFace(System::IntPtr theFaceIntPtr);
     TopoDS_Face GetOCC();
+    //! 隐式转换为 TopoDS_Face
+    static operator TopoDS_Face (TFace^ s) {
+        return s->GetOCC();
+    }
 };
 
 }

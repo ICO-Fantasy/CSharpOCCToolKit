@@ -30,6 +30,8 @@ public:
     bool IsEqual(TShape^ otherShape);
     TopoDS_Shape GetOCC();
     int HashCode(int upperBound);
+    //! 隐式转换为 TopoDS_Shape
+    static operator TopoDS_Shape (TShape^ s);
 public:
     TopoAbs::ShapeEnum ShapeType();
     TVertex^ AsVertex();

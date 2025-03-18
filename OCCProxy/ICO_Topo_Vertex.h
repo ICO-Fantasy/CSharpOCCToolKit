@@ -23,6 +23,10 @@ public:
     TVertex();
     TVertex(const TopoDS_Vertex theVertex);
     TopoDS_Vertex GetOCC();
+    //! 隐式转换为 TopoDS_Vertex
+    static operator TopoDS_Vertex (TVertex^ s) {
+        return s->GetOCC();
+    }
 public:
     gp::Pnt ToPnt();
 };

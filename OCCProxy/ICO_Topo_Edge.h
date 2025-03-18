@@ -12,6 +12,10 @@ public:
     TEdge();
     TEdge(const TopoDS_Edge theEdge);
     TopoDS_Edge GetOCC();
+    //! 隐式转换为 TopoDS_Edge
+    static operator TopoDS_Edge (TEdge^ s) {
+        return s->GetOCC();
+    }
 };
 
 }

@@ -12,6 +12,10 @@ public:
     TWire();
     TWire(const TopoDS_Wire theWire);
     TopoDS_Wire GetOCC();
+    //! 隐式转换为 TopoDS_Wire
+    static operator TopoDS_Wire (TWire^ s) {
+        return s->GetOCC();
+    }
 };
 
 }

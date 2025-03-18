@@ -150,6 +150,11 @@ int TShape::HashCode(int upperBound) {
     return myShape->HashCode(upperBound);
 }
 
+TShape::operator TopoDS_Shape(TShape^ s)
+{
+    return s->GetOCC();
+}
+
 
 TopoAbs::Orientation TShape::Orientation::get() {
     return TopoAbs::Orientation(myShape->Orientation());

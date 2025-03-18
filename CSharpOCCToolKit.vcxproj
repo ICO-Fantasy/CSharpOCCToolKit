@@ -159,6 +159,7 @@
     <ClCompile Include="DataExchange\ICO_OBJExchanger.cpp" />
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
     <ClCompile Include="Extension\ICO_WPR.cpp" />
+    <ClCompile Include="OCCProxy\ICO_MakePrism.cpp" />
     <ClCompile Include="OCCProxy\ICO_GCPnts_AbscissaPoint.cpp" />
     <ClCompile Include="OCCProxy\ICO_GCPnts_UniformAbscissa.cpp" />
     <ClCompile Include="OCCProxy\ICO_SLERP.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
     <ClInclude Include="Extension\ICO_CameraOrientation.h" />
     <ClInclude Include="Extension\ICO_WPR.h" />
+    <ClInclude Include="OCCProxy\ICO_MakePrism.h" />
     <ClInclude Include="OCCProxy\ICO_Aspect_TypeOfMarker.h" />
     <ClInclude Include="OCCProxy\ICO_GCPnts_AbscissaPoint.h" />
     <ClInclude Include="OCCProxy\ICO_GCPnts_UniformAbscissa.h" />

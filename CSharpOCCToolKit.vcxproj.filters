@@ -437,9 +437,6 @@
     <ClCompile Include="Extension\ICO_WPR.cpp">
       <Filter>源文件\Extension</Filter>
     </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_Precision.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="OCCProxy\ICO_SLERP.cpp">
       <Filter>源文件\OCCProxy\gp</Filter>
     </ClCompile>
@@ -448,6 +445,12 @@
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_GCPnts_UniformAbscissa.cpp">
       <Filter>源文件\OCCProxy\GCPnts</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_Precision.cpp">
+      <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_MakePrism.cpp">
+      <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -750,6 +753,9 @@
     </ClInclude>
     <ClInclude Include="Extension\ICO_TopExp_Explorer.h">
       <Filter>头文件\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_MakePrism.h">
+      <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
