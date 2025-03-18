@@ -1,22 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 
 using log4net;
 using log4net.Config;
 
-using Microsoft.VisualBasic.Logging;
-
-using OCCTK.OCC.AIS;
-
-using OCCViewForm;
-
-using TestWPF;
 using TestWPF.Bending;
 using TestWPF.PipeBending;
 using TestWPF.Utils;
@@ -55,7 +45,7 @@ public partial class App:Application {
 		CreateInstanceMutexes( );
 
 		// Start main window
-		//MainWindow = new RobotWindows();
+		MainWindow = new RobotWindows( );
 		//MainWindow = new CanvasTest();
 		//MainWindow = new TestMainWindow( );
 		//! 简易夹具测试
@@ -63,7 +53,7 @@ public partial class App:Application {
 		//! 折弯测试
 		MainWindow = new BendingTest( );
 		//! 弯管重心计算
-		//MainWindow = new CenterOfGravity();
+		//MainWindow = new CenterOfGravity( );
 		MainWindow.Show( );
 
 		ShutdownMode = ShutdownMode.OnMainWindowClose;

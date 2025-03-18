@@ -74,8 +74,8 @@ public partial class BendingTest:Window, IAISSelectionHandler {
 	public BendingTree BendingTree { get; private set; }
 
 	public void CreateBendingTree( ) {
-		BendingTree = new BendingTree(InputWorkpiece, debugContext: Context);
 		try {
+			BendingTree = new BendingTree(InputWorkpiece, debugContext: Context);
 		} catch( Exception e ) {
 			MessageBox.Show($"折弯解析失败，错误：\n{e}", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
 			Debug.WriteLine($"{e}");
