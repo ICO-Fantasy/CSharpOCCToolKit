@@ -26,8 +26,8 @@ namespace gp {
 /// <param name="location"></param>
 /// <param name="theZAxis"></param>
 /// <remarks>X方向为任意轴</remarks>
-Ax2::Ax2(Pnt location, Dir zAxis) {
-    gp_Ax2 theAx2 = gp_Ax2(location, zAxis);
+Ax2::Ax2(Pnt location, Dir zDir) {
+    gp_Ax2 theAx2 = gp_Ax2(location, zDir);
     myLocation = Pnt(theAx2.Location());
     myZDir = Dir(theAx2.Direction());
     myXDir = Dir(theAx2.XDirection());
@@ -36,6 +36,21 @@ Ax2::Ax2(Pnt location, Dir zAxis) {
 Ax2::Ax2(Pnt location, Dir zDir, Dir theXDir) {
     myLocation = location;
     myZDir = zDir;
+    myXDir = theXDir;
+}
+
+Ax2::Ax2(Ax1 zAxis)
+{
+    gp_Ax2 theAx2 = gp_Ax2(zAxis.Location, zAxis.Direction);
+    myLocation = Pnt(theAx2.Location());
+    myZDir = Dir(theAx2.Direction());
+    myXDir = Dir(theAx2.XDirection());
+}
+
+Ax2::Ax2(Ax1 zAxis, Dir XDir)
+{
+    myLocation = zAxis.Location;
+    myZDir = zAxis.Direction;
     myXDir = theXDir;
 }
 

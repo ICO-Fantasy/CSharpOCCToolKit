@@ -25,8 +25,10 @@ public:
 public:
     Ax2(gp_Ax2 theAx2);
     Ax2(gp_Ax3 theAx3);
-    Ax2(Pnt location, Dir zAxis);
+    Ax2(Pnt location, Dir zDir);
     Ax2(Pnt location, Dir zDir, Dir XDir);
+    Ax2(Ax1 zAxis);
+    Ax2(Ax1 zAxis, Dir XDir);
     //Ax2(array<double, 2>^ matrix);
     //Ax2(array<array<double>^>^ matrix);
     gp_Ax2 GetOCC();
