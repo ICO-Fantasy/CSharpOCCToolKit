@@ -298,6 +298,8 @@ public partial class VerticalPlate {
 	/// <summary>
 	/// 从环中获取下端线
 	/// </summary>
+	/// <param name="TOL">拼接精度</param>
+	/// <exception cref="Exception">上下端线分离失败</exception>
 	public void GetBottomEdges( double TOL = 5e-2 ) {
 		//并行迭代
 		Parallel.ForEach(
