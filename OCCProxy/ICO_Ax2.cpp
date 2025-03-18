@@ -51,7 +51,7 @@ Ax2::Ax2(Ax1 zAxis, Dir XDir)
 {
     myLocation = zAxis.Location;
     myZDir = zAxis.Direction;
-    myXDir = theXDir;
+    myXDir = XDir;
 }
 
 Ax2::Ax2(gp_Ax2 theAx2) {
