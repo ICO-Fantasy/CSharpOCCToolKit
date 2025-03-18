@@ -35,6 +35,7 @@ public:
 public:
     void Add(Topo::TWire^ wire);
     bool Error();
+    bool IsDone();
 private:
     BRepBuilderAPI_MakeFace* myMaker;
 protected:

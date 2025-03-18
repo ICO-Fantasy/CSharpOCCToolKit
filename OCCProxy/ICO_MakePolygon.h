@@ -39,6 +39,10 @@ public:
     static operator Topo::TEdge ^ (MakePolygon^ makePolygon) {
         return makePolygon->Edge();  // 隐式调用 Edge 方法
     }
+    //! 隐式转换为 TWire
+    static operator Topo::TWire ^ (MakePolygon^ makePolygon) {
+        return makePolygon->Wire();  // 隐式调用 Edge 方法
+    }
 private:
     BRepBuilderAPI_MakePolygon* myMaker;
 protected:

@@ -24,6 +24,14 @@ Topo::TShape^ MakePrism::Shape()
 {
    return gcnew Topo::TShape(myMaker->Shape());
 }
+bool MakePrism::IsDone()
+{
+    return myMaker->IsDone();
+}
+bool MakePrism::Error()
+{
+    return myMaker;
+}
 }
 }
 }

@@ -74,6 +74,11 @@ bool MakeFace::Error() {
     return false;
 }
 
+bool MakeFace::IsDone()
+{
+    return myMaker->IsDone();
+}
+
 
 }
 }

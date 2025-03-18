@@ -27,6 +27,9 @@ public:
     static operator Topo::TShape ^ (MakePrism^ mp) {
         return mp->Shape();  // 隐式调用 Shape 方法
     }
+public:
+    bool IsDone();
+    bool Error();
 private:
     BRepPrimAPI_MakePrism* myMaker;
 protected:
