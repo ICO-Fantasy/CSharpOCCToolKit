@@ -7,16 +7,16 @@ namespace gp {
 
 XYZ::XYZ(double x, double y, double z)
 {
-    X = x;
-    Y = y;
-    Z = z;
+    myX = x;
+    myY = y;
+    myZ = z;
 }
 
 XYZ::XYZ(gp_XYZ xyz)
 {
-    X = xyz.X();
-    Y = xyz.Y();
-    Z = xyz.Z();
+    myX = xyz.X();
+    myY = xyz.Y();
+    myZ = xyz.Z();
 }
 
 gp_XYZ XYZ::GetOCC()
@@ -31,7 +31,7 @@ System::Object^ XYZ::Clone()
 
 System::String^ XYZ::ToString()
 {
-    return System::String::Format("({0}, {1}, {2})", X, Y, Z);
+    return System::String::Format("{0}, {1}, {2}", X, Y, Z);
 }
 
 }

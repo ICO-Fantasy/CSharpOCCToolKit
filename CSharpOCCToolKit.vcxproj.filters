@@ -102,12 +102,6 @@
     <Filter Include="源文件\OCCProxy\BRep">
       <UniqueIdentifier>{987df178-31e1-487a-a1fb-1695ffa3c13c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\OCCProxy\TopExp">
-      <UniqueIdentifier>{8240fe3f-d45d-4447-91b5-cdb6d1e62969}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\OCCProxy\TopExp">
-      <UniqueIdentifier>{8c71453b-f78c-42bb-bda3-263cb701a80e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\OCCProxy\BRepAlgoAPI">
       <UniqueIdentifier>{f891ec7e-f59b-4f30-ae47-a623a1ceb904}</UniqueIdentifier>
     </Filter>
@@ -216,6 +210,12 @@
     <Filter Include="源文件\OCCProxy\Graphic3d">
       <UniqueIdentifier>{4ec15908-d6a2-4508-b550-9ed26bd37540}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\GCPnts">
+      <UniqueIdentifier>{b4b992d3-b1d1-4da9-bb4a-49fc0e308d8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\GCPnts">
+      <UniqueIdentifier>{f1aeb6d4-0658-45f6-9190-aef8e00a3b86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OCCProxy\ICO_InteractiveObject.cpp">
@@ -233,7 +233,7 @@
     <ClCompile Include="OCCProxy\ICO_Topo_Shape.cpp">
       <Filter>源文件\OCCProxy\TopoDS</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_STEPExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_STEPExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_Manipulator.cpp">
@@ -269,7 +269,7 @@
     <ClCompile Include="OCCProxy\ICO_MakeDir.cpp">
       <Filter>源文件\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_BrepExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_BrepExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_BndBox.cpp">
@@ -319,9 +319,6 @@
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_BRep_Tool.cpp">
       <Filter>源文件\OCCProxy\BRep</Filter>
-    </ClCompile>
-    <ClCompile Include="OCCProxy\ICO_TopExp_Explorer.cpp">
-      <Filter>源文件\OCCProxy\TopExp</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_MakeWire.cpp">
       <Filter>源文件\OCCProxy\BRepBuilderAPI</Filter>
@@ -413,13 +410,13 @@
     <ClCompile Include="OCCProxy\ICO_MakeCylinder.cpp">
       <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_OBJExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_OBJExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
-    <ClCompile Include="DataExchange\ICO_STLExchange.cpp">
+    <ClCompile Include="DataExchange\ICO_STLExchanger.cpp">
       <Filter>源文件\DataExchange</Filter>
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp">
@@ -443,6 +440,15 @@
     <ClCompile Include="OCCProxy\ICO_Precision.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_SLERP.cpp">
+      <Filter>源文件\OCCProxy\gp</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_GCPnts_AbscissaPoint.cpp">
+      <Filter>源文件\OCCProxy\GCPnts</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_GCPnts_UniformAbscissa.cpp">
+      <Filter>源文件\OCCProxy\GCPnts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataExchange\ICO_StringExchange.h">
@@ -463,7 +469,7 @@
     <ClInclude Include="OCCProxy\ICO_Topo_Shape.h">
       <Filter>头文件\OCCProxy\TopoDS</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_STEPExchange.h">
+    <ClInclude Include="DataExchange\ICO_STEPExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_Manipulator.h">
@@ -499,7 +505,7 @@
     <ClInclude Include="OCCProxy\ICO_MakeDir.h">
       <Filter>头文件\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_BrepExchange.h">
+    <ClInclude Include="DataExchange\ICO_BrepExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_BndBox.h">
@@ -576,9 +582,6 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_BRep_Tool.h">
       <Filter>头文件\OCCProxy\BRep</Filter>
-    </ClInclude>
-    <ClInclude Include="OCCProxy\ICO_TopExp_Explorer.h">
-      <Filter>头文件\OCCProxy\TopExp</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_MakeWire.h">
       <Filter>头文件\OCCProxy\BRepBuilderAPI</Filter>
@@ -697,13 +700,13 @@
     <ClInclude Include="OCCProxy\ICO_MakeCylinder.h">
       <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_OBJExchange.h">
+    <ClInclude Include="DataExchange\ICO_OBJExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
-    <ClInclude Include="DataExchange\ICO_STLExchange.h">
+    <ClInclude Include="DataExchange\ICO_STLExchanger.h">
       <Filter>头文件\DataExchange</Filter>
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h">
@@ -732,6 +735,21 @@
     </ClInclude>
     <ClInclude Include="OCCProxy\ICO_Precision.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_SLERP.h">
+      <Filter>头文件\OCCProxy\gp</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_GCPnts_UniformAbscissa.h">
+      <Filter>头文件\OCCProxy\GCPnts</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_GCPnts_AbscissaPoint.h">
+      <Filter>头文件\OCCProxy\GCPnts</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_Aspect_TypeOfMarker.h">
+      <Filter>头文件\OCCProxy\Aspect</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ICO_TopExp_Explorer.h">
+      <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

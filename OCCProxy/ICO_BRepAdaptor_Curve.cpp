@@ -20,7 +20,7 @@ namespace BRepAdaptor {
 /// 创建空的构造器
 /// </summary>
 Curve::Curve() :BaseObject() {
-	NativeHandle = new BRepAdaptor_Curve();
+    NativeHandle = new BRepAdaptor_Curve();
 }
 
 /// <summary>
@@ -28,11 +28,11 @@ Curve::Curve() :BaseObject() {
 /// </summary>
 /// <param name="edge"></param>
 Curve::Curve(TEdge^ edge) :BaseObject() {
-	NativeHandle = new BRepAdaptor_Curve(edge->GetOCC());
+    NativeHandle = new BRepAdaptor_Curve(edge->GetOCC());
 }
 
 Curve::Curve(TEdge^ edge, TFace^ face) :BaseObject() {
-	NativeHandle = new BRepAdaptor_Curve(edge->GetOCC(), face->GetOCC());
+    NativeHandle = new BRepAdaptor_Curve(edge->GetOCC(), face->GetOCC());
 }
 
 /// <summary>
@@ -41,7 +41,7 @@ Curve::Curve(TEdge^ edge, TFace^ face) :BaseObject() {
 /// <param name="UVValue"></param>
 /// <returns></returns>
 Pnt Curve::Value(double UVValue) {
-	return Pnt(myCure()->Value(UVValue));
+    return Pnt(myCure()->Value(UVValue));
 }
 
 /// <summary>
@@ -49,7 +49,7 @@ Pnt Curve::Value(double UVValue) {
 /// </summary>
 /// <returns></returns>
 double Curve::FirstParameter() {
-	return myCure()->FirstParameter();
+    return myCure()->FirstParameter();
 }
 
 /// <summary>
@@ -57,15 +57,15 @@ double Curve::FirstParameter() {
 /// </summary>
 /// <returns></returns>
 double Curve::LastParameter() {
-	return myCure()->LastParameter();
+    return myCure()->LastParameter();
 }
 
 CurveType Curve::GetType() {
-	return CurveType(myCure()->GetType());
+    return CurveType(myCure()->GetType());
 }
 
-gp::Circle^ Curve::Circle() {
-	return gcnew gp::Circle(myCure()->Circle());
+gp::Circle Curve::Circle() {
+    return gp::Circle(myCure()->Circle());
 }
 
 }

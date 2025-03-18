@@ -7,6 +7,7 @@
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
 #include "..\Extension\ICO_CameraOrientation.h"
+#include <windef.h>
 
 using namespace OCCTK::OCC::Graphic3d;
 using namespace OCCTK::OCC::gp;

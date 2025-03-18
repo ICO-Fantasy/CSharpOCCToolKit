@@ -156,16 +156,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DataExchange\ICO_OBJExchange.cpp" />
+    <ClCompile Include="DataExchange\ICO_OBJExchanger.cpp" />
     <ClCompile Include="DataExchange\ICO_XCAFDoc.cpp" />
     <ClCompile Include="Extension\ICO_WPR.cpp" />
+    <ClCompile Include="OCCProxy\ICO_GCPnts_AbscissaPoint.cpp" />
+    <ClCompile Include="OCCProxy\ICO_GCPnts_UniformAbscissa.cpp" />
+    <ClCompile Include="OCCProxy\ICO_SLERP.cpp" />
     <ClCompile Include="OCCProxy\ICO_Precision.cpp" />
     <ClCompile Include="OCCProxy\ICO_XYZ.cpp" />
     <ClCompile Include="OCCProxy\ICO_TransformationPersistence.cpp" />
     <ClCompile Include="OCCProxy\ICO_Graphic3d_Camera.cpp" />
     <ClCompile Include="OCCProxy\ICO_Poly_Triangulation.cpp" />
     <ClCompile Include="OCCProxy\ICO_AIS_Triangulation.cpp" />
-    <ClCompile Include="DataExchange\ICO_STLExchange.cpp" />
+    <ClCompile Include="DataExchange\ICO_STLExchanger.cpp" />
     <ClCompile Include="OCCProxy\ICO_AIS_Point.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepCheck_Analyzer.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepPrimAPI_MakeRevol.cpp" />
@@ -177,7 +180,7 @@
     <ClCompile Include="OCCProxy\ICO_BndBox.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepAdaptor_Curve.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepAdaptor_Surface.cpp" />
-    <ClCompile Include="DataExchange\ICO_BrepExchange.cpp" />
+    <ClCompile Include="DataExchange\ICO_BrepExchanger.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepExtrema_DistShapeShape.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRepGProp_Face.cpp" />
     <ClCompile Include="OCCProxy\ICO_BRep_Tool.cpp" />
@@ -203,7 +206,6 @@
     <ClCompile Include="OCCProxy\ICO_RubberBand.cpp" />
     <ClCompile Include="OCCProxy\ICO_Splitter.cpp" />
     <ClCompile Include="OCCProxy\ICO_TextLabel.cpp" />
-    <ClCompile Include="OCCProxy\ICO_TopExp_Explorer.cpp" />
     <ClCompile Include="OCCProxy\ICO_Topo_Edge.cpp" />
     <ClCompile Include="OCCProxy\ICO_Topo_Face.cpp" />
     <ClCompile Include="OCCProxy\ICO_Topo_Vertex.cpp" />
@@ -214,7 +216,7 @@
     <ClCompile Include="OCCProxy\ICO_Viewer.cpp" />
     <ClCompile Include="Extension\ICO_XShape.cpp" />
     <ClCompile Include="MakeSimpleClamp.cpp" />
-    <ClCompile Include="DataExchange\ICO_STEPExchange.cpp" />
+    <ClCompile Include="DataExchange\ICO_STEPExchanger.cpp" />
     <ClCompile Include="OCCProxy\ICO_Trihedron.cpp" />
     <ClCompile Include="OCCProxy\ICO_BaseObject.cpp" />
     <ClCompile Include="OCCProxy\ICO_MakeBox.cpp" />
@@ -233,10 +235,14 @@
     <ClCompile Include="OCCProxy\ICO_BRepGProp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DataExchange\ICO_OBJExchange.h" />
+    <ClInclude Include="DataExchange\ICO_OBJExchanger.h" />
     <ClInclude Include="DataExchange\ICO_XCAFDoc.h" />
     <ClInclude Include="Extension\ICO_CameraOrientation.h" />
     <ClInclude Include="Extension\ICO_WPR.h" />
+    <ClInclude Include="OCCProxy\ICO_Aspect_TypeOfMarker.h" />
+    <ClInclude Include="OCCProxy\ICO_GCPnts_AbscissaPoint.h" />
+    <ClInclude Include="OCCProxy\ICO_GCPnts_UniformAbscissa.h" />
+    <ClInclude Include="OCCProxy\ICO_SLERP.h" />
     <ClInclude Include="OCCProxy\ICO_Precision.h" />
     <ClInclude Include="OCCProxy\ICO_XYZ.h" />
     <ClInclude Include="OCCProxy\ICO_TransformationPersistence.h" />
@@ -244,7 +250,7 @@
     <ClInclude Include="OCCProxy\ICO_TrsfForm.h" />
     <ClInclude Include="OCCProxy\ICO_Poly_Triangulation.h" />
     <ClInclude Include="OCCProxy\ICO_AIS_Triangulation.h" />
-    <ClInclude Include="DataExchange\ICO_STLExchange.h" />
+    <ClInclude Include="DataExchange\ICO_STLExchanger.h" />
     <ClInclude Include="OCCProxy\ICO_AIS_Point.h" />
     <ClInclude Include="OCCProxy\ICO_BRepCheck_Analyzer.h" />
     <ClInclude Include="OCCProxy\ICO_BRepPrimAPI_MakeRevol.h" />
@@ -257,7 +263,7 @@
     <ClInclude Include="OCCProxy\ICO_BndBox.h" />
     <ClInclude Include="OCCProxy\ICO_BRepAdaptor_Curve.h" />
     <ClInclude Include="OCCProxy\ICO_BRepAdaptor_Surface.h" />
-    <ClInclude Include="DataExchange\ICO_BrepExchange.h" />
+    <ClInclude Include="DataExchange\ICO_BrepExchanger.h" />
     <ClInclude Include="OCCProxy\ICO_BRepExtrema_DistShapeShape.h" />
     <ClInclude Include="OCCProxy\ICO_BRepGProp_Face.h" />
     <ClInclude Include="OCCProxy\ICO_BRep_Tool.h" />
@@ -285,7 +291,7 @@
     <ClInclude Include="OCCProxy\ICO_RubberBand.h" />
     <ClInclude Include="OCCProxy\ICO_Splitter.h" />
     <ClInclude Include="OCCProxy\ICO_TextLabel.h" />
-    <ClInclude Include="OCCProxy\ICO_TopExp_Explorer.h" />
+    <ClInclude Include="Extension\ICO_TopExp_Explorer.h" />
     <ClInclude Include="OCCProxy\ICO_Topo_Edge.h" />
     <ClInclude Include="OCCProxy\ICO_Topo_Face.h" />
     <ClInclude Include="OCCProxy\ICO_Topo_Vertex.h" />
@@ -298,7 +304,7 @@
     <ClInclude Include="Extension\ICO_XShape.h" />
     <ClInclude Include="OCCProxy\ICO_ZLayerId.h" />
     <ClInclude Include="MakeSimpleClamp.h" />
-    <ClInclude Include="DataExchange\ICO_STEPExchange.h" />
+    <ClInclude Include="DataExchange\ICO_STEPExchanger.h" />
     <ClInclude Include="OCCProxy\ICO_Trihedron.h" />
     <ClInclude Include="OCCProxy\ICO_BaseObject.h" />
     <ClInclude Include="OCCProxy\ICO_MakeBox.h" />

@@ -1,49 +1,34 @@
 ﻿#pragma once
+#include "ICO_Ax2.h"
+#include "ICO_Ax3.h"
+#include "ICO_Dir.h"
+#include "ICO_Pnt.h"
+#include <gp_Pln.hxx>
 
-//前向声明
-class gp_Pln;
 namespace OCCTK {
 namespace OCC {
 namespace gp {
+//前向声明
 value struct Trsf;
 value struct Ax1;
-value struct Ax3;
-value struct Pnt;
-value struct Dir;
-}
-}
-}
-
-namespace OCCTK {
-namespace OCC {
-namespace gp {
-
-public ref class Pln :System::ICloneable {
+public value struct Pln :System::ICloneable {
 public:
-    Pln();
+    const static Dir Default = Dir(1.0, 0.0, 0.0);
+public:
     Pln(gp_Pln pln);
-    Pln(gp_Pln* pln);
-    Pln(Ax3 axis);
+    Pln(Ax2 pose);
+    Pln(Ax3 pose);
     Pln(Pnt location, Dir direction);
     gp_Pln GetOCC();
     virtual System::Object^ Clone();
 public:
     double Distance(Pnt point);
     System::ValueTuple<double, double, double, double> Coefficients();
-    property Ax1 Axis {Ax1 get(); };
-protected:
-    gp_Pln* myPln;
-protected:
-    // 析构函数用于清理非托管资源
-    !Pln() {
-        delete myPln;
-        myPln = nullptr;
-    }
-    // 终结器（finalizer）用于垃圾回收时的清理
-    ~Pln() {
-        // 调用析构函数来清理非托管资源
-        this->!Pln();
-    }
+private:
+    Ax2 position;
+public:
+    property Ax2 Position {Ax2 get() { return position; }};
+    property Dir Normal {Dir get() { return Position.ZDir; }};
 };
 
 }

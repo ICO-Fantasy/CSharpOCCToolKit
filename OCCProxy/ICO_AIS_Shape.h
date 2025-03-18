@@ -23,22 +23,21 @@ namespace AIS {
 
 public ref class AShape :public InteractiveObject {
 private:
-	Handle(AIS_Shape) myShape() { return Handle(AIS_Shape)::DownCast(NativeHandle); }
+    Handle(AIS_Shape) myShape() { return Handle(AIS_Shape)::DownCast(NativeHandle); }
 public:
-	AShape(const Handle(AIS_InteractiveObject) aInteractive);
-	AShape(const Handle(AIS_Shape) aAISShape) : InteractiveObject(aAISShape) {};
-	AShape(const TopoDS_Shape& aShape);
-	AShape(System::IntPtr aShapePtr);
-	AShape(Topo::TShape^ aShape);
+    AShape(const Handle(AIS_InteractiveObject) aInteractive);
+    AShape(const Handle(AIS_Shape) aAISShape) : InteractiveObject(aAISShape) {};
+    AShape(const TopoDS_Shape& aShape);
+    AShape(System::IntPtr aShapePtr);
+    AShape(Topo::TShape^ aShape);
 public:
-	Handle(AIS_Shape) GetOCC() { return myShape(); };
-	System::IntPtr GetIntPtr();
+    Handle(AIS_Shape) GetOCC() { return myShape(); };
 public:
-	Topo::TShape^ Shape();
-	void SetColor(int R, int G, int B);
-	void SetTransparency(double theFactor);
-	void SetShape(Topo::TShape^ newShape);
-	virtual bool Equals(System::Object^ obj) override;
+    Topo::TShape^ Shape();
+    void SetColor(int R, int G, int B);
+    void SetTransparency(double theFactor);
+    void SetShape(Topo::TShape^ newShape);
+    virtual bool Equals(System::Object^ obj) override;
 };
 
 }

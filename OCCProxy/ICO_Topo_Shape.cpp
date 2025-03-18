@@ -2,16 +2,16 @@
 #include <Standard_TypeMismatch.hxx>
 #include <TopAbs_Orientation.hxx>
 #include<TopAbs_ShapeEnum.hxx>
+#include <TopLoc_Location.hxx>
 #include<TopoDS.hxx>
 #include<TopoDS_Shape.hxx>
-#include <TopLoc_Location.hxx>
-#include<TopoDS_Vertex.hxx>
 //local
 #include "ICO_Trsf.h"
 #include "ICO_Ax2.h"
 #include "ICO_Topo_Vertex.h"
 #include "ICO_Topo_Edge.h"
 #include "ICO_Topo_Face.h"
+#include "ICO_Orientation.h"
 
 using namespace OCCTK::OCC::TopoAbs;
 using namespace OCCTK::OCC::gp;
@@ -29,9 +29,13 @@ TShape::TShape(const TopoDS_Shape theShape) {
     myShape = new TopoDS_Shape(theShape);
 }
 
-TShape::TShape(TopoDS_Shape* theShape) {
-    myShape = theShape;
-}
+/// <summary>
+/// 使用 TopoDS_Shape 指针创建
+/// </summary>
+/// <param name="theEdgeIntPtr"></param>
+/// <remarks>
+/// !!! 不要轻易使用指针构造方法 !!!
+/// </remarks>
 TShape::TShape(System::IntPtr theShapeIntPtr) {
     // 将 IntPtr 转换为原生指针
     TopoDS_Shape* pShape = reinterpret_cast<TopoDS_Shape*>(theShapeIntPtr.ToPointer());
@@ -55,10 +59,6 @@ TopoDS_Shape TShape::GetOCC() {
     return *myShape;
 }
 
-System::IntPtr TShape::GetPtr() {
-    return System::IntPtr(myShape);
-}
-
 TopoAbs::ShapeEnum TShape::ShapeType() {
     return TopoAbs::ShapeEnum(myShape->ShapeType());
 }
@@ -69,13 +69,13 @@ TopoAbs::ShapeEnum TShape::ShapeType() {
 /// <returns></returns>
 TVertex^ TShape::AsVertex() {
     if (myShape->ShapeType() != TopAbs_VERTEX) {
-        throw gcnew System::Exception("Shape Mismatch is not TVertex");
+        throw gcnew System::Exception("转换失败，Shape 类型不为 TVertex");
     }
     try {
         return gcnew TVertex(TopoDS::Vertex(*myShape));
     }
     catch (Standard_TypeMismatch e) {
-        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+        throw gcnew System::Exception(System::String::Format("类型转换错误: \"{0}\"", (char)e.GetMessageString()));
     }
 }
 
@@ -85,13 +85,13 @@ TVertex^ TShape::AsVertex() {
 /// <returns></returns>
 TEdge^ TShape::AsEdge() {
     if (myShape->ShapeType() != TopAbs_EDGE) {
-        throw gcnew System::Exception("Shape Mismatch is not TEdge");
+        throw gcnew System::Exception("转换失败，Shape 类型不为 TEdge");
     }
     try {
         return gcnew TEdge(TopoDS::Edge(*myShape));
     }
     catch (Standard_TypeMismatch e) {
-        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+        throw gcnew System::Exception(System::String::Format("类型转换错误: \"{0}\"", (char)e.GetMessageString()));
     }
 }
 
@@ -101,13 +101,13 @@ TEdge^ TShape::AsEdge() {
 /// <returns></returns>
 TFace^ TShape::AsFace() {
     if (myShape->ShapeType() != TopAbs_FACE) {
-        throw gcnew System::Exception("Shape Mismatch is not TFace");
+        throw gcnew System::Exception("转换失败，Shape 类型不为 TFace");
     }
     try {
         return gcnew TFace(TopoDS::Face(*myShape));
     }
     catch (Standard_TypeMismatch e) {
-        throw gcnew System::Exception(System::String::Format("Type Mismatch: \"{0}\"", (char)e.GetMessageString()));
+        throw gcnew System::Exception(System::String::Format("类型转换错误: \"{0}\"", (char)e.GetMessageString()));
     }
 }
 

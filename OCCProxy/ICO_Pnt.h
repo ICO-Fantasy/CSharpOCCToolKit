@@ -1,9 +1,9 @@
 ﻿#pragma once
 //在构造函数中使用的值对象需要直接引入
+#include "ICO_Precision.h"
+#include "ICO_XYZ.h"
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
-#include "ICO_XYZ.h"
-#include "ICO_Precision.h"
 
 namespace OCCTK {
 namespace OCC {
@@ -30,9 +30,7 @@ public:
     Pnt(double theX, double theY, double theZ);
     Pnt(System::ValueTuple<double, double, double> theXYZ);
     Pnt(gp_Pnt thePnt);
-    Pnt(gp_Pnt* thePnt);
     Pnt(gp_XYZ theXYZ);
-    Pnt(gp_XYZ* theXYZ);
     Pnt(XYZ theXYZ);
     gp_Pnt GetOCC();
     virtual System::Object^ Clone();
@@ -45,14 +43,18 @@ public:
     Pnt SetX(double value);
     Pnt SetY(double value);
     Pnt SetZ(double value);
+private:
+    double x;
+    double y;
+    double z;
 public:
-    property double X;
-    property double Y;
-    property double Z;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y,
-        [System::Runtime::InteropServices::OutAttribute] double% z) {
+    property double X {double get() { return x; }};
+    property double Y {double get() { return y; }};
+    property double Z {double get() { return z; }};
+    // 解构赋值
+    void Deconstruct([System::Runtime::InteropServices::Out] double% x,
+        [System::Runtime::InteropServices::Out] double% y,
+        [System::Runtime::InteropServices::Out] double% z) {
         x = X;
         y = Y;
         z = Z;
@@ -63,8 +65,12 @@ public:
     bool Equals(Pnt otherPnt, double tol) {
         return this->Distance(otherPnt) <= tol;
     }
+
+    /// 使用默认精度进行比较
     static bool operator == (Pnt Left, Pnt Right) { return Left.Equals(Right, LINEAR_TOL); }//默认精度
     static bool operator != (Pnt Left, Pnt Right) { return !Left.Equals(Right, LINEAR_TOL); }//默认精度
+
+    //支持点的组合操作
     static Pnt operator + (Pnt Left, Pnt Right) {
         return Pnt(
             Left.X + Right.X,
@@ -79,7 +85,10 @@ public:
     }
     //static Pnt operator + (Pnt Left, Vec Right);
     //static Pnt operator - (Pnt Left, Vec Right);
-    //static Pnt operator * (Pnt Left, Trsf Right);
+    
+    //支持点缩放操作(基于原点)
+    static Pnt operator * (Pnt pnt, double factor);
+    static Pnt operator / (Pnt pnt, double factor);
 
 #pragma endregion
 

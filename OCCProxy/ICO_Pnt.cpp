@@ -1,8 +1,8 @@
 ﻿#include "ICO_Pnt.h"
 #include <cmath>
+#include <Geom_CartesianPoint.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
-#include <Geom_CartesianPoint.hxx>
 //local
 #include "ICO_Trsf.h"
 #include "ICO_XYZ.h"
@@ -14,45 +14,33 @@ namespace OCC {
 namespace gp {
 
 Pnt::Pnt(double theX, double theY, double theZ) {
-    X = theX;
-    Y = theY;
-    Z = theZ;
+    x = theX;
+    y = theY;
+    z = theZ;
 }
 
 Pnt::Pnt(System::ValueTuple<double, double, double> theXYZ) {
-    X = theXYZ.Item1;
-    Y = theXYZ.Item2;
-    Z = theXYZ.Item3;
+    x = theXYZ.Item1;
+    y = theXYZ.Item2;
+    z = theXYZ.Item3;
 }
 
 Pnt::Pnt(gp_Pnt thePnt) {
-    X = thePnt.X();
-    Y = thePnt.Y();
-    Z = thePnt.Z();
-}
-
-Pnt::Pnt(gp_Pnt* thePnt) {
-    X = thePnt->X();
-    Y = thePnt->Y();
-    Z = thePnt->Z();
+    x = thePnt.X();
+    y = thePnt.Y();
+    z = thePnt.Z();
 }
 
 Pnt::Pnt(gp_XYZ theXYZ) {
-    X = theXYZ.X();
-    Y = theXYZ.Y();
-    Z = theXYZ.Z();
-}
-
-Pnt::Pnt(gp_XYZ* theXYZ) {
-    X = theXYZ->X();
-    Y = theXYZ->Y();
-    Z = theXYZ->Z();
+    x = theXYZ.X();
+    y = theXYZ.Y();
+    z = theXYZ.Z();
 }
 
 Pnt::Pnt(XYZ theXYZ) {
-    X = theXYZ.X;
-    Y = theXYZ.Y;
-    Z = theXYZ.Z;
+    x = theXYZ.X;
+    y = theXYZ.Y;
+    z = theXYZ.Z;
 }
 
 Object^ Pnt::Clone() {
@@ -104,6 +92,15 @@ Pnt Pnt::SetY(double value) {
 /// <returns></returns>
 Pnt Pnt::SetZ(double value) {
     return Pnt(gp_Pnt(X, Y, value));
+}
+
+Pnt Pnt::operator*(Pnt pnt, double factor)
+{
+    return Pnt(pnt.X * factor, pnt.Y * factor, pnt.Z * factor);
+}
+Pnt Pnt::operator/(Pnt pnt, double factor)
+{
+    return Pnt(pnt.X / factor, pnt.Y / factor, pnt.Z / factor);
 }
 
 }

@@ -22,69 +22,61 @@ namespace OCC {
 namespace gp {
 
 Trsf::Trsf(const gp_Trsf theT) {
-    Translation = Vec(theT.TranslationPart());
-    Rotation= Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    Init(theT);
 }
+//
+//Trsf::Trsf(array<double, 2>^ matrix) {
+//    // 检查矩阵尺寸
+//    if (matrix->GetLength(0) != 3 && matrix->GetLength(0) != 4) {
+//        int rows = matrix->GetLength(0);
+//        System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
+//        throw gcnew System::Exception(str);
+//    }
+//    if (matrix->GetLength(1) != 4) {
+//        int cols = matrix->GetLength(1);
+//        System::String^ str = "输入矩阵为" + cols + "列，需要4行";
+//        throw gcnew System::Exception(str);
+//    }
+//
+//    gp_Trsf theT;
+//    theT.SetValues(matrix[0, 0], matrix[0, 1], matrix[0, 2], matrix[0, 3],
+//        matrix[1, 0], matrix[1, 1], matrix[1, 2], matrix[1, 3],
+//        matrix[2, 0], matrix[2, 1], matrix[2, 2], matrix[2, 3]);
+//    Init(theT);
+//}
+//
+//Trsf::Trsf(array<array<double>^>^ matrix) {
+//    // 检查矩阵尺寸
+//    if (matrix->Length != 3 && matrix->Length != 4) {
+//        int rows = matrix->Length;
+//        System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
+//        throw gcnew System::Exception(str);
+//    }
+//    if (matrix[0]->Length != 4) {
+//        int cols = matrix[0]->Length;
+//        System::String^ str = "输入矩阵为" + cols + "列，需要4行";
+//        throw gcnew System::Exception(str);
+//    }
+//
+//    gp_Trsf theT;
+//    theT.SetValues(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+//        matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+//        matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
+//    Init(theT);
+//}
 
-Trsf::Trsf(array<double, 2>^ matrix) {
-    // 检查矩阵尺寸
-    if (matrix->GetLength(0) != 3 && matrix->GetLength(0) != 4) {
-        int rows = matrix->GetLength(0);
-        System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
-        throw gcnew System::Exception(str);
-    }
-    if (matrix->GetLength(1) != 4) {
-        int cols = matrix->GetLength(1);
-        System::String^ str = "输入矩阵为" + cols + "列，需要4行";
-        throw gcnew System::Exception(str);
-    }
-
-    gp_Trsf theT;
-    theT.SetValues(matrix[0, 0], matrix[0, 1], matrix[0, 2], matrix[0, 3],
-        matrix[1, 0], matrix[1, 1], matrix[1, 2], matrix[1, 3],
-        matrix[2, 0], matrix[2, 1], matrix[2, 2], matrix[2, 3]);
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
-}
-
-Trsf::Trsf(array<array<double>^>^ matrix) {
-    // 检查矩阵尺寸
-    if (matrix->Length != 3 && matrix->Length != 4) {
-        int rows = matrix->Length;
-        System::String^ str = "输入矩阵为" + rows + "行，需要3或4行";
-        throw gcnew System::Exception(str);
-    }
-    if (matrix[0]->Length != 4) {
-        int cols = matrix[0]->Length;
-        System::String^ str = "输入矩阵为" + cols + "列，需要4行";
-        throw gcnew System::Exception(str);
-    }
-
-    gp_Trsf theT;
-    theT.SetValues(matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
-        matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
-        matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3]);
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
-}
-
-Trsf::Trsf(Vec translation, Quat rotation)
+Trsf::Trsf(XYZ translation, Quat rotation)
 {
-    Translation = translation;
-    Rotation = rotation;
-    Scale = 1;
+    myTranslation = translation;
+    myRotation = rotation;
+    myScale = 1;
 }
 
-Trsf::Trsf(Vec translation, Quat rotation,double scale)
+Trsf::Trsf(XYZ translation, Quat rotation, double scale)
 {
-    Translation = translation;
-    Rotation = rotation;
-    Scale = scale;
+    myTranslation = translation;
+    myRotation = rotation;
+    myScale = scale;
 }
 
 /// <summary>
@@ -93,12 +85,11 @@ Trsf::Trsf(Vec translation, Quat rotation,double scale)
 /// <param name="fromAx2"></param>
 /// <param name="toAx2"></param>
 Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
-    gp_Trsf theT;
-    theT.SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    gp_Trsf a;
+    gp_Trsf b;
+    a.SetDisplacement(gp_Ax3(), gp_Ax3(fromAx2));
+    b.SetDisplacement(gp_Ax3(), gp_Ax3(toAx2));
+    Init(a.Inverted().Multiplied(b));
 }
 
 /// <summary>
@@ -107,47 +98,50 @@ Trsf::Trsf(Ax2 fromAx2, Ax2 toAx2) {
 Trsf::Trsf(Ax2 toAx2)
 {
     gp_Trsf theT;
-    theT.SetTransformation(gp_Ax3(), gp_Ax3(toAx2));
-
-    Translation = Vec(theT.TranslationPart());
-    Rotation = Quat(theT.GetRotation());
-    Scale = theT.ScaleFactor();
+    theT.SetDisplacement(gp_Ax3(), gp_Ax3(toAx2));
+    Init(theT);
 }
 
 /// <summary>
-/// 设置平移变换
+/// 只有平移的变换
 /// </summary>
+/// <param name="translation">平移部分</param>
 Trsf::Trsf(Vec translation)
 {
-    Translation = translation;
-    Rotation = Quat::Default;
-    Scale = 1;
+    myTranslation = translation;
+    myRotation = Quat::Default;
+    myScale = 1;
 }
 
 /// <summary>
-/// 设置旋转变换
+/// 只有旋转的变换
 /// </summary>
+/// <param name="rotation">旋转部分</param>
 Trsf::Trsf(Quat rotation)
 {
-    Translation = Vec::Default;
-    Rotation = rotation;
-    Scale = 1;
+    myTranslation = XYZ::Default;
+    myRotation = rotation;
+    myScale = 1;
 }
 
 gp_Trsf Trsf::GetOCC() {
-    gp_Trsf t;
-    t.SetTranslationPart(Translation);
-    t.SetRotationPart(Rotation);
-    if (Scale==0)
+    gp_Trsf t=gp_Trsf();
+    if (Translation != XYZ::Default)
     {
-        Scale = 1;
+        t.SetTranslationPart(Vec(Translation));
+    }
+    t.SetRotationPart(Rotation);
+    //! default 构造的Trsf会出现错误
+    if (Scale == 0)
+    {
+        myScale = 1;
     }
     t.SetScaleFactor(Scale);
     return t;
 }
 
 Object^ Trsf::Clone() {
-    return Trsf(Translation,Rotation,Scale);
+    return Trsf(Translation, Rotation, Scale);
 }
 
 System::String^ Trsf::ToString() {
@@ -155,8 +149,8 @@ System::String^ Trsf::ToString() {
     gp_XYZ p = GetOCC().TranslationPart();
     gp_Quaternion q = GetOCC().GetRotation();
     double x, y, z;
-    q.GetEulerAngles(gp_Intrinsic_XYZ, x, y, z);
-    System::String^ str = "(" + p.X().ToString("F1") + ", " + p.Y().ToString("F1") + ", " + p.Z().ToString("F1") + "), Intrinsic_xyz:(" + (x / M_PI * 180.0).ToString("F1") + ", " + (y / M_PI * 180.0).ToString("F1") + ", " + (z / M_PI * 180.0).ToString("F1") + ")";
+    q.GetEulerAngles(gp_Extrinsic_XYZ, x, y, z);
+    System::String^ str = "(" + p.X().ToString("F1") + ", " + p.Y().ToString("F1") + ", " + p.Z().ToString("F1") + " | Extrinsic_XYZ:(" + (x / M_PI * 180.0).ToString("F1") + ", " + (y / M_PI * 180.0).ToString("F1") + ", " + (z / M_PI * 180.0).ToString("F1") + ")";
     return str;
 }
 
@@ -174,7 +168,12 @@ System::String^ Trsf::ToString() {
 /// <param name="rightTrsf"></param>
 /// <returns></returns>
 Trsf Trsf::Multiplied(Trsf rightTrsf) {
-        return Trsf(GetOCC().Multiplied(rightTrsf.GetOCC()));
+    gp_Trsf l=GetOCC();
+    l.SetForm(gp_TrsfForm::gp_CompoundTrsf);
+    gp_Trsf r= rightTrsf.GetOCC();
+    r.SetForm(gp_TrsfForm::gp_CompoundTrsf);
+    gp_Trsf debugt = l.Multiplied(r);
+    return Trsf(l.Multiplied(r));
 }
 
 /// <summary>
@@ -183,6 +182,48 @@ Trsf Trsf::Multiplied(Trsf rightTrsf) {
 /// <returns></returns>
 Trsf Trsf::Inverted() {
     return Trsf(GetOCC().Inverted());
+}
+
+Trsf Trsf::CreateDisplacement(Ax2 fromAx2,Ax2 toAx2)
+{
+    gp_Trsf t=GetOCC();
+    t.SetDisplacement( gp_Ax3(fromAx2), gp_Ax3(toAx2));
+    return Trsf(t);
+}
+
+Trsf Trsf::CreateTransformation(Ax2 fromAx2, Ax2 toAx2)
+{
+    gp_Trsf t = GetOCC();
+    t.SetTransformation(gp_Ax3(fromAx2), gp_Ax3(toAx2));
+    return Trsf(t);
+}
+
+Trsf Trsf::CreateTransformation(Ax2 toAx2)
+{
+    gp_Trsf t = GetOCC();
+    t.SetTransformation( gp_Ax3(toAx2));
+    return Trsf(t);
+}
+
+void Trsf::Init(gp_Trsf t) {
+    if (t.Form() == gp_TrsfForm::gp_Rotation)
+    {
+        myTranslation = XYZ::Default;
+        myRotation = Quat(t.GetRotation());
+        myScale = t.ScaleFactor();
+    }
+    if (t.Form() == gp_TrsfForm::gp_Translation)
+    {
+        myTranslation = XYZ(t.TranslationPart());
+        myRotation = Quat::Default;
+        myScale = t.ScaleFactor();
+    }
+    if (t.Form() == gp_TrsfForm::gp_CompoundTrsf)
+    {
+        myTranslation = XYZ(t.TranslationPart());
+        myRotation = Quat(t.GetRotation());
+        myScale = t.ScaleFactor();
+    }
 }
 
 }

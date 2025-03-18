@@ -10,6 +10,9 @@ namespace gp {
 value struct Trsf;
 value struct Pnt;
 }
+namespace Aspect {
+enum class TypeOfMarker;
+}
 }
 }
 
@@ -25,6 +28,7 @@ public:
 	APoint(gp::Pnt aPnt);
 public:
 	void SetWidth(double width);
+	void SetMakerType(Aspect::TypeOfMarker type);
 public:
 	Handle(AIS_Point) GetOCC() { return myPnt(); }
 };

@@ -11,23 +11,18 @@ namespace OCC {
 namespace gp {
 
 Ax1::Ax1(Pnt location, Dir direction) {
-    Location = location;
-    Direction = direction;
+    myLocation = location;
+    myDirection = direction;
 }
 
 Ax1::Ax1(Pnt fromPnt, Pnt toPnt) {
-    Location = fromPnt;
-    Direction = Dir(fromPnt, toPnt);
+    myLocation = fromPnt;
+    myDirection = Dir(fromPnt, toPnt);
 }
 
 Ax1::Ax1(gp_Ax1 theAx1) {
-    Location = Pnt(theAx1.Location());
-    Direction = Dir(theAx1.Direction());
-}
-
-Ax1::Ax1(gp_Ax1* theAx1) {
-    Location = Pnt(theAx1->Location());
-    Direction = Dir(theAx1->Direction());
+    myLocation = Pnt(theAx1.Location());
+    myDirection = Dir(theAx1.Direction());
 }
 
 gp_Ax1 Ax1::GetOCC() {
@@ -44,8 +39,8 @@ System::String^ Ax1::ToString() {
 
 //void Ax1::Transform(Trsf theT) {
 //	gp_Ax1 a = gp_Ax1(Location.GetOCC(), Direction).Transformed(theT);
-//	Location = Pnt(a.Location());
-//	Direction = Dir(a.Direction());
+//	location = Pnt(a.Location());
+//	direction = Dir(a.Direction());
 //}
 
 Ax1 Ax1::Transformed(Trsf theT) {

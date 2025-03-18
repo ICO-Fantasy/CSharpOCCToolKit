@@ -5,6 +5,9 @@
 namespace OCCTK {
 namespace OCC {
 namespace gp {
+value struct Vec;
+value struct Pnt;
+value struct Dir;
 }
 }
 }
@@ -16,6 +19,8 @@ namespace gp {
 
 public value struct XYZ :System::ICloneable {
 public:
+    const static XYZ Default = XYZ(0.0, 0.0, 0.0);
+public:
     XYZ(double x, double y, double z);
     XYZ(gp_XYZ xyz);
     gp_XYZ GetOCC();
@@ -23,16 +28,18 @@ public:
     virtual System::String^ ToString() override;
     //! 隐式转换为 gp_XYZ
     static operator gp_XYZ (XYZ xyz) { return xyz.GetOCC(); }
-    //! 隐式转换为 ( x, y, z)
-    static operator System::ValueTuple<double, double, double>(XYZ xyz) { return System::ValueTuple<double, double, double>(xyz.X, xyz.Y, xyz.Z); }
+private:
+    double myX;
+    double myY;
+    double myZ;
 public:
-    property double X;
-    property double Y;
-    property double Z;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y,
-        [System::Runtime::InteropServices::OutAttribute] double% z) {
+    property double X {double get() { return myX; }};
+    property double Y {double get() { return myY; }};
+    property double Z {double get() { return myZ; }};
+    // 解构赋值
+    void Deconstruct([System::Runtime::InteropServices::Out] double% x,
+        [System::Runtime::InteropServices::Out] double% y,
+        [System::Runtime::InteropServices::Out] double% z) {
         x = X;
         y = Y;
         z = Z;
@@ -42,9 +49,9 @@ public:
 
     bool Equals(XYZ other) {
         return (
-            X == X &&
-            Y == Y &&
-            Z == Z);
+            X == other.X &&
+            Y == other.Y &&
+            Z == other.Z);
     }
     static bool operator == (XYZ left, XYZ right) { return left.Equals(right); }//无精度
     static bool operator != (XYZ left, XYZ right) { return !left.Equals(right); }//无精度

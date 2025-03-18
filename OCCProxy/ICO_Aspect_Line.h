@@ -4,6 +4,9 @@ namespace OCCTK {
 namespace OCC {
 namespace Aspect {
 
+/// <summary>
+/// 线的类型
+/// </summary>
 public enum class Line {
 	Aspect_TOL_EMPTY = Aspect_TypeOfLine::Aspect_TOL_EMPTY,
 	Aspect_TOL_SOLID = Aspect_TypeOfLine::Aspect_TOL_SOLID,

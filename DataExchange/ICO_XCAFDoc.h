@@ -11,14 +11,14 @@ ref class XShape;
 namespace OCCTK {
 namespace Extension {
 
-public ref class XCAFDocExchange {
+public ref class XCAFDocExchanger {
 public:
-	XCAFDocExchange(const Handle(TDocStd_Document)& doc);
-	//static void test(System::String^ filePath);
-	XShape^ Shape();
+    XCAFDocExchanger(const Handle(TDocStd_Document)& doc);
+    //static void test(System::String^ filePath);
+    XShape^ Shape();
 private:
-	NCollection_Haft<Handle(TDocStd_Document)> myDoc;
-	XShape^ myShape;
+    NCollection_Haft<Handle(TDocStd_Document)> myDoc;
+    XShape^ myShape;
 };
 
 }

@@ -16,7 +16,6 @@ public:
 public:
     Pnt2D(double theX, double theY);
     Pnt2D(gp_Pnt2d thePnt);
-    Pnt2D(gp_Pnt2d* thePnt);
     virtual System::Object^ Clone();
     virtual System::String^ ToString() override;
     gp_Pnt2d GetOCC();
@@ -27,12 +26,15 @@ public:
     Pnt2D Transformed(Trsf T);
     Pnt2D SetX(double value);
     Pnt2D SetY(double value);
+private:
+    double x;
+    double y;
 public:
-    property double X;
-    property double Y;
-    // Deconstruct 方法
-    void Deconstruct([System::Runtime::InteropServices::OutAttribute] double% x,
-        [System::Runtime::InteropServices::OutAttribute] double% y) {
+    property double X {double get() { return x; }};
+    property double Y {double get() { return y; }};
+    // 解构赋值
+    void Deconstruct([System::Runtime::InteropServices::Out] double% x,
+        [System::Runtime::InteropServices::Out] double% y) {
         x = X;
         y = Y;
     }

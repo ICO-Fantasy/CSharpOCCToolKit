@@ -1,7 +1,7 @@
 ﻿#include "ICO_Topo_Vertex.h"
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Vertex.hxx>
 //local
 #include "ICO_Pnt.h"
 #include "ICO_Topo_Shape.h"
@@ -14,32 +14,22 @@ namespace OCC {
 namespace Topo {
 
 TVertex::TVertex() {
-	myShape = new TopoDS_Vertex();
+    myShape = new TopoDS_Vertex();
 }
 
 TVertex::TVertex(const TopoDS_Vertex theVertex) {
-	myShape = new TopoDS_Vertex(theVertex);
-}
-
-TVertex::TVertex(System::IntPtr theVertexIntPtr) {
-	// 将 IntPtr 转换为原生指针
-	TopoDS_Vertex* pShape = reinterpret_cast<TopoDS_Vertex*>(theVertexIntPtr.ToPointer());
-	myShape = pShape;
-}
-
-TVertex::TVertex(TopoDS_Vertex* theVertex) {
-	myShape = theVertex;
+    myShape = new TopoDS_Vertex(theVertex);
 }
 
 TopoDS_Vertex TVertex::GetOCC() {
-	return TopoDS::Vertex(*myShape);
+    return TopoDS::Vertex(*myShape);
 }
 
 gp::Pnt TVertex::ToPnt() {
-	try {
-		return Pnt(BRep_Tool::Pnt(GetOCC()));
-	}
-	CATCH_AND_THROW_OCC_EXCEPTIONS
+    try {
+        return Pnt(BRep_Tool::Pnt(GetOCC()));
+    }
+    CATCH_AND_THROW_OCC_EXCEPTIONS
 }
 
 }

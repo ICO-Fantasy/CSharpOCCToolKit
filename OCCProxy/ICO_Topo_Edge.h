@@ -9,11 +9,9 @@ namespace Topo {
 
 public ref class TEdge :TShape {
 public:
-	TEdge();
-	TEdge(const TopoDS_Edge theEdge);
-	TEdge(System::IntPtr theEdgeIntPtr);
-	TEdge(TopoDS_Edge* theEdge);
-	TopoDS_Edge GetOCC();
+    TEdge();
+    TEdge(const TopoDS_Edge theEdge);
+    TopoDS_Edge GetOCC();
 };
 
 }
