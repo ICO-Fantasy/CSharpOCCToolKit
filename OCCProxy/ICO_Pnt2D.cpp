@@ -46,7 +46,7 @@ Pnt2D Pnt2D::Transformed(Trsf T) {
 /// </summary>
 /// <param name="value"></param>
 /// <returns></returns>
-Pnt2D Pnt2D::SetX(double value) {
+Pnt2D Pnt2D::UpdateX(double value) {
     return Pnt2D(value, Y);
 }
 
@@ -55,7 +55,7 @@ Pnt2D Pnt2D::SetX(double value) {
 /// </summary>
 /// <param name="value"></param>
 /// <returns></returns>
-Pnt2D Pnt2D::SetY(double value) {
+Pnt2D Pnt2D::UpdateY(double value) {
     return Pnt2D(X, value);
 }
 

@@ -24,8 +24,8 @@ public:
 public:
     double Distance(Pnt2D otherPnt);
     Pnt2D Transformed(Trsf T);
-    Pnt2D SetX(double value);
-    Pnt2D SetY(double value);
+    Pnt2D UpdateX(double value);
+    Pnt2D UpdateY(double value);
 private:
     double x;
     double y;
