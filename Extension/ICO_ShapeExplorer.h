@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "..\OCCProxy\ICO_ShapeEnum.h"
 #include "..\OCCProxy\ICO_Topo_Shape.h"
 #include <stack>
@@ -6,8 +6,8 @@
 #include <TopoDS_Iterator.hxx>
 
 
-// æ¯”è¾ƒshapeçš„ç±»å‹
-// æ€»æ˜¯è¿”å› True å¦‚æœç¬¬ä¸€ä¸ªæ˜¯ SHAPE
+// ±È½ÏshapeµÄÀàĞÍ
+// ×ÜÊÇ·µ»Ø True Èç¹ûµÚÒ»¸öÊÇ SHAPE
 #define SAMETYPE(x,y) ((x) == (y))
 #define AVOID(x,y) (((x) == TopAbs_SHAPE) ? false : (x) == (y))
 #define LESSCOMPLEX(x,y) ((x) > (y))
@@ -23,8 +23,7 @@ ref class TShape;
 }
 }
 
-namespace OCCTK {
-namespace Extension {
+namespace OCCTK::Extension {
 
 public ref class Explorer : System::Collections::Generic::IEnumerable<OCC::Topo::TShape^>
 {
@@ -45,26 +44,42 @@ public:
 	{
 	}
 
+	/// <summary>
+	/// »ñÈ¡µü´úÆ÷
+	/// </summary>
+	/// <returns></returns>
 	virtual System::Collections::Generic::IEnumerator<OCC::Topo::TShape^>^ GetEnumerator() sealed = System::Collections::Generic::IEnumerable<OCC::Topo::TShape^>::GetEnumerator
 	{
 		return gcnew TopoDS_ShapeEnumerator(this);
 	}
-
-		virtual System::Collections::IEnumerator^ EnumerableGetEnumerator() sealed = System::Collections::IEnumerable::GetEnumerator
+	/// <summary>
+	/// »ñÈ¡ÆğÊ¼µÄµü´úÆ÷
+	/// </summary>
+	/// <returns></returns>
+	virtual System::Collections::IEnumerator^ EnumerableGetEnumerator() sealed = System::Collections::IEnumerable::GetEnumerator
 	{
 		return GetEnumerator();
 	}
-
 private:
+/// <summary>
+/// µü´úÆ÷¶¨Òå
+/// </summary>
 	ref struct TopoDS_ShapeEnumerator : public System::Collections::Generic::IEnumerator<OCC::Topo::TShape^> {
 	private:
-		// native members
+		// Ô­Ê¼ÀàĞÍ
+		// µü´úÆ÷¶ÑÕ»
 		std::stack<::TopoDS_Iterator*>* _iteratorStack;
+        // µ±Ç°µÄĞÎ×´
 		const ::TopoDS_Shape* _Shape;
+        // Ñ°ÕÒµÄÀàĞÍ
 		::TopAbs_ShapeEnum _ToFind;
+        // ±ÜÃâµÄÀàĞÍ
 		::TopAbs_ShapeEnum _ToAvoid;
+		//·½ÏòÊÇ·ñÒ»ÖÂ
 		bool _CumOrientation;
+		//Î»ÖÃÊÇ·ñÒ»ÖÂ
 		bool _CumLocation;
+		// ÊÇ·ñ³õÊ¼»¯
 		bool _Initialized;
 
 	internal:
@@ -82,8 +97,7 @@ private:
 	public:
 		property OCC::Topo::TShape^ Current {
 			virtual OCC::Topo::TShape^ get() {
-				::TopoDS_Shape* _result = new ::TopoDS_Shape(_iteratorStack->top()->Value());
-				return gcnew OCC::Topo::TShape(*_result);
+				return gcnew OCC::Topo::TShape(_iteratorStack->top()->Value());
 			}
 		};
 
@@ -110,13 +124,11 @@ private:
 
 		bool _FindNext()
 		{
-			// No more elements
 			if (_iteratorStack->empty())
 				return false;
 
 			if (!_iteratorStack->top()->More())
 			{
-				// Current iterator is empty
 				delete _iteratorStack->top();
 				_iteratorStack->pop();
 				return MoveNext();
@@ -166,11 +178,12 @@ private:
 
 			if (LESSCOMPLEX(shapeType, _ToFind))
 			{
-				// the first Shape is less complex, nothing to find
+				//ÊäÈëµÄÀàĞÍÃ»ÓĞÒªÕÒµÄÀàĞÍ¸´ÔÓ£¬Ã»ÓĞÕÒµ½
 				return false;
 			}
 			else if (SAMETYPE(shapeType, _ToFind))
 			{
+				// ÊäÈëµÄÀàĞÍºÍÒªÕÒµÄÀàĞÍÒ»ÖÂ£¬Ã»ÓĞÕÒµ½
 				return false;
 			}
 
@@ -180,7 +193,7 @@ private:
 			return _FindNext();
 		}
 	};
+
 };
 
-}
 }

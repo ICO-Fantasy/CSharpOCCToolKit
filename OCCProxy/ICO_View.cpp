@@ -1,13 +1,16 @@
 ﻿#include "ICO_View.h"
 #include <V3d_View.hxx>
 #include <WNT_Window.hxx>
+#include <Graphic3d_RenderingMode.hxx>
+#include <windef.h>
 //local
 #include "ICO_Graphic3d_Camera.h"
 #include "ICO_Pnt.h"
 #include "ICO_Vec.h"
 #include "ICO_Dir.h"
+#include "ICO_ViewOrientation.h"
 #include "..\Extension\ICO_CameraOrientation.h"
-#include <windef.h>
+#include "../Extension/ICO_Color.h"
 
 using namespace OCCTK::OCC::Graphic3d;
 using namespace OCCTK::OCC::gp;
@@ -32,6 +35,7 @@ View::View(const Handle(V3d_View)& theView) :BaseObject(theView) {
 View::View(const Handle(V3d_View)& theView, System::IntPtr theWnd) :BaseObject() {
     NativeHandle = theView;
     this->SetWindow(theWnd);
+    this->SetDefault();
 }
 
 
@@ -76,6 +80,7 @@ void View::SetDefaultRendering() {
     myView()->ChangeRenderingParams().CollectedStats = Graphic3d_RenderingParams::PerfCounters_NONE;
 }
 
+
 /// <summary>
 /// 设置自定义的渲染参数
 /// </summary>
@@ -100,7 +105,16 @@ void View::SetICORendering() {
 /// <summary>
 /// 设置默认背景颜色
 /// </summary>
-void View::SetDefaultBGColor() {
+void View::SetDefaultBGColor()
+{
+    if (myView().IsNull()) { return; }
+    myView()->SetBgGradientColors(Color(15,15,15), Color(244,244,244), Aspect_GradientFillMethod_Vertical, true);
+}
+
+/// <summary>
+/// 设置蓝绿色渐变背景颜色
+/// </summary>
+void View::SetICOBGColor() {
     if (myView().IsNull()) { return; }
     myView()->SetBgGradientColors(Quantity_Color(37. / 255., 55. / 255., 113. / 255., Quantity_TOC_RGB), Quantity_Color(36. / 255., 151. / 255., 132. / 255., Quantity_TOC_RGB), Aspect_GradientFillMethod_Vertical, true);
 }

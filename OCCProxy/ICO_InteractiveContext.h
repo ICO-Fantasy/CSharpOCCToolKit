@@ -20,6 +20,9 @@ namespace V3d {
 ref class Viewer;
 ref class View;
 }
+namespace gp {
+value struct Trsf;
+}
 }
 }
 
@@ -101,6 +104,16 @@ public:
 
     bool IsSelected(void);
     bool IsDisplayed(InteractiveObject^ theAISObject);
+#pragma endregion
+
+#pragma region 位置
+
+    void SetLocation(InteractiveObject^ theAISObject, gp::Trsf trsf);
+    void ResetLocation(InteractiveObject^ theAISObject);
+    bool HasLocation(InteractiveObject^ theAISObject);
+    gp::Trsf Location(InteractiveObject^ theAISObject);
+
+
 #pragma endregion
 
 };

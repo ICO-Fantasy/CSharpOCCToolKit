@@ -1,20 +1,20 @@
 ﻿#pragma once
 #include <V3d_View.hxx>
 //local
-#include "..\Extension\ICO_Color.h"
 #include "ICO_BaseObject.h"
-#include "ICO_ViewOrientation.h"
-using namespace OCCTK::Extension;
 
 namespace OCCTK {
 namespace Extension {
 ref class CameraOrientation;
+value struct Color;
 }
 namespace OCC {
 namespace Graphic3d {
 ref class Camera;
 }
 namespace V3d {
+
+enum class ViewOrientation;
 
 public ref class View :BaseObject {
 private:
@@ -30,11 +30,12 @@ public:
     void Remove();
     void SetDefault();
     void SetDefaultRendering();
-    void SetICORendering();
     void SetDefaultBGColor();
-    void SetBgGradientColors(Color C1, Color C2, bool update);
+    void SetBgGradientColors(Extension::Color C1, Extension::Color C2, bool update);
     double GetScale();
-
+public:
+    void SetICORendering();
+    void SetICOBGColor();
 #pragma region 渲染
 
     void Update();
@@ -73,8 +74,8 @@ public:
     Graphic3d::Camera^ Camera();
     void SetCamera(Graphic3d::Camera^ camera);
 
-    CameraOrientation^ CurrentViewOrientation();
-    void SetViewOrientation(CameraOrientation^ theOrientation, bool update);
+    Extension::CameraOrientation^ CurrentViewOrientation();
+    void SetViewOrientation(Extension::CameraOrientation^ theOrientation, bool update);
 #pragma endregion
 
 

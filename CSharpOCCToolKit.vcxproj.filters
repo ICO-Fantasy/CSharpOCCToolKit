@@ -216,6 +216,12 @@
     <Filter Include="源文件\OCCProxy\GCPnts">
       <UniqueIdentifier>{f1aeb6d4-0658-45f6-9190-aef8e00a3b86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\OCCProxy\TopExp">
+      <UniqueIdentifier>{82d5d535-1d4d-401b-914c-64032decb515}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\OCCProxy\TopExp">
+      <UniqueIdentifier>{b0fe0b62-dd41-48c9-8621-4128df8ede7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OCCProxy\ICO_InteractiveObject.cpp">
@@ -451,6 +457,9 @@
     </ClCompile>
     <ClCompile Include="OCCProxy\ICO_MakePrism.cpp">
       <Filter>源文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="OCCProxy\ICO_TopExp_Explorer.cpp">
+      <Filter>源文件\OCCProxy\TopExp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -751,11 +760,14 @@
     <ClInclude Include="OCCProxy\ICO_Aspect_TypeOfMarker.h">
       <Filter>头文件\OCCProxy\Aspect</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\ICO_TopExp_Explorer.h">
-      <Filter>头文件\Extension</Filter>
-    </ClInclude>
     <ClInclude Include="OCCProxy\ICO_MakePrism.h">
       <Filter>头文件\OCCProxy\BRepPrimAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="OCCProxy\ICO_TopExp_Explorer.h">
+      <Filter>头文件\OCCProxy\TopExp</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\ICO_ShapeExplorer.h">
+      <Filter>头文件\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

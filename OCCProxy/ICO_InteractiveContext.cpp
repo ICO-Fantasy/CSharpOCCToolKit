@@ -12,8 +12,11 @@
 #include "..\Extension\ICO_Color.h"
 #include "ICO_Exception.h"
 #include "ICO_BaseObject.h"
+#include "ICO_Trsf.h"
+#include <TopLoc_Location.hxx>
 
 using namespace OCCTK::OCC::V3d;
+using namespace OCCTK::OCC::gp;
 
 namespace OCCTK {
 namespace OCC {
@@ -548,6 +551,41 @@ bool InteractiveContext::IsSelected(void) {
 bool InteractiveContext::IsDisplayed(InteractiveObject^ theAISObject) {
     if (myAISContext().IsNull()) return false;
     return myAISContext()->IsDisplayed(theAISObject);
+}
+
+/// <summary>
+/// 设置AIS对象位置
+/// </summary>
+/// <param name="theAISObject"></param>
+/// <param name="trsf"></param>
+void InteractiveContext::SetLocation(InteractiveObject^ theAISObject, Trsf trsf)
+{
+    if (myAISContext().IsNull()) return ;
+    return myAISContext()->SetLocation(theAISObject,TopLoc_Location(trsf));
+}
+
+/// <summary>
+/// 重设AIS对象位置
+/// </summary>
+/// <param name="theAISObject"></param>
+void InteractiveContext::ResetLocation(InteractiveObject^ theAISObject)
+{
+    if (myAISContext().IsNull()) return;
+    return myAISContext()->ResetLocation(theAISObject);
+}
+
+/// <summary>
+/// 是否设置过位置
+/// </summary>
+bool InteractiveContext::HasLocation(InteractiveObject^ theAISObject)
+{
+    if (myAISContext().IsNull()) return false;
+    return myAISContext()->HasLocation(theAISObject);
+}
+
+gp::Trsf InteractiveContext::Location(InteractiveObject^ theAISObject)
+{
+    return gp::Trsf(myAISContext()->Location(theAISObject).Transformation());
 }
 
 }
